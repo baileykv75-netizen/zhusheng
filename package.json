@@ -1,0 +1,30 @@
+{
+  "name": "zhusheng-building-agent",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "筑生：一栋房子一生的AI智能体",
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0 -p 4173",
+    "build": "next build",
+    "start": "next start -H 0.0.0.0 -p 4173",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-strip-types tests/*.test.ts",
+    "package:submission": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/package-submission.ps1"
+  },
+  "dependencies": {
+    "lucide-react": "^0.468.0",
+    "next": "^15.5.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
