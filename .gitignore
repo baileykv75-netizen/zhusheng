@@ -1,4 +1,6 @@
 .next/
+.open-next/
+dist/
 node_modules/
 .env
 .env.local

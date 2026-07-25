@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = "edge";
-
 const allowedTasks = ["structure_evidence", "explain_diagnosis", "summarize_workorder"] as const;
 type Task = (typeof allowedTasks)[number];
 
