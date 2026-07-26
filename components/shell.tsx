@@ -26,6 +26,7 @@ const navigation = [
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const currentPath = pathname.length > 1 ? pathname.replace(/\/+$/, "") : "/";
   const { state, start, next, previous, reset, exit, goToChapter } = useDemo();
   const chapter = state.currentStep === 1 ? 1 : state.currentStep;
   const activeStep = chapter ? demoSteps[chapter - 1] : null;
@@ -48,7 +49,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </Link>
         <nav className="rail-nav" aria-label="产品视角">
           {navigation.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} className={pathname === href ? "active" : ""} title={label} aria-current={pathname === href ? "page" : undefined}>
+            <Link key={href} href={href} className={currentPath === href ? "active" : ""} title={label} aria-current={currentPath === href ? "page" : undefined}>
               <Icon size={19} />
               <span>{label}</span>
             </Link>
@@ -115,7 +116,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
       <nav className="mobile-nav" aria-label="移动端产品视角">
         {navigation.map(({ href, short, icon: Icon }) => (
-          <Link key={href} href={href} className={pathname === href ? "active" : ""} aria-current={pathname === href ? "page" : undefined}>
+          <Link key={href} href={href} className={currentPath === href ? "active" : ""} aria-current={currentPath === href ? "page" : undefined}>
             <Icon size={18} /><span>{short}</span>
           </Link>
         ))}

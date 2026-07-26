@@ -96,6 +96,7 @@ for (const width of [1366, 768]) {
   const responsive = await browser.newContext({ viewport: { width, height: width === 768 ? 1024 : 768 } });
   const responsivePage = await responsive.newPage();
   await responsivePage.goto(`${baseUrl}/group`, { waitUntil: "networkidle" });
+  await responsivePage.locator('[aria-current="page"]').first().waitFor({ state: "attached" });
   await assertNoOverflow(responsivePage, `group ${width}`);
   assert.equal(await responsivePage.locator('[aria-current="page"]').count() >= 1, true);
   await responsive.close();
