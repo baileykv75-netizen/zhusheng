@@ -97,6 +97,7 @@ function decodeBase64(value) {
 
 function assetPath(pathname) {
   if (pathname === "/") return "/index.html";
+  if (pathname === "/favicon.ico" && ASSETS.has("/icon.svg")) return "/icon.svg";
   if (ASSETS.has(pathname)) return pathname;
   const clean = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
   if (!clean.includes(".") && ASSETS.has(clean + "/index.html")) return clean + "/index.html";
