@@ -3,6 +3,7 @@
 import { Check, ChevronDown, FileCheck2, Gauge, ImagePlus, LockKeyhole, ShieldAlert, Undo2, Waves } from "lucide-react";
 import { useState } from "react";
 import { SceneStage } from "@/components/scene-stage";
+import { EvidenceStrip } from "@/components/evidence-viewer";
 import { TelemetryChart } from "@/components/telemetry-chart";
 import { useDemo } from "@/components/demo-provider";
 
@@ -22,6 +23,8 @@ export default function ResidentPage() {
   const pendingAction = state.actions.find((action) => action.status === "pending");
   const completedTasks = Number(meterConfirmed) + Number(photoAdded);
   const stepChange = changeByStep[state.currentStep];
+  const scene = state.currentStep >= 5 ? (state.valve.status === "closed" ? "valveClosed" : "valveOpen") : "bathroomMoisture";
+  const overlay = state.currentStep === 3 ? "moisture" : state.currentStep === 4 ? "memory-xray" : "none";
 
   function executeAuthorization() {
     setExecuting(true);
@@ -31,11 +34,17 @@ export default function ResidentPage() {
   return (
     <SceneStage
       view="resident"
+      scene={scene}
+      overlay={overlay}
+      preload={["bathroomMoisture", "valveOpen", "valveClosed", "repairValidation"]}
       focus="pipe-joint"
       activeFlow={Boolean(incident && incident.status !== "resolved")}
-      cues={incident ? [
-        { id: "joint", label: "W-1602-B7", detail: `${incident.confidence}% 疑似漏点`, x: 29, y: 44, tone: state.currentStep >= 6 ? "safe" : "risk" },
-        { id: "sensor", label: "S-M1602-04", detail: `墙体湿度 ${state.currentStep >= 6 ? "38" : "41"}%`, x: 42, y: 58, tone: state.currentStep >= 6 ? "safe" : "water" }
+      cues={incident ? scene === "bathroomMoisture" ? [
+        { id: "surface", label: "潮湿区域", detail: `墙体湿度 ${state.currentStep >= 6 ? "38" : "41"}%`, x: 42, y: 46, tone: "risk" },
+        { id: "sensor", label: "S-M1602-04", detail: "持续异常已确认", x: 35, y: 58, tone: "water" }
+      ] : [
+        { id: "valve", label: "V-16F-02-B", detail: state.valve.status === "closed" ? "局部进水阀 · 已关闭" : "局部进水阀 · 待授权", x: 35, y: 20, tone: state.valve.status === "closed" ? "safe" : "risk" },
+        { id: "joint", label: "W-1602-B7", detail: state.valve.status === "closed" ? "微流量 0 L/min" : `${incident.confidence}% 疑似漏点`, x: 38, y: 50, tone: state.valve.status === "closed" ? "safe" : "risk" }
       ] : []}
     >
       <header className="stage-heading compact resident-stage-heading">
@@ -59,12 +68,13 @@ export default function ResidentPage() {
 
             {stepChange ? <section className={`step-change step-${state.currentStep}`}><div><strong>{stepChange.title}</strong><em>第{state.currentStep}章</em></div><ul>{stepChange.items.map((item) => <li key={item}><Check size={12} />{item}</li>)}</ul></section> : null}
 
-            <section className="diagnosis-card">
+            <section className={pendingAction ? "diagnosis-card authorization-compact" : "diagnosis-card"}>
               <div className="dossier-section-title"><span>联合诊断结论</span><em>诊断置信度 {incident.confidence}%</em></div>
               <p>{incident.diagnosis}</p>
               <div className="confidence-rail" aria-label={`诊断置信度${incident.confidence}%`}><i style={{ width: `${incident.confidence}%` }} /></div>
               {state.currentStep >= 5 ? <div className="confidence-reason"><strong>置信度由56%提升至86%</strong><span>原因：停水后仍有微流量，且潮湿位置与支管接头空间关系吻合。</span></div> : null}
-              <details className="reference-vault"><summary>关联证据 <span>{state.evidence.length}条</span><ChevronDown size={14} /></summary><div>{state.evidence.map((record) => <span key={record.id}><FileCheck2 size={12} />{record.id} · {record.type}</span>)}</div></details>
+              <details className="reference-vault"><summary>关联证据 <span>{state.evidence.length}条</span><ChevronDown size={14} /></summary><div>{state.evidence.map((record) => <span key={record.id}><FileCheck2 size={12} />{record.id} · {record.type}</span>)}</div>{state.currentStep >= 4 ? <EvidenceStrip ids={["joint", "pressure"]} label="建造阶段关联影像" /> : null}</details>
+              {state.currentStep >= 5 ? <EvidenceStrip ids={["dampWall", "waterMeter"]} label="住户本步补充证据" /> : null}
             </section>
 
             {state.currentStep === 3 ? <section className="chapter-action"><p>下一步将调用建造阶段的品质证据，判断异常是否与隐蔽管线有关。</p><button className="stage-decision" onClick={next}>启动跨阶段诊断</button></section> : null}
@@ -74,6 +84,7 @@ export default function ResidentPage() {
                 <div className="dossier-section-title"><span>待补充任务</span><em>已完成 {completedTasks}/2</em></div>
                 <button className={meterConfirmed ? "supplement-task complete" : "supplement-task"} onClick={() => setMeterConfirmed((value) => !value)}><Gauge size={17} /><span><strong>确认停用水后水表状态</strong><small>{meterConfirmed ? "已确认仍缓慢转动 · 有助于排除生活用水" : "待住户确认"}</small></span><i>{meterConfirmed ? <Check size={12} /> : "1"}</i></button>
                 <button className={photoAdded ? "supplement-task complete" : "supplement-task"} onClick={() => setPhotoAdded(true)}><ImagePlus size={17} /><span><strong>补充墙面潮湿区域照片</strong><small>{photoAdded ? "照片已选择 · 用于比对构件空间位置" : "待添加照片"}</small></span><i>{photoAdded ? <Check size={12} /> : "2"}</i></button>
+                {completedTasks > 0 ? <EvidenceStrip ids={[...(photoAdded ? ["dampWall" as const] : []), ...(meterConfirmed ? ["waterMeter" as const] : [])]} label="本次住户补充" /> : null}
                 <button className="stage-decision" disabled={completedTasks < 2} onClick={next}>提交信息并更新诊断</button>
                 {completedTasks < 2 ? <p className="disabled-reason">完成两项现场信息后才能更新诊断；引导演示可使用示例信息继续。</p> : null}
               </section>

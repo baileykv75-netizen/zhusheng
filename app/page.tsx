@@ -1,22 +1,35 @@
 "use client";
 
-import { Activity, Check, ChevronRight, Layers3, MapPin, Radio, Waves, X } from "lucide-react";
+import { Activity, Building2, Check, ChevronRight, Layers3, MapPin, Radio, Waves, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { SceneStage } from "@/components/scene-stage";
 import { useDemo } from "@/components/demo-provider";
-import type { VisualCue } from "@/lib/stage";
+import type { SceneId, VisualCue } from "@/lib/stage";
 
-const layers = ["空间", "给排水", "设备"] as const;
+const layers = ["总览", "空间", "给排水", "设备"] as const;
 type Layer = (typeof layers)[number];
 
 const layerData: Record<Layer, {
   title: string;
   subtitle: string;
+  scene: SceneId;
   cues: VisualCue[];
   metrics: [string, string, string][];
   legend: string[];
 }> = {
+  总览: {
+    scene: "buildingOverview",
+    title: "1602 · 建筑生命入口",
+    subtitle: "华章新筑2号楼 / 16F",
+    cues: [
+      { id: "building", label: "BLD-HZZ-02", detail: "运营第1684天", x: 43, y: 70, tone: "safe" },
+      { id: "room-entry", label: "16F · 1602", detail: "建筑记忆可进入", x: 48, y: 39, tone: "water" }
+    ],
+    metrics: [["运营天数", "1684", "天"], ["生命记忆", "94.2", "%"], ["专业智能体", "6", "个"]],
+    legend: ["建筑主体", "1602入口"]
+  },
   空间: {
+    scene: "buildingSpace",
     title: "1602 · 空间记忆",
     subtitle: "16F / MiC卫生间模块",
     cues: [
@@ -27,6 +40,7 @@ const layerData: Record<Layer, {
     legend: ["房间边界", "MiC模块"]
   },
   给排水: {
+    scene: "buildingWater",
     title: "1602 · 给排水系统",
     subtitle: "冷热水立管 / 支管 / 局部阀门",
     cues: [
@@ -37,6 +51,7 @@ const layerData: Record<Layer, {
     legend: ["冷热水管线", "局部阀门"]
   },
   设备: {
+    scene: "buildingDevices",
     title: "1602 · 设备状态",
     subtitle: "传感器 / 水表 / 阀门",
     cues: [
@@ -51,7 +66,7 @@ const layerData: Record<Layer, {
 
 export default function BuildingWorkbench() {
   const { state } = useDemo();
-  const [layer, setLayer] = useState<Layer>("给排水");
+  const [layer, setLayer] = useState<Layer>("总览");
   const [lensOpen, setLensOpen] = useState(false);
   const hotspotRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -69,7 +84,14 @@ export default function BuildingWorkbench() {
   }
 
   return (
-    <SceneStage view="building" focus={lensOpen ? "room-1602" : "overview"} activeFlow={layer === "给排水" && hasOpenIncident} cues={config.cues}>
+    <SceneStage
+      view="building"
+      scene={config.scene}
+      focus={lensOpen ? "room-1602" : "overview"}
+      preload={["buildingSpace", "buildingWater", "buildingDevices", "bathroomConstruction"]}
+      activeFlow={layer === "给排水" && hasOpenIncident}
+      cues={config.cues}
+    >
       <header className="stage-heading building-heading">
         <span className="stage-kicker">建筑生命 · 运营第1684天</span>
         <h1>一栋楼，<br />正在工作。</h1>
@@ -79,7 +101,7 @@ export default function BuildingWorkbench() {
       <div className="layer-console" role="group" aria-label="建筑图层">
         {layers.map((item) => (
           <button key={item} className={layer === item ? "active" : ""} aria-pressed={layer === item} onClick={() => setLayer(item)}>
-            {item === "空间" ? <MapPin size={14} /> : item === "给排水" ? <Waves size={14} /> : <Layers3 size={14} />}{item}
+            {item === "总览" ? <Building2 size={14} /> : item === "空间" ? <MapPin size={14} /> : item === "给排水" ? <Waves size={14} /> : <Layers3 size={14} />}{item}
           </button>
         ))}
       </div>
