@@ -39,28 +39,24 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <small>建筑全生命周期智能体</small>
           </span>
         </Link>
+        <nav className="section-nav" aria-label="产品视角">
+          {navigation.map(({ href, label, icon: Icon }) => (
+            <Link key={href} href={href} className={pathname === href ? "active" : ""}>
+              <Icon size={15} />
+              <span>{label}</span>
+            </Link>
+          ))}
+        </nav>
         <div className="project-context">
-          <span>华章新筑 · 2号楼</span>
+          <span className="project-name">华章新筑 · 2号楼</span>
           <span className="project-code">BLD-HZZ-02</span>
-          <span className={`runtime ${state.runtimeMode}`}>
-            <i />
-            {state.runtimeMode === "ai" ? "AI在线" : state.runtimeMode === "degraded" ? "降级运行" : "演示回退"}
-          </span>
+          <span className={`runtime ${state.runtimeMode}`}><i />{state.runtimeMode === "ai" ? "AI在线" : state.runtimeMode === "degraded" ? "降级运行" : "演示回退"}</span>
         </div>
         <button className="primary-action" onClick={start}>
           <ArrowRight size={16} />
-          开始2分钟演示
+          <span>开始演示</span>
         </button>
       </header>
-
-      <nav className="section-nav" aria-label="产品视角">
-        {navigation.map(({ href, label, icon: Icon }) => (
-          <Link key={href} href={href} className={pathname === href ? "active" : ""}>
-            <Icon size={16} />
-            <span>{label}</span>
-          </Link>
-        ))}
-      </nav>
 
       <main>{children}</main>
 
@@ -73,11 +69,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="demo-task">
             <strong>{activeStep.label}</strong>
             <span>{activeStep.task}</span>
-          </div>
-          <div className="demo-progress" aria-label={`演示进度 ${state.currentStep}/7`}>
-            {demoSteps.map((step, index) => (
-              <i key={step.id} className={index < state.currentStep ? "done" : ""} />
-            ))}
           </div>
           <div className="demo-buttons">
             <button className="icon-action" onClick={previous} aria-label="上一步" title="上一步">
@@ -101,6 +92,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <span><ShieldCheck size={14} /> 演示数据 · 不含真实住户与工友信息</span>
         <span>筑生 v2.0</span>
       </footer>
+
+      <nav className="mobile-nav" aria-label="移动端产品视角">
+        {navigation.map(({ href, label, icon: Icon }) => (
+          <Link key={href} href={href} className={pathname === href ? "active" : ""}>
+            <Icon size={18} /><span>{label}</span>
+          </Link>
+        ))}
+      </nav>
     </div>
   );
 }

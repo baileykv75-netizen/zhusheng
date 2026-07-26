@@ -13,8 +13,8 @@ export default function ResidentPage() {
     <div className="page resident-page">
       <div className="page-heading compact">
         <div>
-          <span className="eyebrow">INCIDENT RESPONSE / 1602</span>
-          <h1>住户事件处置</h1>
+          <span className="eyebrow">1602卫生间 · 水系统事件</span>
+          <h1>从异常到处置，每一步都有依据</h1>
         </div>
         <div className={incident ? "incident-state active" : "incident-state"}>
           <i />
@@ -31,7 +31,7 @@ export default function ResidentPage() {
         </section>
       ) : (
         <section className="incident-workspace">
-          <div className="incident-journal">
+          <div className="incident-analysis">
             <header className="incident-title">
               <AlertTriangle size={21} />
               <div>
@@ -40,34 +40,6 @@ export default function ResidentPage() {
               </div>
               <em>{incident.status === "resolved" ? "已恢复" : incident.status === "dispatched" ? "维修中" : "分析中"}</em>
             </header>
-            <div className="event-timeline">
-              {incident.timeline.map((item, index) => (
-                <div key={`${item.time}-${index}`}>
-                  <time>{item.time}</time>
-                  <i className={index === incident.timeline.length - 1 ? "current" : ""} />
-                  <span><strong>{item.actor}</strong><small>{item.text}</small></span>
-                </div>
-              ))}
-            </div>
-            {incident.missing.length > 0 ? (
-              <section className="resident-inputs">
-                <div className="subheading"><span>住户补充信息</span><em>{incident.missing.length}项待补充</em></div>
-                <label className="meter-answer">
-                  <Gauge size={18} />
-                  <span><strong>停用水后水表状态</strong><small>水表仍在缓慢转动</small></span>
-                  <input type="checkbox" defaultChecked aria-label="确认停用水后水表仍转动" />
-                </label>
-                <button className="photo-upload"><ImagePlus size={18} />补充墙面潮湿区域照片</button>
-                <button className="record-submit" onClick={next}>提交并继续联合诊断</button>
-              </section>
-            ) : null}
-          </div>
-
-          <div className="incident-analysis">
-            <section className="analysis-block">
-              <div className="subheading"><span>传感趋势</span><em>S-M1602-04 / F-1602-01</em></div>
-              <TelemetryChart />
-            </section>
             <section className="analysis-block diagnosis-block">
               <div className="subheading"><span>联合诊断</span><em>{incident.confidence}% CONF.</em></div>
               <p>{incident.diagnosis}</p>
@@ -77,6 +49,10 @@ export default function ResidentPage() {
                   <span key={ref}><FileCheck2 size={13} />{ref}</span>
                 ))}
               </div>
+            </section>
+            <section className="analysis-block telemetry-block">
+              <div className="subheading"><span>传感趋势</span><em>S-M1602-04 / F-1602-01</em></div>
+              <TelemetryChart />
             </section>
 
             {pendingAction ? (
@@ -98,6 +74,33 @@ export default function ResidentPage() {
               </section>
             ) : null}
           </div>
+
+          <aside className="incident-journal">
+            {incident.missing.length > 0 ? (
+              <section className="resident-inputs">
+                <div className="subheading"><span>住户补充信息</span><em>{incident.missing.length}项待补充</em></div>
+                <label className="meter-answer">
+                  <Gauge size={18} />
+                  <span><strong>停用水后水表状态</strong><small>水表仍在缓慢转动</small></span>
+                  <input type="checkbox" defaultChecked aria-label="确认停用水后水表仍转动" />
+                </label>
+                <button className="photo-upload"><ImagePlus size={18} />补充墙面潮湿区域照片</button>
+                <button className="record-submit" onClick={next}>提交并继续联合诊断</button>
+              </section>
+            ) : null}
+            <details className="timeline-disclosure">
+              <summary>事件与智能体协作记录 <span>{incident.timeline.length}条</span></summary>
+              <div className="event-timeline">
+                {incident.timeline.map((item, index) => (
+                  <div key={`${item.time}-${index}`}>
+                    <time>{item.time}</time>
+                    <i className={index === incident.timeline.length - 1 ? "current" : ""} />
+                    <span><strong>{item.actor}</strong><small>{item.text}</small></span>
+                  </div>
+                ))}
+              </div>
+            </details>
+          </aside>
         </section>
       )}
     </div>

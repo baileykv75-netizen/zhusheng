@@ -13,9 +13,9 @@ export default function GroupPage() {
     <div className="page group-page">
       <div className="group-heading">
         <div>
-          <span className="eyebrow">GROUP QUALITY INTELLIGENCE</span>
-          <h1>集团建筑群质量运行</h1>
-          <p>12个在建及运营项目 · 数据口径截至2026.07.25 18:36</p>
+          <span className="eyebrow">集团质量运行 · 12个项目</span>
+          <h1>让一栋楼的经验，成为下一批楼的标准</h1>
+          <p>5个在建项目与7个运营项目正在共享可追溯的质量经验。</p>
         </div>
         <div className="group-mark">CSCI<span>示范样板</span></div>
       </div>
@@ -23,11 +23,10 @@ export default function GroupPage() {
       <section className="portfolio-summary">
         <div><span>在管建筑</span><strong>12</strong><small>5在建 / 7运营</small></div>
         <div><span>建筑生命记忆</span><strong>94.2%</strong><small>关键证据完整率</small></div>
-        <div><span>待处理质量事件</span><strong>{state.incident && state.incident.status !== "resolved" ? "07" : "06"}</strong><small>较上周 -2</small></div>
         <div><span>本月标准建议</span><strong>{feedback ? "04" : "03"}</strong><small>2项进入评审</small></div>
       </section>
 
-      <section className="group-grid">
+      <section className="group-primary">
         <div className="enterprise-panel project-register">
           <header><span>项目群质量摘要</span><em>PORTFOLIO / 12</em></header>
           <table>
@@ -39,45 +38,6 @@ export default function GroupPage() {
               <tr><td><strong>新城保障房三期</strong><small>BLD-XC-07</small></td><td>交付</td><td>91.4%</td><td>3</td><td><span className="trend watch">关注</span></td></tr>
             </tbody>
           </table>
-        </div>
-
-        <div className="enterprise-panel issue-panel">
-          <header><span>跨项目共性问题</span><em>LAST 90 DAYS</em></header>
-          <div className="issue-bars">
-            {[
-              ["管线接口", 68, "18"],
-              ["防水收口", 47, "12"],
-              ["门窗密封", 32, "08"],
-              ["设备调试", 24, "06"]
-            ].map(([name, width, count]) => (
-              <div key={name}><span>{name}</span><i><b style={{ width: `${width}%` }} /></i><em>{count}</em></div>
-            ))}
-          </div>
-          <div className="quality-note"><Factory size={17} /><span><strong>PPR支管接口</strong><small>在3个MiC项目出现相似定位成本，建议统一影像采集要求。</small></span></div>
-        </div>
-
-        <div className="enterprise-panel workorder-panel">
-          <header><span>样板事件审计链</span><em>INC-260725-01</em></header>
-          {workOrder ? (
-            <>
-              <div className="workorder-summary">
-                <ClipboardCheck size={19} />
-                <span><strong>{workOrder.id} · 1602卫生间隐蔽管线检修</strong><small>{workOrder.location}</small></span>
-                <em>{workOrder.status === "completed" ? "已完成" : "已派发"}</em>
-              </div>
-              <table className="audit-table">
-                <tbody>
-                  <tr><th>构件</th><td>{workOrder.component}</td></tr>
-                  <tr><th>维修指令</th><td>{workOrder.instruction}</td></tr>
-                  <tr><th>依据</th><td>{workOrder.refs.join(" / ")}</td></tr>
-                  <tr><th>授权</th><td>{state.valve.authorizedBy || "未授权"}</td></tr>
-                </tbody>
-              </table>
-              {canResolve ? <button className="record-submit group-resolve" onClick={next}>模拟维修完成并验证恢复</button> : null}
-            </>
-          ) : (
-            <div className="panel-empty"><FileSearch size={22} /><span>样板事件完成关阀后生成审计链</span></div>
-          )}
         </div>
 
         <div className="enterprise-panel feedback-panel">
@@ -97,6 +57,51 @@ export default function GroupPage() {
             <div className="panel-empty"><Database size={22} /><span>维修验证后形成下一项目改进建议</span></div>
           )}
         </div>
+      </section>
+
+      <section className="group-disclosures">
+        <details className="enterprise-disclosure">
+          <summary><span>跨项目共性问题</span><em>过去90天 · 待处理 {state.incident && state.incident.status !== "resolved" ? "07" : "06"}</em></summary>
+          <div className="issue-panel">
+            <div className="issue-bars">
+              {[
+                ["管线接口", 68, "18"],
+                ["防水收口", 47, "12"],
+                ["门窗密封", 32, "08"],
+                ["设备调试", 24, "06"]
+              ].map(([name, width, count]) => (
+                <div key={name}><span>{name}</span><i><b style={{ width: `${width}%` }} /></i><em>{count}</em></div>
+              ))}
+            </div>
+            <div className="quality-note"><Factory size={17} /><span><strong>PPR支管接口</strong><small>在3个MiC项目出现相似定位成本，建议统一影像采集要求。</small></span></div>
+          </div>
+        </details>
+
+        <details className="enterprise-disclosure" open={Boolean(workOrder && canResolve)}>
+          <summary><span>样板事件审计链</span><em>INC-260725-01</em></summary>
+          <div className="workorder-panel">
+            {workOrder ? (
+              <>
+                <div className="workorder-summary">
+                  <ClipboardCheck size={19} />
+                  <span><strong>{workOrder.id} · 1602卫生间隐蔽管线检修</strong><small>{workOrder.location}</small></span>
+                  <em>{workOrder.status === "completed" ? "已完成" : "已派发"}</em>
+                </div>
+                <table className="audit-table">
+                  <tbody>
+                    <tr><th>构件</th><td>{workOrder.component}</td></tr>
+                    <tr><th>维修指令</th><td>{workOrder.instruction}</td></tr>
+                    <tr><th>依据</th><td>{workOrder.refs.join(" / ")}</td></tr>
+                    <tr><th>授权</th><td>{state.valve.authorizedBy || "未授权"}</td></tr>
+                  </tbody>
+                </table>
+                {canResolve ? <button className="record-submit group-resolve" onClick={next}>模拟维修完成并验证恢复</button> : null}
+              </>
+            ) : (
+              <div className="panel-empty"><FileSearch size={22} /><span>样板事件完成关阀后生成审计链</span></div>
+            )}
+          </div>
+        </details>
       </section>
     </div>
   );

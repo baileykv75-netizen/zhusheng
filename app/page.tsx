@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Check, Layers3, MapPin, Radio, ScanLine, Waves } from "lucide-react";
+import { Check, Layers3, MapPin, PanelRightOpen, Radio, ScanLine, Waves, X } from "lucide-react";
 import { useState } from "react";
 import { useDemo } from "@/components/demo-provider";
 
@@ -10,6 +10,7 @@ const layers = ["空间", "给排水", "设备"] as const;
 export default function BuildingWorkbench() {
   const { state } = useDemo();
   const [layer, setLayer] = useState<(typeof layers)[number]>("给排水");
+  const [inspectorOpen, setInspectorOpen] = useState(false);
   const latestTrace = state.agentTrace.at(-1);
   const incidentStatus = state.incident
     ? state.incident.status === "resolved"
@@ -19,19 +20,25 @@ export default function BuildingWorkbench() {
 
   return (
     <div className="page building-page">
-      <section className="status-strip" aria-label="建筑运行摘要">
-        <div><span>当前阶段</span><strong>运营期 · DAY 1684</strong></div>
-        <div><span>生命记忆</span><strong>{state.evidence.length > 3 ? "95%" : "94%"} / 2,848条</strong></div>
-        <div><span>空间映射</span><strong>186空间 / 312模块</strong></div>
-        <div><span>当前状态</span><strong className={state.incident && state.incident.status !== "resolved" ? "attention" : ""}>{incidentStatus}</strong></div>
-      </section>
+      <header className="building-intro">
+        <div>
+          <span className="eyebrow">建筑生命工作台 · BLD-HZZ-02</span>
+          <h1>一栋楼正在工作</h1>
+          <p>建造记录正在成为这栋建筑今日判断与行动的依据。</p>
+        </div>
+        <section className="status-strip" aria-label="建筑运行摘要">
+          <div><span>生命记忆</span><strong>{state.evidence.length > 3 ? "95.0%" : "94.2%"}</strong></div>
+          <div><span>在线空间</span><strong>186</strong></div>
+          <div><span>当前状态</span><strong className={state.incident && state.incident.status !== "resolved" ? "attention" : ""}>{incidentStatus}</strong></div>
+        </section>
+      </header>
 
       <section className="building-workbench">
         <div className="bim-workspace">
           <div className="workspace-heading">
-            <div>
-              <span className="eyebrow">BUILDING LIFE CANVAS</span>
-              <h1>一栋楼正在工作</h1>
+            <div className="drawing-title">
+              <span>建筑剖面 · 16F空间定位</span>
+              <small>运营期 DAY 1684 · 给排水系统</small>
             </div>
             <div className="layer-switch" role="group" aria-label="BIM图层">
               {layers.map((item) => (
@@ -40,6 +47,9 @@ export default function BuildingWorkbench() {
                   {item}
                 </button>
               ))}
+              <button className="inspector-trigger" onClick={() => setInspectorOpen(true)}>
+                <PanelRightOpen size={14} />任务检查器
+              </button>
             </div>
           </div>
 
@@ -53,7 +63,7 @@ export default function BuildingWorkbench() {
             />
             <div className="drawing-coordinate coordinate-x">X / 07-12</div>
             <div className="drawing-coordinate coordinate-y">Y / B-F</div>
-            <button className="component-callout" aria-label="定位1602卫生间">
+            <button className="component-callout" aria-label="定位1602卫生间" onClick={() => setInspectorOpen(true)}>
               <span className="callout-line" />
               <span className="callout-copy">
                 <small>16F · BATHROOM</small>
@@ -88,10 +98,16 @@ export default function BuildingWorkbench() {
           </div>
         </div>
 
-        <aside className="building-inspector">
+        <button
+          className={inspectorOpen ? "inspector-backdrop visible" : "inspector-backdrop"}
+          aria-label="关闭任务检查器"
+          onClick={() => setInspectorOpen(false)}
+          tabIndex={inspectorOpen ? 0 : -1}
+        />
+        <aside className={inspectorOpen ? "building-inspector open" : "building-inspector"} aria-hidden={!inspectorOpen}>
           <div className="inspector-header">
-            <span>BUILDING / 02</span>
-            <strong>总智能体任务检查器</strong>
+            <span><small>BUILDING / 02</small><strong>总智能体任务检查器</strong></span>
+            <button aria-label="关闭任务检查器" onClick={() => setInspectorOpen(false)}><X size={18} /></button>
           </div>
           <section className="inspector-section">
             <div className="section-line">

@@ -247,9 +247,11 @@ function executeStep(state: DemoSnapshot, index: number): DemoSnapshot {
 
 export const DemoEngine = {
   start(mode: RuntimeMode = "fallback") {
-    return executeStep(createInitialSnapshot(mode), 1);
+    return { ...createInitialSnapshot(mode), currentStep: 1 };
   },
   next(state: DemoSnapshot) {
+    if (state.currentStep === 0) return executeStep(state, 1);
+    if (state.currentStep === 1 && !state.completedSteps.includes(1)) return executeStep(state, 1);
     return state.currentStep >= 7 ? state : executeStep(state, state.currentStep + 1);
   },
   previous(state: DemoSnapshot) {

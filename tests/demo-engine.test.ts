@@ -4,7 +4,8 @@ import { createInitialSnapshot, DemoEngine } from "../lib/demo-engine.ts";
 
 test("seven-step lifecycle closes only after authorization and verification", () => {
   let state = DemoEngine.start();
-  for (let index = 1; index < 7; index += 1) state = DemoEngine.next(state);
+  state = DemoEngine.next(state);
+  while (state.currentStep < 7) state = DemoEngine.next(state);
   assert.equal(state.currentStep, 7);
   assert.equal(state.incident?.status, "resolved");
   assert.equal(state.workOrders[0].status, "completed");
