@@ -42,12 +42,12 @@ Write-Host "正在生成生产版本..."
 & $npm.Source run build
 if ($LASTEXITCODE -ne 0) { throw "生产构建失败。" }
 
-$next = Join-Path $root "node_modules\next\dist\bin\next"
+$server = Join-Path $root "scripts\serve-dist.mjs"
 $stdout = Join-Path $root "server.stdout.log"
 $stderr = Join-Path $root "server.stderr.log"
 $process = Start-Process `
   -FilePath $node.Source `
-  -ArgumentList @($next, "start", $root, "-H", "127.0.0.1", "-p", $port) `
+  -ArgumentList @($server) `
   -WorkingDirectory $root `
   -WindowStyle Hidden `
   -RedirectStandardOutput $stdout `

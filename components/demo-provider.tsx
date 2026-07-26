@@ -40,7 +40,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       .then((body: { mode?: RuntimeMode }) => {
         if (body.mode) setState((current) => ({ ...current, runtimeMode: body.mode as RuntimeMode }));
       })
-      .catch(() => setState((current) => ({ ...current, runtimeMode: "degraded" })))
+      .catch(() => setState((current) => ({ ...current, runtimeMode: "fallback" })))
       .finally(() => setHydrated(true));
   }, []);
 

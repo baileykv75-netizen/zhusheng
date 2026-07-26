@@ -6,9 +6,9 @@
   "description": "筑生：一栋房子一生的AI智能体",
   "scripts": {
     "dev": "next dev -H 0.0.0.0 -p 4173",
-    "build": "next build && opennextjs-cloudflare build --skipNextBuild && node scripts/prepare-sites-dist.mjs",
+    "build": "next build && node scripts/prepare-sites-dist.mjs",
     "build:next": "next build",
-    "start": "next start -H 0.0.0.0 -p 4173",
+    "start": "node scripts/serve-dist.mjs",
     "typecheck": "tsc --noEmit",
     "test": "node --test --experimental-strip-types tests/*.test.ts",
     "package:submission": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/package-submission.ps1"
@@ -20,12 +20,10 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@opennextjs/cloudflare": "1.19.11",
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.7.0",
-    "wrangler": "^4.114.0"
+    "typescript": "^5.7.0"
   },
   "engines": {
     "node": ">=20"

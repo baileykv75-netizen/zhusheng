@@ -33,7 +33,7 @@ $files = @(
 foreach ($file in $files) {
   Copy-Item -LiteralPath (Join-Path $root $file) -Destination $staging
 }
-foreach ($directory in @("app", "components", "lib", "public", "docs", "tests", "scripts", "submission")) {
+foreach ($directory in @(".openai", "app", "components", "lib", "public", "docs", "tests", "scripts", "submission")) {
   $source = Join-Path $root $directory
   if (Test-Path -LiteralPath $source) {
     Copy-Item -LiteralPath $source -Destination $staging -Recurse

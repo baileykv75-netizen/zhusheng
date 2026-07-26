@@ -30,11 +30,11 @@ await assertNoOverflow(page, "home desktop");
 await page.screenshot({ path: `${output}/v2-01-home-desktop.png`, fullPage: true });
 
 await page.getByRole("button", { name: "开始2分钟演示" }).click();
-await page.waitForURL("**/worker");
+await page.waitForURL("**/worker**");
 await page.screenshot({ path: `${output}/v2-02-worker-desktop.png`, fullPage: true });
 await page.locator(".demo-next").click();
 await page.locator(".demo-next").click();
-await page.waitForURL("**/resident");
+await page.waitForURL("**/resident**");
 await page.screenshot({ path: `${output}/v2-03-resident-analysis-desktop.png`, fullPage: true });
 await page.locator(".demo-next").click();
 await page.locator(".demo-next").click();
@@ -45,7 +45,7 @@ await page.getByRole("button", { name: /确认授权并执行关阀/ }).click();
 const afterAuth = await page.evaluate(() => JSON.parse(sessionStorage.getItem("zhusheng.demo.v2")).valve.status);
 assert.equal(afterAuth, "closed");
 await page.locator(".demo-next").click();
-await page.waitForURL("**/group");
+await page.waitForURL("**/group**");
 await assertNoOverflow(page, "group desktop");
 await page.screenshot({ path: `${output}/v2-05-group-desktop.png`, fullPage: true });
 
