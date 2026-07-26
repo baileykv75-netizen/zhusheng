@@ -26,10 +26,19 @@ const navigation = [
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { state, start, next, previous, reset } = useDemo();
-  const activeStep = state.currentStep ? demoSteps[state.currentStep - 1] : null;
+  const { state, start, next, previous, reset, exit, goToChapter } = useDemo();
+  const chapter = state.currentStep === 1 ? 1 : state.currentStep;
+  const activeStep = chapter ? demoSteps[chapter - 1] : null;
   const demoActive = state.currentStep > 0;
-  const modeText = state.runtimeMode === "ai" ? "AI ONLINE" : state.runtimeMode === "degraded" ? "DEGRADED" : "DEMO FALLBACK";
+  const workerSubstepLabels = ["", "现场口述", "AI整理", "品质核验"];
+  const nextGoal = state.currentStep === 1
+    ? ["", "生成结构化记录", "提交品质核验", "写入建筑记忆"][state.workerSubstep]
+    : ["", "", "进入住户处置", "启动跨阶段诊断", "查看住户补充信息", "完成人工授权", "查看企业知识反馈", "演示完成"][state.currentStep];
+  const authorizationBlocked = state.currentStep === 5 && state.incident?.status === "awaiting_authorization";
+
+  function confirmReset() {
+    if (window.confirm("确定重置引导演示并清除当前进度吗？")) reset();
+  }
 
   return (
     <div className={demoActive ? "app-shell demo-active" : "app-shell"}>
@@ -39,7 +48,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </Link>
         <nav className="rail-nav" aria-label="产品视角">
           {navigation.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} className={pathname === href ? "active" : ""} title={label}>
+            <Link key={href} href={href} className={pathname === href ? "active" : ""} title={label} aria-current={pathname === href ? "page" : undefined}>
               <Icon size={19} />
               <span>{label}</span>
             </Link>
@@ -55,12 +64,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </div>
         <div className="project-meta">
           <span>BLD-HZZ-02</span>
-          <span className={`runtime-mode ${state.runtimeMode}`}><i />{modeText}</span>
+          <span className="runtime-mode"><i />脱敏演示数据</span>
         </div>
         {!demoActive ? (
-          <button className="stage-primary" onClick={start}><Play size={15} fill="currentColor" />开始2分钟演示</button>
+          <button className="stage-primary" onClick={start}><Play size={15} fill="currentColor" /><span>开始2分钟演示</span></button>
         ) : (
-          <span className="demo-live"><Pause size={13} />GUIDED SESSION</span>
+          <span className="demo-live"><Pause size={13} />引导演示中</span>
         )}
       </header>
 
@@ -69,28 +78,44 @@ export function Shell({ children }: { children: React.ReactNode }) {
       {demoActive && activeStep ? (
         <aside className="cinema-timeline" aria-label="引导演示控制器">
           <div className="timeline-copy">
-            <span>{String(state.currentStep).padStart(2, "0")}<small>/07</small></span>
-            <div><strong>{activeStep.label}</strong><small>{activeStep.task}</small></div>
+            <span>{String(chapter).padStart(2, "0")}<small>/07</small></span>
+            <div>
+              <strong>第{chapter}章 · {activeStep.label}</strong>
+              <small>{state.currentStep === 1 ? `本章进度 ${state.workerSubstep}/3：${workerSubstepLabels[state.workerSubstep]}` : `下一动作：${nextGoal}`}</small>
+            </div>
           </div>
           <div className="timeline-track" aria-label={`当前第${state.currentStep}步，共7步`}>
             {demoSteps.map((step, index) => (
-              <i key={step.id} className={index + 1 < state.currentStep ? "done" : index + 1 === state.currentStep ? "active" : ""} />
+              <button
+                key={step.id}
+                className={index + 1 < chapter ? "done" : index + 1 === chapter ? "active" : ""}
+                aria-label={`${index + 1}. ${step.label}`}
+                disabled={index + 1 >= chapter}
+                onClick={() => goToChapter(index + 1)}
+              />
             ))}
           </div>
           <div className="timeline-actions">
             <button onClick={previous} aria-label="上一步" title="上一步"><ArrowLeft size={17} /></button>
-            <button className="timeline-next" onClick={next} disabled={state.currentStep === 7}>
-              {state.currentStep === 7 ? "演示完成" : "下一步"}<ArrowRight size={16} />
-            </button>
-            <button onClick={reset} aria-label="重置演示" title="重置演示"><RotateCcw size={16} /></button>
-            <button onClick={reset} aria-label="退出演示" title="退出演示"><X size={17} /></button>
+            {state.currentStep === 7 ? (
+              <>
+                <button className="timeline-next" onClick={start}><RotateCcw size={15} />重新播放</button>
+                <Link className="timeline-link" href="/">返回建筑生命</Link>
+              </>
+            ) : (
+              <button className="timeline-next" onClick={next} disabled={authorizationBlocked}>
+                {authorizationBlocked ? "等待授权" : "继续引导"}<ArrowRight size={16} />
+              </button>
+            )}
+            <button onClick={confirmReset} aria-label="重置演示" title="重置演示"><RotateCcw size={16} /></button>
+            <button onClick={exit} aria-label="退出演示" title="退出演示"><X size={17} /></button>
           </div>
         </aside>
       ) : null}
 
       <nav className="mobile-nav" aria-label="移动端产品视角">
         {navigation.map(({ href, short, icon: Icon }) => (
-          <Link key={href} href={href} className={pathname === href ? "active" : ""}>
+          <Link key={href} href={href} className={pathname === href ? "active" : ""} aria-current={pathname === href ? "page" : undefined}>
             <Icon size={18} /><span>{short}</span>
           </Link>
         ))}

@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { createInitialSnapshot, DemoEngine, DemoSnapshot, demoSteps, RuntimeMode } from "@/lib/demo-engine";
 
-const STORAGE_KEY = "zhusheng.demo.v2";
+const STORAGE_KEY = "zhusheng.demo.v3";
 
 type DemoContextValue = {
   state: DemoSnapshot;
@@ -13,6 +13,8 @@ type DemoContextValue = {
   next: () => void;
   previous: () => void;
   reset: () => void;
+  exit: () => void;
+  goToChapter: (chapter: number) => void;
   approve: () => void;
 };
 
@@ -24,13 +26,14 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const search = useSearchParams();
+  const [entryPath, setEntryPath] = useState("/");
 
   useEffect(() => {
     const saved = sessionStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as DemoSnapshot;
-        if (parsed.schemaVersion === 2) setState(parsed);
+        if (parsed.schemaVersion === 3) setState(parsed);
       } catch {
         sessionStorage.removeItem(STORAGE_KEY);
       }
@@ -62,10 +65,11 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   }, [pathname, router]);
 
   const start = useCallback(() => {
+    setEntryPath(pathname);
     const snapshot = DemoEngine.start(state.runtimeMode);
     setState(snapshot);
     navigate(snapshot);
-  }, [navigate, state.runtimeMode]);
+  }, [navigate, pathname, state.runtimeMode]);
 
   const next = useCallback(() => {
     const snapshot = DemoEngine.next(state);
@@ -86,15 +90,27 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     router.push("/");
   }, [router, state.runtimeMode]);
 
+  const exit = useCallback(() => {
+    setState(DemoEngine.reset(state.runtimeMode));
+    sessionStorage.removeItem(STORAGE_KEY);
+    router.push(entryPath);
+  }, [entryPath, router, state.runtimeMode]);
+
   const approve = useCallback(() => {
     const snapshot = DemoEngine.approve(state);
     setState(snapshot);
     navigate(snapshot);
   }, [navigate, state]);
 
+  const goToChapter = useCallback((chapter: number) => {
+    const snapshot = DemoEngine.replayToChapter(state, chapter);
+    setState(snapshot);
+    navigate(snapshot);
+  }, [navigate, state]);
+
   const value = useMemo(
-    () => ({ state, hydrated, start, next, previous, reset, approve }),
-    [approve, hydrated, next, previous, reset, start, state]
+    () => ({ state, hydrated, start, next, previous, reset, exit, approve, goToChapter }),
+    [approve, exit, goToChapter, hydrated, next, previous, reset, start, state]
   );
 
   return <DemoContext.Provider value={value}>{children}</DemoContext.Provider>;

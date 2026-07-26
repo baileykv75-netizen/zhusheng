@@ -23,8 +23,9 @@ export type AgentTrace = {
 };
 
 export type DemoSnapshot = {
-  schemaVersion: 2;
+  schemaVersion: 3;
   currentStep: number;
+  workerSubstep: 0 | 1 | 2 | 3;
   completedSteps: number[];
   runtimeMode: RuntimeMode;
   evidence: EvidenceRecord[];
@@ -71,8 +72,9 @@ const baseTelemetry = [
 
 export function createInitialSnapshot(mode: RuntimeMode = "fallback"): DemoSnapshot {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     currentStep: 0,
+    workerSubstep: 0,
     completedSteps: [],
     runtimeMode: mode,
     evidence: [
@@ -140,19 +142,6 @@ function trace(
 function executeStep(state: DemoSnapshot, index: number): DemoSnapshot {
   const next = structuredClone(state);
   next.currentStep = index;
-
-  if (index === 1) {
-    next.evidence.push({
-      id: "EV-2848",
-      type: "管线接头复核",
-      source: "安装班组口述 + 现场照片",
-      status: "needs_review",
-      note: "1602卫生间北侧墙冷热水接头已完成，照片与房间码已同步。",
-      capturedAt: "2025-03-18 14:26",
-      refs: ["1602卫生间", "MIC-BATH-1602", "W-1602-B7"]
-    });
-    trace(next, "工友现场口述", "工友服务智能体", "整理施工记录", "识别房间、构件与工序，保留原始口述。", ["MIC-BATH-1602"], 84, next.runtimeMode);
-  }
 
   if (index === 2) {
     const record = next.evidence.find((item) => item.id === "EV-2848");
@@ -245,20 +234,78 @@ function executeStep(state: DemoSnapshot, index: number): DemoSnapshot {
   return next;
 }
 
+function structureWorkerEvidence(state: DemoSnapshot): DemoSnapshot {
+  const next = structuredClone(state);
+  next.currentStep = 1;
+  next.workerSubstep = 2;
+  if (!next.evidence.some((item) => item.id === "EV-2848")) {
+    next.evidence.push({
+      id: "EV-2848",
+      type: "管线接头复核",
+      source: "安装班组口述 + 现场照片",
+      status: "needs_review",
+      note: "1602卫生间北侧墙冷热水接头已完成，照片与房间码已同步。",
+      capturedAt: "2025-03-18 14:26",
+      refs: ["1602卫生间", "MIC-BATH-1602", "W-1602-B7"]
+    });
+  }
+  trace(next, "工友现场口述", "工友服务智能体", "整理施工记录", "识别房间、构件与工序，保留原始口述。", ["MIC-BATH-1602"], 84, next.runtimeMode);
+  return next;
+}
+
+function submitWorkerQuality(state: DemoSnapshot): DemoSnapshot {
+  const next = structuredClone(state);
+  next.currentStep = 1;
+  next.workerSubstep = 3;
+  if (!next.completedSteps.includes(1)) next.completedSteps.push(1);
+  trace(next, "工友服务智能体", "品质智能体", "提交关键工序证据", "字段与影像证据已提交，等待写入建筑生命记忆。", ["EV-2848", "W-1602-B7"], 92);
+  return next;
+}
+
+function stageOrdinal(state: DemoSnapshot) {
+  if (state.currentStep === 0) return 0;
+  if (state.currentStep === 1) return state.workerSubstep || 1;
+  return state.currentStep + 2;
+}
+
+function startSnapshot(mode: RuntimeMode = "fallback"): DemoSnapshot {
+  return { ...createInitialSnapshot(mode), currentStep: 1, workerSubstep: 1 };
+}
+
+function advanceState(state: DemoSnapshot): DemoSnapshot {
+  if (state.currentStep === 0) return startSnapshot(state.runtimeMode);
+  if (state.currentStep === 1 && state.workerSubstep === 1) return structureWorkerEvidence(state);
+  if (state.currentStep === 1 && state.workerSubstep === 2) return submitWorkerQuality(state);
+  if (state.currentStep === 1 && state.workerSubstep === 3) return executeStep(state, 2);
+  if (state.currentStep === 5 && state.incident?.status === "awaiting_authorization") return state;
+  return state.currentStep >= 7 ? state : executeStep(state, state.currentStep + 1);
+}
+
+function replayToOrdinal(mode: RuntimeMode, target: number): DemoSnapshot {
+  if (target <= 0) return createInitialSnapshot(mode);
+  let replay: DemoSnapshot = startSnapshot(mode);
+  while (stageOrdinal(replay) < target) {
+    replay = replay.currentStep === 5 && replay.incident?.status === "awaiting_authorization"
+      ? executeStep(replay, 6)
+      : advanceState(replay);
+  }
+  return replay;
+}
+
 export const DemoEngine = {
-  start(mode: RuntimeMode = "fallback") {
-    return { ...createInitialSnapshot(mode), currentStep: 1 };
+  start(mode: RuntimeMode = "fallback"): DemoSnapshot {
+    return startSnapshot(mode);
   },
   next(state: DemoSnapshot) {
-    if (state.currentStep === 0) return executeStep(state, 1);
-    if (state.currentStep === 1 && !state.completedSteps.includes(1)) return executeStep(state, 1);
-    return state.currentStep >= 7 ? state : executeStep(state, state.currentStep + 1);
+    return advanceState(state);
   },
   previous(state: DemoSnapshot) {
-    const target = Math.max(0, state.currentStep - 1);
-    let replay = createInitialSnapshot(state.runtimeMode);
-    for (let index = 1; index <= target; index += 1) replay = executeStep(replay, index);
-    return replay;
+    const target = Math.max(0, stageOrdinal(state) - 1);
+    return replayToOrdinal(state.runtimeMode, target);
+  },
+  replayToChapter(state: DemoSnapshot, chapter: number) {
+    const target = chapter <= 1 ? 1 : Math.min(9, chapter + 2);
+    return replayToOrdinal(state.runtimeMode, target);
   },
   reset(mode: RuntimeMode = "fallback") {
     return createInitialSnapshot(mode);
