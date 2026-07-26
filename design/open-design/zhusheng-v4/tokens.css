@@ -1,0 +1,16 @@
+:root {
+  --zs-graphite: #0c0d0e;
+  --zs-graphite-2: #141618;
+  --zs-pearl: #f4f3ef;
+  --zs-silver: #b7bcbf;
+  --zs-steel: #777f83;
+  --zs-enterprise-red: #d42121;
+  --zs-water-cyan: #52c8d7;
+  --zs-safety-amber: #f2b84b;
+  --zs-safe-green: #62b58b;
+  --zs-radius-panel: 6px;
+  --zs-radius-control: 3px;
+  --zs-motion-scene: 480ms;
+  --zs-motion-panel: 240ms;
+  --zs-motion-control: 140ms;
+}

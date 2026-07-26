@@ -12,12 +12,17 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f5f5f2"
+  themeColor: "#0c0d0e"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN">
+      <head>
+        <link rel="preload" as="image" href="/assets/v4/building-stage.webp" type="image/webp" />
+        <link rel="preload" as="image" href="/assets/v4/bathroom-stage.webp" type="image/webp" />
+        <link rel="preload" as="image" href="/assets/v4/portfolio-stage.webp" type="image/webp" />
+      </head>
       <body>
         <Suspense fallback={null}>
           <DemoProvider>
