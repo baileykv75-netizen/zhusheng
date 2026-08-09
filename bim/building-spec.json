@@ -1,0 +1,860 @@
+{
+  "meta": {
+    "specVersion": "2.5.0",
+    "modelStatus": "synthetic_demo",
+    "ifcSchema": "IFC4",
+    "lengthUnit": "METRE",
+    "disclaimerZh": "脱敏合成演示模型，不作为施工依据",
+    "disclaimerEn": "Synthetic demonstration model. Not for construction."
+  },
+  "project": {
+    "businessId": "PRJ-ZS-DEMO",
+    "name": "筑生合成演示项目"
+  },
+  "site": {
+    "businessId": "SITE-ZS-DEMO",
+    "name": "筑生合成场地"
+  },
+  "building": {
+    "businessId": "BLD-ZS-DEMO-001",
+    "name": "筑生样板楼A座",
+    "buildingType": "MiC模块化住宅",
+    "storeyCount": 18,
+    "storeyHeight": 3.0,
+    "footprint": {
+      "widthX": 27.2,
+      "depthY": 14.8
+    },
+    "origin": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    }
+  },
+  "storeys": {
+    "firstStorey": {
+      "use": "入口及公共服务空间",
+      "spaces": [
+        {
+          "businessId": "SPACE-01-LOBBY",
+          "name": "首层入口及公共服务空间",
+          "bounds": {
+            "minX": 0.0,
+            "maxX": 27.2,
+            "minY": 0.0,
+            "maxY": 14.8
+          },
+          "conceptualOnly": true
+        }
+      ]
+    },
+    "residentialFrom": 2,
+    "residentialTo": 18,
+    "idPattern": "LVL-{storey:02d}",
+    "namePattern": "{storey}层",
+    "elevationFormula": "(storey - 1) * 3.0"
+  },
+  "typicalResidentialStorey": {
+    "apartmentCount": 4,
+    "corridor": {
+      "businessIdPattern": "SPACE-{storey:02d}-CORRIDOR",
+      "name": "公共走廊",
+      "bounds": {
+        "minX": 0.0,
+        "maxX": 27.2,
+        "minY": 6.4,
+        "maxY": 8.4
+      }
+    },
+    "core": {
+      "businessIdPattern": "SPACE-{storey:02d}-CORE",
+      "name": "核心筒",
+      "segments": [
+        {
+          "suffix": "SOUTH",
+          "bounds": {
+            "minX": 11.2,
+            "maxX": 16.0,
+            "minY": 0.0,
+            "maxY": 6.4
+          }
+        },
+        {
+          "suffix": "NORTH",
+          "bounds": {
+            "minX": 11.2,
+            "maxX": 16.0,
+            "minY": 8.4,
+            "maxY": 14.8
+          }
+        }
+      ],
+      "conceptualOnly": true
+    },
+    "apartments": [
+      {
+        "suffix": "01",
+        "position": "northwest",
+        "bounds": {
+          "minX": 0.0,
+          "maxX": 11.2,
+          "minY": 8.4,
+          "maxY": 14.8
+        }
+      },
+      {
+        "suffix": "02",
+        "position": "northeast",
+        "bounds": {
+          "minX": 16.0,
+          "maxX": 27.2,
+          "minY": 8.4,
+          "maxY": 14.8
+        }
+      },
+      {
+        "suffix": "03",
+        "position": "southwest",
+        "bounds": {
+          "minX": 0.0,
+          "maxX": 11.2,
+          "minY": 0.0,
+          "maxY": 6.4
+        }
+      },
+      {
+        "suffix": "04",
+        "position": "southeast",
+        "bounds": {
+          "minX": 16.0,
+          "maxX": 27.2,
+          "minY": 0.0,
+          "maxY": 6.4
+        }
+      }
+    ]
+  },
+  "focusUnit": {
+    "businessId": "UNIT-1602",
+    "name": "1602户",
+    "storey": 16,
+    "suffix": "02",
+    "targetAreaSquareMetres": 72.0,
+    "globalOrigin": {
+      "x": 16.0,
+      "y": 8.4,
+      "z": 45.0
+    },
+    "moduleSize": {
+      "widthX": 11.2,
+      "depthY": 6.4
+    },
+    "entrance": {
+      "edge": "south",
+      "localCentreX": 6.5,
+      "doorWidth": 0.9
+    },
+    "spaces": [
+      {
+        "businessId": "SPACE-1602-BATHROOM",
+        "name": "1602卫生间",
+        "localOrigin": {
+          "x": 0.3,
+          "y": 0.3
+        },
+        "size": {
+          "widthX": 2.4,
+          "depthY": 1.8,
+          "clearHeight": 2.8
+        }
+      },
+      {
+        "businessId": "SPACE-1602-KITCHEN",
+        "name": "1602厨房",
+        "localOrigin": {
+          "x": 2.9,
+          "y": 0.3
+        },
+        "size": {
+          "widthX": 2.6,
+          "depthY": 2.2,
+          "clearHeight": 2.8
+        }
+      },
+      {
+        "businessId": "SPACE-1602-BEDROOM-2",
+        "name": "1602次卧",
+        "localOrigin": {
+          "x": 0.3,
+          "y": 2.7
+        },
+        "size": {
+          "widthX": 3.2,
+          "depthY": 3.4,
+          "clearHeight": 2.8
+        }
+      },
+      {
+        "businessId": "SPACE-1602-MASTER",
+        "name": "1602主卧",
+        "localOrigin": {
+          "x": 3.7,
+          "y": 2.7
+        },
+        "size": {
+          "widthX": 3.6,
+          "depthY": 3.4,
+          "clearHeight": 2.8
+        }
+      },
+      {
+        "businessId": "SPACE-1602-LIVING",
+        "name": "1602客餐厅",
+        "localOrigin": {
+          "x": 7.5,
+          "y": 0.3
+        },
+        "size": {
+          "widthX": 3.4,
+          "depthY": 5.8,
+          "clearHeight": 2.8
+        }
+      },
+      {
+        "businessId": "SPACE-1602-CIRCULATION",
+        "name": "1602入口与交通空间",
+        "localOrigin": {
+          "x": 5.7,
+          "y": 0.3
+        },
+        "size": {
+          "widthX": 1.6,
+          "depthY": 2.2,
+          "clearHeight": 2.8
+        }
+      }
+    ]
+  },
+  "construction": {
+    "externalWallThickness": 0.2,
+    "internalWallThickness": 0.12,
+    "structuralSlabThickness": 0.15,
+    "defaultDoorHeight": 2.1,
+    "bathroomDoorWidth": 0.8
+  },
+  "architecturalShell": {
+    "floorSlab": {
+      "businessIdPattern": "SLAB-LVL-{storey:02d}",
+      "namePattern": "{storey}层结构楼板",
+      "thickness": 0.18,
+      "edgeOverhang": 0.1
+    },
+    "externalWall": {
+      "businessIdPattern": "WALL-LVL-{storey:02d}-EXT-{facade}-{segment}",
+      "namePattern": "{storey}层{facadeZh}外墙{segment}",
+      "height": 3.0,
+      "facades": [
+        "SOUTH",
+        "NORTH",
+        "WEST",
+        "EAST"
+      ]
+    },
+    "window": {
+      "businessIdPattern": "WINDOW-LVL-{storey:02d}-{facade}-{index:02d}",
+      "namePattern": "{storey}层{facadeZh}立面窗{index}",
+      "facades": [
+        "SOUTH",
+        "NORTH"
+      ],
+      "countPerFacade": 4,
+      "width": 1.8,
+      "height": 1.4,
+      "sillHeight": 0.9,
+      "frameDepth": 0.2,
+      "firstCentreX": 2.8,
+      "spacingX": 7.2
+    },
+    "mainEntrance": {
+      "businessId": "DOOR-LVL-01-MAIN",
+      "name": "首层住宅主入口",
+      "facade": "SOUTH",
+      "centreX": 13.6,
+      "width": 2.4,
+      "height": 2.4,
+      "depth": 0.2
+    },
+    "coreWalls": {
+      "businessIdPattern": "WALL-LVL-{storey:02d}-CORE-{segment}-{side}",
+      "namePattern": "{storey}层{segmentZh}核心筒{sideZh}墙",
+      "thickness": 0.2,
+      "height": 3.0,
+      "sidesPerSegment": [
+        "WEST",
+        "EAST",
+        "CORRIDOR"
+      ]
+    },
+    "roof": {
+      "businessId": "SLAB-ROOF",
+      "name": "18层上部屋面板",
+      "elevation": 54.0,
+      "thickness": 0.2,
+      "edgeOverhang": 0.1,
+      "parapetHeight": 1.1,
+      "parapetThickness": 0.2,
+      "parapetBusinessIdPattern": "WALL-ROOF-PARAPET-{facade}"
+    },
+    "displayStyles": {
+      "space": {
+        "name": "筑生空间分析",
+        "rgb": [
+          0.55,
+          0.72,
+          0.78
+        ],
+        "transparency": 0.86
+      },
+      "focusSpace": {
+        "name": "筑生1602空间定位",
+        "rgb": [
+          0.16,
+          0.72,
+          0.78
+        ],
+        "transparency": 0.72
+      },
+      "slab": {
+        "name": "筑生楼板",
+        "rgb": [
+          0.48,
+          0.5,
+          0.5
+        ],
+        "transparency": 0.0
+      },
+      "wall": {
+        "name": "筑生建筑墙体",
+        "rgb": [
+          0.78,
+          0.79,
+          0.76
+        ],
+        "transparency": 0.0
+      },
+      "window": {
+        "name": "筑生建筑窗",
+        "rgb": [
+          0.08,
+          0.42,
+          0.48
+        ],
+        "transparency": 0.18
+      },
+      "entrance": {
+        "name": "筑生主入口",
+        "rgb": [
+          0.72,
+          0.08,
+          0.07
+        ],
+        "transparency": 0.0
+      },
+      "focusShell": {
+        "name": "筑生1602实体定位",
+        "rgb": [
+          0.78,
+          0.52,
+          0.16
+        ],
+        "transparency": 0.0
+      },
+      "waterproofing": {
+        "name": "筑生防水示意层",
+        "rgb": [
+          0.12,
+          0.58,
+          0.62
+        ],
+        "transparency": 0.35
+      },
+      "coldWater": {
+        "name": "筑生冷水系统",
+        "rgb": [
+          0.08,
+          0.48,
+          0.72
+        ],
+        "transparency": 0.0
+      },
+      "hotWater": {
+        "name": "筑生热水系统",
+        "rgb": [
+          0.78,
+          0.18,
+          0.12
+        ],
+        "transparency": 0.0
+      },
+      "equipment": {
+        "name": "筑生给水设备",
+        "rgb": [
+          0.86,
+          0.62,
+          0.12
+        ],
+        "transparency": 0.0
+      },
+      "sensor": {
+        "name": "筑生环境传感器",
+        "rgb": [
+          0.24,
+          0.72,
+          0.46
+        ],
+        "transparency": 0.0
+      },
+      "sanitary": {
+        "name": "筑生卫生洁具",
+        "rgb": [
+          0.9,
+          0.91,
+          0.88
+        ],
+        "transparency": 0.0
+      },
+      "glass": {
+        "name": "筑生淋浴玻璃",
+        "rgb": [
+          0.48,
+          0.7,
+          0.74
+        ],
+        "transparency": 0.55
+      }
+    },
+    "componentIdRules": {
+      "floorSlab": "SLAB-LVL-{storey:02d}",
+      "externalWall": "WALL-LVL-{storey:02d}-EXT-{facade}-{segment}",
+      "window": "WINDOW-LVL-{storey:02d}-{facade}-{index:02d}",
+      "coreWall": "WALL-LVL-{storey:02d}-CORE-{segment}-{side}",
+      "mainEntrance": "DOOR-LVL-01-MAIN",
+      "roofSlab": "SLAB-ROOF"
+    }
+  },
+  "bathroomDetail": {
+    "businessId": "SPACE-1602-BATHROOM",
+    "structuralSlabBusinessId": "SLAB-1602-BATHROOM",
+    "waterproofing": {
+      "businessId": "WP-1602-BATHROOM",
+      "ifcClass": "IfcCovering",
+      "predefinedType": "FLOORING",
+      "displayName": "1602卫生间防水示意层",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "engineeringThickness": 0.002,
+      "displayThickness": 0.02,
+      "wallUpturnHeight": 1.8,
+      "lifecycleStatus": "CONSTRUCTION_MEMORY_SEEDED",
+      "evidenceTypes": ["waterproof_material_batch", "application_photo", "closed_water_test"],
+      "humanAuthorizationRequired": false
+    },
+    "systems": [
+      {
+        "businessId": "SYS-1602-CW",
+        "displayName": "1602卫生间生活冷水系统",
+        "systemType": "DOMESTIC_COLD_WATER",
+        "ifcPredefinedType": "DOMESTICCOLDWATER",
+        "members": ["METER-1602-FLOW-01", "VALVE-1602-CW-01", "PIPE-1602-CW-01", "J-1602-CW-03", "PIPE-1602-CW-02"]
+      },
+      {
+        "businessId": "SYS-1602-HW",
+        "displayName": "1602卫生间生活热水系统",
+        "systemType": "DOMESTIC_HOT_WATER",
+        "ifcPredefinedType": "DOMESTICHOTWATER",
+        "members": ["PIPE-1602-HW-01"]
+      },
+      {
+        "businessId": "SYS-1602-ENV",
+        "displayName": "1602卫生间环境监测系统",
+        "systemType": "ENVIRONMENT_MONITORING",
+        "ifcPredefinedType": "CONTROL",
+        "members": ["SENSOR-1602-HUM-01"]
+      }
+    ],
+    "components": [
+      {
+        "businessId": "METER-1602-FLOW-01",
+        "displayName": "1602卫生间微流量水表",
+        "ifcClass": "IfcFlowMeter",
+        "predefinedType": "WATERMETER",
+        "spaceId": "SPACE-1602-BATHROOM",
+        "systemId": "SYS-1602-CW",
+        "geometry": {"shape": "box", "localOrigin": {"x": 0.15, "y": 1.56, "z": 1.1}, "size": {"x": 0.3, "y": 0.08, "z": 0.08}},
+        "ports": [
+          {"businessId": "PORT-METER-1602-FLOW-01-IN", "displayName": "微流量水表入口", "role": "INLET", "flowDirection": "SINK", "boundary": true},
+          {"businessId": "PORT-METER-1602-FLOW-01-OUT", "displayName": "微流量水表出口", "role": "OUTLET", "flowDirection": "SOURCE", "boundary": false}
+        ],
+        "flowDirection": "FORWARD",
+        "upstreamIds": [],
+        "downstreamIds": ["VALVE-1602-CW-01"],
+        "isolationValveId": "VALVE-1602-CW-01",
+        "lifecycleStatus": "COMMISSIONING_READY",
+        "evidenceTypes": ["meter_installation_photo", "meter_calibration_certificate"],
+        "humanAuthorizationRequired": false
+      },
+      {
+        "businessId": "VALVE-1602-CW-01",
+        "displayName": "1602卫生间局部冷水关断阀",
+        "ifcClass": "IfcValve",
+        "predefinedType": "ISOLATING",
+        "spaceId": "SPACE-1602-BATHROOM",
+        "systemId": "SYS-1602-CW",
+        "geometry": {"shape": "box", "localOrigin": {"x": 0.45, "y": 1.54, "z": 1.08}, "size": {"x": 0.18, "y": 0.12, "z": 0.12}},
+        "ports": [
+          {"businessId": "PORT-VALVE-1602-CW-01-IN", "displayName": "局部关断阀入口", "role": "INLET", "flowDirection": "SINK", "boundary": false},
+          {"businessId": "PORT-VALVE-1602-CW-01-OUT", "displayName": "局部关断阀出口", "role": "OUTLET", "flowDirection": "SOURCE", "boundary": false}
+        ],
+        "flowDirection": "FORWARD",
+        "upstreamIds": ["METER-1602-FLOW-01"],
+        "downstreamIds": ["PIPE-1602-CW-01"],
+        "isolationValveId": "VALVE-1602-CW-01",
+        "lifecycleStatus": "AVAILABLE_NOT_ACTUATED",
+        "evidenceTypes": ["valve_installation_photo", "valve_function_test", "human_authorization_record"],
+        "humanAuthorizationRequired": true,
+        "safety": {"actionClass": "LOCAL_WATER_ISOLATION", "authorizationState": "NOT_REQUESTED", "fallbackMode": "MANUAL_PROPERTY_ACTION"}
+      },
+      {
+        "businessId": "PIPE-1602-CW-01",
+        "displayName": "1602卫生间上游冷水管段",
+        "ifcClass": "IfcPipeSegment",
+        "predefinedType": "RIGIDSEGMENT",
+        "spaceId": "SPACE-1602-BATHROOM",
+        "systemId": "SYS-1602-CW",
+        "geometry": {"shape": "box", "localOrigin": {"x": 0.63, "y": 1.57, "z": 1.11}, "size": {"x": 0.67, "y": 0.06, "z": 0.06}},
+        "ports": [
+          {"businessId": "PORT-PIPE-1602-CW-01-IN", "displayName": "上游冷水管入口", "role": "INLET", "flowDirection": "SINK", "boundary": false},
+          {"businessId": "PORT-PIPE-1602-CW-01-OUT", "displayName": "上游冷水管出口", "role": "OUTLET", "flowDirection": "SOURCE", "boundary": false}
+        ],
+        "flowDirection": "FORWARD",
+        "upstreamIds": ["VALVE-1602-CW-01"],
+        "downstreamIds": ["J-1602-CW-03"],
+        "isolationValveId": "VALVE-1602-CW-01",
+        "lifecycleStatus": "AS_BUILT_MEMORY_SEEDED",
+        "evidenceTypes": ["pipe_installation_photo", "pressure_test_record"],
+        "humanAuthorizationRequired": false
+      },
+      {
+        "businessId": "J-1602-CW-03",
+        "displayName": "1602卫生间重点冷水接头",
+        "ifcClass": "IfcPipeFitting",
+        "predefinedType": "CONNECTOR",
+        "spaceId": "SPACE-1602-BATHROOM",
+        "systemId": "SYS-1602-CW",
+        "geometry": {"shape": "box", "localOrigin": {"x": 1.3, "y": 1.54, "z": 1.08}, "size": {"x": 0.12, "y": 0.12, "z": 0.12}},
+        "ports": [
+          {"businessId": "PORT-J-1602-CW-03-IN", "displayName": "重点冷水接头入口", "role": "INLET", "flowDirection": "SINK", "boundary": false},
+          {"businessId": "PORT-J-1602-CW-03-OUT", "displayName": "重点冷水接头出口", "role": "OUTLET", "flowDirection": "SOURCE", "boundary": false}
+        ],
+        "flowDirection": "FORWARD",
+        "upstreamIds": ["PIPE-1602-CW-01"],
+        "downstreamIds": ["PIPE-1602-CW-02"],
+        "isolationValveId": "VALVE-1602-CW-01",
+        "lifecycleStatus": "AS_BUILT_MEMORY_SEEDED",
+        "evidenceTypes": ["joint_dual_angle_photo", "fusion_parameter_record", "pressure_test_record"],
+        "humanAuthorizationRequired": false,
+        "eventFocus": true
+      },
+      {
+        "businessId": "PIPE-1602-CW-02",
+        "displayName": "1602卫生间下游冷水管段",
+        "ifcClass": "IfcPipeSegment",
+        "predefinedType": "RIGIDSEGMENT",
+        "spaceId": "SPACE-1602-BATHROOM",
+        "systemId": "SYS-1602-CW",
+        "geometry": {"shape": "box", "localOrigin": {"x": 1.42, "y": 1.57, "z": 1.11}, "size": {"x": 0.73, "y": 0.06, "z": 0.06}},
+        "ports": [
+          {"businessId": "PORT-PIPE-1602-CW-02-IN", "displayName": "下游冷水管入口", "role": "INLET", "flowDirection": "SINK", "boundary": false},
+          {"businessId": "PORT-PIPE-1602-CW-02-OUT", "displayName": "下游冷水管出口", "role": "OUTLET", "flowDirection": "SOURCE", "boundary": true}
+        ],
+        "flowDirection": "FORWARD",
+        "upstreamIds": ["J-1602-CW-03"],
+        "downstreamIds": [],
+        "isolationValveId": "VALVE-1602-CW-01",
+        "lifecycleStatus": "AS_BUILT_MEMORY_SEEDED",
+        "evidenceTypes": ["pipe_installation_photo", "pressure_test_record"],
+        "humanAuthorizationRequired": false
+      },
+      {
+        "businessId": "PIPE-1602-HW-01",
+        "displayName": "1602卫生间热水支管",
+        "ifcClass": "IfcPipeSegment",
+        "predefinedType": "RIGIDSEGMENT",
+        "spaceId": "SPACE-1602-BATHROOM",
+        "systemId": "SYS-1602-HW",
+        "geometry": {"shape": "box", "localOrigin": {"x": 0.15, "y": 1.38, "z": 1.34}, "size": {"x": 2.0, "y": 0.05, "z": 0.05}},
+        "ports": [
+          {"businessId": "PORT-PIPE-1602-HW-01-IN", "displayName": "热水支管入口", "role": "INLET", "flowDirection": "SINK", "boundary": true},
+          {"businessId": "PORT-PIPE-1602-HW-01-OUT", "displayName": "热水支管出口", "role": "OUTLET", "flowDirection": "SOURCE", "boundary": true}
+        ],
+        "flowDirection": "FORWARD",
+        "upstreamIds": [],
+        "downstreamIds": [],
+        "isolationValveId": null,
+        "lifecycleStatus": "AS_BUILT_MEMORY_SEEDED",
+        "evidenceTypes": ["pipe_installation_photo", "pressure_test_record"],
+        "humanAuthorizationRequired": false
+      },
+      {
+        "businessId": "SENSOR-1602-HUM-01",
+        "displayName": "1602卫生间湿度传感器",
+        "ifcClass": "IfcSensor",
+        "predefinedType": "HUMIDITYSENSOR",
+        "spaceId": "SPACE-1602-BATHROOM",
+        "systemId": "SYS-1602-ENV",
+        "monitoringType": "HUMIDITY",
+        "geometry": {"shape": "box", "localOrigin": {"x": 1.95, "y": 1.72, "z": 1.8}, "size": {"x": 0.16, "y": 0.06, "z": 0.2}},
+        "ports": [],
+        "flowDirection": "NOT_APPLICABLE",
+        "upstreamIds": [],
+        "downstreamIds": [],
+        "isolationValveId": null,
+        "lifecycleStatus": "CAPABILITY_DEFINED_NO_TIME_SERIES",
+        "evidenceTypes": ["sensor_installation_photo", "sensor_calibration_certificate"],
+        "humanAuthorizationRequired": false
+      }
+    ],
+    "fixtures": [
+      {
+        "businessId": "FIXTURE-1602-WC-01",
+        "displayName": "1602卫生间坐便器",
+        "ifcClass": "IfcSanitaryTerminal",
+        "predefinedType": "TOILETPAN",
+        "spaceId": "SPACE-1602-BATHROOM",
+        "geometry": {
+          "shape": "box",
+          "localOrigin": {"x": 1.64, "y": 0.16, "z": 0.0},
+          "size": {"x": 0.58, "y": 0.72, "z": 0.78}
+        },
+        "lifecycleStatus": "ENVIRONMENT_COMPONENT_READY",
+        "evidenceTypes": ["fixture_installation_photo", "fixture_acceptance_record"],
+        "humanAuthorizationRequired": false
+      },
+      {
+        "businessId": "FIXTURE-1602-BASIN-01",
+        "displayName": "1602卫生间洗手盆",
+        "ifcClass": "IfcSanitaryTerminal",
+        "predefinedType": "WASHHANDBASIN",
+        "spaceId": "SPACE-1602-BATHROOM",
+        "geometry": {
+          "shape": "box",
+          "localOrigin": {"x": 0.18, "y": 0.2, "z": 0.68},
+          "size": {"x": 0.72, "y": 0.46, "z": 0.18}
+        },
+        "lifecycleStatus": "ENVIRONMENT_COMPONENT_READY",
+        "evidenceTypes": ["fixture_installation_photo", "fixture_acceptance_record"],
+        "humanAuthorizationRequired": false
+      },
+      {
+        "businessId": "FIXTURE-1602-SHOWER-01",
+        "displayName": "1602卫生间淋浴设备",
+        "ifcClass": "IfcSanitaryTerminal",
+        "predefinedType": "SHOWER",
+        "spaceId": "SPACE-1602-BATHROOM",
+        "geometry": {
+          "shape": "box",
+          "localOrigin": {"x": 2.22, "y": 1.08, "z": 0.18},
+          "size": {"x": 0.12, "y": 0.18, "z": 2.05}
+        },
+        "lifecycleStatus": "ENVIRONMENT_COMPONENT_READY",
+        "evidenceTypes": ["fixture_installation_photo", "fixture_function_test"],
+        "humanAuthorizationRequired": false
+      },
+      {
+        "businessId": "DRAIN-1602-FLOOR-01",
+        "displayName": "1602卫生间地漏",
+        "ifcClass": "IfcWasteTerminal",
+        "predefinedType": "FLOORTRAP",
+        "spaceId": "SPACE-1602-BATHROOM",
+        "geometry": {
+          "shape": "box",
+          "localOrigin": {"x": 1.94, "y": 1.36, "z": 0.025},
+          "size": {"x": 0.16, "y": 0.16, "z": 0.025}
+        },
+        "lifecycleStatus": "ENVIRONMENT_COMPONENT_READY",
+        "evidenceTypes": ["drain_installation_photo", "drain_flow_test"],
+        "humanAuthorizationRequired": false
+      },
+      {
+        "businessId": "PARTITION-1602-SHOWER-01",
+        "displayName": "1602卫生间淋浴玻璃隔断",
+        "ifcClass": "IfcBuildingElementProxy",
+        "predefinedType": "USERDEFINED",
+        "objectType": "SHOWER_PARTITION",
+        "spaceId": "SPACE-1602-BATHROOM",
+        "geometry": {
+          "shape": "box",
+          "localOrigin": {"x": 1.5, "y": 0.86, "z": 0.05},
+          "size": {"x": 0.035, "y": 0.6, "z": 1.95}
+        },
+        "lifecycleStatus": "ENVIRONMENT_COMPONENT_READY",
+        "evidenceTypes": ["partition_installation_photo", "partition_acceptance_record"],
+        "humanAuthorizationRequired": false
+      }
+    ],
+    "connections": [
+      {"businessId": "CONN-1602-CW-01", "fromComponentId": "METER-1602-FLOW-01", "fromPortId": "PORT-METER-1602-FLOW-01-OUT", "toComponentId": "VALVE-1602-CW-01", "toPortId": "PORT-VALVE-1602-CW-01-IN", "flowDirection": "SOURCE"},
+      {"businessId": "CONN-1602-CW-02", "fromComponentId": "VALVE-1602-CW-01", "fromPortId": "PORT-VALVE-1602-CW-01-OUT", "toComponentId": "PIPE-1602-CW-01", "toPortId": "PORT-PIPE-1602-CW-01-IN", "flowDirection": "SOURCE"},
+      {"businessId": "CONN-1602-CW-03", "fromComponentId": "PIPE-1602-CW-01", "fromPortId": "PORT-PIPE-1602-CW-01-OUT", "toComponentId": "J-1602-CW-03", "toPortId": "PORT-J-1602-CW-03-IN", "flowDirection": "SOURCE"},
+      {"businessId": "CONN-1602-CW-04", "fromComponentId": "J-1602-CW-03", "fromPortId": "PORT-J-1602-CW-03-OUT", "toComponentId": "PIPE-1602-CW-02", "toPortId": "PORT-PIPE-1602-CW-02-IN", "flowDirection": "SOURCE"}
+    ]
+  },
+  "bathroomVisual": {
+    "sceneId": "SCENE-1602-BATHROOM",
+    "sourceBuildingId": "BLD-ZS-DEMO-001",
+    "sourceStoreyId": "LVL-16",
+    "sourceUnitId": "UNIT-1602",
+    "sourceSpaceId": "SPACE-1602-BATHROOM",
+    "coordinateMode": "BUILDING_GLOBAL_ROOT_WITH_ROOM_LOCAL_CHILDREN",
+    "roomFinish": {
+      "floorFinishThickness": 0.035,
+      "wallTileThickness": 0.018,
+      "ceilingElevation": 2.72,
+      "ceilingThickness": 0.06,
+      "tileModule": 0.3,
+      "groutWidth": 0.006,
+      "thresholdWidth": 0.08,
+      "wetZoneBoundaryX": 1.5
+    },
+    "materials": {
+      "MAT-TILE-WALL": {"baseColor": [0.78, 0.8, 0.78, 1.0], "roughness": 0.32, "metallic": 0.0},
+      "MAT-TILE-FLOOR": {"baseColor": [0.34, 0.38, 0.37, 1.0], "roughness": 0.42, "metallic": 0.0},
+      "MAT-GROUT": {"baseColor": [0.1, 0.11, 0.11, 1.0], "roughness": 0.7, "metallic": 0.0},
+      "MAT-PORCELAIN": {"baseColor": [0.92, 0.93, 0.9, 1.0], "roughness": 0.18, "metallic": 0.0},
+      "MAT-VANITY": {"baseColor": [0.22, 0.25, 0.24, 1.0], "roughness": 0.36, "metallic": 0.05},
+      "MAT-METAL": {"baseColor": [0.42, 0.46, 0.47, 1.0], "roughness": 0.22, "metallic": 0.72},
+      "MAT-GLASS": {"baseColor": [0.55, 0.76, 0.79, 0.26], "roughness": 0.08, "metallic": 0.0, "transmission": 0.72},
+      "MAT-MIRROR": {"baseColor": [0.5, 0.58, 0.6, 1.0], "roughness": 0.04, "metallic": 0.9},
+      "MAT-COLD-WATER": {"baseColor": [0.07, 0.34, 0.58, 1.0], "roughness": 0.3, "metallic": 0.15},
+      "MAT-HOT-WATER": {"baseColor": [0.62, 0.12, 0.08, 1.0], "roughness": 0.3, "metallic": 0.15},
+      "MAT-VALVE": {"baseColor": [0.78, 0.36, 0.08, 1.0], "roughness": 0.28, "metallic": 0.35},
+      "MAT-JOINT": {"baseColor": [0.92, 0.67, 0.08, 1.0], "roughness": 0.2, "metallic": 0.2},
+      "MAT-SENSOR": {"baseColor": [0.12, 0.58, 0.42, 1.0], "roughness": 0.28, "metallic": 0.08},
+      "MAT-WATERPROOF": {"baseColor": [0.06, 0.5, 0.56, 0.28], "roughness": 0.4, "metallic": 0.0},
+      "MAT-EVIDENCE": {"baseColor": [0.94, 0.62, 0.08, 1.0], "roughness": 0.24, "metallic": 0.15},
+      "MAT-DAMP-LIGHT": {"baseColor": [0.12, 0.24, 0.25, 0.24], "roughness": 0.18, "metallic": 0.0},
+      "MAT-DAMP-MODERATE": {"baseColor": [0.08, 0.18, 0.19, 0.42], "roughness": 0.14, "metallic": 0.0},
+      "MAT-DAMP-SEVERE": {"baseColor": [0.04, 0.1, 0.11, 0.62], "roughness": 0.1, "metallic": 0.0},
+      "MAT-REPAIR": {"baseColor": [0.26, 0.19, 0.13, 1.0], "roughness": 0.8, "metallic": 0.0}
+    },
+    "views": {
+      "VIEW_RESIDENT": {
+        "camera": "CAM_RESIDENT_OVERVIEW",
+        "visibleLayers": ["ARCHITECTURE", "FIXTURES"],
+        "hiddenLayers": ["SYSTEMS", "WATERPROOFING", "EVIDENCE", "MAINTENANCE"],
+        "hiddenNodes": ["WALL-1602-BATHROOM-EAST", "WALL-1602-BATHROOM-SOUTH-WEST", "WALL-1602-BATHROOM-SOUTH-EAST"]
+      },
+      "VIEW_DIAGNOSTIC": {
+        "camera": "CAM_DIAGNOSTIC_CUTAWAY",
+        "visibleLayers": ["ARCHITECTURE", "FIXTURES", "SYSTEMS"],
+        "hiddenLayers": ["WATERPROOFING", "EVIDENCE", "MAINTENANCE"],
+        "hiddenNodes": ["WALL-1602-BATHROOM-EAST", "WALL-1602-BATHROOM-SOUTH-WEST", "WALL-1602-BATHROOM-SOUTH-EAST", "DOOR-1602-BATHROOM", "PARTITION-1602-SHOWER-01"]
+      },
+      "VIEW_CONSTRUCTION_MEMORY": {
+        "camera": "CAM_CONSTRUCTION_MEMORY",
+        "visibleLayers": ["ARCHITECTURE", "SYSTEMS", "WATERPROOFING", "EVIDENCE"],
+        "hiddenLayers": ["MAINTENANCE"],
+        "hiddenNodes": ["WALL-1602-BATHROOM-EAST", "WALL-1602-BATHROOM-SOUTH-WEST", "WALL-1602-BATHROOM-SOUTH-EAST", "DOOR-1602-BATHROOM", "PARTITION-1602-SHOWER-01"]
+      },
+      "VIEW_MAINTENANCE": {
+        "camera": "CAM_JOINT_CLOSEUP",
+        "visibleLayers": ["ARCHITECTURE", "FIXTURES", "SYSTEMS", "MAINTENANCE"],
+        "hiddenLayers": ["WATERPROOFING", "EVIDENCE"],
+        "hiddenNodes": ["WALL-1602-BATHROOM-EAST", "WALL-1602-BATHROOM-SOUTH-WEST", "WALL-1602-BATHROOM-SOUTH-EAST", "DOOR-1602-BATHROOM", "PARTITION-1602-SHOWER-01"]
+      }
+    },
+    "visualStates": {
+      "states": ["DRY", "DAMP_LIGHT", "DAMP_MODERATE", "DAMP_SEVERE", "REPAIR_OPEN", "REPAIRED"],
+      "defaultState": "DRY",
+      "moistureLevel": {"type": "number", "minimum": 0.0, "maximum": 1.0, "default": 0.0},
+      "valvePosition": {"type": "enum", "values": ["OPEN", "CLOSED"], "default": "OPEN", "authorizationRequired": true},
+      "repairState": {"type": "enum", "values": ["CLOSED_WALL", "REPAIR_OPEN", "REPAIRED"], "default": "CLOSED_WALL"}
+    },
+    "evidenceAnchors": [
+      {"businessId": "EVIDENCE-ANCHOR-PIPE-INSTALL", "localPosition": [1.0, 1.54, 1.18], "relatedBusinessIds": ["PIPE-1602-CW-01", "PIPE-1602-HW-01"]},
+      {"businessId": "EVIDENCE-ANCHOR-WATERPROOF", "localPosition": [1.12, 0.92, 0.08], "relatedBusinessIds": ["WP-1602-BATHROOM"]},
+      {"businessId": "EVIDENCE-ANCHOR-CLOSED-WATER-TEST", "localPosition": [1.9, 1.3, 0.12], "relatedBusinessIds": ["WP-1602-BATHROOM", "DRAIN-1602-FLOOR-01"]},
+      {"businessId": "EVIDENCE-ANCHOR-RESIDENT-WALL-PHOTO", "localPosition": [1.34, 1.72, 1.0], "relatedBusinessIds": ["J-1602-CW-03", "WALL-1602-BATHROOM-NORTH"]},
+      {"businessId": "EVIDENCE-ANCHOR-METER-READING", "localPosition": [0.28, 1.54, 1.24], "relatedBusinessIds": ["METER-1602-FLOW-01"]},
+      {"businessId": "EVIDENCE-ANCHOR-REPAIR-RESULT", "localPosition": [1.36, 1.62, 1.12], "relatedBusinessIds": ["J-1602-CW-03"]}
+    ],
+    "performance": {
+      "maxGlbBytes": 15728640,
+      "maxTriangles": 150000,
+      "renderWidth": 1600,
+      "renderHeight": 900,
+      "maxTextureDimension": 2048
+    }
+  },
+  "identity": {
+    "propertySetName": "Pset_ZhushengIdentity",
+    "businessIdProperty": "BusinessId",
+    "deterministicGlobalIds": true,
+    "globalIdSeedNamespace": "zhusheng-demo-v1"
+  },
+  "phase1": {
+    "includeStoreys": true,
+    "includeTypicalUnitSpaces": true,
+    "includeFocusUnitRooms": true,
+    "includeFocusBathroomWalls": true,
+    "includeFocusBathroomSlab": true,
+    "includeFocusBathroomDoor": true,
+    "includePipes": false,
+    "includeValves": false,
+    "includeMeters": false,
+    "includeSensors": false,
+    "includeLifecycleEvidence": false,
+    "includeWebExport": false
+  },
+  "phase1_1": {
+    "includeFloorSlabs": true,
+    "includeExternalWalls": true,
+    "includeFacadeWindows": true,
+    "includeMainEntrance": true,
+    "includeCoreWalls": true,
+    "includeRoof": true,
+    "includeParapet": true,
+    "includePipes": false,
+    "includeValves": false,
+    "includeMeters": false,
+    "includeSensors": false,
+    "includeLifecycleEvidence": false,
+    "includeWebExport": false
+  },
+  "phase2": {
+    "includeWaterproofing": true,
+    "includeColdWaterSystem": true,
+    "includeHotWaterSystem": true,
+    "includeHumiditySensor": true,
+    "includeTopology": true,
+    "includeMemorySeed": true,
+    "includeSensorTimeSeries": false,
+    "includeLeakDiagnosis": false,
+    "includeAuthorizedActions": false,
+    "includeLifecycleEventEngine": false,
+    "includeWebExport": false
+  },
+  "phase2_5": {
+    "includeBathroomFixtures": true,
+    "includeBathroomVisualScene": true,
+    "includeGlbExport": true,
+    "includeVisualManifest": true,
+    "includeEvidenceAnchors": true,
+    "includeNeutralVisualStates": true,
+    "includeLifecycleEventEngine": false,
+    "includeSensorTimeSeries": false,
+    "includeLeakDiagnosis": false,
+    "includeAuthorizedActions": false,
+    "includeWorkOrders": false,
+    "includeWebsiteIntegration": false
+  }
+}

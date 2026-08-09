@@ -1,0 +1,22 @@
+{
+  "description": "只有湿度异常，微流量保持正常",
+  "syntheticDemo": true,
+  "steps": [
+    {
+      "eventId": "EVT-1602-HUMIDITY-001",
+      "buildingId": "BLD-ZS-DEMO-001",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "detectedAt": "2026-07-29T08:59:00.000Z",
+      "evaluatedAt": "2026-07-29T09:05:00.000Z",
+      "observations": [
+        { "id": "OBS-HUM-H01", "sensorBusinessId": "SENSOR-1602-HUM-01", "observedAt": "2026-07-29T09:00:00.000Z", "metric": "RELATIVE_HUMIDITY", "value": 88, "unit": "%", "baseline": 58, "durationMinutes": 40, "quality": "GOOD", "syntheticDemo": true },
+        { "id": "OBS-FLOW-H01", "sensorBusinessId": "METER-1602-FLOW-01", "observedAt": "2026-07-29T09:00:00.000Z", "metric": "MICRO_FLOW", "value": 0, "unit": "L/min", "baseline": 0, "durationMinutes": 30, "quality": "GOOD", "syntheticDemo": true }
+      ],
+      "evidence": [
+        { "id": "EVD-WP-H01", "type": "WATERPROOFING_RECORD", "status": "PRESENT", "observedValue": "COMPLETE", "sourceActor": "WORKER", "relatedBusinessIds": ["WP-1602-BATHROOM"], "capturedAt": "2025-03-19T10:08:00.000Z", "reliability": 0.9, "provenance": "合成防水施工记录", "syntheticDemo": true },
+        { "id": "EVD-CWT-H01", "type": "CLOSED_WATER_TEST", "status": "PRESENT", "observedValue": "PASS", "sourceActor": "PROPERTY", "relatedBusinessIds": ["WP-1602-BATHROOM"], "capturedAt": "2025-03-21T16:40:00.000Z", "reliability": 0.95, "provenance": "合成闭水试验记录", "syntheticDemo": true }
+      ],
+      "syntheticDemo": true
+    }
+  ]
+}

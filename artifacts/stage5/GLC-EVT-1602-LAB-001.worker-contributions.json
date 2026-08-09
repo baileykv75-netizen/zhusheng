@@ -1,0 +1,73 @@
+[
+  {
+    "contributionId": "CONTRIB-EVT-1602-LAB-001-EVD-PIPE-LAB-001",
+    "evidenceId": "EVD-PIPE-LAB-001",
+    "evidenceType": "PIPE_INSTALLATION_RECORD",
+    "constructionProcess": "给水管线安装记录",
+    "relatedSpaceIds": [
+      "SPACE-1602-BATHROOM"
+    ],
+    "relatedComponentIds": [
+      "J-1602-CW-03",
+      "PIPE-1602-CW-01"
+    ],
+    "contributorId": "WORKER-DEMO-ID-NOT-RECORDED",
+    "contributorIdentityStatus": "DEMO_ID_NOT_RECORDED",
+    "usedBy": [
+      {
+        "useType": "DIAGNOSIS",
+        "referenceId": "EVT-1602-LAB-001",
+        "usedAt": "2026-07-29T11:52:13.432Z"
+      },
+      {
+        "useType": "REPAIR_TASK",
+        "referenceId": "TASK-EVT-1602-LAB-001-J-1602-CW-03",
+        "usedAt": "2026-07-29T11:53:09.387Z"
+      },
+      {
+        "useType": "MEMORY_PATCH",
+        "referenceId": "PATCH-EVT-1602-LAB-001-16",
+        "usedAt": "2026-07-29T11:53:14.960Z"
+      }
+    ],
+    "locatingContribution": "将入住异常缩小到冷水连接链及相邻构件，而非盲目拆检整个卫生间。",
+    "responsibilityInference": "PROHIBITED",
+    "syntheticDemo": true,
+    "contentHash": "5d9983364e3c4c7469864307c49a643e5fe9657e9d7fdfb9cf22f0f904be82a9"
+  },
+  {
+    "contributionId": "CONTRIB-EVT-1602-LAB-001-EVD-WP-LAB-001",
+    "evidenceId": "EVD-WP-LAB-001",
+    "evidenceType": "WATERPROOFING_RECORD",
+    "constructionProcess": "卫生间防水施工记录",
+    "relatedSpaceIds": [
+      "SPACE-1602-BATHROOM"
+    ],
+    "relatedComponentIds": [
+      "WP-1602-BATHROOM"
+    ],
+    "contributorId": "WORKER-DEMO-ID-NOT-RECORDED",
+    "contributorIdentityStatus": "DEMO_ID_NOT_RECORDED",
+    "usedBy": [
+      {
+        "useType": "DIAGNOSIS",
+        "referenceId": "EVT-1602-LAB-001",
+        "usedAt": "2026-07-29T11:52:13.432Z"
+      },
+      {
+        "useType": "REPAIR_TASK",
+        "referenceId": "TASK-EVT-1602-LAB-001-J-1602-CW-03",
+        "usedAt": "2026-07-29T11:53:09.387Z"
+      },
+      {
+        "useType": "MEMORY_PATCH",
+        "referenceId": "PATCH-EVT-1602-LAB-001-16",
+        "usedAt": "2026-07-29T11:53:14.960Z"
+      }
+    ],
+    "locatingContribution": "提供防水施工基线，帮助比较供水连接与防水失效两个候选方向。",
+    "responsibilityInference": "PROHIBITED",
+    "syntheticDemo": true,
+    "contentHash": "f7fb95b5f0592067466dc1c5bba1b7b3f39c11e8895cedac6eecc34273feb054"
+  }
+]

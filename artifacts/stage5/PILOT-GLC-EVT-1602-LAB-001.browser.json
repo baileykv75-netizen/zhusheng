@@ -1,0 +1,43 @@
+{
+  "checklistItemId": "PILOT-GLC-EVT-1602-LAB-001-GRD-GLC-EVT-1602-LAB-001-01",
+  "sourceCardId": "GLC-EVT-1602-LAB-001",
+  "sourceEventIds": [
+    "EVT-1602-LAB-001"
+  ],
+  "applicableProjectTypes": [
+    "下一批MiC住宅试点项目"
+  ],
+  "applicableSpaces": [
+    "MiC卫生间模块",
+    "SPACE-1602-BATHROOM"
+  ],
+  "targetComponentType": "给水管道连接件",
+  "targetBusinessId": "J-1602-CW-03",
+  "inspectionProcess": [
+    "MiC卫生间模块封板前定位给水管道连接件",
+    "对更换连接节点及相邻上下游接口进行复核",
+    "闭水或交付验证记录同时关联空间、构件BusinessId与证据ID"
+  ],
+  "requiredEvidence": [
+    "更换前后节点近景、连接参数与复核记录",
+    "可追溯至空间与构件身份的施工记录",
+    "试点模块验证记录及异常处置结果"
+  ],
+  "passConditions": [
+    "目标构件及相邻连接可由BusinessId精确查询",
+    "施工证据覆盖建议检查工序且来源明确",
+    "试点验证结果经人工复核并保留审计记录"
+  ],
+  "failureHandling": [
+    "证据缺失时退回补录，不自动判定责任",
+    "检查异常时转人工复核并保留原始证据",
+    "未完成试点验证前不得升级为企业标准"
+  ],
+  "status": "PILOT_ONLY",
+  "reviewerId": "GROUP-REVIEWER-DEMO-01",
+  "reviewedAt": "2026-07-30T08:00:44.929Z",
+  "reviewDecisionId": "GRD-GLC-EVT-1602-LAB-001-01",
+  "syntheticDemo": true,
+  "disclaimer": "脱敏合成演示试点检查项。仅用于下一批项目试点验证，不是企业标准。",
+  "contentHash": "89c050522599e0110201d7e15bf1fa0376a0b74573fcb443a3dbdb29f2ac0eb3"
+}

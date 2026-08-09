@@ -1,0 +1,9 @@
+.git
+.env
+.zhusheng-server.pid
+outputs
+submission
+server.*.log
+node_modules
+.next
+*.log

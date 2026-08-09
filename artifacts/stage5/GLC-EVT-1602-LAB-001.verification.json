@@ -1,0 +1,32 @@
+{
+  "valid": true,
+  "checks": [
+    {
+      "id": "SOURCE_EVENT",
+      "passed": true,
+      "message": "通过"
+    },
+    {
+      "id": "CARD_INTEGRITY",
+      "passed": true,
+      "message": "通过"
+    },
+    {
+      "id": "WORKER_CONTRIBUTIONS",
+      "passed": true,
+      "message": "通过"
+    },
+    {
+      "id": "REVIEW_AUDIT",
+      "passed": true,
+      "message": "通过"
+    },
+    {
+      "id": "PILOT_CONSISTENCY",
+      "passed": true,
+      "message": "通过"
+    }
+  ],
+  "reviewState": "APPROVED_AS_PILOT",
+  "reviewRootHash": "c19cf94c84a0df68dd0311e40903bf85b473eeaa165b355664d3ed1b150d859c"
+}

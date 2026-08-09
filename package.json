@@ -1,0 +1,56 @@
+{
+  "name": "zhusheng-building-agent",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "筑生：一栋房子一生的AI智能体",
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0 -p 4174",
+    "build": "pnpm run check:life-event-assets && pnpm run check:group-learning-assets && next build && node scripts/prepare-sites-dist.mjs",
+    "build:next": "pnpm run check:life-event-assets && pnpm run check:group-learning-assets && next build",
+    "start": "node scripts/serve-dist.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-strip-types tests/*.test.ts tests/life-event-engine/*.test.ts",
+    "test:css-delivery": "node tests/css-delivery-qa.mjs",
+    "test:exhibit": "node tests/exhibit-qa.mjs",
+    "test:resident-task": "node tests/resident-task-qa.mjs",
+    "test:stage4a-visual": "node tests/stage4a-visual-qa.mjs",
+    "test:stage4b-visual": "node tests/stage4b-visual-qa.mjs",
+    "event:simulate": "node --experimental-strip-types scripts/life-event-cli.ts",
+    "event:verify-artifact": "node --experimental-strip-types scripts/life-event-artifact-cli.ts --mode verify",
+    "event:replay": "node --experimental-strip-types scripts/life-event-artifact-cli.ts --mode replay",
+    "sync:life-event-assets": "node --experimental-strip-types scripts/sync-life-event-assets.ts",
+    "check:life-event-assets": "node --experimental-strip-types scripts/sync-life-event-assets.ts --check",
+    "sync:group-learning-assets": "node --experimental-strip-types scripts/sync-group-learning-assets.ts",
+    "check:group-learning-assets": "node --experimental-strip-types scripts/sync-group-learning-assets.ts --check",
+    "group:export": "node --experimental-strip-types scripts/generate-group-learning-artifacts.ts",
+    "test:stage5-visual": "node tests/stage5-visual-qa.mjs",
+    "test:stage6a-visual": "node tests/stage6a-visual-qa.mjs",
+    "test:stage6b-visual": "node tests/stage6b-visual-qa.mjs",
+    "test:journey-visual": "node tests/journey-visual-qa.mjs",
+    "test:unified-workspace": "node tests/unified-lifecycle-visual-qa.mjs",
+    "agent:export": "node --experimental-strip-types scripts/generate-building-agent-artifact.ts",
+    "agent:gateway": "node --env-file-if-exists=.env --experimental-strip-types tools/building-agent-gateway/server.ts",
+    "agent:live-smoke": "node --env-file-if-exists=.env --experimental-strip-types scripts/live-deepseek-smoke.ts",
+    "security:scan": "node scripts/scan-stage6b-secrets.mjs",
+    "package:submission": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/package-submission.ps1"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.2.0",
+    "lucide-react": "^0.468.0",
+    "next": "^15.5.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.185.1",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

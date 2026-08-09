@@ -1,0 +1,605 @@
+{
+  "disclaimer": "脱敏合成演示事件，不作为真实诊断或设备控制依据",
+  "eventId": "EVT-1602-HUMIDITY-001",
+  "state": "ASSESSED",
+  "valvePosition": "OPEN",
+  "rankedHypotheses": [
+    {
+      "hypothesis": "CONDENSATION_OR_AMBIENT_HUMIDITY",
+      "candidateBusinessIds": [
+        "SENSOR-1602-HUM-01"
+      ],
+      "rawScore": 45,
+      "evidenceCoverage": 0.667,
+      "gapFromLeader": 20,
+      "confidence": "MEDIUM",
+      "contributions": [
+        {
+          "ruleId": "RULE-HUM-003",
+          "hypothesis": "CONDENSATION_OR_AMBIENT_HUMIDITY",
+          "contribution": 25,
+          "evidenceIds": [
+            "OBS-HUM-H01"
+          ],
+          "explanation": "湿度异常首先证明环境潮湿，需要流量证据区分原因"
+        },
+        {
+          "ruleId": "RULE-ENV-001",
+          "hypothesis": "CONDENSATION_OR_AMBIENT_HUMIDITY",
+          "contribution": 20,
+          "evidenceIds": [
+            "OBS-FLOW-H01"
+          ],
+          "explanation": "湿度异常但微流量正常，更支持环境潮湿或冷凝"
+        }
+      ]
+    },
+    {
+      "hypothesis": "UNRESOLVED",
+      "candidateBusinessIds": [],
+      "rawScore": 25,
+      "evidenceCoverage": 0.5,
+      "gapFromLeader": 20,
+      "confidence": "NOT_APPLICABLE",
+      "contributions": [
+        {
+          "ruleId": "RULE-UNR-001",
+          "hypothesis": "UNRESOLVED",
+          "contribution": 25,
+          "evidenceIds": [],
+          "explanation": "关键证据缺失，当前应保持未决并继续补证"
+        }
+      ]
+    },
+    {
+      "hypothesis": "WATERPROOFING_FAILURE",
+      "candidateBusinessIds": [
+        "WP-1602-BATHROOM"
+      ],
+      "rawScore": 5.6,
+      "evidenceCoverage": 0.75,
+      "gapFromLeader": 39.4,
+      "confidence": "NOT_APPLICABLE",
+      "contributions": [
+        {
+          "ruleId": "RULE-HUM-002",
+          "hypothesis": "WATERPROOFING_FAILURE",
+          "contribution": 8,
+          "evidenceIds": [
+            "OBS-HUM-H01"
+          ],
+          "explanation": "持续潮湿与防水失效相容，但不是特异证据"
+        },
+        {
+          "ruleId": "RULE-WP-002",
+          "hypothesis": "WATERPROOFING_FAILURE",
+          "contribution": 9,
+          "evidenceIds": [
+            "EVD-WP-H01"
+          ],
+          "explanation": "防水施工记忆提供可核查对象和范围"
+        },
+        {
+          "ruleId": "RULE-WP-003",
+          "hypothesis": "WATERPROOFING_FAILURE",
+          "contribution": -11.4,
+          "evidenceIds": [
+            "EVD-CWT-H01"
+          ],
+          "explanation": "历史闭水试验合格降低施工期防水缺陷的相对支持度，但不能完全排除后期失效"
+        }
+      ]
+    },
+    {
+      "hypothesis": "COLD_WATER_JOINT_LEAK",
+      "candidateBusinessIds": [
+        "J-1602-CW-03"
+      ],
+      "rawScore": -8,
+      "evidenceCoverage": 0.2,
+      "gapFromLeader": 53,
+      "confidence": "NOT_APPLICABLE",
+      "contributions": [
+        {
+          "ruleId": "RULE-HUM-001",
+          "hypothesis": "COLD_WATER_JOINT_LEAK",
+          "contribution": 10,
+          "evidenceIds": [
+            "OBS-HUM-H01"
+          ],
+          "explanation": "持续湿度异常支持存在潮湿现象，但不能单独确定供水接头泄漏"
+        },
+        {
+          "ruleId": "RULE-CW-005",
+          "hypothesis": "COLD_WATER_JOINT_LEAK",
+          "contribution": -18,
+          "evidenceIds": [
+            "OBS-FLOW-H01"
+          ],
+          "explanation": "未观察到持续微流量，削弱供水接头泄漏假设"
+        }
+      ]
+    }
+  ],
+  "decisionConfidence": "MEDIUM",
+  "supportingEvidence": [
+    "EVD-CWT-H01",
+    "EVD-WP-H01",
+    "OBS-FLOW-H01",
+    "OBS-HUM-H01"
+  ],
+  "contradictingEvidence": [],
+  "missingEvidence": [
+    {
+      "evidenceType": "PIPE_INSTALLATION_RECORD",
+      "reason": "用于核对接头位置、工序与施工记忆完整性",
+      "requestedFrom": "WORKER",
+      "relatedBusinessIds": [
+        "J-1602-CW-03",
+        "PIPE-1602-CW-01",
+        "PIPE-1602-CW-02",
+        "PIPE-1602-HW-01"
+      ]
+    },
+    {
+      "evidenceType": "RESIDENT_WALL_PHOTO",
+      "reason": "用于定位潮湿区域与隐蔽构件的空间关系",
+      "requestedFrom": "RESIDENT",
+      "relatedBusinessIds": [
+        "J-1602-CW-03"
+      ]
+    },
+    {
+      "evidenceType": "METER_READING",
+      "reason": "用于复核无人用水条件下微流量是否真实存在",
+      "requestedFrom": "RESIDENT",
+      "relatedBusinessIds": [
+        "METER-1602-FLOW-01"
+      ]
+    }
+  ],
+  "contradictions": [],
+  "nextSteps": [
+    "请WORKER补充PIPE_INSTALLATION_RECORD：用于核对接头位置、工序与施工记忆完整性",
+    "请RESIDENT补充RESIDENT_WALL_PHOTO：用于定位潮湿区域与隐蔽构件的空间关系",
+    "请RESIDENT补充METER_READING：用于复核无人用水条件下微流量是否真实存在"
+  ],
+  "proposedActions": [],
+  "authorizationRequests": [],
+  "authorizedActions": [],
+  "completedActions": [],
+  "authorizationRequirement": null,
+  "visualDirective": {
+    "view": "VIEW_DIAGNOSTIC",
+    "highlightBusinessIds": [
+      "SENSOR-1602-HUM-01"
+    ],
+    "moistureState": "DAMP_SEVERE",
+    "valvePosition": "OPEN",
+    "evidenceAnchorIds": [
+      "EVIDENCE-ANCHOR-METER-READING",
+      "EVIDENCE-ANCHOR-PIPE-INSTALL",
+      "EVIDENCE-ANCHOR-RESIDENT-WALL-PHOTO"
+    ],
+    "allowedActions": [
+      "REQUEST_METER_READING",
+      "REQUEST_PIPE_INSTALLATION_RECORD",
+      "REQUEST_RESIDENT_WALL_PHOTO"
+    ],
+    "authorizationRequired": false
+  },
+  "auditLog": [
+    {
+      "sequence": 1,
+      "eventId": "EVT-1602-HUMIDITY-001",
+      "timestamp": "2026-07-29T09:05:00.000Z",
+      "actorType": "SYSTEM",
+      "actionType": "EVENT_DETECTED",
+      "previousState": "DETECTED",
+      "nextState": "COLLECTING_EVIDENCE",
+      "inputRefs": [
+        "OBS-FLOW-H01",
+        "OBS-HUM-H01"
+      ],
+      "evidenceRefs": [
+        "EVD-CWT-H01",
+        "EVD-WP-H01"
+      ],
+      "componentRefs": [
+        "J-1602-CW-03",
+        "SENSOR-1602-HUM-01",
+        "WP-1602-BATHROOM"
+      ],
+      "ruleIds": [
+        "RULE-CW-005",
+        "RULE-ENV-001",
+        "RULE-HUM-001",
+        "RULE-HUM-002",
+        "RULE-HUM-003",
+        "RULE-UNR-001",
+        "RULE-WP-002",
+        "RULE-WP-003"
+      ],
+      "ruleSetVersion": "ZS-LE-1.1.0",
+      "memoryVersion": "2.5.0",
+      "previousHash": "9b9bcc0a243a635ac5b97998697153cec8b9af1b8c1bc0bab625a58092f6a487",
+      "inputSnapshotHash": "17d18c2c397ffbb3c3c098ce4af2da9df4082222c429c9c1ef5bee2c2e2bd49b",
+      "evidenceSnapshotHash": "10ef3164130358d3066ed1dee5fe0910af074d665e97df1611270e4723ab1e19",
+      "authorizationRecordIds": [],
+      "decisionOutputHash": "91dd4b05950b7ff170fe8fb7ed0f7d6670a846ff588479dee4b28038745d00ee",
+      "entryHash": "18fa852958d3eec2676d61304153eec4d403e950dd8fa0221532761ff23eefa8"
+    },
+    {
+      "sequence": 2,
+      "eventId": "EVT-1602-HUMIDITY-001",
+      "timestamp": "2026-07-29T09:05:00.000Z",
+      "actorType": "SYSTEM",
+      "actionType": "ASSESSMENT_COMPLETED",
+      "previousState": "COLLECTING_EVIDENCE",
+      "nextState": "ASSESSED",
+      "inputRefs": [
+        "OBS-FLOW-H01",
+        "OBS-HUM-H01"
+      ],
+      "evidenceRefs": [
+        "EVD-CWT-H01",
+        "EVD-WP-H01"
+      ],
+      "componentRefs": [
+        "J-1602-CW-03",
+        "SENSOR-1602-HUM-01",
+        "WP-1602-BATHROOM"
+      ],
+      "ruleIds": [
+        "RULE-CW-005",
+        "RULE-ENV-001",
+        "RULE-HUM-001",
+        "RULE-HUM-002",
+        "RULE-HUM-003",
+        "RULE-UNR-001",
+        "RULE-WP-002",
+        "RULE-WP-003"
+      ],
+      "ruleSetVersion": "ZS-LE-1.1.0",
+      "memoryVersion": "2.5.0",
+      "previousHash": "18fa852958d3eec2676d61304153eec4d403e950dd8fa0221532761ff23eefa8",
+      "inputSnapshotHash": "17d18c2c397ffbb3c3c098ce4af2da9df4082222c429c9c1ef5bee2c2e2bd49b",
+      "evidenceSnapshotHash": "10ef3164130358d3066ed1dee5fe0910af074d665e97df1611270e4723ab1e19",
+      "authorizationRecordIds": [],
+      "decisionOutputHash": "91dd4b05950b7ff170fe8fb7ed0f7d6670a846ff588479dee4b28038745d00ee",
+      "entryHash": "9c75b5ffbd6ceac6f2b070206cb74ff847cae0b155b8f06ef672b50d37c2d1e6"
+    }
+  ],
+  "ruleSetVersion": "ZS-LE-1.1.0",
+  "memoryVersion": "2.5.0",
+  "syntheticDemo": true,
+  "input": {
+    "eventId": "EVT-1602-HUMIDITY-001",
+    "buildingId": "BLD-ZS-DEMO-001",
+    "spaceId": "SPACE-1602-BATHROOM",
+    "detectedAt": "2026-07-29T08:59:00.000Z",
+    "evaluatedAt": "2026-07-29T09:05:00.000Z",
+    "observations": [
+      {
+        "id": "OBS-HUM-H01",
+        "sensorBusinessId": "SENSOR-1602-HUM-01",
+        "observedAt": "2026-07-29T09:00:00.000Z",
+        "metric": "RELATIVE_HUMIDITY",
+        "value": 88,
+        "unit": "%",
+        "baseline": 58,
+        "durationMinutes": 40,
+        "quality": "GOOD",
+        "syntheticDemo": true
+      },
+      {
+        "id": "OBS-FLOW-H01",
+        "sensorBusinessId": "METER-1602-FLOW-01",
+        "observedAt": "2026-07-29T09:00:00.000Z",
+        "metric": "MICRO_FLOW",
+        "value": 0,
+        "unit": "L/min",
+        "baseline": 0,
+        "durationMinutes": 30,
+        "quality": "GOOD",
+        "syntheticDemo": true
+      }
+    ],
+    "evidence": [
+      {
+        "id": "EVD-WP-H01",
+        "type": "WATERPROOFING_RECORD",
+        "status": "PRESENT",
+        "observedValue": "COMPLETE",
+        "sourceActor": "WORKER",
+        "relatedBusinessIds": [
+          "WP-1602-BATHROOM"
+        ],
+        "capturedAt": "2025-03-19T10:08:00.000Z",
+        "reliability": 0.9,
+        "provenance": "合成防水施工记录",
+        "syntheticDemo": true
+      },
+      {
+        "id": "EVD-CWT-H01",
+        "type": "CLOSED_WATER_TEST",
+        "status": "PRESENT",
+        "observedValue": "PASS",
+        "sourceActor": "PROPERTY",
+        "relatedBusinessIds": [
+          "WP-1602-BATHROOM"
+        ],
+        "capturedAt": "2025-03-21T16:40:00.000Z",
+        "reliability": 0.95,
+        "provenance": "合成闭水试验记录",
+        "syntheticDemo": true
+      }
+    ],
+    "syntheticDemo": true
+  },
+  "inputSnapshots": {
+    "17d18c2c397ffbb3c3c098ce4af2da9df4082222c429c9c1ef5bee2c2e2bd49b": {
+      "eventId": "EVT-1602-HUMIDITY-001",
+      "buildingId": "BLD-ZS-DEMO-001",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "detectedAt": "2026-07-29T08:59:00.000Z",
+      "evaluatedAt": "2026-07-29T09:05:00.000Z",
+      "observations": [
+        {
+          "id": "OBS-HUM-H01",
+          "sensorBusinessId": "SENSOR-1602-HUM-01",
+          "observedAt": "2026-07-29T09:00:00.000Z",
+          "metric": "RELATIVE_HUMIDITY",
+          "value": 88,
+          "unit": "%",
+          "baseline": 58,
+          "durationMinutes": 40,
+          "quality": "GOOD",
+          "syntheticDemo": true
+        },
+        {
+          "id": "OBS-FLOW-H01",
+          "sensorBusinessId": "METER-1602-FLOW-01",
+          "observedAt": "2026-07-29T09:00:00.000Z",
+          "metric": "MICRO_FLOW",
+          "value": 0,
+          "unit": "L/min",
+          "baseline": 0,
+          "durationMinutes": 30,
+          "quality": "GOOD",
+          "syntheticDemo": true
+        }
+      ],
+      "evidence": [
+        {
+          "id": "EVD-WP-H01",
+          "type": "WATERPROOFING_RECORD",
+          "status": "PRESENT",
+          "observedValue": "COMPLETE",
+          "sourceActor": "WORKER",
+          "relatedBusinessIds": [
+            "WP-1602-BATHROOM"
+          ],
+          "capturedAt": "2025-03-19T10:08:00.000Z",
+          "reliability": 0.9,
+          "provenance": "合成防水施工记录",
+          "syntheticDemo": true
+        },
+        {
+          "id": "EVD-CWT-H01",
+          "type": "CLOSED_WATER_TEST",
+          "status": "PRESENT",
+          "observedValue": "PASS",
+          "sourceActor": "PROPERTY",
+          "relatedBusinessIds": [
+            "WP-1602-BATHROOM"
+          ],
+          "capturedAt": "2025-03-21T16:40:00.000Z",
+          "reliability": 0.95,
+          "provenance": "合成闭水试验记录",
+          "syntheticDemo": true
+        }
+      ],
+      "syntheticDemo": true
+    }
+  },
+  "evidenceSnapshots": {
+    "10ef3164130358d3066ed1dee5fe0910af074d665e97df1611270e4723ab1e19": [
+      {
+        "id": "EVD-WP-H01",
+        "type": "WATERPROOFING_RECORD",
+        "status": "PRESENT",
+        "observedValue": "COMPLETE",
+        "sourceActor": "WORKER",
+        "relatedBusinessIds": [
+          "WP-1602-BATHROOM"
+        ],
+        "capturedAt": "2025-03-19T10:08:00.000Z",
+        "reliability": 0.9,
+        "provenance": "合成防水施工记录",
+        "syntheticDemo": true
+      },
+      {
+        "id": "EVD-CWT-H01",
+        "type": "CLOSED_WATER_TEST",
+        "status": "PRESENT",
+        "observedValue": "PASS",
+        "sourceActor": "PROPERTY",
+        "relatedBusinessIds": [
+          "WP-1602-BATHROOM"
+        ],
+        "capturedAt": "2025-03-21T16:40:00.000Z",
+        "reliability": 0.95,
+        "provenance": "合成闭水试验记录",
+        "syntheticDemo": true
+      }
+    ]
+  },
+  "decisionSnapshots": {
+    "91dd4b05950b7ff170fe8fb7ed0f7d6670a846ff588479dee4b28038745d00ee": {
+      "eventId": "EVT-1602-HUMIDITY-001",
+      "evaluatedAt": "2026-07-29T09:05:00.000Z",
+      "decisionConfidence": "MEDIUM",
+      "rankedHypotheses": [
+        {
+          "hypothesis": "CONDENSATION_OR_AMBIENT_HUMIDITY",
+          "candidateBusinessIds": [
+            "SENSOR-1602-HUM-01"
+          ],
+          "rawScore": 45,
+          "evidenceCoverage": 0.667,
+          "gapFromLeader": 20,
+          "confidence": "MEDIUM",
+          "contributions": [
+            {
+              "ruleId": "RULE-HUM-003",
+              "hypothesis": "CONDENSATION_OR_AMBIENT_HUMIDITY",
+              "contribution": 25,
+              "evidenceIds": [
+                "OBS-HUM-H01"
+              ],
+              "explanation": "湿度异常首先证明环境潮湿，需要流量证据区分原因"
+            },
+            {
+              "ruleId": "RULE-ENV-001",
+              "hypothesis": "CONDENSATION_OR_AMBIENT_HUMIDITY",
+              "contribution": 20,
+              "evidenceIds": [
+                "OBS-FLOW-H01"
+              ],
+              "explanation": "湿度异常但微流量正常，更支持环境潮湿或冷凝"
+            }
+          ]
+        },
+        {
+          "hypothesis": "UNRESOLVED",
+          "candidateBusinessIds": [],
+          "rawScore": 25,
+          "evidenceCoverage": 0.5,
+          "gapFromLeader": 20,
+          "confidence": "NOT_APPLICABLE",
+          "contributions": [
+            {
+              "ruleId": "RULE-UNR-001",
+              "hypothesis": "UNRESOLVED",
+              "contribution": 25,
+              "evidenceIds": [],
+              "explanation": "关键证据缺失，当前应保持未决并继续补证"
+            }
+          ]
+        },
+        {
+          "hypothesis": "WATERPROOFING_FAILURE",
+          "candidateBusinessIds": [
+            "WP-1602-BATHROOM"
+          ],
+          "rawScore": 5.6,
+          "evidenceCoverage": 0.75,
+          "gapFromLeader": 39.4,
+          "confidence": "NOT_APPLICABLE",
+          "contributions": [
+            {
+              "ruleId": "RULE-HUM-002",
+              "hypothesis": "WATERPROOFING_FAILURE",
+              "contribution": 8,
+              "evidenceIds": [
+                "OBS-HUM-H01"
+              ],
+              "explanation": "持续潮湿与防水失效相容，但不是特异证据"
+            },
+            {
+              "ruleId": "RULE-WP-002",
+              "hypothesis": "WATERPROOFING_FAILURE",
+              "contribution": 9,
+              "evidenceIds": [
+                "EVD-WP-H01"
+              ],
+              "explanation": "防水施工记忆提供可核查对象和范围"
+            },
+            {
+              "ruleId": "RULE-WP-003",
+              "hypothesis": "WATERPROOFING_FAILURE",
+              "contribution": -11.4,
+              "evidenceIds": [
+                "EVD-CWT-H01"
+              ],
+              "explanation": "历史闭水试验合格降低施工期防水缺陷的相对支持度，但不能完全排除后期失效"
+            }
+          ]
+        },
+        {
+          "hypothesis": "COLD_WATER_JOINT_LEAK",
+          "candidateBusinessIds": [
+            "J-1602-CW-03"
+          ],
+          "rawScore": -8,
+          "evidenceCoverage": 0.2,
+          "gapFromLeader": 53,
+          "confidence": "NOT_APPLICABLE",
+          "contributions": [
+            {
+              "ruleId": "RULE-HUM-001",
+              "hypothesis": "COLD_WATER_JOINT_LEAK",
+              "contribution": 10,
+              "evidenceIds": [
+                "OBS-HUM-H01"
+              ],
+              "explanation": "持续湿度异常支持存在潮湿现象，但不能单独确定供水接头泄漏"
+            },
+            {
+              "ruleId": "RULE-CW-005",
+              "hypothesis": "COLD_WATER_JOINT_LEAK",
+              "contribution": -18,
+              "evidenceIds": [
+                "OBS-FLOW-H01"
+              ],
+              "explanation": "未观察到持续微流量，削弱供水接头泄漏假设"
+            }
+          ]
+        }
+      ],
+      "supportingEvidence": [
+        "EVD-CWT-H01",
+        "EVD-WP-H01",
+        "OBS-FLOW-H01",
+        "OBS-HUM-H01"
+      ],
+      "contradictingEvidence": [],
+      "missingEvidence": [
+        {
+          "evidenceType": "PIPE_INSTALLATION_RECORD",
+          "reason": "用于核对接头位置、工序与施工记忆完整性",
+          "requestedFrom": "WORKER",
+          "relatedBusinessIds": [
+            "J-1602-CW-03",
+            "PIPE-1602-CW-01",
+            "PIPE-1602-CW-02",
+            "PIPE-1602-HW-01"
+          ]
+        },
+        {
+          "evidenceType": "RESIDENT_WALL_PHOTO",
+          "reason": "用于定位潮湿区域与隐蔽构件的空间关系",
+          "requestedFrom": "RESIDENT",
+          "relatedBusinessIds": [
+            "J-1602-CW-03"
+          ]
+        },
+        {
+          "evidenceType": "METER_READING",
+          "reason": "用于复核无人用水条件下微流量是否真实存在",
+          "requestedFrom": "RESIDENT",
+          "relatedBusinessIds": [
+            "METER-1602-FLOW-01"
+          ]
+        }
+      ],
+      "contradictions": [],
+      "proposedActions": [],
+      "authorizationRequests": [],
+      "authorizedActions": [],
+      "completedActions": []
+    }
+  },
+  "lastDecisionSnapshotHash": "91dd4b05950b7ff170fe8fb7ed0f7d6670a846ff588479dee4b28038745d00ee"
+}

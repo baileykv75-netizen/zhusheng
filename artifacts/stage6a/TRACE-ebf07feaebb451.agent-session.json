@@ -1,0 +1,1781 @@
+{
+  "schemaVersion": 1,
+  "sessionId": "BA-SESSION-STAGE6A-001",
+  "traceId": "TRACE-ebf07feaebb451",
+  "originalInput": "1602卫生间墙脚连续两天发潮，湿度大约78%，微流量0.06 L/min，停水以后水表还在缓慢走，墙面有一张照片。",
+  "confirmedDraft": {
+    "draftId": "DRAFT-fa8521258e7f",
+    "originalText": "1602卫生间墙脚连续两天发潮，湿度大约78%，微流量0.06 L/min，停水以后水表还在缓慢走，墙面有一张照片。",
+    "extractedFields": {
+      "spaceId": "SPACE-1602-BATHROOM",
+      "humidity": 82,
+      "humidityBaseline": 55,
+      "durationMinutes": 2880,
+      "microFlow": 0.06,
+      "microFlowBaseline": 0,
+      "meterFinding": "FLOW_CONFIRMED_NO_USE",
+      "photoFinding": "MOISTURE_VISIBLE",
+      "photoPresent": true,
+      "dataQuality": "GOOD",
+      "sourceActor": "RESIDENT"
+    },
+    "inferences": [
+      "文本可能描述了无人用水时仍有水表变化，需用户确认后才能作为证据"
+    ],
+    "uncertainties": [],
+    "revisions": [
+      {
+        "revisionId": "REV-DRAFT-fa8521258e7f-1",
+        "revisedAt": "2026-07-29T10:01:00.000Z",
+        "correctedFields": {
+          "humidity": 82
+        },
+        "revisionReason": "评委核对湿度读数后从78%修正为82%"
+      }
+    ],
+    "status": "CONFIRMED",
+    "createdAt": "2026-07-29T10:00:00.000Z",
+    "syntheticDemo": true,
+    "confirmedAt": "2026-07-29T10:01:00.000Z"
+  },
+  "response": {
+    "mode": "deterministic",
+    "intent": "EVALUATE_EVENT",
+    "facts": [
+      "事件引擎状态：AUTHORIZATION_PENDING",
+      "第一候选：COLD_WATER_JOINT_LEAK",
+      "规则原始分值：79.6，可信等级：HIGH",
+      "支持证据：EVD-CWT-LAB-601",
+      "支持证据：EVD-METER-LAB-601",
+      "支持证据：EVD-PHOTO-LAB-601",
+      "支持证据：EVD-PIPE-LAB-601",
+      "支持证据：EVD-WP-LAB-601",
+      "支持证据：OBS-FLOW-LAB-601",
+      "支持证据：OBS-HUM-LAB-601"
+    ],
+    "inferences": [
+      "第一候选来自确定性规则与构件拓扑排序，原始分值不是故障概率。"
+    ],
+    "uncertainties": [],
+    "missingEvidence": [],
+    "toolCalls": [
+      {
+        "callId": "CALL-01",
+        "toolName": "query_building_memory",
+        "specialistAgent": "建筑记忆智能体",
+        "inputSummary": "{\"query\":\"1602卫生间\"}",
+        "outputSummary": "建筑记忆返回40个匹配身份",
+        "sourceRefs": [
+          "DOOR-1602-BATHROOM",
+          "DRAIN-1602-FLOOR-01",
+          "FIXTURE-1602-BASIN-01",
+          "FIXTURE-1602-SHOWER-01",
+          "FIXTURE-1602-WC-01",
+          "J-1602-CW-03",
+          "METER-1602-FLOW-01",
+          "PARTITION-1602-SHOWER-01",
+          "PIPE-1602-CW-01",
+          "PIPE-1602-CW-02",
+          "PIPE-1602-HW-01",
+          "PORT-J-1602-CW-03-IN",
+          "PORT-J-1602-CW-03-OUT",
+          "PORT-METER-1602-FLOW-01-IN",
+          "PORT-METER-1602-FLOW-01-OUT",
+          "PORT-PIPE-1602-CW-01-IN",
+          "PORT-PIPE-1602-CW-01-OUT",
+          "PORT-PIPE-1602-CW-02-IN",
+          "PORT-PIPE-1602-CW-02-OUT",
+          "PORT-PIPE-1602-HW-01-IN",
+          "PORT-PIPE-1602-HW-01-OUT",
+          "PORT-VALVE-1602-CW-01-IN",
+          "PORT-VALVE-1602-CW-01-OUT",
+          "SENSOR-1602-HUM-01",
+          "SLAB-1602-BATHROOM",
+          "SPACE-1602-BATHROOM",
+          "SPACE-1602-BEDROOM-2",
+          "SPACE-1602-CIRCULATION",
+          "SPACE-1602-KITCHEN",
+          "SPACE-1602-LIVING",
+          "SPACE-1602-MASTER",
+          "SYS-1602-CW",
+          "SYS-1602-ENV",
+          "SYS-1602-HW",
+          "UNIT-1602",
+          "VALVE-1602-CW-01",
+          "WALL-1602-BATHROOM-EAST",
+          "WALL-1602-BATHROOM-NORTH",
+          "WALL-1602-BATHROOM-SOUTH-EAST",
+          "WALL-1602-BATHROOM-SOUTH-WEST"
+        ],
+        "status": "SUCCEEDED",
+        "occurredAt": "2026-07-29T10:01:00.000Z"
+      },
+      {
+        "callId": "CALL-02",
+        "toolName": "locate_component",
+        "specialistAgent": "建筑记忆智能体",
+        "inputSummary": "{\"businessId\":\"J-1602-CW-03\"}",
+        "outputSummary": "J-1602-CW-03位于LVL-16/UNIT-1602/SPACE-1602-BATHROOM",
+        "sourceRefs": [
+          "J-1602-CW-03",
+          "BLD-ZS-DEMO-001",
+          "LVL-16",
+          "UNIT-1602",
+          "SPACE-1602-BATHROOM"
+        ],
+        "status": "SUCCEEDED",
+        "occurredAt": "2026-07-29T10:01:00.000Z"
+      },
+      {
+        "callId": "CALL-03",
+        "toolName": "list_required_evidence",
+        "specialistAgent": "品质智能体",
+        "inputSummary": "{\"spaceId\":\"SPACE-1602-BATHROOM\"}",
+        "outputSummary": "当前候选需要5类证据",
+        "sourceRefs": [
+          "J-1602-CW-03"
+        ],
+        "status": "SUCCEEDED",
+        "occurredAt": "2026-07-29T10:01:00.000Z"
+      },
+      {
+        "callId": "CALL-04",
+        "toolName": "submit_confirmed_observation",
+        "specialistAgent": "居住服务智能体",
+        "inputSummary": "{\"draft\":{\"draftId\":\"DRAFT-fa8521258e7f\",\"originalText\":\"1602卫生间墙脚连续两天发潮，湿度大约78%，微流量0.06 L/min，停水以后水表还在缓慢走，墙面有一张照片。\",\"extractedFields\":{\"spaceId\":\"SPACE-1602-BATHROOM\",\"humidity\":8",
+        "outputSummary": "用户确认字段已转换为事件引擎输入",
+        "sourceRefs": [
+          "SPACE-1602-BATHROOM",
+          "DRAFT-fa8521258e7f"
+        ],
+        "status": "SUCCEEDED",
+        "occurredAt": "2026-07-29T10:01:00.000Z"
+      },
+      {
+        "callId": "CALL-05",
+        "toolName": "evaluate_life_event",
+        "specialistAgent": "建筑健康智能体",
+        "inputSummary": "{\"controls\":{\"humidity\":{\"value\":82,\"baseline\":55,\"durationMinutes\":2880,\"quality\":\"GOOD\"},\"microFlow\":{\"value\":0.06,\"baseline\":0,\"durationMinutes\":2880,\"quality\":\"GOOD\"},\"pipeInst",
+        "outputSummary": "事件引擎输出COLD_WATER_JOINT_LEAK，分值79.6，可信等级HIGH",
+        "sourceRefs": [
+          "J-1602-CW-03",
+          "EVD-CWT-LAB-601",
+          "EVD-METER-LAB-601",
+          "EVD-PHOTO-LAB-601",
+          "EVD-PIPE-LAB-601",
+          "EVD-WP-LAB-601",
+          "OBS-FLOW-LAB-601",
+          "OBS-HUM-LAB-601"
+        ],
+        "status": "SUCCEEDED",
+        "occurredAt": "2026-07-29T10:01:00.000Z"
+      },
+      {
+        "callId": "CALL-06",
+        "toolName": "explain_decision",
+        "specialistAgent": "居住服务智能体",
+        "inputSummary": "{\"result\":{\"eventId\":\"EVT-1602-LAB-601\",\"state\":\"AUTHORIZATION_PENDING\",\"valvePosition\":\"OPEN\",\"rankedHypotheses\":[{\"hypothesis\":\"COLD_WATER_JOINT_LEAK\",\"candidateBusinessIds\":[\"J-",
+        "outputSummary": "COLD_WATER_JOINT_LEAK按透明规则排序第一；分值不是故障概率",
+        "sourceRefs": [
+          "J-1602-CW-03",
+          "EVD-CWT-LAB-601",
+          "EVD-METER-LAB-601",
+          "EVD-PHOTO-LAB-601",
+          "EVD-PIPE-LAB-601",
+          "EVD-WP-LAB-601",
+          "OBS-FLOW-LAB-601",
+          "OBS-HUM-LAB-601"
+        ],
+        "status": "SUCCEEDED",
+        "occurredAt": "2026-07-29T10:01:00.000Z"
+      },
+      {
+        "callId": "CALL-07",
+        "toolName": "request_human_authorization",
+        "specialistAgent": "设备动作智能体",
+        "inputSummary": "{\"result\":{\"eventId\":\"EVT-1602-LAB-601\",\"state\":\"AUTHORIZATION_PENDING\",\"valvePosition\":\"OPEN\",\"rankedHypotheses\":[{\"hypothesis\":\"COLD_WATER_JOINT_LEAK\",\"candidateBusinessIds\":[\"J-",
+        "outputSummary": "仅创建人工授权请求，不批准也不执行设备动作",
+        "sourceRefs": [
+          "VALVE-1602-CW-01"
+        ],
+        "status": "SUCCEEDED",
+        "occurredAt": "2026-07-29T10:01:00.000Z"
+      },
+      {
+        "callId": "CALL-08",
+        "toolName": "navigate_to_workspace",
+        "specialistAgent": "居住服务智能体",
+        "inputSummary": "{\"route\":\"/resident\"}",
+        "outputSummary": "建议由用户进入/resident专业工作台",
+        "sourceRefs": [],
+        "status": "SUCCEEDED",
+        "occurredAt": "2026-07-29T10:01:00.000Z"
+      }
+    ],
+    "sourceRefs": [
+      {
+        "businessId": "DOOR-1602-BATHROOM",
+        "label": "DOOR-1602-BATHROOM",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "DRAIN-1602-FLOOR-01",
+        "label": "DRAIN-1602-FLOOR-01",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "FIXTURE-1602-BASIN-01",
+        "label": "FIXTURE-1602-BASIN-01",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "FIXTURE-1602-SHOWER-01",
+        "label": "FIXTURE-1602-SHOWER-01",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "FIXTURE-1602-WC-01",
+        "label": "FIXTURE-1602-WC-01",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "J-1602-CW-03",
+        "label": "J-1602-CW-03",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "METER-1602-FLOW-01",
+        "label": "METER-1602-FLOW-01",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PARTITION-1602-SHOWER-01",
+        "label": "PARTITION-1602-SHOWER-01",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PIPE-1602-CW-01",
+        "label": "PIPE-1602-CW-01",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PIPE-1602-CW-02",
+        "label": "PIPE-1602-CW-02",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PIPE-1602-HW-01",
+        "label": "PIPE-1602-HW-01",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PORT-J-1602-CW-03-IN",
+        "label": "PORT-J-1602-CW-03-IN",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PORT-J-1602-CW-03-OUT",
+        "label": "PORT-J-1602-CW-03-OUT",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PORT-METER-1602-FLOW-01-IN",
+        "label": "PORT-METER-1602-FLOW-01-IN",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PORT-METER-1602-FLOW-01-OUT",
+        "label": "PORT-METER-1602-FLOW-01-OUT",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PORT-PIPE-1602-CW-01-IN",
+        "label": "PORT-PIPE-1602-CW-01-IN",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PORT-PIPE-1602-CW-01-OUT",
+        "label": "PORT-PIPE-1602-CW-01-OUT",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PORT-PIPE-1602-CW-02-IN",
+        "label": "PORT-PIPE-1602-CW-02-IN",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PORT-PIPE-1602-CW-02-OUT",
+        "label": "PORT-PIPE-1602-CW-02-OUT",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PORT-PIPE-1602-HW-01-IN",
+        "label": "PORT-PIPE-1602-HW-01-IN",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PORT-PIPE-1602-HW-01-OUT",
+        "label": "PORT-PIPE-1602-HW-01-OUT",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PORT-VALVE-1602-CW-01-IN",
+        "label": "PORT-VALVE-1602-CW-01-IN",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "PORT-VALVE-1602-CW-01-OUT",
+        "label": "PORT-VALVE-1602-CW-01-OUT",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "SENSOR-1602-HUM-01",
+        "label": "SENSOR-1602-HUM-01",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "SLAB-1602-BATHROOM",
+        "label": "SLAB-1602-BATHROOM",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "SPACE-1602-BATHROOM",
+        "label": "SPACE-1602-BATHROOM",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "SPACE-1602-BEDROOM-2",
+        "label": "SPACE-1602-BEDROOM-2",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "SPACE-1602-CIRCULATION",
+        "label": "SPACE-1602-CIRCULATION",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "SPACE-1602-KITCHEN",
+        "label": "SPACE-1602-KITCHEN",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "SPACE-1602-LIVING",
+        "label": "SPACE-1602-LIVING",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "SPACE-1602-MASTER",
+        "label": "SPACE-1602-MASTER",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "SYS-1602-CW",
+        "label": "SYS-1602-CW",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "SYS-1602-ENV",
+        "label": "SYS-1602-ENV",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "SYS-1602-HW",
+        "label": "SYS-1602-HW",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "UNIT-1602",
+        "label": "UNIT-1602",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "VALVE-1602-CW-01",
+        "label": "VALVE-1602-CW-01",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "WALL-1602-BATHROOM-EAST",
+        "label": "WALL-1602-BATHROOM-EAST",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "WALL-1602-BATHROOM-NORTH",
+        "label": "WALL-1602-BATHROOM-NORTH",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "WALL-1602-BATHROOM-SOUTH-EAST",
+        "label": "WALL-1602-BATHROOM-SOUTH-EAST",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "WALL-1602-BATHROOM-SOUTH-WEST",
+        "label": "WALL-1602-BATHROOM-SOUTH-WEST",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "BLD-ZS-DEMO-001",
+        "label": "BLD-ZS-DEMO-001",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "LVL-16",
+        "label": "LVL-16",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "DRAFT-fa8521258e7f",
+        "label": "DRAFT-fa8521258e7f",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "EVD-CWT-LAB-601",
+        "label": "EVD-CWT-LAB-601",
+        "sourceType": "LIFE_EVENT"
+      },
+      {
+        "businessId": "EVD-METER-LAB-601",
+        "label": "EVD-METER-LAB-601",
+        "sourceType": "LIFE_EVENT"
+      },
+      {
+        "businessId": "EVD-PHOTO-LAB-601",
+        "label": "EVD-PHOTO-LAB-601",
+        "sourceType": "LIFE_EVENT"
+      },
+      {
+        "businessId": "EVD-PIPE-LAB-601",
+        "label": "EVD-PIPE-LAB-601",
+        "sourceType": "LIFE_EVENT"
+      },
+      {
+        "businessId": "EVD-WP-LAB-601",
+        "label": "EVD-WP-LAB-601",
+        "sourceType": "LIFE_EVENT"
+      },
+      {
+        "businessId": "OBS-FLOW-LAB-601",
+        "label": "OBS-FLOW-LAB-601",
+        "sourceType": "BUILDING_MEMORY"
+      },
+      {
+        "businessId": "OBS-HUM-LAB-601",
+        "label": "OBS-HUM-LAB-601",
+        "sourceType": "BUILDING_MEMORY"
+      }
+    ],
+    "proposedNextAction": {
+      "label": "进入住户自由实验继续补证与人工授权",
+      "route": "/resident"
+    },
+    "requiresHumanConfirmation": true,
+    "safetyNotice": "关键设备动作必须在住户工作台由人工独立授权并明确执行；总智能体不能代为批准或关阀。",
+    "specialistAgents": [
+      "建筑记忆智能体",
+      "品质智能体",
+      "居住服务智能体",
+      "建筑健康智能体",
+      "设备动作智能体"
+    ],
+    "traceId": "TRACE-ebf07feaebb451",
+    "decision": {
+      "eventId": "EVT-1602-LAB-601",
+      "state": "AUTHORIZATION_PENDING",
+      "valvePosition": "OPEN",
+      "rankedHypotheses": [
+        {
+          "hypothesis": "COLD_WATER_JOINT_LEAK",
+          "candidateBusinessIds": [
+            "J-1602-CW-03"
+          ],
+          "rawScore": 79.6,
+          "evidenceCoverage": 1,
+          "gapFromLeader": 62.2,
+          "confidence": "HIGH",
+          "contributions": [
+            {
+              "ruleId": "RULE-HUM-001",
+              "hypothesis": "COLD_WATER_JOINT_LEAK",
+              "contribution": 10,
+              "evidenceIds": [
+                "OBS-HUM-LAB-601"
+              ],
+              "explanation": "持续湿度异常支持存在潮湿现象，但不能单独确定供水接头泄漏"
+            },
+            {
+              "ruleId": "RULE-CW-001",
+              "hypothesis": "COLD_WATER_JOINT_LEAK",
+              "contribution": 32,
+              "evidenceIds": [
+                "OBS-FLOW-LAB-601"
+              ],
+              "explanation": "无人用水条件下持续微流量支持供水系统存在泄漏"
+            },
+            {
+              "ruleId": "RULE-CW-002",
+              "hypothesis": "COLD_WATER_JOINT_LEAK",
+              "contribution": 20.68,
+              "evidenceIds": [
+                "EVD-METER-LAB-601"
+              ],
+              "explanation": "人工水表观察与微流量传感器相互印证"
+            },
+            {
+              "ruleId": "RULE-CW-003",
+              "hypothesis": "COLD_WATER_JOINT_LEAK",
+              "contribution": 9.4,
+              "evidenceIds": [
+                "EVD-PHOTO-LAB-601"
+              ],
+              "explanation": "墙面影像支持潮湿位置与供水构件空间关系"
+            },
+            {
+              "ruleId": "RULE-CW-004",
+              "hypothesis": "COLD_WATER_JOINT_LEAK",
+              "contribution": 7.52,
+              "evidenceIds": [
+                "EVD-PIPE-LAB-601"
+              ],
+              "explanation": "施工记忆使冷水构件链和重点接头可追溯"
+            }
+          ]
+        },
+        {
+          "hypothesis": "WATERPROOFING_FAILURE",
+          "candidateBusinessIds": [
+            "WP-1602-BATHROOM"
+          ],
+          "rawScore": 17.4,
+          "evidenceCoverage": 1,
+          "gapFromLeader": 62.2,
+          "confidence": "NOT_APPLICABLE",
+          "contributions": [
+            {
+              "ruleId": "RULE-HUM-002",
+              "hypothesis": "WATERPROOFING_FAILURE",
+              "contribution": 8,
+              "evidenceIds": [
+                "OBS-HUM-LAB-601"
+              ],
+              "explanation": "持续潮湿与防水失效相容，但不是特异证据"
+            },
+            {
+              "ruleId": "RULE-WP-001",
+              "hypothesis": "WATERPROOFING_FAILURE",
+              "contribution": 11.28,
+              "evidenceIds": [
+                "EVD-PHOTO-LAB-601"
+              ],
+              "explanation": "墙面潮湿影像与防水路径异常相容"
+            },
+            {
+              "ruleId": "RULE-WP-002",
+              "hypothesis": "WATERPROOFING_FAILURE",
+              "contribution": 9.4,
+              "evidenceIds": [
+                "EVD-WP-LAB-601"
+              ],
+              "explanation": "防水施工记忆提供可核查对象和范围"
+            },
+            {
+              "ruleId": "RULE-WP-003",
+              "hypothesis": "WATERPROOFING_FAILURE",
+              "contribution": -11.28,
+              "evidenceIds": [
+                "EVD-CWT-LAB-601"
+              ],
+              "explanation": "历史闭水试验合格降低施工期防水缺陷的相对支持度，但不能完全排除后期失效"
+            }
+          ]
+        },
+        {
+          "hypothesis": "CONDENSATION_OR_AMBIENT_HUMIDITY",
+          "candidateBusinessIds": [
+            "SENSOR-1602-HUM-01"
+          ],
+          "rawScore": 10,
+          "evidenceCoverage": 0.667,
+          "gapFromLeader": 69.6,
+          "confidence": "NOT_APPLICABLE",
+          "contributions": [
+            {
+              "ruleId": "RULE-HUM-003",
+              "hypothesis": "CONDENSATION_OR_AMBIENT_HUMIDITY",
+              "contribution": 25,
+              "evidenceIds": [
+                "OBS-HUM-LAB-601"
+              ],
+              "explanation": "湿度异常首先证明环境潮湿，需要流量证据区分原因"
+            },
+            {
+              "ruleId": "RULE-ENV-002",
+              "hypothesis": "CONDENSATION_OR_AMBIENT_HUMIDITY",
+              "contribution": -15,
+              "evidenceIds": [
+                "OBS-FLOW-LAB-601"
+              ],
+              "explanation": "持续微流量削弱单纯环境潮湿解释"
+            }
+          ]
+        },
+        {
+          "hypothesis": "UNRESOLVED",
+          "candidateBusinessIds": [],
+          "rawScore": 0,
+          "evidenceCoverage": 0,
+          "gapFromLeader": 79.6,
+          "confidence": "NOT_APPLICABLE",
+          "contributions": []
+        }
+      ],
+      "decisionConfidence": "HIGH",
+      "supportingEvidence": [
+        "EVD-CWT-LAB-601",
+        "EVD-METER-LAB-601",
+        "EVD-PHOTO-LAB-601",
+        "EVD-PIPE-LAB-601",
+        "EVD-WP-LAB-601",
+        "OBS-FLOW-LAB-601",
+        "OBS-HUM-LAB-601"
+      ],
+      "contradictingEvidence": [],
+      "missingEvidence": [],
+      "contradictions": [],
+      "nextSteps": [
+        "由住户或物业授权SIMULATE_CLOSE_VALVE，目标VALVE-1602-CW-01"
+      ],
+      "proposedActions": [],
+      "authorizationRequests": [
+        {
+          "action": "REQUEST_HUMAN_AUTHORIZATION",
+          "requestedAction": "SIMULATE_CLOSE_VALVE",
+          "targetBusinessId": "VALVE-1602-CW-01"
+        }
+      ],
+      "authorizedActions": [],
+      "completedActions": [],
+      "authorizationRequirement": {
+        "action": "SIMULATE_CLOSE_VALVE",
+        "targetBusinessId": "VALVE-1602-CW-01",
+        "status": "PENDING"
+      },
+      "visualDirective": {
+        "view": "VIEW_DIAGNOSTIC",
+        "highlightBusinessIds": [
+          "J-1602-CW-03",
+          "METER-1602-FLOW-01",
+          "SENSOR-1602-HUM-01",
+          "VALVE-1602-CW-01"
+        ],
+        "moistureState": "DAMP_MODERATE",
+        "valvePosition": "OPEN",
+        "evidenceAnchorIds": [
+          "EVIDENCE-ANCHOR-METER-READING",
+          "EVIDENCE-ANCHOR-RESIDENT-WALL-PHOTO"
+        ],
+        "allowedActions": [
+          "REQUEST_HUMAN_AUTHORIZATION"
+        ],
+        "authorizationRequired": true
+      },
+      "auditLog": [
+        {
+          "sequence": 1,
+          "eventId": "EVT-1602-LAB-601",
+          "timestamp": "2026-07-29T10:00:00.000Z",
+          "actorType": "SYSTEM",
+          "actionType": "EVENT_DETECTED",
+          "previousState": "DETECTED",
+          "nextState": "COLLECTING_EVIDENCE",
+          "inputRefs": [
+            "OBS-FLOW-LAB-601",
+            "OBS-HUM-LAB-601"
+          ],
+          "evidenceRefs": [
+            "EVD-CWT-LAB-601",
+            "EVD-METER-LAB-601",
+            "EVD-PHOTO-LAB-601",
+            "EVD-PIPE-LAB-601",
+            "EVD-WP-LAB-601"
+          ],
+          "componentRefs": [
+            "J-1602-CW-03",
+            "SENSOR-1602-HUM-01",
+            "WP-1602-BATHROOM"
+          ],
+          "ruleIds": [
+            "RULE-CW-001",
+            "RULE-CW-002",
+            "RULE-CW-003",
+            "RULE-CW-004",
+            "RULE-ENV-002",
+            "RULE-HUM-001",
+            "RULE-HUM-002",
+            "RULE-HUM-003",
+            "RULE-WP-001",
+            "RULE-WP-002",
+            "RULE-WP-003"
+          ],
+          "ruleSetVersion": "ZS-LE-1.1.0",
+          "memoryVersion": "2.5.0",
+          "previousHash": "9b9bcc0a243a635ac5b97998697153cec8b9af1b8c1bc0bab625a58092f6a487",
+          "inputSnapshotHash": "af3f72f0754fe388f3c8b59b4699487daa6def2bdaee71314cf13ba12d58f968",
+          "evidenceSnapshotHash": "d41886ae8fb3d58cbfb260beacaf5202f3fc2d09e2b36ea35f125e11395a2281",
+          "authorizationRecordIds": [],
+          "repairRecordIds": [],
+          "decisionOutputHash": "4929f99b143fa1c3240fd7e069efc801d93852132f5ddcaea084663511c4a666",
+          "entryHash": "b0c85db972c709ffeb7c86713df70e128599c26a41bdb2a6ef521a8d31cb688e"
+        },
+        {
+          "sequence": 2,
+          "eventId": "EVT-1602-LAB-601",
+          "timestamp": "2026-07-29T10:00:00.000Z",
+          "actorType": "SYSTEM",
+          "actionType": "ASSESSMENT_COMPLETED",
+          "previousState": "COLLECTING_EVIDENCE",
+          "nextState": "ASSESSED",
+          "inputRefs": [
+            "OBS-FLOW-LAB-601",
+            "OBS-HUM-LAB-601"
+          ],
+          "evidenceRefs": [
+            "EVD-CWT-LAB-601",
+            "EVD-METER-LAB-601",
+            "EVD-PHOTO-LAB-601",
+            "EVD-PIPE-LAB-601",
+            "EVD-WP-LAB-601"
+          ],
+          "componentRefs": [
+            "J-1602-CW-03",
+            "SENSOR-1602-HUM-01",
+            "WP-1602-BATHROOM"
+          ],
+          "ruleIds": [
+            "RULE-CW-001",
+            "RULE-CW-002",
+            "RULE-CW-003",
+            "RULE-CW-004",
+            "RULE-ENV-002",
+            "RULE-HUM-001",
+            "RULE-HUM-002",
+            "RULE-HUM-003",
+            "RULE-WP-001",
+            "RULE-WP-002",
+            "RULE-WP-003"
+          ],
+          "ruleSetVersion": "ZS-LE-1.1.0",
+          "memoryVersion": "2.5.0",
+          "previousHash": "b0c85db972c709ffeb7c86713df70e128599c26a41bdb2a6ef521a8d31cb688e",
+          "inputSnapshotHash": "af3f72f0754fe388f3c8b59b4699487daa6def2bdaee71314cf13ba12d58f968",
+          "evidenceSnapshotHash": "d41886ae8fb3d58cbfb260beacaf5202f3fc2d09e2b36ea35f125e11395a2281",
+          "authorizationRecordIds": [],
+          "repairRecordIds": [],
+          "decisionOutputHash": "4929f99b143fa1c3240fd7e069efc801d93852132f5ddcaea084663511c4a666",
+          "entryHash": "da61b2b4f7e644213e601e1e36b431ed309686b3e8435f91dc2ace7466db1092"
+        },
+        {
+          "sequence": 3,
+          "eventId": "EVT-1602-LAB-601",
+          "timestamp": "2026-07-29T10:00:00.000Z",
+          "actorType": "SYSTEM",
+          "actionType": "SIMULATED_ACTION_PROPOSED",
+          "previousState": "ASSESSED",
+          "nextState": "ACTION_PROPOSED",
+          "inputRefs": [
+            "OBS-FLOW-LAB-601",
+            "OBS-HUM-LAB-601"
+          ],
+          "evidenceRefs": [
+            "EVD-CWT-LAB-601",
+            "EVD-METER-LAB-601",
+            "EVD-PHOTO-LAB-601",
+            "EVD-PIPE-LAB-601",
+            "EVD-WP-LAB-601"
+          ],
+          "componentRefs": [
+            "J-1602-CW-03",
+            "SENSOR-1602-HUM-01",
+            "WP-1602-BATHROOM"
+          ],
+          "ruleIds": [
+            "RULE-CW-001",
+            "RULE-CW-002",
+            "RULE-CW-003",
+            "RULE-CW-004",
+            "RULE-ENV-002",
+            "RULE-HUM-001",
+            "RULE-HUM-002",
+            "RULE-HUM-003",
+            "RULE-WP-001",
+            "RULE-WP-002",
+            "RULE-WP-003"
+          ],
+          "ruleSetVersion": "ZS-LE-1.1.0",
+          "memoryVersion": "2.5.0",
+          "previousHash": "da61b2b4f7e644213e601e1e36b431ed309686b3e8435f91dc2ace7466db1092",
+          "inputSnapshotHash": "af3f72f0754fe388f3c8b59b4699487daa6def2bdaee71314cf13ba12d58f968",
+          "evidenceSnapshotHash": "d41886ae8fb3d58cbfb260beacaf5202f3fc2d09e2b36ea35f125e11395a2281",
+          "authorizationRecordIds": [],
+          "repairRecordIds": [],
+          "decisionOutputHash": "4929f99b143fa1c3240fd7e069efc801d93852132f5ddcaea084663511c4a666",
+          "actionTargetBusinessId": "VALVE-1602-CW-01",
+          "entryHash": "0164b7a9531d2f6ab76d3b870dc895c4898a5a7749aaf1a67476fe38811ad65c"
+        },
+        {
+          "sequence": 4,
+          "eventId": "EVT-1602-LAB-601",
+          "timestamp": "2026-07-29T10:00:00.000Z",
+          "actorType": "SYSTEM",
+          "actionType": "HUMAN_AUTHORIZATION_REQUESTED",
+          "previousState": "ACTION_PROPOSED",
+          "nextState": "AUTHORIZATION_PENDING",
+          "inputRefs": [
+            "OBS-FLOW-LAB-601",
+            "OBS-HUM-LAB-601"
+          ],
+          "evidenceRefs": [
+            "EVD-CWT-LAB-601",
+            "EVD-METER-LAB-601",
+            "EVD-PHOTO-LAB-601",
+            "EVD-PIPE-LAB-601",
+            "EVD-WP-LAB-601"
+          ],
+          "componentRefs": [
+            "J-1602-CW-03",
+            "SENSOR-1602-HUM-01",
+            "WP-1602-BATHROOM"
+          ],
+          "ruleIds": [
+            "RULE-CW-001",
+            "RULE-CW-002",
+            "RULE-CW-003",
+            "RULE-CW-004",
+            "RULE-ENV-002",
+            "RULE-HUM-001",
+            "RULE-HUM-002",
+            "RULE-HUM-003",
+            "RULE-WP-001",
+            "RULE-WP-002",
+            "RULE-WP-003"
+          ],
+          "ruleSetVersion": "ZS-LE-1.1.0",
+          "memoryVersion": "2.5.0",
+          "previousHash": "0164b7a9531d2f6ab76d3b870dc895c4898a5a7749aaf1a67476fe38811ad65c",
+          "inputSnapshotHash": "af3f72f0754fe388f3c8b59b4699487daa6def2bdaee71314cf13ba12d58f968",
+          "evidenceSnapshotHash": "d41886ae8fb3d58cbfb260beacaf5202f3fc2d09e2b36ea35f125e11395a2281",
+          "authorizationRecordIds": [],
+          "repairRecordIds": [],
+          "decisionOutputHash": "4929f99b143fa1c3240fd7e069efc801d93852132f5ddcaea084663511c4a666",
+          "actionTargetBusinessId": "VALVE-1602-CW-01",
+          "entryHash": "994af338e2ce4b731eba68ea32f8fe4f829c0b5f9ad28cf8f777c4baa17e5d95"
+        }
+      ],
+      "ruleSetVersion": "ZS-LE-1.1.0",
+      "memoryVersion": "2.5.0",
+      "syntheticDemo": true,
+      "input": {
+        "eventId": "EVT-1602-LAB-601",
+        "buildingId": "BLD-ZS-DEMO-001",
+        "spaceId": "SPACE-1602-BATHROOM",
+        "detectedAt": "2026-07-29T09:51:00.000Z",
+        "evaluatedAt": "2026-07-29T10:00:00.000Z",
+        "observations": [
+          {
+            "id": "OBS-HUM-LAB-601",
+            "sensorBusinessId": "SENSOR-1602-HUM-01",
+            "observedAt": "2026-07-29T09:56:00.000Z",
+            "metric": "RELATIVE_HUMIDITY",
+            "value": 82,
+            "unit": "%",
+            "baseline": 55,
+            "durationMinutes": 2880,
+            "quality": "GOOD",
+            "syntheticDemo": true
+          },
+          {
+            "id": "OBS-FLOW-LAB-601",
+            "sensorBusinessId": "METER-1602-FLOW-01",
+            "observedAt": "2026-07-29T09:56:00.000Z",
+            "metric": "MICRO_FLOW",
+            "value": 0.06,
+            "unit": "L/min",
+            "baseline": 0,
+            "durationMinutes": 2880,
+            "quality": "GOOD",
+            "syntheticDemo": true
+          }
+        ],
+        "evidence": [
+          {
+            "id": "EVD-PIPE-LAB-601",
+            "type": "PIPE_INSTALLATION_RECORD",
+            "status": "PRESENT",
+            "observedValue": "TRACEABLE",
+            "sourceActor": "WORKER",
+            "relatedBusinessIds": [
+              "J-1602-CW-03",
+              "PIPE-1602-CW-01"
+            ],
+            "capturedAt": "2025-03-18T14:26:00.000Z",
+            "reliability": 0.94,
+            "provenance": "阶段4B浏览器本地脱敏合成输入",
+            "syntheticDemo": true
+          },
+          {
+            "id": "EVD-WP-LAB-601",
+            "type": "WATERPROOFING_RECORD",
+            "status": "PRESENT",
+            "observedValue": "COMPLETE",
+            "sourceActor": "WORKER",
+            "relatedBusinessIds": [
+              "WP-1602-BATHROOM"
+            ],
+            "capturedAt": "2025-03-19T10:08:00.000Z",
+            "reliability": 0.94,
+            "provenance": "阶段4B浏览器本地脱敏合成输入",
+            "syntheticDemo": true
+          },
+          {
+            "id": "EVD-CWT-LAB-601",
+            "type": "CLOSED_WATER_TEST",
+            "status": "PRESENT",
+            "observedValue": "PASS",
+            "sourceActor": "PROPERTY",
+            "relatedBusinessIds": [
+              "WP-1602-BATHROOM"
+            ],
+            "capturedAt": "2025-03-21T16:40:00.000Z",
+            "reliability": 0.94,
+            "provenance": "阶段4B浏览器本地脱敏合成输入",
+            "syntheticDemo": true
+          },
+          {
+            "id": "EVD-PHOTO-LAB-601",
+            "type": "RESIDENT_WALL_PHOTO",
+            "status": "PRESENT",
+            "observedValue": "MOISTURE_VISIBLE",
+            "sourceActor": "RESIDENT",
+            "relatedBusinessIds": [
+              "WALL-1602-BATHROOM-NORTH",
+              "SPACE-1602-BATHROOM"
+            ],
+            "capturedAt": "2026-07-29T09:58:00.000Z",
+            "reliability": 0.94,
+            "provenance": "阶段4B浏览器本地脱敏合成输入",
+            "syntheticDemo": true
+          },
+          {
+            "id": "EVD-METER-LAB-601",
+            "type": "METER_READING",
+            "status": "PRESENT",
+            "observedValue": "FLOW_CONFIRMED_NO_USE",
+            "sourceActor": "RESIDENT",
+            "relatedBusinessIds": [
+              "METER-1602-FLOW-01"
+            ],
+            "capturedAt": "2026-07-29T09:59:00.000Z",
+            "reliability": 0.94,
+            "provenance": "阶段4B浏览器本地脱敏合成输入",
+            "syntheticDemo": true
+          }
+        ],
+        "syntheticDemo": true
+      },
+      "inputSnapshots": {
+        "af3f72f0754fe388f3c8b59b4699487daa6def2bdaee71314cf13ba12d58f968": {
+          "eventId": "EVT-1602-LAB-601",
+          "buildingId": "BLD-ZS-DEMO-001",
+          "spaceId": "SPACE-1602-BATHROOM",
+          "detectedAt": "2026-07-29T09:51:00.000Z",
+          "evaluatedAt": "2026-07-29T10:00:00.000Z",
+          "observations": [
+            {
+              "id": "OBS-HUM-LAB-601",
+              "sensorBusinessId": "SENSOR-1602-HUM-01",
+              "observedAt": "2026-07-29T09:56:00.000Z",
+              "metric": "RELATIVE_HUMIDITY",
+              "value": 82,
+              "unit": "%",
+              "baseline": 55,
+              "durationMinutes": 2880,
+              "quality": "GOOD",
+              "syntheticDemo": true
+            },
+            {
+              "id": "OBS-FLOW-LAB-601",
+              "sensorBusinessId": "METER-1602-FLOW-01",
+              "observedAt": "2026-07-29T09:56:00.000Z",
+              "metric": "MICRO_FLOW",
+              "value": 0.06,
+              "unit": "L/min",
+              "baseline": 0,
+              "durationMinutes": 2880,
+              "quality": "GOOD",
+              "syntheticDemo": true
+            }
+          ],
+          "evidence": [
+            {
+              "id": "EVD-PIPE-LAB-601",
+              "type": "PIPE_INSTALLATION_RECORD",
+              "status": "PRESENT",
+              "observedValue": "TRACEABLE",
+              "sourceActor": "WORKER",
+              "relatedBusinessIds": [
+                "J-1602-CW-03",
+                "PIPE-1602-CW-01"
+              ],
+              "capturedAt": "2025-03-18T14:26:00.000Z",
+              "reliability": 0.94,
+              "provenance": "阶段4B浏览器本地脱敏合成输入",
+              "syntheticDemo": true
+            },
+            {
+              "id": "EVD-WP-LAB-601",
+              "type": "WATERPROOFING_RECORD",
+              "status": "PRESENT",
+              "observedValue": "COMPLETE",
+              "sourceActor": "WORKER",
+              "relatedBusinessIds": [
+                "WP-1602-BATHROOM"
+              ],
+              "capturedAt": "2025-03-19T10:08:00.000Z",
+              "reliability": 0.94,
+              "provenance": "阶段4B浏览器本地脱敏合成输入",
+              "syntheticDemo": true
+            },
+            {
+              "id": "EVD-CWT-LAB-601",
+              "type": "CLOSED_WATER_TEST",
+              "status": "PRESENT",
+              "observedValue": "PASS",
+              "sourceActor": "PROPERTY",
+              "relatedBusinessIds": [
+                "WP-1602-BATHROOM"
+              ],
+              "capturedAt": "2025-03-21T16:40:00.000Z",
+              "reliability": 0.94,
+              "provenance": "阶段4B浏览器本地脱敏合成输入",
+              "syntheticDemo": true
+            },
+            {
+              "id": "EVD-PHOTO-LAB-601",
+              "type": "RESIDENT_WALL_PHOTO",
+              "status": "PRESENT",
+              "observedValue": "MOISTURE_VISIBLE",
+              "sourceActor": "RESIDENT",
+              "relatedBusinessIds": [
+                "WALL-1602-BATHROOM-NORTH",
+                "SPACE-1602-BATHROOM"
+              ],
+              "capturedAt": "2026-07-29T09:58:00.000Z",
+              "reliability": 0.94,
+              "provenance": "阶段4B浏览器本地脱敏合成输入",
+              "syntheticDemo": true
+            },
+            {
+              "id": "EVD-METER-LAB-601",
+              "type": "METER_READING",
+              "status": "PRESENT",
+              "observedValue": "FLOW_CONFIRMED_NO_USE",
+              "sourceActor": "RESIDENT",
+              "relatedBusinessIds": [
+                "METER-1602-FLOW-01"
+              ],
+              "capturedAt": "2026-07-29T09:59:00.000Z",
+              "reliability": 0.94,
+              "provenance": "阶段4B浏览器本地脱敏合成输入",
+              "syntheticDemo": true
+            }
+          ],
+          "syntheticDemo": true
+        }
+      },
+      "evidenceSnapshots": {
+        "d41886ae8fb3d58cbfb260beacaf5202f3fc2d09e2b36ea35f125e11395a2281": [
+          {
+            "id": "EVD-PIPE-LAB-601",
+            "type": "PIPE_INSTALLATION_RECORD",
+            "status": "PRESENT",
+            "observedValue": "TRACEABLE",
+            "sourceActor": "WORKER",
+            "relatedBusinessIds": [
+              "J-1602-CW-03",
+              "PIPE-1602-CW-01"
+            ],
+            "capturedAt": "2025-03-18T14:26:00.000Z",
+            "reliability": 0.94,
+            "provenance": "阶段4B浏览器本地脱敏合成输入",
+            "syntheticDemo": true
+          },
+          {
+            "id": "EVD-WP-LAB-601",
+            "type": "WATERPROOFING_RECORD",
+            "status": "PRESENT",
+            "observedValue": "COMPLETE",
+            "sourceActor": "WORKER",
+            "relatedBusinessIds": [
+              "WP-1602-BATHROOM"
+            ],
+            "capturedAt": "2025-03-19T10:08:00.000Z",
+            "reliability": 0.94,
+            "provenance": "阶段4B浏览器本地脱敏合成输入",
+            "syntheticDemo": true
+          },
+          {
+            "id": "EVD-CWT-LAB-601",
+            "type": "CLOSED_WATER_TEST",
+            "status": "PRESENT",
+            "observedValue": "PASS",
+            "sourceActor": "PROPERTY",
+            "relatedBusinessIds": [
+              "WP-1602-BATHROOM"
+            ],
+            "capturedAt": "2025-03-21T16:40:00.000Z",
+            "reliability": 0.94,
+            "provenance": "阶段4B浏览器本地脱敏合成输入",
+            "syntheticDemo": true
+          },
+          {
+            "id": "EVD-PHOTO-LAB-601",
+            "type": "RESIDENT_WALL_PHOTO",
+            "status": "PRESENT",
+            "observedValue": "MOISTURE_VISIBLE",
+            "sourceActor": "RESIDENT",
+            "relatedBusinessIds": [
+              "WALL-1602-BATHROOM-NORTH",
+              "SPACE-1602-BATHROOM"
+            ],
+            "capturedAt": "2026-07-29T09:58:00.000Z",
+            "reliability": 0.94,
+            "provenance": "阶段4B浏览器本地脱敏合成输入",
+            "syntheticDemo": true
+          },
+          {
+            "id": "EVD-METER-LAB-601",
+            "type": "METER_READING",
+            "status": "PRESENT",
+            "observedValue": "FLOW_CONFIRMED_NO_USE",
+            "sourceActor": "RESIDENT",
+            "relatedBusinessIds": [
+              "METER-1602-FLOW-01"
+            ],
+            "capturedAt": "2026-07-29T09:59:00.000Z",
+            "reliability": 0.94,
+            "provenance": "阶段4B浏览器本地脱敏合成输入",
+            "syntheticDemo": true
+          }
+        ]
+      },
+      "decisionSnapshots": {
+        "4929f99b143fa1c3240fd7e069efc801d93852132f5ddcaea084663511c4a666": {
+          "eventId": "EVT-1602-LAB-601",
+          "evaluatedAt": "2026-07-29T10:00:00.000Z",
+          "decisionConfidence": "HIGH",
+          "rankedHypotheses": [
+            {
+              "hypothesis": "COLD_WATER_JOINT_LEAK",
+              "candidateBusinessIds": [
+                "J-1602-CW-03"
+              ],
+              "rawScore": 79.6,
+              "evidenceCoverage": 1,
+              "gapFromLeader": 62.2,
+              "confidence": "HIGH",
+              "contributions": [
+                {
+                  "ruleId": "RULE-HUM-001",
+                  "hypothesis": "COLD_WATER_JOINT_LEAK",
+                  "contribution": 10,
+                  "evidenceIds": [
+                    "OBS-HUM-LAB-601"
+                  ],
+                  "explanation": "持续湿度异常支持存在潮湿现象，但不能单独确定供水接头泄漏"
+                },
+                {
+                  "ruleId": "RULE-CW-001",
+                  "hypothesis": "COLD_WATER_JOINT_LEAK",
+                  "contribution": 32,
+                  "evidenceIds": [
+                    "OBS-FLOW-LAB-601"
+                  ],
+                  "explanation": "无人用水条件下持续微流量支持供水系统存在泄漏"
+                },
+                {
+                  "ruleId": "RULE-CW-002",
+                  "hypothesis": "COLD_WATER_JOINT_LEAK",
+                  "contribution": 20.68,
+                  "evidenceIds": [
+                    "EVD-METER-LAB-601"
+                  ],
+                  "explanation": "人工水表观察与微流量传感器相互印证"
+                },
+                {
+                  "ruleId": "RULE-CW-003",
+                  "hypothesis": "COLD_WATER_JOINT_LEAK",
+                  "contribution": 9.4,
+                  "evidenceIds": [
+                    "EVD-PHOTO-LAB-601"
+                  ],
+                  "explanation": "墙面影像支持潮湿位置与供水构件空间关系"
+                },
+                {
+                  "ruleId": "RULE-CW-004",
+                  "hypothesis": "COLD_WATER_JOINT_LEAK",
+                  "contribution": 7.52,
+                  "evidenceIds": [
+                    "EVD-PIPE-LAB-601"
+                  ],
+                  "explanation": "施工记忆使冷水构件链和重点接头可追溯"
+                }
+              ]
+            },
+            {
+              "hypothesis": "WATERPROOFING_FAILURE",
+              "candidateBusinessIds": [
+                "WP-1602-BATHROOM"
+              ],
+              "rawScore": 17.4,
+              "evidenceCoverage": 1,
+              "gapFromLeader": 62.2,
+              "confidence": "NOT_APPLICABLE",
+              "contributions": [
+                {
+                  "ruleId": "RULE-HUM-002",
+                  "hypothesis": "WATERPROOFING_FAILURE",
+                  "contribution": 8,
+                  "evidenceIds": [
+                    "OBS-HUM-LAB-601"
+                  ],
+                  "explanation": "持续潮湿与防水失效相容，但不是特异证据"
+                },
+                {
+                  "ruleId": "RULE-WP-001",
+                  "hypothesis": "WATERPROOFING_FAILURE",
+                  "contribution": 11.28,
+                  "evidenceIds": [
+                    "EVD-PHOTO-LAB-601"
+                  ],
+                  "explanation": "墙面潮湿影像与防水路径异常相容"
+                },
+                {
+                  "ruleId": "RULE-WP-002",
+                  "hypothesis": "WATERPROOFING_FAILURE",
+                  "contribution": 9.4,
+                  "evidenceIds": [
+                    "EVD-WP-LAB-601"
+                  ],
+                  "explanation": "防水施工记忆提供可核查对象和范围"
+                },
+                {
+                  "ruleId": "RULE-WP-003",
+                  "hypothesis": "WATERPROOFING_FAILURE",
+                  "contribution": -11.28,
+                  "evidenceIds": [
+                    "EVD-CWT-LAB-601"
+                  ],
+                  "explanation": "历史闭水试验合格降低施工期防水缺陷的相对支持度，但不能完全排除后期失效"
+                }
+              ]
+            },
+            {
+              "hypothesis": "CONDENSATION_OR_AMBIENT_HUMIDITY",
+              "candidateBusinessIds": [
+                "SENSOR-1602-HUM-01"
+              ],
+              "rawScore": 10,
+              "evidenceCoverage": 0.667,
+              "gapFromLeader": 69.6,
+              "confidence": "NOT_APPLICABLE",
+              "contributions": [
+                {
+                  "ruleId": "RULE-HUM-003",
+                  "hypothesis": "CONDENSATION_OR_AMBIENT_HUMIDITY",
+                  "contribution": 25,
+                  "evidenceIds": [
+                    "OBS-HUM-LAB-601"
+                  ],
+                  "explanation": "湿度异常首先证明环境潮湿，需要流量证据区分原因"
+                },
+                {
+                  "ruleId": "RULE-ENV-002",
+                  "hypothesis": "CONDENSATION_OR_AMBIENT_HUMIDITY",
+                  "contribution": -15,
+                  "evidenceIds": [
+                    "OBS-FLOW-LAB-601"
+                  ],
+                  "explanation": "持续微流量削弱单纯环境潮湿解释"
+                }
+              ]
+            },
+            {
+              "hypothesis": "UNRESOLVED",
+              "candidateBusinessIds": [],
+              "rawScore": 0,
+              "evidenceCoverage": 0,
+              "gapFromLeader": 79.6,
+              "confidence": "NOT_APPLICABLE",
+              "contributions": []
+            }
+          ],
+          "supportingEvidence": [
+            "EVD-CWT-LAB-601",
+            "EVD-METER-LAB-601",
+            "EVD-PHOTO-LAB-601",
+            "EVD-PIPE-LAB-601",
+            "EVD-WP-LAB-601",
+            "OBS-FLOW-LAB-601",
+            "OBS-HUM-LAB-601"
+          ],
+          "contradictingEvidence": [],
+          "missingEvidence": [],
+          "contradictions": [],
+          "proposedActions": [],
+          "authorizationRequests": [
+            {
+              "action": "REQUEST_HUMAN_AUTHORIZATION",
+              "requestedAction": "SIMULATE_CLOSE_VALVE",
+              "targetBusinessId": "VALVE-1602-CW-01"
+            }
+          ],
+          "authorizedActions": [],
+          "completedActions": []
+        }
+      },
+      "lastDecisionSnapshotHash": "4929f99b143fa1c3240fd7e069efc801d93852132f5ddcaea084663511c4a666",
+      "repairRecords": []
+    }
+  },
+  "traceLog": [
+    {
+      "traceId": "TRACE-d78d0335854bca",
+      "sessionId": "BA-SESSION-STAGE6A-001",
+      "timestamp": "2026-07-29T10:00:00.000Z",
+      "mode": "deterministic",
+      "actionType": "INPUT_ANALYZED",
+      "userInputSummary": "1602卫生间墙脚连续两天发潮，湿度大约78%，微流量0.06 L/min，停水以后水表还在缓慢走，墙面有一张照片。",
+      "intent": "DRAFT_OBSERVATION",
+      "toolCalls": [
+        {
+          "callId": "CALL-01",
+          "toolName": "draft_observation",
+          "specialistAgent": "居住服务智能体",
+          "inputSummary": "{\"draft\":{\"draftId\":\"DRAFT-fa8521258e7f\",\"originalText\":\"1602卫生间墙脚连续两天发潮，湿度大约78%，微流量0.06 L/min，停水以后水表还在缓慢走，墙面有一张照片。\",\"extractedFields\":{\"spaceId\":\"SPACE-1602-BATHROOM\",\"humidity\":7",
+          "outputSummary": "已形成待确认观察草稿，尚未进入正式事件",
+          "sourceRefs": [
+            "SPACE-1602-BATHROOM"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:00:00.000Z"
+        }
+      ],
+      "sourceRefs": [
+        "SPACE-1602-BATHROOM"
+      ],
+      "userConfirmation": false,
+      "responseSummary": "已识别空间候选：1602卫生间；当前内容仍是待确认草稿，尚未进入正式证据链",
+      "sequence": 1,
+      "previousHash": "284fbea41174fda45a47aceba03568771b883ef6e2b38a0850bd20ebf1dcc52d",
+      "entryHash": "13fff89b7805eb1af82bc3fe63c0019994525a4b3143439fd83f3f4b805e88fe"
+    },
+    {
+      "traceId": "TRACE-ebf07feaebb451",
+      "sessionId": "BA-SESSION-STAGE6A-001",
+      "timestamp": "2026-07-29T10:01:00.000Z",
+      "mode": "deterministic",
+      "actionType": "TOOLS_EXECUTED",
+      "userInputSummary": "1602卫生间墙脚连续两天发潮，湿度大约78%，微流量0.06 L/min，停水以后水表还在缓慢走，墙面有一张照片。",
+      "intent": "EVALUATE_EVENT",
+      "toolCalls": [
+        {
+          "callId": "CALL-01",
+          "toolName": "query_building_memory",
+          "specialistAgent": "建筑记忆智能体",
+          "inputSummary": "{\"query\":\"1602卫生间\"}",
+          "outputSummary": "建筑记忆返回40个匹配身份",
+          "sourceRefs": [
+            "DOOR-1602-BATHROOM",
+            "DRAIN-1602-FLOOR-01",
+            "FIXTURE-1602-BASIN-01",
+            "FIXTURE-1602-SHOWER-01",
+            "FIXTURE-1602-WC-01",
+            "J-1602-CW-03",
+            "METER-1602-FLOW-01",
+            "PARTITION-1602-SHOWER-01",
+            "PIPE-1602-CW-01",
+            "PIPE-1602-CW-02",
+            "PIPE-1602-HW-01",
+            "PORT-J-1602-CW-03-IN",
+            "PORT-J-1602-CW-03-OUT",
+            "PORT-METER-1602-FLOW-01-IN",
+            "PORT-METER-1602-FLOW-01-OUT",
+            "PORT-PIPE-1602-CW-01-IN",
+            "PORT-PIPE-1602-CW-01-OUT",
+            "PORT-PIPE-1602-CW-02-IN",
+            "PORT-PIPE-1602-CW-02-OUT",
+            "PORT-PIPE-1602-HW-01-IN",
+            "PORT-PIPE-1602-HW-01-OUT",
+            "PORT-VALVE-1602-CW-01-IN",
+            "PORT-VALVE-1602-CW-01-OUT",
+            "SENSOR-1602-HUM-01",
+            "SLAB-1602-BATHROOM",
+            "SPACE-1602-BATHROOM",
+            "SPACE-1602-BEDROOM-2",
+            "SPACE-1602-CIRCULATION",
+            "SPACE-1602-KITCHEN",
+            "SPACE-1602-LIVING",
+            "SPACE-1602-MASTER",
+            "SYS-1602-CW",
+            "SYS-1602-ENV",
+            "SYS-1602-HW",
+            "UNIT-1602",
+            "VALVE-1602-CW-01",
+            "WALL-1602-BATHROOM-EAST",
+            "WALL-1602-BATHROOM-NORTH",
+            "WALL-1602-BATHROOM-SOUTH-EAST",
+            "WALL-1602-BATHROOM-SOUTH-WEST"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-02",
+          "toolName": "locate_component",
+          "specialistAgent": "建筑记忆智能体",
+          "inputSummary": "{\"businessId\":\"J-1602-CW-03\"}",
+          "outputSummary": "J-1602-CW-03位于LVL-16/UNIT-1602/SPACE-1602-BATHROOM",
+          "sourceRefs": [
+            "J-1602-CW-03",
+            "BLD-ZS-DEMO-001",
+            "LVL-16",
+            "UNIT-1602",
+            "SPACE-1602-BATHROOM"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-03",
+          "toolName": "list_required_evidence",
+          "specialistAgent": "品质智能体",
+          "inputSummary": "{\"spaceId\":\"SPACE-1602-BATHROOM\"}",
+          "outputSummary": "当前候选需要5类证据",
+          "sourceRefs": [
+            "J-1602-CW-03"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-04",
+          "toolName": "submit_confirmed_observation",
+          "specialistAgent": "居住服务智能体",
+          "inputSummary": "{\"draft\":{\"draftId\":\"DRAFT-fa8521258e7f\",\"originalText\":\"1602卫生间墙脚连续两天发潮，湿度大约78%，微流量0.06 L/min，停水以后水表还在缓慢走，墙面有一张照片。\",\"extractedFields\":{\"spaceId\":\"SPACE-1602-BATHROOM\",\"humidity\":8",
+          "outputSummary": "用户确认字段已转换为事件引擎输入",
+          "sourceRefs": [
+            "SPACE-1602-BATHROOM",
+            "DRAFT-fa8521258e7f"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-05",
+          "toolName": "evaluate_life_event",
+          "specialistAgent": "建筑健康智能体",
+          "inputSummary": "{\"controls\":{\"humidity\":{\"value\":82,\"baseline\":55,\"durationMinutes\":2880,\"quality\":\"GOOD\"},\"microFlow\":{\"value\":0.06,\"baseline\":0,\"durationMinutes\":2880,\"quality\":\"GOOD\"},\"pipeInst",
+          "outputSummary": "事件引擎输出COLD_WATER_JOINT_LEAK，分值79.6，可信等级HIGH",
+          "sourceRefs": [
+            "J-1602-CW-03",
+            "EVD-CWT-LAB-601",
+            "EVD-METER-LAB-601",
+            "EVD-PHOTO-LAB-601",
+            "EVD-PIPE-LAB-601",
+            "EVD-WP-LAB-601",
+            "OBS-FLOW-LAB-601",
+            "OBS-HUM-LAB-601"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-06",
+          "toolName": "explain_decision",
+          "specialistAgent": "居住服务智能体",
+          "inputSummary": "{\"result\":{\"eventId\":\"EVT-1602-LAB-601\",\"state\":\"AUTHORIZATION_PENDING\",\"valvePosition\":\"OPEN\",\"rankedHypotheses\":[{\"hypothesis\":\"COLD_WATER_JOINT_LEAK\",\"candidateBusinessIds\":[\"J-",
+          "outputSummary": "COLD_WATER_JOINT_LEAK按透明规则排序第一；分值不是故障概率",
+          "sourceRefs": [
+            "J-1602-CW-03",
+            "EVD-CWT-LAB-601",
+            "EVD-METER-LAB-601",
+            "EVD-PHOTO-LAB-601",
+            "EVD-PIPE-LAB-601",
+            "EVD-WP-LAB-601",
+            "OBS-FLOW-LAB-601",
+            "OBS-HUM-LAB-601"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-07",
+          "toolName": "request_human_authorization",
+          "specialistAgent": "设备动作智能体",
+          "inputSummary": "{\"result\":{\"eventId\":\"EVT-1602-LAB-601\",\"state\":\"AUTHORIZATION_PENDING\",\"valvePosition\":\"OPEN\",\"rankedHypotheses\":[{\"hypothesis\":\"COLD_WATER_JOINT_LEAK\",\"candidateBusinessIds\":[\"J-",
+          "outputSummary": "仅创建人工授权请求，不批准也不执行设备动作",
+          "sourceRefs": [
+            "VALVE-1602-CW-01"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-08",
+          "toolName": "navigate_to_workspace",
+          "specialistAgent": "居住服务智能体",
+          "inputSummary": "{\"route\":\"/resident\"}",
+          "outputSummary": "建议由用户进入/resident专业工作台",
+          "sourceRefs": [],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        }
+      ],
+      "sourceRefs": [
+        "DOOR-1602-BATHROOM",
+        "DRAIN-1602-FLOOR-01",
+        "FIXTURE-1602-BASIN-01",
+        "FIXTURE-1602-SHOWER-01",
+        "FIXTURE-1602-WC-01",
+        "J-1602-CW-03",
+        "METER-1602-FLOW-01",
+        "PARTITION-1602-SHOWER-01",
+        "PIPE-1602-CW-01",
+        "PIPE-1602-CW-02",
+        "PIPE-1602-HW-01",
+        "PORT-J-1602-CW-03-IN",
+        "PORT-J-1602-CW-03-OUT",
+        "PORT-METER-1602-FLOW-01-IN",
+        "PORT-METER-1602-FLOW-01-OUT",
+        "PORT-PIPE-1602-CW-01-IN",
+        "PORT-PIPE-1602-CW-01-OUT",
+        "PORT-PIPE-1602-CW-02-IN",
+        "PORT-PIPE-1602-CW-02-OUT",
+        "PORT-PIPE-1602-HW-01-IN",
+        "PORT-PIPE-1602-HW-01-OUT",
+        "PORT-VALVE-1602-CW-01-IN",
+        "PORT-VALVE-1602-CW-01-OUT",
+        "SENSOR-1602-HUM-01",
+        "SLAB-1602-BATHROOM",
+        "SPACE-1602-BATHROOM",
+        "SPACE-1602-BEDROOM-2",
+        "SPACE-1602-CIRCULATION",
+        "SPACE-1602-KITCHEN",
+        "SPACE-1602-LIVING",
+        "SPACE-1602-MASTER",
+        "SYS-1602-CW",
+        "SYS-1602-ENV",
+        "SYS-1602-HW",
+        "UNIT-1602",
+        "VALVE-1602-CW-01",
+        "WALL-1602-BATHROOM-EAST",
+        "WALL-1602-BATHROOM-NORTH",
+        "WALL-1602-BATHROOM-SOUTH-EAST",
+        "WALL-1602-BATHROOM-SOUTH-WEST",
+        "BLD-ZS-DEMO-001",
+        "LVL-16",
+        "DRAFT-fa8521258e7f",
+        "EVD-CWT-LAB-601",
+        "EVD-METER-LAB-601",
+        "EVD-PHOTO-LAB-601",
+        "EVD-PIPE-LAB-601",
+        "EVD-WP-LAB-601",
+        "OBS-FLOW-LAB-601",
+        "OBS-HUM-LAB-601"
+      ],
+      "userConfirmation": true,
+      "responseSummary": "事件引擎状态：AUTHORIZATION_PENDING；第一候选：COLD_WATER_JOINT_LEAK；规则原始分值：79.6，可信等级：HIGH；支持证据：EVD-CWT-LAB-601；支持证据：EVD-METER-LAB-601；支持证据：EVD-PHOTO-LAB-601；支持证据：EVD-PIPE-LAB-601；支持证据：EVD-WP-LAB-601；支持证据：OBS-FLOW-LAB-601；支持证据：OBS-HUM-LAB-601",
+      "sequence": 2,
+      "previousHash": "13fff89b7805eb1af82bc3fe63c0019994525a4b3143439fd83f3f4b805e88fe",
+      "entryHash": "3326261e729375eb0739aae594ad129ebeac9e8e2d649a375d4bf471b66dda7c"
+    }
+  ],
+  "verification": {
+    "valid": true,
+    "replay": {
+      "sessionId": "BA-SESSION-STAGE6A-001",
+      "intent": "EVALUATE_EVENT",
+      "mode": "deterministic",
+      "toolCalls": [
+        {
+          "callId": "CALL-01",
+          "toolName": "draft_observation",
+          "specialistAgent": "居住服务智能体",
+          "inputSummary": "{\"draft\":{\"draftId\":\"DRAFT-fa8521258e7f\",\"originalText\":\"1602卫生间墙脚连续两天发潮，湿度大约78%，微流量0.06 L/min，停水以后水表还在缓慢走，墙面有一张照片。\",\"extractedFields\":{\"spaceId\":\"SPACE-1602-BATHROOM\",\"humidity\":7",
+          "outputSummary": "已形成待确认观察草稿，尚未进入正式事件",
+          "sourceRefs": [
+            "SPACE-1602-BATHROOM"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:00:00.000Z"
+        },
+        {
+          "callId": "CALL-01",
+          "toolName": "query_building_memory",
+          "specialistAgent": "建筑记忆智能体",
+          "inputSummary": "{\"query\":\"1602卫生间\"}",
+          "outputSummary": "建筑记忆返回40个匹配身份",
+          "sourceRefs": [
+            "DOOR-1602-BATHROOM",
+            "DRAIN-1602-FLOOR-01",
+            "FIXTURE-1602-BASIN-01",
+            "FIXTURE-1602-SHOWER-01",
+            "FIXTURE-1602-WC-01",
+            "J-1602-CW-03",
+            "METER-1602-FLOW-01",
+            "PARTITION-1602-SHOWER-01",
+            "PIPE-1602-CW-01",
+            "PIPE-1602-CW-02",
+            "PIPE-1602-HW-01",
+            "PORT-J-1602-CW-03-IN",
+            "PORT-J-1602-CW-03-OUT",
+            "PORT-METER-1602-FLOW-01-IN",
+            "PORT-METER-1602-FLOW-01-OUT",
+            "PORT-PIPE-1602-CW-01-IN",
+            "PORT-PIPE-1602-CW-01-OUT",
+            "PORT-PIPE-1602-CW-02-IN",
+            "PORT-PIPE-1602-CW-02-OUT",
+            "PORT-PIPE-1602-HW-01-IN",
+            "PORT-PIPE-1602-HW-01-OUT",
+            "PORT-VALVE-1602-CW-01-IN",
+            "PORT-VALVE-1602-CW-01-OUT",
+            "SENSOR-1602-HUM-01",
+            "SLAB-1602-BATHROOM",
+            "SPACE-1602-BATHROOM",
+            "SPACE-1602-BEDROOM-2",
+            "SPACE-1602-CIRCULATION",
+            "SPACE-1602-KITCHEN",
+            "SPACE-1602-LIVING",
+            "SPACE-1602-MASTER",
+            "SYS-1602-CW",
+            "SYS-1602-ENV",
+            "SYS-1602-HW",
+            "UNIT-1602",
+            "VALVE-1602-CW-01",
+            "WALL-1602-BATHROOM-EAST",
+            "WALL-1602-BATHROOM-NORTH",
+            "WALL-1602-BATHROOM-SOUTH-EAST",
+            "WALL-1602-BATHROOM-SOUTH-WEST"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-02",
+          "toolName": "locate_component",
+          "specialistAgent": "建筑记忆智能体",
+          "inputSummary": "{\"businessId\":\"J-1602-CW-03\"}",
+          "outputSummary": "J-1602-CW-03位于LVL-16/UNIT-1602/SPACE-1602-BATHROOM",
+          "sourceRefs": [
+            "J-1602-CW-03",
+            "BLD-ZS-DEMO-001",
+            "LVL-16",
+            "UNIT-1602",
+            "SPACE-1602-BATHROOM"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-03",
+          "toolName": "list_required_evidence",
+          "specialistAgent": "品质智能体",
+          "inputSummary": "{\"spaceId\":\"SPACE-1602-BATHROOM\"}",
+          "outputSummary": "当前候选需要5类证据",
+          "sourceRefs": [
+            "J-1602-CW-03"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-04",
+          "toolName": "submit_confirmed_observation",
+          "specialistAgent": "居住服务智能体",
+          "inputSummary": "{\"draft\":{\"draftId\":\"DRAFT-fa8521258e7f\",\"originalText\":\"1602卫生间墙脚连续两天发潮，湿度大约78%，微流量0.06 L/min，停水以后水表还在缓慢走，墙面有一张照片。\",\"extractedFields\":{\"spaceId\":\"SPACE-1602-BATHROOM\",\"humidity\":8",
+          "outputSummary": "用户确认字段已转换为事件引擎输入",
+          "sourceRefs": [
+            "SPACE-1602-BATHROOM",
+            "DRAFT-fa8521258e7f"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-05",
+          "toolName": "evaluate_life_event",
+          "specialistAgent": "建筑健康智能体",
+          "inputSummary": "{\"controls\":{\"humidity\":{\"value\":82,\"baseline\":55,\"durationMinutes\":2880,\"quality\":\"GOOD\"},\"microFlow\":{\"value\":0.06,\"baseline\":0,\"durationMinutes\":2880,\"quality\":\"GOOD\"},\"pipeInst",
+          "outputSummary": "事件引擎输出COLD_WATER_JOINT_LEAK，分值79.6，可信等级HIGH",
+          "sourceRefs": [
+            "J-1602-CW-03",
+            "EVD-CWT-LAB-601",
+            "EVD-METER-LAB-601",
+            "EVD-PHOTO-LAB-601",
+            "EVD-PIPE-LAB-601",
+            "EVD-WP-LAB-601",
+            "OBS-FLOW-LAB-601",
+            "OBS-HUM-LAB-601"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-06",
+          "toolName": "explain_decision",
+          "specialistAgent": "居住服务智能体",
+          "inputSummary": "{\"result\":{\"eventId\":\"EVT-1602-LAB-601\",\"state\":\"AUTHORIZATION_PENDING\",\"valvePosition\":\"OPEN\",\"rankedHypotheses\":[{\"hypothesis\":\"COLD_WATER_JOINT_LEAK\",\"candidateBusinessIds\":[\"J-",
+          "outputSummary": "COLD_WATER_JOINT_LEAK按透明规则排序第一；分值不是故障概率",
+          "sourceRefs": [
+            "J-1602-CW-03",
+            "EVD-CWT-LAB-601",
+            "EVD-METER-LAB-601",
+            "EVD-PHOTO-LAB-601",
+            "EVD-PIPE-LAB-601",
+            "EVD-WP-LAB-601",
+            "OBS-FLOW-LAB-601",
+            "OBS-HUM-LAB-601"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-07",
+          "toolName": "request_human_authorization",
+          "specialistAgent": "设备动作智能体",
+          "inputSummary": "{\"result\":{\"eventId\":\"EVT-1602-LAB-601\",\"state\":\"AUTHORIZATION_PENDING\",\"valvePosition\":\"OPEN\",\"rankedHypotheses\":[{\"hypothesis\":\"COLD_WATER_JOINT_LEAK\",\"candidateBusinessIds\":[\"J-",
+          "outputSummary": "仅创建人工授权请求，不批准也不执行设备动作",
+          "sourceRefs": [
+            "VALVE-1602-CW-01"
+          ],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        },
+        {
+          "callId": "CALL-08",
+          "toolName": "navigate_to_workspace",
+          "specialistAgent": "居住服务智能体",
+          "inputSummary": "{\"route\":\"/resident\"}",
+          "outputSummary": "建议由用户进入/resident专业工作台",
+          "sourceRefs": [],
+          "status": "SUCCEEDED",
+          "occurredAt": "2026-07-29T10:01:00.000Z"
+        }
+      ],
+      "rootHash": "3326261e729375eb0739aae594ad129ebeac9e8e2d649a375d4bf471b66dda7c",
+      "lastResponseSummary": "事件引擎状态：AUTHORIZATION_PENDING；第一候选：COLD_WATER_JOINT_LEAK；规则原始分值：79.6，可信等级：HIGH；支持证据：EVD-CWT-LAB-601；支持证据：EVD-METER-LAB-601；支持证据：EVD-PHOTO-LAB-601；支持证据：EVD-PIPE-LAB-601；支持证据：EVD-WP-LAB-601；支持证据：OBS-FLOW-LAB-601；支持证据：OBS-HUM-LAB-601"
+    },
+    "checkedAt": "2026-07-29T10:02:00.000Z"
+  },
+  "syntheticDemo": true,
+  "disclaimer": "脱敏合成演示总智能体会话，不是真实诊断、设备控制或大模型调用记录。"
+}
