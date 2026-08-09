@@ -1,8 +1,9 @@
 import { LifeEventEngine } from "../../engine.ts";
 import { validateLifeEventContext } from "../../context-validation.ts";
 import type { BuildingMemory, EngineClock, VisualManifest } from "../../types.ts";
+import { publicAssetPath } from "../../../site-path.ts";
 
-export const LIFE_EVENT_ASSET_ROOT = "/assets/life-event";
+export const LIFE_EVENT_ASSET_ROOT = publicAssetPath("/assets/life-event");
 
 export type AssetIntegrity = {
   schemaVersion: 1;
