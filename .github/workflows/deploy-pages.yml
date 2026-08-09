@@ -34,7 +34,10 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Build static site
-        run: pnpm run build:next
+        run: |
+          pnpm run sync:life-event-assets
+          pnpm run sync:group-learning-assets
+          pnpm exec next build
         env:
           NEXT_PUBLIC_BASE_PATH: /zhusheng
       - name: Upload GitHub Pages artifact
