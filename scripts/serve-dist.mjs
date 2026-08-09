@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 
-const port = Number(process.env.PORT || 4173);
+const port = Number(process.env.PORT || 4174);
 const host = process.env.HOST || "127.0.0.1";
 const workerPath = resolve(process.cwd(), "dist/server/index.js");
 const worker = (await import(pathToFileURL(workerPath).href)).default;

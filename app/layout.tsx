@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { DemoProvider } from "@/components/demo-provider";
+import { LifecycleJourneyProvider } from "@/components/lifecycle-journey-provider";
 import { Shell } from "@/components/shell";
 import "./globals.css";
 
@@ -12,21 +13,18 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0c0d0e"
+  themeColor: "#f4f1ea"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN">
-      <head>
-        <link rel="preload" as="image" href="/assets/v4/building-stage.webp" type="image/webp" />
-        <link rel="preload" as="image" href="/assets/v4/bathroom-stage.webp" type="image/webp" />
-        <link rel="preload" as="image" href="/assets/v4/portfolio-stage.webp" type="image/webp" />
-      </head>
       <body>
         <Suspense fallback={null}>
           <DemoProvider>
-            <Shell>{children}</Shell>
+            <LifecycleJourneyProvider>
+              <Shell>{children}</Shell>
+            </LifecycleJourneyProvider>
           </DemoProvider>
         </Suspense>
       </body>

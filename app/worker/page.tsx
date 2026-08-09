@@ -6,9 +6,11 @@ import { useEffect, useMemo, useState } from "react";
 import { SceneStage } from "@/components/scene-stage";
 import { EvidenceStrip } from "@/components/evidence-viewer";
 import { useDemo } from "@/components/demo-provider";
+import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 
 export default function WorkerPage() {
-  const { state, next, start } = useDemo();
+  const { state, next } = useDemo();
+  const { markWorkerEvidenceReady } = useLifecycleJourney();
   const [recording, setRecording] = useState(false);
   const [paused, setPaused] = useState(false);
   const [recorded, setRecorded] = useState(false);
@@ -37,6 +39,11 @@ export default function WorkerPage() {
     setRecording(false);
     setPaused(false);
     setRecorded(true);
+  }
+
+  function enterResidentTask() {
+    markWorkerEvidenceReady();
+    next();
   }
 
   return (
@@ -102,7 +109,7 @@ export default function WorkerPage() {
             <EvidenceStrip ids={["joint", "pressure"]} label="EV-2848建筑记忆证据" />
             <dl className="memory-object"><div><dt>空间</dt><dd>1602卫生间</dd></div><div><dt>构件</dt><dd>W-1602-B7</dd></div><div><dt>班组</dt><dd>安装班组（脱敏）</dd></div><div><dt>验收阶段</dt><dd>隐蔽工程复核</dd></div></dl>
             <div className="contribution-line"><span>工友品质贡献</span><strong>关键隐蔽工序形成可信记录</strong></div>
-            <div className="success-links"><Link href="/">查看建筑记忆</Link><button onClick={start}>返回现场记录</button></div>
+          <div className="success-links"><button className="stage-decision" onClick={enterResidentTask}>进入入住任务处置</button><Link href="/">返回筑生总智能体</Link></div>
           </div>
         )}
       </section>

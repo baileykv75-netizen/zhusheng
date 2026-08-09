@@ -1,0 +1,23 @@
+{
+  "description": "湿度和微流量异常存在，但缺少住户照片与人工水表观察",
+  "syntheticDemo": true,
+  "steps": [
+    {
+      "eventId": "EVT-1602-MISSING-001",
+      "buildingId": "BLD-ZS-DEMO-001",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "detectedAt": "2026-07-29T09:59:00.000Z",
+      "evaluatedAt": "2026-07-29T10:05:00.000Z",
+      "observations": [
+        { "id": "OBS-HUM-M01", "sensorBusinessId": "SENSOR-1602-HUM-01", "observedAt": "2026-07-29T10:00:00.000Z", "metric": "RELATIVE_HUMIDITY", "value": 80, "unit": "%", "baseline": 55, "durationMinutes": 45, "quality": "GOOD", "syntheticDemo": true },
+        { "id": "OBS-FLOW-M01", "sensorBusinessId": "METER-1602-FLOW-01", "observedAt": "2026-07-29T10:00:00.000Z", "metric": "MICRO_FLOW", "value": 0.05, "unit": "L/min", "baseline": 0, "durationMinutes": 30, "quality": "GOOD", "syntheticDemo": true }
+      ],
+      "evidence": [
+        { "id": "EVD-PIPE-M01", "type": "PIPE_INSTALLATION_RECORD", "status": "PRESENT", "observedValue": "TRACEABLE", "sourceActor": "WORKER", "relatedBusinessIds": ["J-1602-CW-03", "PIPE-1602-CW-01"], "capturedAt": "2025-03-18T14:26:00.000Z", "reliability": 0.95, "provenance": "合成施工记忆种子", "syntheticDemo": true },
+        { "id": "EVD-WP-M01", "type": "WATERPROOFING_RECORD", "status": "PRESENT", "observedValue": "COMPLETE", "sourceActor": "WORKER", "relatedBusinessIds": ["WP-1602-BATHROOM"], "capturedAt": "2025-03-19T10:08:00.000Z", "reliability": 0.9, "provenance": "合成防水施工记录", "syntheticDemo": true },
+        { "id": "EVD-CWT-M01", "type": "CLOSED_WATER_TEST", "status": "PRESENT", "observedValue": "PASS", "sourceActor": "PROPERTY", "relatedBusinessIds": ["WP-1602-BATHROOM"], "capturedAt": "2025-03-21T16:40:00.000Z", "reliability": 0.95, "provenance": "合成闭水试验记录", "syntheticDemo": true }
+      ],
+      "syntheticDemo": true
+    }
+  ]
+}

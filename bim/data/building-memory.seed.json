@@ -1,0 +1,5105 @@
+{
+  "buildingId": "BLD-ZS-DEMO-001",
+  "components": [
+    {
+      "buildingId": "BLD-ZS-DEMO-001",
+      "businessId": "DRAIN-1602-FLOOR-01",
+      "displayName": "1602卫生间地漏",
+      "downstreamIds": [],
+      "evidenceTypes": [
+        "drain_installation_photo",
+        "drain_flow_test"
+      ],
+      "humanAuthorizationRequired": false,
+      "ifcClass": "IfcWasteTerminal",
+      "ifcGlobalId": "0pS4qx8iPKJexETXi8l1nw",
+      "lifecycleStatus": "ENVIRONMENT_COMPONENT_READY",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "storeyId": "LVL-16",
+      "syntheticDemo": true,
+      "systemId": null,
+      "unitId": "UNIT-1602",
+      "upstreamIds": []
+    },
+    {
+      "buildingId": "BLD-ZS-DEMO-001",
+      "businessId": "FIXTURE-1602-BASIN-01",
+      "displayName": "1602卫生间洗手盆",
+      "downstreamIds": [],
+      "evidenceTypes": [
+        "fixture_installation_photo",
+        "fixture_acceptance_record"
+      ],
+      "humanAuthorizationRequired": false,
+      "ifcClass": "IfcSanitaryTerminal",
+      "ifcGlobalId": "23sDdoSa9TzfxI20wLSb_Y",
+      "lifecycleStatus": "ENVIRONMENT_COMPONENT_READY",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "storeyId": "LVL-16",
+      "syntheticDemo": true,
+      "systemId": null,
+      "unitId": "UNIT-1602",
+      "upstreamIds": []
+    },
+    {
+      "buildingId": "BLD-ZS-DEMO-001",
+      "businessId": "FIXTURE-1602-SHOWER-01",
+      "displayName": "1602卫生间淋浴设备",
+      "downstreamIds": [],
+      "evidenceTypes": [
+        "fixture_installation_photo",
+        "fixture_function_test"
+      ],
+      "humanAuthorizationRequired": false,
+      "ifcClass": "IfcSanitaryTerminal",
+      "ifcGlobalId": "3ti$eETIPInRe$W0y_rl28",
+      "lifecycleStatus": "ENVIRONMENT_COMPONENT_READY",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "storeyId": "LVL-16",
+      "syntheticDemo": true,
+      "systemId": null,
+      "unitId": "UNIT-1602",
+      "upstreamIds": []
+    },
+    {
+      "buildingId": "BLD-ZS-DEMO-001",
+      "businessId": "FIXTURE-1602-WC-01",
+      "displayName": "1602卫生间坐便器",
+      "downstreamIds": [],
+      "evidenceTypes": [
+        "fixture_installation_photo",
+        "fixture_acceptance_record"
+      ],
+      "humanAuthorizationRequired": false,
+      "ifcClass": "IfcSanitaryTerminal",
+      "ifcGlobalId": "1LdxdLIPnNTg5eHy1uuj$1",
+      "lifecycleStatus": "ENVIRONMENT_COMPONENT_READY",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "storeyId": "LVL-16",
+      "syntheticDemo": true,
+      "systemId": null,
+      "unitId": "UNIT-1602",
+      "upstreamIds": []
+    },
+    {
+      "buildingId": "BLD-ZS-DEMO-001",
+      "businessId": "J-1602-CW-03",
+      "displayName": "1602卫生间重点冷水接头",
+      "downstreamIds": [
+        "PIPE-1602-CW-02"
+      ],
+      "evidenceTypes": [
+        "joint_dual_angle_photo",
+        "fusion_parameter_record",
+        "pressure_test_record"
+      ],
+      "humanAuthorizationRequired": false,
+      "ifcClass": "IfcPipeFitting",
+      "ifcGlobalId": "335_0vB1nGSBl7rYBoGxwT",
+      "lifecycleStatus": "AS_BUILT_MEMORY_SEEDED",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "storeyId": "LVL-16",
+      "syntheticDemo": true,
+      "systemId": "SYS-1602-CW",
+      "unitId": "UNIT-1602",
+      "upstreamIds": [
+        "PIPE-1602-CW-01"
+      ]
+    },
+    {
+      "buildingId": "BLD-ZS-DEMO-001",
+      "businessId": "METER-1602-FLOW-01",
+      "displayName": "1602卫生间微流量水表",
+      "downstreamIds": [
+        "VALVE-1602-CW-01"
+      ],
+      "evidenceTypes": [
+        "meter_installation_photo",
+        "meter_calibration_certificate"
+      ],
+      "humanAuthorizationRequired": false,
+      "ifcClass": "IfcFlowMeter",
+      "ifcGlobalId": "0jB2RokC9PkAHxCJo4uVuI",
+      "lifecycleStatus": "COMMISSIONING_READY",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "storeyId": "LVL-16",
+      "syntheticDemo": true,
+      "systemId": "SYS-1602-CW",
+      "unitId": "UNIT-1602",
+      "upstreamIds": []
+    },
+    {
+      "buildingId": "BLD-ZS-DEMO-001",
+      "businessId": "PARTITION-1602-SHOWER-01",
+      "displayName": "1602卫生间淋浴玻璃隔断",
+      "downstreamIds": [],
+      "evidenceTypes": [
+        "partition_installation_photo",
+        "partition_acceptance_record"
+      ],
+      "humanAuthorizationRequired": false,
+      "ifcClass": "IfcBuildingElementProxy",
+      "ifcGlobalId": "2_f9FRSBvSzuyU3waAIWDe",
+      "lifecycleStatus": "ENVIRONMENT_COMPONENT_READY",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "storeyId": "LVL-16",
+      "syntheticDemo": true,
+      "systemId": null,
+      "unitId": "UNIT-1602",
+      "upstreamIds": []
+    },
+    {
+      "buildingId": "BLD-ZS-DEMO-001",
+      "businessId": "PIPE-1602-CW-01",
+      "displayName": "1602卫生间上游冷水管段",
+      "downstreamIds": [
+        "J-1602-CW-03"
+      ],
+      "evidenceTypes": [
+        "pipe_installation_photo",
+        "pressure_test_record"
+      ],
+      "humanAuthorizationRequired": false,
+      "ifcClass": "IfcPipeSegment",
+      "ifcGlobalId": "3OvAR_zLnMMfCPWJLEqKva",
+      "lifecycleStatus": "AS_BUILT_MEMORY_SEEDED",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "storeyId": "LVL-16",
+      "syntheticDemo": true,
+      "systemId": "SYS-1602-CW",
+      "unitId": "UNIT-1602",
+      "upstreamIds": [
+        "VALVE-1602-CW-01"
+      ]
+    },
+    {
+      "buildingId": "BLD-ZS-DEMO-001",
+      "businessId": "PIPE-1602-CW-02",
+      "displayName": "1602卫生间下游冷水管段",
+      "downstreamIds": [],
+      "evidenceTypes": [
+        "pipe_installation_photo",
+        "pressure_test_record"
+      ],
+      "humanAuthorizationRequired": false,
+      "ifcClass": "IfcPipeSegment",
+      "ifcGlobalId": "1gY45OQcbQ7P4PuRYcLL5_",
+      "lifecycleStatus": "AS_BUILT_MEMORY_SEEDED",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "storeyId": "LVL-16",
+      "syntheticDemo": true,
+      "systemId": "SYS-1602-CW",
+      "unitId": "UNIT-1602",
+      "upstreamIds": [
+        "J-1602-CW-03"
+      ]
+    },
+    {
+      "buildingId": "BLD-ZS-DEMO-001",
+      "businessId": "PIPE-1602-HW-01",
+      "displayName": "1602卫生间热水支管",
+      "downstreamIds": [],
+      "evidenceTypes": [
+        "pipe_installation_photo",
+        "pressure_test_record"
+      ],
+      "humanAuthorizationRequired": false,
+      "ifcClass": "IfcPipeSegment",
+      "ifcGlobalId": "36LhsGedXPufeyYlYHt4Ls",
+      "lifecycleStatus": "AS_BUILT_MEMORY_SEEDED",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "storeyId": "LVL-16",
+      "syntheticDemo": true,
+      "systemId": "SYS-1602-HW",
+      "unitId": "UNIT-1602",
+      "upstreamIds": []
+    },
+    {
+      "buildingId": "BLD-ZS-DEMO-001",
+      "businessId": "SENSOR-1602-HUM-01",
+      "displayName": "1602卫生间湿度传感器",
+      "downstreamIds": [],
+      "evidenceTypes": [
+        "sensor_installation_photo",
+        "sensor_calibration_certificate"
+      ],
+      "humanAuthorizationRequired": false,
+      "ifcClass": "IfcSensor",
+      "ifcGlobalId": "1E8P_ko7XLTOcOHVVTBvqV",
+      "lifecycleStatus": "CAPABILITY_DEFINED_NO_TIME_SERIES",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "storeyId": "LVL-16",
+      "syntheticDemo": true,
+      "systemId": "SYS-1602-ENV",
+      "unitId": "UNIT-1602",
+      "upstreamIds": []
+    },
+    {
+      "buildingId": "BLD-ZS-DEMO-001",
+      "businessId": "VALVE-1602-CW-01",
+      "displayName": "1602卫生间局部冷水关断阀",
+      "downstreamIds": [
+        "PIPE-1602-CW-01"
+      ],
+      "evidenceTypes": [
+        "valve_installation_photo",
+        "valve_function_test",
+        "human_authorization_record"
+      ],
+      "humanAuthorizationRequired": true,
+      "ifcClass": "IfcValve",
+      "ifcGlobalId": "0dZjT4flPP59fQfI4VUIOw",
+      "lifecycleStatus": "AVAILABLE_NOT_ACTUATED",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "storeyId": "LVL-16",
+      "syntheticDemo": true,
+      "systemId": "SYS-1602-CW",
+      "unitId": "UNIT-1602",
+      "upstreamIds": [
+        "METER-1602-FLOW-01"
+      ]
+    },
+    {
+      "buildingId": "BLD-ZS-DEMO-001",
+      "businessId": "WP-1602-BATHROOM",
+      "displayName": "1602卫生间防水示意层",
+      "downstreamIds": [],
+      "evidenceTypes": [
+        "waterproof_material_batch",
+        "application_photo",
+        "closed_water_test"
+      ],
+      "humanAuthorizationRequired": false,
+      "ifcClass": "IfcCovering",
+      "ifcGlobalId": "2POPXIP6bVuwysur6mxYmg",
+      "lifecycleStatus": "CONSTRUCTION_MEMORY_SEEDED",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "storeyId": "LVL-16",
+      "syntheticDemo": true,
+      "systemId": null,
+      "unitId": "UNIT-1602",
+      "upstreamIds": []
+    }
+  ],
+  "connections": [
+    {
+      "businessId": "CONN-1602-CW-01",
+      "flowDirection": "SOURCE",
+      "fromComponentId": "METER-1602-FLOW-01",
+      "fromPortId": "PORT-METER-1602-FLOW-01-OUT",
+      "ifcGlobalId": "13ALXPvQDMIAiAX4XQTBn5",
+      "toComponentId": "VALVE-1602-CW-01",
+      "toPortId": "PORT-VALVE-1602-CW-01-IN"
+    },
+    {
+      "businessId": "CONN-1602-CW-02",
+      "flowDirection": "SOURCE",
+      "fromComponentId": "VALVE-1602-CW-01",
+      "fromPortId": "PORT-VALVE-1602-CW-01-OUT",
+      "ifcGlobalId": "0nqdC2TVHUzRojBn5oarKW",
+      "toComponentId": "PIPE-1602-CW-01",
+      "toPortId": "PORT-PIPE-1602-CW-01-IN"
+    },
+    {
+      "businessId": "CONN-1602-CW-03",
+      "flowDirection": "SOURCE",
+      "fromComponentId": "PIPE-1602-CW-01",
+      "fromPortId": "PORT-PIPE-1602-CW-01-OUT",
+      "ifcGlobalId": "3b8eqwxUvGqQWKajeY21xF",
+      "toComponentId": "J-1602-CW-03",
+      "toPortId": "PORT-J-1602-CW-03-IN"
+    },
+    {
+      "businessId": "CONN-1602-CW-04",
+      "flowDirection": "SOURCE",
+      "fromComponentId": "J-1602-CW-03",
+      "fromPortId": "PORT-J-1602-CW-03-OUT",
+      "ifcGlobalId": "23zDl8JZ5IuArD1I2zcI_$",
+      "toComponentId": "PIPE-1602-CW-02",
+      "toPortId": "PORT-PIPE-1602-CW-02-IN"
+    }
+  ],
+  "disclaimer": "脱敏合成演示模型，不作为施工依据",
+  "evidenceRequirements": [
+    {
+      "componentId": "DRAIN-1602-FLOOR-01",
+      "evidenceTypes": [
+        "drain_installation_photo",
+        "drain_flow_test"
+      ]
+    },
+    {
+      "componentId": "FIXTURE-1602-BASIN-01",
+      "evidenceTypes": [
+        "fixture_installation_photo",
+        "fixture_acceptance_record"
+      ]
+    },
+    {
+      "componentId": "FIXTURE-1602-SHOWER-01",
+      "evidenceTypes": [
+        "fixture_installation_photo",
+        "fixture_function_test"
+      ]
+    },
+    {
+      "componentId": "FIXTURE-1602-WC-01",
+      "evidenceTypes": [
+        "fixture_installation_photo",
+        "fixture_acceptance_record"
+      ]
+    },
+    {
+      "componentId": "J-1602-CW-03",
+      "evidenceTypes": [
+        "joint_dual_angle_photo",
+        "fusion_parameter_record",
+        "pressure_test_record"
+      ]
+    },
+    {
+      "componentId": "METER-1602-FLOW-01",
+      "evidenceTypes": [
+        "meter_installation_photo",
+        "meter_calibration_certificate"
+      ]
+    },
+    {
+      "componentId": "PARTITION-1602-SHOWER-01",
+      "evidenceTypes": [
+        "partition_installation_photo",
+        "partition_acceptance_record"
+      ]
+    },
+    {
+      "componentId": "PIPE-1602-CW-01",
+      "evidenceTypes": [
+        "pipe_installation_photo",
+        "pressure_test_record"
+      ]
+    },
+    {
+      "componentId": "PIPE-1602-CW-02",
+      "evidenceTypes": [
+        "pipe_installation_photo",
+        "pressure_test_record"
+      ]
+    },
+    {
+      "componentId": "PIPE-1602-HW-01",
+      "evidenceTypes": [
+        "pipe_installation_photo",
+        "pressure_test_record"
+      ]
+    },
+    {
+      "componentId": "SENSOR-1602-HUM-01",
+      "evidenceTypes": [
+        "sensor_installation_photo",
+        "sensor_calibration_certificate"
+      ]
+    },
+    {
+      "componentId": "VALVE-1602-CW-01",
+      "evidenceTypes": [
+        "valve_installation_photo",
+        "valve_function_test",
+        "human_authorization_record"
+      ]
+    },
+    {
+      "componentId": "WP-1602-BATHROOM",
+      "evidenceTypes": [
+        "waterproof_material_batch",
+        "application_photo",
+        "closed_water_test"
+      ]
+    }
+  ],
+  "identityIndex": {
+    "BLD-ZS-DEMO-001": {
+      "displayName": "筑生样板楼A座",
+      "ifcClass": "IfcBuilding",
+      "ifcGlobalId": "3EPXrlJWvT1BwPQCiuo8$J"
+    },
+    "DOOR-1602-BATHROOM": {
+      "displayName": "1602卫生间门",
+      "ifcClass": "IfcDoor",
+      "ifcGlobalId": "1GVKO1tqTH88ZEicvUqCFX"
+    },
+    "DOOR-LVL-01-MAIN": {
+      "displayName": "首层住宅主入口",
+      "ifcClass": "IfcDoor",
+      "ifcGlobalId": "3D9ZGcTpLStwZ$ifpylvg8"
+    },
+    "DRAIN-1602-FLOOR-01": {
+      "displayName": "1602卫生间地漏",
+      "ifcClass": "IfcWasteTerminal",
+      "ifcGlobalId": "0pS4qx8iPKJexETXi8l1nw"
+    },
+    "FIXTURE-1602-BASIN-01": {
+      "displayName": "1602卫生间洗手盆",
+      "ifcClass": "IfcSanitaryTerminal",
+      "ifcGlobalId": "23sDdoSa9TzfxI20wLSb_Y"
+    },
+    "FIXTURE-1602-SHOWER-01": {
+      "displayName": "1602卫生间淋浴设备",
+      "ifcClass": "IfcSanitaryTerminal",
+      "ifcGlobalId": "3ti$eETIPInRe$W0y_rl28"
+    },
+    "FIXTURE-1602-WC-01": {
+      "displayName": "1602卫生间坐便器",
+      "ifcClass": "IfcSanitaryTerminal",
+      "ifcGlobalId": "1LdxdLIPnNTg5eHy1uuj$1"
+    },
+    "J-1602-CW-03": {
+      "displayName": "1602卫生间重点冷水接头",
+      "ifcClass": "IfcPipeFitting",
+      "ifcGlobalId": "335_0vB1nGSBl7rYBoGxwT"
+    },
+    "LVL-01": {
+      "displayName": "1层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "1wQ5_pShXNYe4e3hix78vP"
+    },
+    "LVL-02": {
+      "displayName": "2层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "3FSBOcHJTRH93kbanMW8rJ"
+    },
+    "LVL-03": {
+      "displayName": "3层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "0rEl4ZxC9JDhd$7RCqGOLs"
+    },
+    "LVL-04": {
+      "displayName": "4层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "3MS5XIUarRJfJvxn2SJbB$"
+    },
+    "LVL-05": {
+      "displayName": "5层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "3nHjWa1fPUfxCFhhm$g2Qe"
+    },
+    "LVL-06": {
+      "displayName": "6层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "0_nkt8Bg1KG8kpNiLj4LCj"
+    },
+    "LVL-07": {
+      "displayName": "7层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "346Ha6UZzR1RZCQp9fsv7a"
+    },
+    "LVL-08": {
+      "displayName": "8层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "15KtufRRTJdfLzVNb_WAXZ"
+    },
+    "LVL-09": {
+      "displayName": "9层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "0S5J2AS9PMOQMCedXVTuKj"
+    },
+    "LVL-10": {
+      "displayName": "10层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "0JGY8cS5XIexagDWKLwNQk"
+    },
+    "LVL-11": {
+      "displayName": "11层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "0HdSNsnnvIOBF4Sfns8XWI"
+    },
+    "LVL-12": {
+      "displayName": "12层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "15cQg8o8fIQONQlzPPLj0d"
+    },
+    "LVL-13": {
+      "displayName": "13层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "3dVj2DcAzVSQd5MuwxUw7j"
+    },
+    "LVL-14": {
+      "displayName": "14层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "0Aqr4r2yXSYfdCjt2HZjNA"
+    },
+    "LVL-15": {
+      "displayName": "15层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "081i5EQjzMzBSphzqkQV0F"
+    },
+    "LVL-16": {
+      "displayName": "16层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "3FSVT3WXjIEO$WUOtLyRZS"
+    },
+    "LVL-17": {
+      "displayName": "17层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "32lJG31MjInA2eKgdRYVj8"
+    },
+    "LVL-18": {
+      "displayName": "18层",
+      "ifcClass": "IfcBuildingStorey",
+      "ifcGlobalId": "09ISzEH_LKJ9XRdl6mSjG2"
+    },
+    "METER-1602-FLOW-01": {
+      "displayName": "1602卫生间微流量水表",
+      "ifcClass": "IfcFlowMeter",
+      "ifcGlobalId": "0jB2RokC9PkAHxCJo4uVuI"
+    },
+    "PARTITION-1602-SHOWER-01": {
+      "displayName": "1602卫生间淋浴玻璃隔断",
+      "ifcClass": "IfcBuildingElementProxy",
+      "ifcGlobalId": "2_f9FRSBvSzuyU3waAIWDe"
+    },
+    "PIPE-1602-CW-01": {
+      "displayName": "1602卫生间上游冷水管段",
+      "ifcClass": "IfcPipeSegment",
+      "ifcGlobalId": "3OvAR_zLnMMfCPWJLEqKva"
+    },
+    "PIPE-1602-CW-02": {
+      "displayName": "1602卫生间下游冷水管段",
+      "ifcClass": "IfcPipeSegment",
+      "ifcGlobalId": "1gY45OQcbQ7P4PuRYcLL5_"
+    },
+    "PIPE-1602-HW-01": {
+      "displayName": "1602卫生间热水支管",
+      "ifcClass": "IfcPipeSegment",
+      "ifcGlobalId": "36LhsGedXPufeyYlYHt4Ls"
+    },
+    "PORT-J-1602-CW-03-IN": {
+      "displayName": "重点冷水接头入口",
+      "ifcClass": "IfcDistributionPort",
+      "ifcGlobalId": "1qumYaSg1HbOnFYf4MLy7Z"
+    },
+    "PORT-J-1602-CW-03-OUT": {
+      "displayName": "重点冷水接头出口",
+      "ifcClass": "IfcDistributionPort",
+      "ifcGlobalId": "0cvkC$zgnRlhSZtrhD252J"
+    },
+    "PORT-METER-1602-FLOW-01-IN": {
+      "displayName": "微流量水表入口",
+      "ifcClass": "IfcDistributionPort",
+      "ifcGlobalId": "3ktqZxrXLLkRMUzrYIrTN1"
+    },
+    "PORT-METER-1602-FLOW-01-OUT": {
+      "displayName": "微流量水表出口",
+      "ifcClass": "IfcDistributionPort",
+      "ifcGlobalId": "2A5FshqJrHDvDdR1v6i_AW"
+    },
+    "PORT-PIPE-1602-CW-01-IN": {
+      "displayName": "上游冷水管入口",
+      "ifcClass": "IfcDistributionPort",
+      "ifcGlobalId": "1KioY4WxzPOvq6StDXU4cA"
+    },
+    "PORT-PIPE-1602-CW-01-OUT": {
+      "displayName": "上游冷水管出口",
+      "ifcClass": "IfcDistributionPort",
+      "ifcGlobalId": "08xt7ak6TPPRVlNJAPn4TI"
+    },
+    "PORT-PIPE-1602-CW-02-IN": {
+      "displayName": "下游冷水管入口",
+      "ifcClass": "IfcDistributionPort",
+      "ifcGlobalId": "2pFNZaAZzL8u9wvkewkZav"
+    },
+    "PORT-PIPE-1602-CW-02-OUT": {
+      "displayName": "下游冷水管出口",
+      "ifcClass": "IfcDistributionPort",
+      "ifcGlobalId": "05a1FwZr5VBh1Gj5twToWp"
+    },
+    "PORT-PIPE-1602-HW-01-IN": {
+      "displayName": "热水支管入口",
+      "ifcClass": "IfcDistributionPort",
+      "ifcGlobalId": "2h_TwG40XJMe8F6jV_af5w"
+    },
+    "PORT-PIPE-1602-HW-01-OUT": {
+      "displayName": "热水支管出口",
+      "ifcClass": "IfcDistributionPort",
+      "ifcGlobalId": "3DmK6I7w9TsgO8SbErgU23"
+    },
+    "PORT-VALVE-1602-CW-01-IN": {
+      "displayName": "局部关断阀入口",
+      "ifcClass": "IfcDistributionPort",
+      "ifcGlobalId": "2O8xHueA1JfgdEa0wa2zfR"
+    },
+    "PORT-VALVE-1602-CW-01-OUT": {
+      "displayName": "局部关断阀出口",
+      "ifcClass": "IfcDistributionPort",
+      "ifcGlobalId": "0zsD7d5tHIdwY1b2R4L3J0"
+    },
+    "PRJ-ZS-DEMO": {
+      "displayName": "筑生合成演示项目",
+      "ifcClass": "IfcProject",
+      "ifcGlobalId": "0RqNUKdFLP5gPpZfcL16M2"
+    },
+    "SENSOR-1602-HUM-01": {
+      "displayName": "1602卫生间湿度传感器",
+      "ifcClass": "IfcSensor",
+      "ifcGlobalId": "1E8P_ko7XLTOcOHVVTBvqV"
+    },
+    "SITE-ZS-DEMO": {
+      "displayName": "筑生合成场地",
+      "ifcClass": "IfcSite",
+      "ifcGlobalId": "3K3mWtTwLNsPBkYiBWkxvq"
+    },
+    "SLAB-1602-BATHROOM": {
+      "displayName": "1602卫生间结构板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "3q7otrgzLS6vF2JvCuCLl5"
+    },
+    "SLAB-LVL-01": {
+      "displayName": "1层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "3_mN62HkzV0fMWlJz4Cqzd"
+    },
+    "SLAB-LVL-02": {
+      "displayName": "2层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "2UGaOAqDjTx91Q16NcAfBh"
+    },
+    "SLAB-LVL-03": {
+      "displayName": "3层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "1OkfCn_3bSru8ghj5$axW$"
+    },
+    "SLAB-LVL-04": {
+      "displayName": "4层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "1UIRtXoRbJKB5k7tzWxT4e"
+    },
+    "SLAB-LVL-05": {
+      "displayName": "5层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "0NvwCd8E9LWgw21JZhHiXj"
+    },
+    "SLAB-LVL-06": {
+      "displayName": "6层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "2AiF5icpDI_hnaUUf_zxPz"
+    },
+    "SLAB-LVL-07": {
+      "displayName": "7层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "1X78G6L7DU9waOntATzGgv"
+    },
+    "SLAB-LVL-08": {
+      "displayName": "8层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "0U_OykasrGZRaDMqn4gf66"
+    },
+    "SLAB-LVL-09": {
+      "displayName": "9层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "3iCJwF5FjR4fX8YyHeaXI0"
+    },
+    "SLAB-LVL-10": {
+      "displayName": "10层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "2USB2Xr6fMIPtqVFOD$RXa"
+    },
+    "SLAB-LVL-11": {
+      "displayName": "11层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "3BiS1iUp1Mh9TMMmF3b7Lg"
+    },
+    "SLAB-LVL-12": {
+      "displayName": "12层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "06OglQzVvKJBrY15OIuQA0"
+    },
+    "SLAB-LVL-13": {
+      "displayName": "13层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "1Gw5xNv6DStxVKV17rYBZn"
+    },
+    "SLAB-LVL-14": {
+      "displayName": "14层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "2edzdB62zGjBlMfJiF$tKb"
+    },
+    "SLAB-LVL-15": {
+      "displayName": "15层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "1CUrKrwSLOpAuKd8n$r_MN"
+    },
+    "SLAB-LVL-16": {
+      "displayName": "16层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "06by8L91nLuu1aZPca0QUw"
+    },
+    "SLAB-LVL-17": {
+      "displayName": "17层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "2ePrhVUZPPoxIynv0gtbbz"
+    },
+    "SLAB-LVL-18": {
+      "displayName": "18层结构楼板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "0voWebslzPihWopw4021eI"
+    },
+    "SLAB-ROOF": {
+      "displayName": "18层上部屋面板",
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "2hIp2PTC5GFf06YRa_wMzK"
+    },
+    "SPACE-01-LOBBY": {
+      "displayName": "首层入口及公共服务空间",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0PGwxSXjfNXO4w2yzjvxGX"
+    },
+    "SPACE-02-CORE-NORTH": {
+      "displayName": "2层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2YJUqOC7fV4836V333i0wD"
+    },
+    "SPACE-02-CORE-SOUTH": {
+      "displayName": "2层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1fNuO4_LHSd9$xsnsVGTcz"
+    },
+    "SPACE-02-CORRIDOR": {
+      "displayName": "2层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1XTN64dcbJQQmrqCKdssM6"
+    },
+    "SPACE-03-CORE-NORTH": {
+      "displayName": "3层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3sX5gAyLjJsBuR3af8NFjf"
+    },
+    "SPACE-03-CORE-SOUTH": {
+      "displayName": "3层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1lGZgnQBHSKPijAhOVw_yv"
+    },
+    "SPACE-03-CORRIDOR": {
+      "displayName": "3层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1L8O8L_e1PBRlP8ZO81PZV"
+    },
+    "SPACE-04-CORE-NORTH": {
+      "displayName": "4层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0TQXw4bIbOG9jCCNkpnC16"
+    },
+    "SPACE-04-CORE-SOUTH": {
+      "displayName": "4层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0UQwP_U7nQkP06BmSPt6cn"
+    },
+    "SPACE-04-CORRIDOR": {
+      "displayName": "4层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3HflzAiDTHOR6InHkTnBPC"
+    },
+    "SPACE-05-CORE-NORTH": {
+      "displayName": "5层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0zPDtazjjMUuWBJMwaQe_9"
+    },
+    "SPACE-05-CORE-SOUTH": {
+      "displayName": "5层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2e240h5d9QhRlv$KLQf7LI"
+    },
+    "SPACE-05-CORRIDOR": {
+      "displayName": "5层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0Fq7FbrKLTlh4EjETIRS9E"
+    },
+    "SPACE-06-CORE-NORTH": {
+      "displayName": "6层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3bPFhj1Q1SlwsZ7wbxDg29"
+    },
+    "SPACE-06-CORE-SOUTH": {
+      "displayName": "6层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "19OajC20bHi8Z89NSdRiAS"
+    },
+    "SPACE-06-CORRIDOR": {
+      "displayName": "6层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0xcbAc2ofKmOYVTnmK8Ip2"
+    },
+    "SPACE-07-CORE-NORTH": {
+      "displayName": "7层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0e3o9NRKnVVekvJPgMT5iE"
+    },
+    "SPACE-07-CORE-SOUTH": {
+      "displayName": "7层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0H7f0kHNTUWw6r_fVVynEg"
+    },
+    "SPACE-07-CORRIDOR": {
+      "displayName": "7层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1FBRyqFQHG5R1Tvlia9q8u"
+    },
+    "SPACE-08-CORE-NORTH": {
+      "displayName": "8层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1tJt02kqjNURiFVXMX2SFq"
+    },
+    "SPACE-08-CORE-SOUTH": {
+      "displayName": "8层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "28Ce0$NirHCgwSd7LkBxG0"
+    },
+    "SPACE-08-CORRIDOR": {
+      "displayName": "8层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3FTk$bynTVGhrRc2CT5LP0"
+    },
+    "SPACE-09-CORE-NORTH": {
+      "displayName": "9层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2nYB5YWx9I4AfUelL_7S80"
+    },
+    "SPACE-09-CORE-SOUTH": {
+      "displayName": "9层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3PldvMoXDK4P9vvmyEJcmL"
+    },
+    "SPACE-09-CORRIDOR": {
+      "displayName": "9层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1fh8sk7BnGjvqWuQvEmmbm"
+    },
+    "SPACE-10-CORE-NORTH": {
+      "displayName": "10层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2r8MOtvMXP_9j8TqMRLBjT"
+    },
+    "SPACE-10-CORE-SOUTH": {
+      "displayName": "10层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "368_VBnyXJlQ1ZDVfGHtlq"
+    },
+    "SPACE-10-CORRIDOR": {
+      "displayName": "10层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3bnu$FN8bH4vjiOSuQ4Zxd"
+    },
+    "SPACE-11-CORE-NORTH": {
+      "displayName": "11层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0jpJF_ftbSC9ZCCJj3OtB8"
+    },
+    "SPACE-11-CORE-SOUTH": {
+      "displayName": "11层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0AndMYbnvSohA63RQZew0K"
+    },
+    "SPACE-11-CORRIDOR": {
+      "displayName": "11层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0mYtCSA4nVAR_bAsz7px_R"
+    },
+    "SPACE-12-CORE-NORTH": {
+      "displayName": "12层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0mK_JWCpjMefW4wJMgWj83"
+    },
+    "SPACE-12-CORE-SOUTH": {
+      "displayName": "12层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2B87rsUxzHxQwdXt4l5eUn"
+    },
+    "SPACE-12-CORRIDOR": {
+      "displayName": "12层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2VP8UVMjTMfeSTn31uXwAo"
+    },
+    "SPACE-13-CORE-NORTH": {
+      "displayName": "13层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2wH$aXSw1KOOOga1pzbB9W"
+    },
+    "SPACE-13-CORE-SOUTH": {
+      "displayName": "13层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2TZDRCJWzHRhfsBSfmWpEi"
+    },
+    "SPACE-13-CORRIDOR": {
+      "displayName": "13层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1ufWnfwd5LWwv3Xv3tLtuN"
+    },
+    "SPACE-14-CORE-NORTH": {
+      "displayName": "14层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3j88Pa2_nMPO3CYCTVx_Wa"
+    },
+    "SPACE-14-CORE-SOUTH": {
+      "displayName": "14层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3yjB1iL5XKZR1hQlZet2YG"
+    },
+    "SPACE-14-CORRIDOR": {
+      "displayName": "14层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1M44w_UbLS1gLm35nUyTdt"
+    },
+    "SPACE-15-CORE-NORTH": {
+      "displayName": "15层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0LojwVhCHJEwZ5iGi3uKhw"
+    },
+    "SPACE-15-CORE-SOUTH": {
+      "displayName": "15层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0M0S9XgSHRMQGKkUIlpIqb"
+    },
+    "SPACE-15-CORRIDOR": {
+      "displayName": "15层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2FvY9rR3bIXukbkpfslMlF"
+    },
+    "SPACE-16-CORE-NORTH": {
+      "displayName": "16层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3Q2cWUokbMDRJiPcQOpKPZ"
+    },
+    "SPACE-16-CORE-SOUTH": {
+      "displayName": "16层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1qH0B7Fs5L4RsnfmF8pSxg"
+    },
+    "SPACE-16-CORRIDOR": {
+      "displayName": "16层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3rVKGSjwXQDg_PutMi_3D4"
+    },
+    "SPACE-1602-BATHROOM": {
+      "displayName": "1602卫生间",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3dkIkA51vH1ANC1RHLIll3"
+    },
+    "SPACE-1602-BEDROOM-2": {
+      "displayName": "1602次卧",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3FcHnOQeTUZvVWR6V_ButO"
+    },
+    "SPACE-1602-CIRCULATION": {
+      "displayName": "1602入口与交通空间",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1D3Adx8DbTdeoEKH7nIkWB"
+    },
+    "SPACE-1602-KITCHEN": {
+      "displayName": "1602厨房",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0f9srbuAHLVA$XrXUOX_oL"
+    },
+    "SPACE-1602-LIVING": {
+      "displayName": "1602客餐厅",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0vJ$Ux9STTdxhkIPR4PpHO"
+    },
+    "SPACE-1602-MASTER": {
+      "displayName": "1602主卧",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3JazST8uzVnvjI6PxBzzAy"
+    },
+    "SPACE-17-CORE-NORTH": {
+      "displayName": "17层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3ubSG5YL1K2e_wlzh_22ou"
+    },
+    "SPACE-17-CORE-SOUTH": {
+      "displayName": "17层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0G2DV7m3nJbBK6QW5ARAaD"
+    },
+    "SPACE-17-CORRIDOR": {
+      "displayName": "17层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2bwRdvlS5NvQsrMQfIbWVS"
+    },
+    "SPACE-18-CORE-NORTH": {
+      "displayName": "18层核心筒NORTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2pc1y6LhXGSxwphH9Gkc2Y"
+    },
+    "SPACE-18-CORE-SOUTH": {
+      "displayName": "18层核心筒SOUTH",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "38EOD8WBXQ0BSzm7xMMVRK"
+    },
+    "SPACE-18-CORRIDOR": {
+      "displayName": "18层公共走廊",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2TgKjZ6M9S6eeNKXi5oq64"
+    },
+    "SYS-1602-CW": {
+      "displayName": "1602卫生间生活冷水系统",
+      "ifcClass": "IfcDistributionSystem",
+      "ifcGlobalId": "119f3TwaPRpwhNJQU5v$ep"
+    },
+    "SYS-1602-ENV": {
+      "displayName": "1602卫生间环境监测系统",
+      "ifcClass": "IfcDistributionSystem",
+      "ifcGlobalId": "1JQo_qqonSUhHB9bL0KsqI"
+    },
+    "SYS-1602-HW": {
+      "displayName": "1602卫生间生活热水系统",
+      "ifcClass": "IfcDistributionSystem",
+      "ifcGlobalId": "2EmtHWGeXJdAI3MYCHZwtw"
+    },
+    "UNIT-0201": {
+      "displayName": "201户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1EjOl0yP5LUwL2pSIuKML0"
+    },
+    "UNIT-0202": {
+      "displayName": "202户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1yePOcKV9HquDD2ilYkr0t"
+    },
+    "UNIT-0203": {
+      "displayName": "203户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1eo_KD5x1R7ApkYJxvZ0Zu"
+    },
+    "UNIT-0204": {
+      "displayName": "204户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1bzy1qGk9JZhmpjcrc8bsn"
+    },
+    "UNIT-0301": {
+      "displayName": "301户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "29ETg94G9Gxe$Gv1d7z0av"
+    },
+    "UNIT-0302": {
+      "displayName": "302户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3bhtwjHv5LahdjI9odJYB$"
+    },
+    "UNIT-0303": {
+      "displayName": "303户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "110MaQ9$TMzhZ_svsFP5eL"
+    },
+    "UNIT-0304": {
+      "displayName": "304户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1e$Iocl8nUfR7WB4Pewslr"
+    },
+    "UNIT-0401": {
+      "displayName": "401户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0CRjI5x2zORP8$1hubw6F4"
+    },
+    "UNIT-0402": {
+      "displayName": "402户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0jIi3a6jbLUwSSgY_GKriP"
+    },
+    "UNIT-0403": {
+      "displayName": "403户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2JQmmxZWfJDhhdh26_92kk"
+    },
+    "UNIT-0404": {
+      "displayName": "404户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "20kqdOWLPPlQmonbsFXy7N"
+    },
+    "UNIT-0501": {
+      "displayName": "501户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "06fECOQ3bKIOzUBAXEQF3U"
+    },
+    "UNIT-0502": {
+      "displayName": "502户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1VLbvF1o5IgubcESbEMeFH"
+    },
+    "UNIT-0503": {
+      "displayName": "503户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1NfCs03QHMke9JnmMUbYEp"
+    },
+    "UNIT-0504": {
+      "displayName": "504户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "28gDi1BpfT98axuo_tCgMk"
+    },
+    "UNIT-0601": {
+      "displayName": "601户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3$nuk5d1rJpxYDBWVC2r15"
+    },
+    "UNIT-0602": {
+      "displayName": "602户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "13prJIcFPUS8oxFqk6Y8cC"
+    },
+    "UNIT-0603": {
+      "displayName": "603户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2Tl6wxW1HKRgz0yRTnDtQh"
+    },
+    "UNIT-0604": {
+      "displayName": "604户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3E4EsgRJzRHhYC5H8DY3vB"
+    },
+    "UNIT-0701": {
+      "displayName": "701户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0nW4p$vjzMVulfjpDXgpKV"
+    },
+    "UNIT-0702": {
+      "displayName": "702户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2R5sQ5tpvNZwH1Z40h3N3F"
+    },
+    "UNIT-0703": {
+      "displayName": "703户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0AsCfl4e1RXx_ncfDEVHMX"
+    },
+    "UNIT-0704": {
+      "displayName": "704户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3GxHmevtnOURhb0Vk8JitN"
+    },
+    "UNIT-0801": {
+      "displayName": "801户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3BpIPMWh9Ijh5f1upnAf87"
+    },
+    "UNIT-0802": {
+      "displayName": "802户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2_T73H$4jNj9jH7w0YhgDI"
+    },
+    "UNIT-0803": {
+      "displayName": "803户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "392B4KOxLH2PUVqYlxPc6a"
+    },
+    "UNIT-0804": {
+      "displayName": "804户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1AX2UHoE9JGfYgCeRnQchJ"
+    },
+    "UNIT-0901": {
+      "displayName": "901户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0KI6HPkL9RxRr4r6bnSDA1"
+    },
+    "UNIT-0902": {
+      "displayName": "902户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1LdDWhdGHPLv5AWxx3SMER"
+    },
+    "UNIT-0903": {
+      "displayName": "903户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0nPVP_bZ5LIB9wYDQAOiVf"
+    },
+    "UNIT-0904": {
+      "displayName": "904户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2fAhRpIt9M7v5Fq9AMttVk"
+    },
+    "UNIT-1001": {
+      "displayName": "1001户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "02wHaGMZfMa88BDqUkIu_m"
+    },
+    "UNIT-1002": {
+      "displayName": "1002户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2vtp9izvjNEOfJqr4tmFUk"
+    },
+    "UNIT-1003": {
+      "displayName": "1003户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3YZ7pnKVPTtx4TJe9Xx_Yh"
+    },
+    "UNIT-1004": {
+      "displayName": "1004户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1bgK0TEcLQ$xDAGrk5ttYD"
+    },
+    "UNIT-1101": {
+      "displayName": "1101户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2PTY21AvDGgBfwC4_Cv4DL"
+    },
+    "UNIT-1102": {
+      "displayName": "1102户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0$H6nHlCjPWQK2Ba4U4mNu"
+    },
+    "UNIT-1103": {
+      "displayName": "1103户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0b4qXaqafOM9IMnoqP3rVe"
+    },
+    "UNIT-1104": {
+      "displayName": "1104户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2vCrXZVJ9OJR_LblfHTddq"
+    },
+    "UNIT-1201": {
+      "displayName": "1201户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1nMZ0G8A9Pvf3yvRnXbYOU"
+    },
+    "UNIT-1202": {
+      "displayName": "1202户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3md5CrCsrOG8fqL$pojKbm"
+    },
+    "UNIT-1203": {
+      "displayName": "1203户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3rhg$OKADQWuf0_UbzH_uP"
+    },
+    "UNIT-1204": {
+      "displayName": "1204户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "27n0Z1eFvSHhHsgn7qMuli"
+    },
+    "UNIT-1301": {
+      "displayName": "1301户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1PVEIGvmbM0w019CZiqssy"
+    },
+    "UNIT-1302": {
+      "displayName": "1302户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "07J4h_uQLIxBeS1gm$vATP"
+    },
+    "UNIT-1303": {
+      "displayName": "1303户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1e9Kv52MjL3PCtpUVBgvya"
+    },
+    "UNIT-1304": {
+      "displayName": "1304户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0MQAQcs8TSDheTQe08yEu$"
+    },
+    "UNIT-1401": {
+      "displayName": "1401户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1R5qsjEgrPbwArMO3yCMNP"
+    },
+    "UNIT-1402": {
+      "displayName": "1402户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0169x$bQDQMBX8PH3i50au"
+    },
+    "UNIT-1403": {
+      "displayName": "1403户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "39ZGLTgsHS6QS5v7Ntppju"
+    },
+    "UNIT-1404": {
+      "displayName": "1404户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2ezoc_nX9ScQ5a8M7NuuHr"
+    },
+    "UNIT-1501": {
+      "displayName": "1501户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2K6390me9QMPlf0A_CjdOj"
+    },
+    "UNIT-1502": {
+      "displayName": "1502户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3EIHFUgfHHCR3RC7T_JxP1"
+    },
+    "UNIT-1503": {
+      "displayName": "1503户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "09pmHNBKLMrxTqQyLWEkMb"
+    },
+    "UNIT-1504": {
+      "displayName": "1504户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3cffrPIr1NSxEqoIvJqetB"
+    },
+    "UNIT-1601": {
+      "displayName": "1601户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "25chQrjYHOlPIbZ3BKl7w_"
+    },
+    "UNIT-1602": {
+      "displayName": "1602户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0d_L$Xag9OJu23930UJLYg"
+    },
+    "UNIT-1603": {
+      "displayName": "1603户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "10WQ9A7azHw9sagj0jFJYB"
+    },
+    "UNIT-1604": {
+      "displayName": "1604户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0P8e7ejBbT88XSkAJXEQvK"
+    },
+    "UNIT-1701": {
+      "displayName": "1701户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3$70TyBEnSQwRQ_QBAqy3D"
+    },
+    "UNIT-1702": {
+      "displayName": "1702户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "2zi9WvabvN3R$uceYfj2sG"
+    },
+    "UNIT-1703": {
+      "displayName": "1703户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "089RLE0LbKCAj7ewa9Oa99"
+    },
+    "UNIT-1704": {
+      "displayName": "1704户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "1ljfoVKmHGxPllvZxR1r3N"
+    },
+    "UNIT-1801": {
+      "displayName": "1801户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "0jPEm3iSnPqPRtqUrSCxs8"
+    },
+    "UNIT-1802": {
+      "displayName": "1802户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3c3Wq6QQHUdxZFr$LjnWNR"
+    },
+    "UNIT-1803": {
+      "displayName": "1803户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "116$oiTd9VGfH3YfETWfv8"
+    },
+    "UNIT-1804": {
+      "displayName": "1804户",
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3ahlcA_XvSSPefQhozHm0$"
+    },
+    "VALVE-1602-CW-01": {
+      "displayName": "1602卫生间局部冷水关断阀",
+      "ifcClass": "IfcValve",
+      "ifcGlobalId": "0dZjT4flPP59fQfI4VUIOw"
+    },
+    "WALL-1602-BATHROOM-EAST": {
+      "displayName": "1602卫生间EAST墙体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2X6XvzpHTORgfLX_M7AkwA"
+    },
+    "WALL-1602-BATHROOM-NORTH": {
+      "displayName": "1602卫生间NORTH墙体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0RNcCnVbjP5PwZ3Kgm3awP"
+    },
+    "WALL-1602-BATHROOM-SOUTH-EAST": {
+      "displayName": "1602卫生间SOUTH-EAST墙体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3$cIHHxMvGUB3vIraH_ol9"
+    },
+    "WALL-1602-BATHROOM-SOUTH-WEST": {
+      "displayName": "1602卫生间SOUTH-WEST墙体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2YFH1JtHjJ1eESIx$GRa4a"
+    },
+    "WALL-1602-BATHROOM-WEST": {
+      "displayName": "1602卫生间WEST墙体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0WA9uqAufJovOINeFnpVJk"
+    },
+    "WALL-LVL-01-CORE-NORTH-CORRIDOR": {
+      "displayName": "1层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2rSfFuuwzVJO4Z6NTjyvDt"
+    },
+    "WALL-LVL-01-CORE-NORTH-EAST": {
+      "displayName": "1层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3RMhUBLhbNXff9KJ6HPgOJ"
+    },
+    "WALL-LVL-01-CORE-NORTH-WEST": {
+      "displayName": "1层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1vatU1QHjH5v$x57NY$HE9"
+    },
+    "WALL-LVL-01-CORE-SOUTH-CORRIDOR": {
+      "displayName": "1层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1PNoeAwi1PeRfbX$2HBqz2"
+    },
+    "WALL-LVL-01-CORE-SOUTH-EAST": {
+      "displayName": "1层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "17hT5_VY9RDh5o9MbWIQuY"
+    },
+    "WALL-LVL-01-CORE-SOUTH-WEST": {
+      "displayName": "1层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2kBN5vyWDVhvtkjokDN9wJ"
+    },
+    "WALL-LVL-01-EXT-EAST-MAIN": {
+      "displayName": "1层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "15JZzEjgbVWwqPkqj2emFz"
+    },
+    "WALL-LVL-01-EXT-NORTH-PANEL-01": {
+      "displayName": "1层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "11BBs0kIPNMAwxIs94YCRA"
+    },
+    "WALL-LVL-01-EXT-NORTH-PANEL-02": {
+      "displayName": "1层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0L$fEfgkrJS9vmindEcdai"
+    },
+    "WALL-LVL-01-EXT-NORTH-PANEL-03": {
+      "displayName": "1层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3dLP3qB$9SwvFo1GysAsH0"
+    },
+    "WALL-LVL-01-EXT-NORTH-PANEL-04": {
+      "displayName": "1层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2osy2gQYTVq9KV369AB4b_"
+    },
+    "WALL-LVL-01-EXT-NORTH-PANEL-05": {
+      "displayName": "1层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3qmoAv40LR5uOO40JyElLm"
+    },
+    "WALL-LVL-01-EXT-NORTH-PANEL-06": {
+      "displayName": "1层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1mBOl8HMHK2grBCQxYtdCf"
+    },
+    "WALL-LVL-01-EXT-NORTH-PANEL-07": {
+      "displayName": "1层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1cATPdWpHHh9LF8AyTJ0U3"
+    },
+    "WALL-LVL-01-EXT-SOUTH-PANEL-01": {
+      "displayName": "1层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1KzCAxCk9IXe6N6rh7JCN6"
+    },
+    "WALL-LVL-01-EXT-SOUTH-PANEL-02": {
+      "displayName": "1层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1dNxGBwwzGwur7B$7MvTb9"
+    },
+    "WALL-LVL-01-EXT-SOUTH-PANEL-03": {
+      "displayName": "1层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0zlZaSR_TMvAQW0XBg0Gpv"
+    },
+    "WALL-LVL-01-EXT-SOUTH-PANEL-04": {
+      "displayName": "1层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3_a0EqaJDNcx3oOrZgJ2c0"
+    },
+    "WALL-LVL-01-EXT-SOUTH-PANEL-05": {
+      "displayName": "1层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2h5cM$FELOmwM_ROMp$yhk"
+    },
+    "WALL-LVL-01-EXT-SOUTH-PANEL-06": {
+      "displayName": "1层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0rwZqpFKzT3v39li1yZifs"
+    },
+    "WALL-LVL-01-EXT-SOUTH-PANEL-07": {
+      "displayName": "1层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2HrwRU4ATGMRXWvXJlmEZi"
+    },
+    "WALL-LVL-01-EXT-SOUTH-PANEL-08": {
+      "displayName": "1层南外墙分段08",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2SUXK6bSrJgPcgI3JF9eVc"
+    },
+    "WALL-LVL-01-EXT-SOUTH-PANEL-09": {
+      "displayName": "1层南外墙分段09",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1ee6LqtyLR0htZ7bG$kzJy"
+    },
+    "WALL-LVL-01-EXT-SOUTH-PANEL-10": {
+      "displayName": "1层南外墙分段10",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0YUtjSA85PTRRAbl0tH4lm"
+    },
+    "WALL-LVL-01-EXT-SOUTH-PANEL-11": {
+      "displayName": "1层南外墙分段11",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2hXyEeVKrTRei98mTjdbMH"
+    },
+    "WALL-LVL-01-EXT-WEST-MAIN": {
+      "displayName": "1层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0r2cY6YofK0g6qEMzFjXll"
+    },
+    "WALL-LVL-02-CORE-NORTH-CORRIDOR": {
+      "displayName": "2层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2BbHSuAwHMiQOBelyCfrI8"
+    },
+    "WALL-LVL-02-CORE-NORTH-EAST": {
+      "displayName": "2层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0tACDY9HjV58XwsMwW_sdx"
+    },
+    "WALL-LVL-02-CORE-NORTH-WEST": {
+      "displayName": "2层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1kY5ese8TKSgoDaA7bY_g0"
+    },
+    "WALL-LVL-02-CORE-SOUTH-CORRIDOR": {
+      "displayName": "2层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0GiqTZ0MXN9B1c6abrYhjE"
+    },
+    "WALL-LVL-02-CORE-SOUTH-EAST": {
+      "displayName": "2层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "14RI1WdYTHBvL41Isa3IIB"
+    },
+    "WALL-LVL-02-CORE-SOUTH-WEST": {
+      "displayName": "2层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2qU5_1bsTMGgDAT2P$GP4J"
+    },
+    "WALL-LVL-02-EXT-EAST-MAIN": {
+      "displayName": "2层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "10em1ceGXTffa4iDz_V2F6"
+    },
+    "WALL-LVL-02-EXT-NORTH-PANEL-01": {
+      "displayName": "2层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1LfIj9f5PO98u44$rIuBoP"
+    },
+    "WALL-LVL-02-EXT-NORTH-PANEL-02": {
+      "displayName": "2层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3OuC_EzXrIDByedBZoLwwT"
+    },
+    "WALL-LVL-02-EXT-NORTH-PANEL-03": {
+      "displayName": "2层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2wMnFwYB9JbfQPX4wxmZSj"
+    },
+    "WALL-LVL-02-EXT-NORTH-PANEL-04": {
+      "displayName": "2层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2QyVkgFCfHVwgIlkoXZkAl"
+    },
+    "WALL-LVL-02-EXT-NORTH-PANEL-05": {
+      "displayName": "2层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3oyIXHdnnIfv7YdogQgAQ_"
+    },
+    "WALL-LVL-02-EXT-NORTH-PANEL-06": {
+      "displayName": "2层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1DDGY1USDMFw$In_LFwoh5"
+    },
+    "WALL-LVL-02-EXT-NORTH-PANEL-07": {
+      "displayName": "2层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2VT7h73e1LFeS0Vd0_OELw"
+    },
+    "WALL-LVL-02-EXT-SOUTH-PANEL-01": {
+      "displayName": "2层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1wIpa4TrbS3u88dQ_97MV6"
+    },
+    "WALL-LVL-02-EXT-SOUTH-PANEL-02": {
+      "displayName": "2层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3sBDcaMiLOr8ZW2gzGbb5J"
+    },
+    "WALL-LVL-02-EXT-SOUTH-PANEL-03": {
+      "displayName": "2层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0g5p2GGgDQVf2OWtFpcDPS"
+    },
+    "WALL-LVL-02-EXT-SOUTH-PANEL-04": {
+      "displayName": "2层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1n7sInzuHNkQdACSD9Os5p"
+    },
+    "WALL-LVL-02-EXT-SOUTH-PANEL-05": {
+      "displayName": "2层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2GcwkgJoTMePdkc_aAnoLx"
+    },
+    "WALL-LVL-02-EXT-SOUTH-PANEL-06": {
+      "displayName": "2层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3CAwmnLf9PBh79jVfaeI3d"
+    },
+    "WALL-LVL-02-EXT-SOUTH-PANEL-07": {
+      "displayName": "2层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1MlDukgeHMmAO016pai2Y0"
+    },
+    "WALL-LVL-02-EXT-WEST-MAIN": {
+      "displayName": "2层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3P5jOFR$5Qr9qVCsHzilhK"
+    },
+    "WALL-LVL-03-CORE-NORTH-CORRIDOR": {
+      "displayName": "3层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2HPgxGLojTuQ9wvAuYw0tb"
+    },
+    "WALL-LVL-03-CORE-NORTH-EAST": {
+      "displayName": "3层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1L8SvULbLKjAAUifoMNFJV"
+    },
+    "WALL-LVL-03-CORE-NORTH-WEST": {
+      "displayName": "3层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0QeBC81$1TawvFmRy1u8Jb"
+    },
+    "WALL-LVL-03-CORE-SOUTH-CORRIDOR": {
+      "displayName": "3层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1z3L1oWkTUIuK66BXli8ln"
+    },
+    "WALL-LVL-03-CORE-SOUTH-EAST": {
+      "displayName": "3层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "00cU3GCM1O3xW7hJl1Di74"
+    },
+    "WALL-LVL-03-CORE-SOUTH-WEST": {
+      "displayName": "3层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0FzRK2q3LKwBW62bAPhjVX"
+    },
+    "WALL-LVL-03-EXT-EAST-MAIN": {
+      "displayName": "3层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2oFgjwZefIB8ZfSRxdPDG3"
+    },
+    "WALL-LVL-03-EXT-NORTH-PANEL-01": {
+      "displayName": "3层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0HpgH4X_PSZQ1KLkFbmIyf"
+    },
+    "WALL-LVL-03-EXT-NORTH-PANEL-02": {
+      "displayName": "3层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1d0n8Km8zNzPP9Fu4A4x37"
+    },
+    "WALL-LVL-03-EXT-NORTH-PANEL-03": {
+      "displayName": "3层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3Ws0vhClvOdhihI2HxTR2Q"
+    },
+    "WALL-LVL-03-EXT-NORTH-PANEL-04": {
+      "displayName": "3层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1EBJ6xRmPIyBQkbCi$xM8w"
+    },
+    "WALL-LVL-03-EXT-NORTH-PANEL-05": {
+      "displayName": "3层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1CWc6GQiLLVfSb3iwS5Ffd"
+    },
+    "WALL-LVL-03-EXT-NORTH-PANEL-06": {
+      "displayName": "3层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1K_DiW6nvVH9TdTbPLfAol"
+    },
+    "WALL-LVL-03-EXT-NORTH-PANEL-07": {
+      "displayName": "3层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "39BYV3G2nOnAF0z0oREcYK"
+    },
+    "WALL-LVL-03-EXT-SOUTH-PANEL-01": {
+      "displayName": "3层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0BzxQLfwbMHwR_80dsaKAD"
+    },
+    "WALL-LVL-03-EXT-SOUTH-PANEL-02": {
+      "displayName": "3层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2RxChak7HQrgoFZFWcmgGT"
+    },
+    "WALL-LVL-03-EXT-SOUTH-PANEL-03": {
+      "displayName": "3层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1EdG4wb4rLa8RfjRZBdNBg"
+    },
+    "WALL-LVL-03-EXT-SOUTH-PANEL-04": {
+      "displayName": "3层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3E6xhgxJDQgfMiKdi6oRLf"
+    },
+    "WALL-LVL-03-EXT-SOUTH-PANEL-05": {
+      "displayName": "3层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2N99UZzIPI4glngOBSw$94"
+    },
+    "WALL-LVL-03-EXT-SOUTH-PANEL-06": {
+      "displayName": "3层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0jZWQ_G5XK5RYiMugWAdF_"
+    },
+    "WALL-LVL-03-EXT-SOUTH-PANEL-07": {
+      "displayName": "3层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0RZjKIIinOWhL7MKc86$nE"
+    },
+    "WALL-LVL-03-EXT-WEST-MAIN": {
+      "displayName": "3层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0dex_4Hl9NCQxsnwM96IFQ"
+    },
+    "WALL-LVL-04-CORE-NORTH-CORRIDOR": {
+      "displayName": "4层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2B__biDMrOJR$YvAp7jmab"
+    },
+    "WALL-LVL-04-CORE-NORTH-EAST": {
+      "displayName": "4层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2d3o5qPYvIPB9YW91aYA5a"
+    },
+    "WALL-LVL-04-CORE-NORTH-WEST": {
+      "displayName": "4层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3nIsqdwvrLo8Y1ixFpu_c7"
+    },
+    "WALL-LVL-04-CORE-SOUTH-CORRIDOR": {
+      "displayName": "4层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1Nf3hqDiTHpRYY4L_scUse"
+    },
+    "WALL-LVL-04-CORE-SOUTH-EAST": {
+      "displayName": "4层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "36w5nIJi5U_8QEFEWarIQH"
+    },
+    "WALL-LVL-04-CORE-SOUTH-WEST": {
+      "displayName": "4层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2jZTN477DMqvDzr4zqZdzx"
+    },
+    "WALL-LVL-04-EXT-EAST-MAIN": {
+      "displayName": "4层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2IIV9ylF9OqeBuUYJD5KNd"
+    },
+    "WALL-LVL-04-EXT-NORTH-PANEL-01": {
+      "displayName": "4层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0eQ7Y$3jTQOxgypDq7j1i4"
+    },
+    "WALL-LVL-04-EXT-NORTH-PANEL-02": {
+      "displayName": "4层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1AEuuOEALUCBa$Dc8LhH9x"
+    },
+    "WALL-LVL-04-EXT-NORTH-PANEL-03": {
+      "displayName": "4层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0rSS7G$mjL3xgwXZsMqIgx"
+    },
+    "WALL-LVL-04-EXT-NORTH-PANEL-04": {
+      "displayName": "4层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0pEIiw0yHThfObNHLlJG_j"
+    },
+    "WALL-LVL-04-EXT-NORTH-PANEL-05": {
+      "displayName": "4层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3TBeiWET1QQgWDugjGnb4n"
+    },
+    "WALL-LVL-04-EXT-NORTH-PANEL-06": {
+      "displayName": "4层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "20dnq9C1vPO8Kk0Rk$SBs3"
+    },
+    "WALL-LVL-04-EXT-NORTH-PANEL-07": {
+      "displayName": "4层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3AQfiaPHDVgfBsQ1ozY77J"
+    },
+    "WALL-LVL-04-EXT-SOUTH-PANEL-01": {
+      "displayName": "4层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "15hjBh$SXOUAyKaTHQGXbt"
+    },
+    "WALL-LVL-04-EXT-SOUTH-PANEL-02": {
+      "displayName": "4层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1Vmml3_lHPgxjH$eMNVBhU"
+    },
+    "WALL-LVL-04-EXT-SOUTH-PANEL-03": {
+      "displayName": "4层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2M$VT4kzPTz8$K3SASUKyi"
+    },
+    "WALL-LVL-04-EXT-SOUTH-PANEL-04": {
+      "displayName": "4层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0bhpANTBTGiRYo8Gasr8T2"
+    },
+    "WALL-LVL-04-EXT-SOUTH-PANEL-05": {
+      "displayName": "4层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1KP4ASDu1TVOsYwVj85GPG"
+    },
+    "WALL-LVL-04-EXT-SOUTH-PANEL-06": {
+      "displayName": "4层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1_fMF2GDTQy9yK_72UlaQ5"
+    },
+    "WALL-LVL-04-EXT-SOUTH-PANEL-07": {
+      "displayName": "4层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3VHKbn5mnL5e7jSG3cFYof"
+    },
+    "WALL-LVL-04-EXT-WEST-MAIN": {
+      "displayName": "4层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2aCXaFcfrIVw00Dd6ZtbYz"
+    },
+    "WALL-LVL-05-CORE-NORTH-CORRIDOR": {
+      "displayName": "5层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0jcawCiybPvBwpJCeaWhfe"
+    },
+    "WALL-LVL-05-CORE-NORTH-EAST": {
+      "displayName": "5层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "026bVr3IrJtQxmmlA_JXyL"
+    },
+    "WALL-LVL-05-CORE-NORTH-WEST": {
+      "displayName": "5层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3eOfi0c49LH8YI_LI_6IrJ"
+    },
+    "WALL-LVL-05-CORE-SOUTH-CORRIDOR": {
+      "displayName": "5层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1$YzW$XaTT6Q9EeucJf5Ef"
+    },
+    "WALL-LVL-05-CORE-SOUTH-EAST": {
+      "displayName": "5层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0Om97BTP9MNhW3ffEk30nK"
+    },
+    "WALL-LVL-05-CORE-SOUTH-WEST": {
+      "displayName": "5层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "19QuPHjMTKO97i0MQ$gADd"
+    },
+    "WALL-LVL-05-EXT-EAST-MAIN": {
+      "displayName": "5层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "32afX_lITM7xH$pqPgrBha"
+    },
+    "WALL-LVL-05-EXT-NORTH-PANEL-01": {
+      "displayName": "5层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2eft1ZXAvQJfiYA4AE9mxi"
+    },
+    "WALL-LVL-05-EXT-NORTH-PANEL-02": {
+      "displayName": "5层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1u_TLIfv1S7uG0O3HGIpnR"
+    },
+    "WALL-LVL-05-EXT-NORTH-PANEL-03": {
+      "displayName": "5层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "09bgxIiivTQvgJwWjJ8Zla"
+    },
+    "WALL-LVL-05-EXT-NORTH-PANEL-04": {
+      "displayName": "5层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "22DxZHkS9KJxMRUK1O1DDz"
+    },
+    "WALL-LVL-05-EXT-NORTH-PANEL-05": {
+      "displayName": "5层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1C8WVZYODKnw4ddLtxzkrN"
+    },
+    "WALL-LVL-05-EXT-NORTH-PANEL-06": {
+      "displayName": "5层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "15FMfCjkfR7eRjBpEqryhe"
+    },
+    "WALL-LVL-05-EXT-NORTH-PANEL-07": {
+      "displayName": "5层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3ZkLVFxhfKRg9SAJ2Sbvkl"
+    },
+    "WALL-LVL-05-EXT-SOUTH-PANEL-01": {
+      "displayName": "5层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0g8HEoTPPOhxuUbWzL8rhy"
+    },
+    "WALL-LVL-05-EXT-SOUTH-PANEL-02": {
+      "displayName": "5层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0k8Zm_d0DOPAKznTj$w5kk"
+    },
+    "WALL-LVL-05-EXT-SOUTH-PANEL-03": {
+      "displayName": "5层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "12kpjh$6HHWeE0jXNqRttv"
+    },
+    "WALL-LVL-05-EXT-SOUTH-PANEL-04": {
+      "displayName": "5层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3gQ3di1YHRAQfk5ZTvAEzs"
+    },
+    "WALL-LVL-05-EXT-SOUTH-PANEL-05": {
+      "displayName": "5层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0YUXCQK31MjhbQR7YavI4E"
+    },
+    "WALL-LVL-05-EXT-SOUTH-PANEL-06": {
+      "displayName": "5层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3k4QbQ6$fQCvWGYZ5vZwQd"
+    },
+    "WALL-LVL-05-EXT-SOUTH-PANEL-07": {
+      "displayName": "5层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1cg9LypKrG_xRMV3b0bQTV"
+    },
+    "WALL-LVL-05-EXT-WEST-MAIN": {
+      "displayName": "5层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2Qq_5bXerM9A_UkMpyTeYS"
+    },
+    "WALL-LVL-06-CORE-NORTH-CORRIDOR": {
+      "displayName": "6层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0aCxE3mxnMDRnvfnRAyyFT"
+    },
+    "WALL-LVL-06-CORE-NORTH-EAST": {
+      "displayName": "6层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "00whIymobRrRKg6LS05_b3"
+    },
+    "WALL-LVL-06-CORE-NORTH-WEST": {
+      "displayName": "6层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2aIjC$BhfSwQ1J16vzt3tu"
+    },
+    "WALL-LVL-06-CORE-SOUTH-CORRIDOR": {
+      "displayName": "6层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0_YcjOVjXHb9VJIS$K1Q7e"
+    },
+    "WALL-LVL-06-CORE-SOUTH-EAST": {
+      "displayName": "6层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3xn9S5Q6nSW83f_vG5LsSs"
+    },
+    "WALL-LVL-06-CORE-SOUTH-WEST": {
+      "displayName": "6层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2XxrJIP15Uog3GhMaZNy19"
+    },
+    "WALL-LVL-06-EXT-EAST-MAIN": {
+      "displayName": "6层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2EEpwbVbfLjv2qHi6A8fNc"
+    },
+    "WALL-LVL-06-EXT-NORTH-PANEL-01": {
+      "displayName": "6层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0pU76uHl9Jwfs$dgLlDi2U"
+    },
+    "WALL-LVL-06-EXT-NORTH-PANEL-02": {
+      "displayName": "6层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3HsgfSttfPiQbNMf6pHTkb"
+    },
+    "WALL-LVL-06-EXT-NORTH-PANEL-03": {
+      "displayName": "6层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3SzuoQ6nHVRPGdA04ieXYK"
+    },
+    "WALL-LVL-06-EXT-NORTH-PANEL-04": {
+      "displayName": "6层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0x7AI$ISTLYvS4cmBEW3yS"
+    },
+    "WALL-LVL-06-EXT-NORTH-PANEL-05": {
+      "displayName": "6层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1jJwsQhe9KjeZ9WrJgZpz0"
+    },
+    "WALL-LVL-06-EXT-NORTH-PANEL-06": {
+      "displayName": "6层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3hsik3fh9U_QWfT175JHML"
+    },
+    "WALL-LVL-06-EXT-NORTH-PANEL-07": {
+      "displayName": "6层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1kCoauAhfUWg6MVsa3vlsY"
+    },
+    "WALL-LVL-06-EXT-SOUTH-PANEL-01": {
+      "displayName": "6层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "34MgPTYPTM0x$36IZCKbci"
+    },
+    "WALL-LVL-06-EXT-SOUTH-PANEL-02": {
+      "displayName": "6层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "26VuHNm89MyfBHZ5qryPNF"
+    },
+    "WALL-LVL-06-EXT-SOUTH-PANEL-03": {
+      "displayName": "6层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1SqAtEn9fRpfxGPAvLC1Z8"
+    },
+    "WALL-LVL-06-EXT-SOUTH-PANEL-04": {
+      "displayName": "6层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0h5FemxFfNzhPg64WIOngr"
+    },
+    "WALL-LVL-06-EXT-SOUTH-PANEL-05": {
+      "displayName": "6层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0AyCr_1oTQG9PBtQLJSh5I"
+    },
+    "WALL-LVL-06-EXT-SOUTH-PANEL-06": {
+      "displayName": "6层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "29ngqaaUXKHgpPOwmZfov4"
+    },
+    "WALL-LVL-06-EXT-SOUTH-PANEL-07": {
+      "displayName": "6层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3xmSAPG81T$ugE6X1TiwtW"
+    },
+    "WALL-LVL-06-EXT-WEST-MAIN": {
+      "displayName": "6层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0zCSWKP3PGhBXqVX7ED$tY"
+    },
+    "WALL-LVL-07-CORE-NORTH-CORRIDOR": {
+      "displayName": "7层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3XFfdv5RXSPQ3AHPLKlTdk"
+    },
+    "WALL-LVL-07-CORE-NORTH-EAST": {
+      "displayName": "7层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1FdmyiX0vNf9DaBsNNfo$q"
+    },
+    "WALL-LVL-07-CORE-NORTH-WEST": {
+      "displayName": "7层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1yh8VKPdbLfBdM8y33oKFe"
+    },
+    "WALL-LVL-07-CORE-SOUTH-CORRIDOR": {
+      "displayName": "7层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0pb24Qu5nNWBSpkHIwLFuT"
+    },
+    "WALL-LVL-07-CORE-SOUTH-EAST": {
+      "displayName": "7层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1HUaoo$VLUsvFoXL3gdtnR"
+    },
+    "WALL-LVL-07-CORE-SOUTH-WEST": {
+      "displayName": "7层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1a8IuAYLDNDB_kcw0VK9AM"
+    },
+    "WALL-LVL-07-EXT-EAST-MAIN": {
+      "displayName": "7层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1B8ghN4vzHA96A29mc2UrS"
+    },
+    "WALL-LVL-07-EXT-NORTH-PANEL-01": {
+      "displayName": "7层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1YT1VFvGjRavSzCtwGYBrd"
+    },
+    "WALL-LVL-07-EXT-NORTH-PANEL-02": {
+      "displayName": "7层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1RnBMu2yLMwPjEuRdm7qXL"
+    },
+    "WALL-LVL-07-EXT-NORTH-PANEL-03": {
+      "displayName": "7层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2VOPmXi1vPAuPu_6cUzAB9"
+    },
+    "WALL-LVL-07-EXT-NORTH-PANEL-04": {
+      "displayName": "7层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "06BfUImEbM9P54v9jM5gVq"
+    },
+    "WALL-LVL-07-EXT-NORTH-PANEL-05": {
+      "displayName": "7层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2w91skQVbIx8cvZYWFHyXa"
+    },
+    "WALL-LVL-07-EXT-NORTH-PANEL-06": {
+      "displayName": "7层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0Rh6$cmyrNtQcShCCU87md"
+    },
+    "WALL-LVL-07-EXT-NORTH-PANEL-07": {
+      "displayName": "7层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1rBbQepQLKhgPQrFJohenj"
+    },
+    "WALL-LVL-07-EXT-SOUTH-PANEL-01": {
+      "displayName": "7层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0k2wzgpQbUJ8R8pWvFEsR1"
+    },
+    "WALL-LVL-07-EXT-SOUTH-PANEL-02": {
+      "displayName": "7层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1Z6tSHHaDQKPVNN7WIT82T"
+    },
+    "WALL-LVL-07-EXT-SOUTH-PANEL-03": {
+      "displayName": "7层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2zUyk$6SPVtuTb_YKd1qHo"
+    },
+    "WALL-LVL-07-EXT-SOUTH-PANEL-04": {
+      "displayName": "7层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0Z3MRkgNjGTupBxeIsi1zm"
+    },
+    "WALL-LVL-07-EXT-SOUTH-PANEL-05": {
+      "displayName": "7层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1e3qnhWqPGeOCCuzkF$sww"
+    },
+    "WALL-LVL-07-EXT-SOUTH-PANEL-06": {
+      "displayName": "7层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2i6D8IWcnKwO1SKGYcIQ0K"
+    },
+    "WALL-LVL-07-EXT-SOUTH-PANEL-07": {
+      "displayName": "7层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2lwdIvwqHJd91vEnQ4n_3m"
+    },
+    "WALL-LVL-07-EXT-WEST-MAIN": {
+      "displayName": "7层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0lRecNiCrL78yKYWOndqNz"
+    },
+    "WALL-LVL-08-CORE-NORTH-CORRIDOR": {
+      "displayName": "8层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0bMH20lAzQrQUpSWfzHOTU"
+    },
+    "WALL-LVL-08-CORE-NORTH-EAST": {
+      "displayName": "8层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1xy$TPbLbJAAfD2hvZ_rwa"
+    },
+    "WALL-LVL-08-CORE-NORTH-WEST": {
+      "displayName": "8层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "078lh8HlnQlxmatLqJMFqm"
+    },
+    "WALL-LVL-08-CORE-SOUTH-CORRIDOR": {
+      "displayName": "8层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3F3k$z_0zOT95odyrT93ly"
+    },
+    "WALL-LVL-08-CORE-SOUTH-EAST": {
+      "displayName": "8层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "15Hu7iC6rNufOp5cA55PFA"
+    },
+    "WALL-LVL-08-CORE-SOUTH-WEST": {
+      "displayName": "8层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2Rn4jy5XDML8ghwxsusNQ8"
+    },
+    "WALL-LVL-08-EXT-EAST-MAIN": {
+      "displayName": "8层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2weR7zoszP8vsjemKDb5vI"
+    },
+    "WALL-LVL-08-EXT-NORTH-PANEL-01": {
+      "displayName": "8层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1LO2_pGRfV$hwMaSOVa83G"
+    },
+    "WALL-LVL-08-EXT-NORTH-PANEL-02": {
+      "displayName": "8层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3vIkku9fvHnggSeVaYjQqO"
+    },
+    "WALL-LVL-08-EXT-NORTH-PANEL-03": {
+      "displayName": "8层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0HrgbQwC9UUh7FsHttPaz5"
+    },
+    "WALL-LVL-08-EXT-NORTH-PANEL-04": {
+      "displayName": "8层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2s1J4ehnbN3fQE2rltt5GF"
+    },
+    "WALL-LVL-08-EXT-NORTH-PANEL-05": {
+      "displayName": "8层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0uqIfFiSPLKgeFhyIePc52"
+    },
+    "WALL-LVL-08-EXT-NORTH-PANEL-06": {
+      "displayName": "8层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0NUkxXmT9V8vZO85ngXGK0"
+    },
+    "WALL-LVL-08-EXT-NORTH-PANEL-07": {
+      "displayName": "8层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2yqurkWC5SNf6lywnFpRCE"
+    },
+    "WALL-LVL-08-EXT-SOUTH-PANEL-01": {
+      "displayName": "8层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3mtzCQihnVcOco5eEm6zux"
+    },
+    "WALL-LVL-08-EXT-SOUTH-PANEL-02": {
+      "displayName": "8层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0h9rb_CsDHP9LV5nLEvxJx"
+    },
+    "WALL-LVL-08-EXT-SOUTH-PANEL-03": {
+      "displayName": "8层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3DzHH9WmnG4whGQHdtjhA9"
+    },
+    "WALL-LVL-08-EXT-SOUTH-PANEL-04": {
+      "displayName": "8层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1RcAaKocXNUQJk$ioVRFxr"
+    },
+    "WALL-LVL-08-EXT-SOUTH-PANEL-05": {
+      "displayName": "8层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1a$QRqcdLIzhMa0$mv0HDU"
+    },
+    "WALL-LVL-08-EXT-SOUTH-PANEL-06": {
+      "displayName": "8层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0$LQ1KJhzOEwNzTztAKIRU"
+    },
+    "WALL-LVL-08-EXT-SOUTH-PANEL-07": {
+      "displayName": "8层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2WLaiORSfGNuzXWNt8kJz1"
+    },
+    "WALL-LVL-08-EXT-WEST-MAIN": {
+      "displayName": "8层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2Pi2QuvPzMX8N_ORRDyfUa"
+    },
+    "WALL-LVL-09-CORE-NORTH-CORRIDOR": {
+      "displayName": "9层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1Oq6gGs9LPqQzyX5NGYtqp"
+    },
+    "WALL-LVL-09-CORE-NORTH-EAST": {
+      "displayName": "9层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2VX894ebLTjvY88X52hqtt"
+    },
+    "WALL-LVL-09-CORE-NORTH-WEST": {
+      "displayName": "9层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2V9Hd8r4PP1g421ooBg7Kq"
+    },
+    "WALL-LVL-09-CORE-SOUTH-CORRIDOR": {
+      "displayName": "9层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0oZEVvG0LStOHLTFlb5PmL"
+    },
+    "WALL-LVL-09-CORE-SOUTH-EAST": {
+      "displayName": "9层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1fCG6mmDfHGuCGg8oWbpyP"
+    },
+    "WALL-LVL-09-CORE-SOUTH-WEST": {
+      "displayName": "9层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2iB5hsKuTPmhhog5rR3$et"
+    },
+    "WALL-LVL-09-EXT-EAST-MAIN": {
+      "displayName": "9层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0UYBrRzgrTDhn8uMa7XDe_"
+    },
+    "WALL-LVL-09-EXT-NORTH-PANEL-01": {
+      "displayName": "9层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3_dRLgawbHcR3_5QXTVYXX"
+    },
+    "WALL-LVL-09-EXT-NORTH-PANEL-02": {
+      "displayName": "9层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2YF54z6L1VzvpjrB$8cycJ"
+    },
+    "WALL-LVL-09-EXT-NORTH-PANEL-03": {
+      "displayName": "9层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0aPVfdEsbVdwsiNODJbG9Q"
+    },
+    "WALL-LVL-09-EXT-NORTH-PANEL-04": {
+      "displayName": "9层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0A2NxkYxrUagIBzUQbo8cC"
+    },
+    "WALL-LVL-09-EXT-NORTH-PANEL-05": {
+      "displayName": "9层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2QSW5n22fIvPg$UGrjwtzv"
+    },
+    "WALL-LVL-09-EXT-NORTH-PANEL-06": {
+      "displayName": "9层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2eW4Sfv7bS1huw$H8SkYdX"
+    },
+    "WALL-LVL-09-EXT-NORTH-PANEL-07": {
+      "displayName": "9层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "21JMQbPiLNQ9wV7jFismKf"
+    },
+    "WALL-LVL-09-EXT-SOUTH-PANEL-01": {
+      "displayName": "9层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "21bZc57V5S9BbSjyNmTUE$"
+    },
+    "WALL-LVL-09-EXT-SOUTH-PANEL-02": {
+      "displayName": "9层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2RUWUQwv5I9hNAsb4U5LB_"
+    },
+    "WALL-LVL-09-EXT-SOUTH-PANEL-03": {
+      "displayName": "9层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1Ls9Hq2S9NgxYBUQ9ETwFW"
+    },
+    "WALL-LVL-09-EXT-SOUTH-PANEL-04": {
+      "displayName": "9层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1eMhj6qEnN0gl360kE7Vcy"
+    },
+    "WALL-LVL-09-EXT-SOUTH-PANEL-05": {
+      "displayName": "9层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2Bb352y3bPLhXjwDSxa5jF"
+    },
+    "WALL-LVL-09-EXT-SOUTH-PANEL-06": {
+      "displayName": "9层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "08hsD1i2zHLAf68ruf8CB4"
+    },
+    "WALL-LVL-09-EXT-SOUTH-PANEL-07": {
+      "displayName": "9层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2nbnncDNfRfBJD2Wn$dNZn"
+    },
+    "WALL-LVL-09-EXT-WEST-MAIN": {
+      "displayName": "9层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2NBRcRB8nSdemjh6go1w1l"
+    },
+    "WALL-LVL-10-CORE-NORTH-CORRIDOR": {
+      "displayName": "10层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1yuGCHe7TH7fxMuohp94HX"
+    },
+    "WALL-LVL-10-CORE-NORTH-EAST": {
+      "displayName": "10层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0XdoikZvDJWOwSTNN53Dsv"
+    },
+    "WALL-LVL-10-CORE-NORTH-WEST": {
+      "displayName": "10层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "116q_xHXLMvOfWGwLpa12t"
+    },
+    "WALL-LVL-10-CORE-SOUTH-CORRIDOR": {
+      "displayName": "10层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "38C0zqRcfTs8QWRIba9WjQ"
+    },
+    "WALL-LVL-10-CORE-SOUTH-EAST": {
+      "displayName": "10层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0Bf_Ok4D1O7wmtqgHD2ML6"
+    },
+    "WALL-LVL-10-CORE-SOUTH-WEST": {
+      "displayName": "10层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0ymEU8pHnRg88QlHRc7wgD"
+    },
+    "WALL-LVL-10-EXT-EAST-MAIN": {
+      "displayName": "10层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3UyuZxWE9RMvUgAjPRiLCY"
+    },
+    "WALL-LVL-10-EXT-NORTH-PANEL-01": {
+      "displayName": "10层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1wWfpSTfrNQ9cibK_LnGHC"
+    },
+    "WALL-LVL-10-EXT-NORTH-PANEL-02": {
+      "displayName": "10层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3lJSs0ZZzKBwE5RR$L$xYS"
+    },
+    "WALL-LVL-10-EXT-NORTH-PANEL-03": {
+      "displayName": "10层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3z7NZGEQzOkQ9OPA7TvKmC"
+    },
+    "WALL-LVL-10-EXT-NORTH-PANEL-04": {
+      "displayName": "10层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0X9HoqK$PHaesilNdhS$es"
+    },
+    "WALL-LVL-10-EXT-NORTH-PANEL-05": {
+      "displayName": "10层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3vILw8E8vNYPA4isDfSLYw"
+    },
+    "WALL-LVL-10-EXT-NORTH-PANEL-06": {
+      "displayName": "10层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3U94VK_vrOPPikdOEjZ3eZ"
+    },
+    "WALL-LVL-10-EXT-NORTH-PANEL-07": {
+      "displayName": "10层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3uSqT$MDrPVR6uPCT7WlSt"
+    },
+    "WALL-LVL-10-EXT-SOUTH-PANEL-01": {
+      "displayName": "10层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3wKTkjBOXVQAnRJMocWoit"
+    },
+    "WALL-LVL-10-EXT-SOUTH-PANEL-02": {
+      "displayName": "10层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "08qO9NDzvLyeyQeDB8H3PC"
+    },
+    "WALL-LVL-10-EXT-SOUTH-PANEL-03": {
+      "displayName": "10层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3iMSZNrEjNfRn8ffL$pRbb"
+    },
+    "WALL-LVL-10-EXT-SOUTH-PANEL-04": {
+      "displayName": "10层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "08QhWs6a5UtO45o0rCLYLx"
+    },
+    "WALL-LVL-10-EXT-SOUTH-PANEL-05": {
+      "displayName": "10层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3c0UrPRT5Lzx9LwBOFCNBi"
+    },
+    "WALL-LVL-10-EXT-SOUTH-PANEL-06": {
+      "displayName": "10层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3wiKL4XQrGmw$93$4PBk1C"
+    },
+    "WALL-LVL-10-EXT-SOUTH-PANEL-07": {
+      "displayName": "10层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0oyEEN7UHPewtJtHvN0RRv"
+    },
+    "WALL-LVL-10-EXT-WEST-MAIN": {
+      "displayName": "10层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1xGjdnNUbMlhBoI4y$6U9m"
+    },
+    "WALL-LVL-11-CORE-NORTH-CORRIDOR": {
+      "displayName": "11层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0Zd5HEwA9O8eBBB$dorHwS"
+    },
+    "WALL-LVL-11-CORE-NORTH-EAST": {
+      "displayName": "11层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1u1c_h$OvOKxgKLynwy9dv"
+    },
+    "WALL-LVL-11-CORE-NORTH-WEST": {
+      "displayName": "11层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0sdlTGUmvPvh4DugEP3ESf"
+    },
+    "WALL-LVL-11-CORE-SOUTH-CORRIDOR": {
+      "displayName": "11层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3Zfhh1BwLL6ORoe21hc_AB"
+    },
+    "WALL-LVL-11-CORE-SOUTH-EAST": {
+      "displayName": "11层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0_ONUWXFnPLRmpHK8T2K6u"
+    },
+    "WALL-LVL-11-CORE-SOUTH-WEST": {
+      "displayName": "11层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1rOkOCsdrVlxrS_$X_bsPo"
+    },
+    "WALL-LVL-11-EXT-EAST-MAIN": {
+      "displayName": "11层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3$kFTPBVnHhetUsjoSvYaK"
+    },
+    "WALL-LVL-11-EXT-NORTH-PANEL-01": {
+      "displayName": "11层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2P82tLpIHMLQIUr6fASlMp"
+    },
+    "WALL-LVL-11-EXT-NORTH-PANEL-02": {
+      "displayName": "11层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3_UqX1McrP_wbUZOfiZdew"
+    },
+    "WALL-LVL-11-EXT-NORTH-PANEL-03": {
+      "displayName": "11层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3yR0JDOgrNNPdVfa52Er$f"
+    },
+    "WALL-LVL-11-EXT-NORTH-PANEL-04": {
+      "displayName": "11层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "37UVbcgVjKi91LE4uYdR2M"
+    },
+    "WALL-LVL-11-EXT-NORTH-PANEL-05": {
+      "displayName": "11层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1aoTcxjcbQmwkuNSlNlggb"
+    },
+    "WALL-LVL-11-EXT-NORTH-PANEL-06": {
+      "displayName": "11层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1YoVNWD0LIT84DSNxNPhtG"
+    },
+    "WALL-LVL-11-EXT-NORTH-PANEL-07": {
+      "displayName": "11层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3UYWq_HTfMm8taKWhD0KVY"
+    },
+    "WALL-LVL-11-EXT-SOUTH-PANEL-01": {
+      "displayName": "11层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0BjuSbP5zOEhVin2PiQS1f"
+    },
+    "WALL-LVL-11-EXT-SOUTH-PANEL-02": {
+      "displayName": "11层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1ZFLE7EUDOGvahuh2ZhBkA"
+    },
+    "WALL-LVL-11-EXT-SOUTH-PANEL-03": {
+      "displayName": "11层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1ijlgffKvGRBHphoZCiISS"
+    },
+    "WALL-LVL-11-EXT-SOUTH-PANEL-04": {
+      "displayName": "11层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1a1cx_eXLOButufYejwQAq"
+    },
+    "WALL-LVL-11-EXT-SOUTH-PANEL-05": {
+      "displayName": "11层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3vUBguNGjGeBNLzqOzuhJz"
+    },
+    "WALL-LVL-11-EXT-SOUTH-PANEL-06": {
+      "displayName": "11层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0oOghadXfISfa6BNxVvynG"
+    },
+    "WALL-LVL-11-EXT-SOUTH-PANEL-07": {
+      "displayName": "11层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0WOGvoIM1Hzw$ZOrgyQdwa"
+    },
+    "WALL-LVL-11-EXT-WEST-MAIN": {
+      "displayName": "11层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2OkRRTrYHTwhpnVM3xxm7Q"
+    },
+    "WALL-LVL-12-CORE-NORTH-CORRIDOR": {
+      "displayName": "12层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1AZLR_ptHQ0vNk0V2YCPLK"
+    },
+    "WALL-LVL-12-CORE-NORTH-EAST": {
+      "displayName": "12层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2849wW3JPOawDsugypzvGI"
+    },
+    "WALL-LVL-12-CORE-NORTH-WEST": {
+      "displayName": "12层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1cHIMoDsfNQebEX2aMtcXf"
+    },
+    "WALL-LVL-12-CORE-SOUTH-CORRIDOR": {
+      "displayName": "12层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1Zd$WjdavIVgW7dIu2xTi7"
+    },
+    "WALL-LVL-12-CORE-SOUTH-EAST": {
+      "displayName": "12层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1P6rdOdbnN3fHVojhJht6P"
+    },
+    "WALL-LVL-12-CORE-SOUTH-WEST": {
+      "displayName": "12层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1apW7jibfKRPnkHbdefWuJ"
+    },
+    "WALL-LVL-12-EXT-EAST-MAIN": {
+      "displayName": "12层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3Knq$sj1bV1fyjcL7TvQPz"
+    },
+    "WALL-LVL-12-EXT-NORTH-PANEL-01": {
+      "displayName": "12层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0jYr5R4jLGBwWPohWGGVyn"
+    },
+    "WALL-LVL-12-EXT-NORTH-PANEL-02": {
+      "displayName": "12层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0gdOI7jrTIohA0KYog8YHo"
+    },
+    "WALL-LVL-12-EXT-NORTH-PANEL-03": {
+      "displayName": "12层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0o4r$HH_9Ij8IUo$i0eDWY"
+    },
+    "WALL-LVL-12-EXT-NORTH-PANEL-04": {
+      "displayName": "12层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2wX8YIi5XIDOiHBD8iekF5"
+    },
+    "WALL-LVL-12-EXT-NORTH-PANEL-05": {
+      "displayName": "12层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2PK9gU3xfKfhSiWEN0g0Nh"
+    },
+    "WALL-LVL-12-EXT-NORTH-PANEL-06": {
+      "displayName": "12层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2UPu7Pr9PIJvqBv$F4ypu6"
+    },
+    "WALL-LVL-12-EXT-NORTH-PANEL-07": {
+      "displayName": "12层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "14ZLQ$H1bOAP$F$ZPtG0k6"
+    },
+    "WALL-LVL-12-EXT-SOUTH-PANEL-01": {
+      "displayName": "12层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3t$tVSdenGM8GXLnvRgwnZ"
+    },
+    "WALL-LVL-12-EXT-SOUTH-PANEL-02": {
+      "displayName": "12层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0c1t9KJFDI7Pc$5$uytysH"
+    },
+    "WALL-LVL-12-EXT-SOUTH-PANEL-03": {
+      "displayName": "12层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1mJNGCUJXI2BQ_7vQRz_CC"
+    },
+    "WALL-LVL-12-EXT-SOUTH-PANEL-04": {
+      "displayName": "12层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1eujdEfYPS$xnEhloGfjnm"
+    },
+    "WALL-LVL-12-EXT-SOUTH-PANEL-05": {
+      "displayName": "12层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1_rX8USbPMRvIdkmOlulbR"
+    },
+    "WALL-LVL-12-EXT-SOUTH-PANEL-06": {
+      "displayName": "12层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2ktp7Oh$nLL99A6Mi1aL$O"
+    },
+    "WALL-LVL-12-EXT-SOUTH-PANEL-07": {
+      "displayName": "12层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0DCY0V4GDHVwXElyQlUhSs"
+    },
+    "WALL-LVL-12-EXT-WEST-MAIN": {
+      "displayName": "12层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "04zA20k$HPPA6U3tHwmQNq"
+    },
+    "WALL-LVL-13-CORE-NORTH-CORRIDOR": {
+      "displayName": "13层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0jBDJ$13PMfO$JIN$RTvse"
+    },
+    "WALL-LVL-13-CORE-NORTH-EAST": {
+      "displayName": "13层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3MOyJddnLMvhQhTo$lvFvC"
+    },
+    "WALL-LVL-13-CORE-NORTH-WEST": {
+      "displayName": "13层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1tUgacN2DGeRqviDaFDoNF"
+    },
+    "WALL-LVL-13-CORE-SOUTH-CORRIDOR": {
+      "displayName": "13层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0A24XbADXVK89vPbfMsZfV"
+    },
+    "WALL-LVL-13-CORE-SOUTH-EAST": {
+      "displayName": "13层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2cazhnc0vKYvrTMLl2O0xP"
+    },
+    "WALL-LVL-13-CORE-SOUTH-WEST": {
+      "displayName": "13层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "01yh$6zJnPBez5H8oADds$"
+    },
+    "WALL-LVL-13-EXT-EAST-MAIN": {
+      "displayName": "13层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0VwmJzmwTVtuytOyyaq3DT"
+    },
+    "WALL-LVL-13-EXT-NORTH-PANEL-01": {
+      "displayName": "13层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1oK6D_AYDSTxrwBRlnC8v1"
+    },
+    "WALL-LVL-13-EXT-NORTH-PANEL-02": {
+      "displayName": "13层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3v11qdUtPJgub1l3OsNu_a"
+    },
+    "WALL-LVL-13-EXT-NORTH-PANEL-03": {
+      "displayName": "13层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2MeGOSzhvGqg6lTbNdyv$k"
+    },
+    "WALL-LVL-13-EXT-NORTH-PANEL-04": {
+      "displayName": "13层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1QEPRef6vTKgSsw$QmIGYo"
+    },
+    "WALL-LVL-13-EXT-NORTH-PANEL-05": {
+      "displayName": "13层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2hwRIyrhzVz9p3kNCdsQq8"
+    },
+    "WALL-LVL-13-EXT-NORTH-PANEL-06": {
+      "displayName": "13层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "24wH_A5xXJYwV1MgHBre17"
+    },
+    "WALL-LVL-13-EXT-NORTH-PANEL-07": {
+      "displayName": "13层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2xfEgEyTPNeOXGoQko0KeW"
+    },
+    "WALL-LVL-13-EXT-SOUTH-PANEL-01": {
+      "displayName": "13层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2eU2$pItzJ0AEXQSv7fivs"
+    },
+    "WALL-LVL-13-EXT-SOUTH-PANEL-02": {
+      "displayName": "13层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0lSbOczfXSAhYddDtZKO7K"
+    },
+    "WALL-LVL-13-EXT-SOUTH-PANEL-03": {
+      "displayName": "13层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1wQczRAeLMqxp4t$wgpZIK"
+    },
+    "WALL-LVL-13-EXT-SOUTH-PANEL-04": {
+      "displayName": "13层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3RTjp$jgLHhBosifORc2oW"
+    },
+    "WALL-LVL-13-EXT-SOUTH-PANEL-05": {
+      "displayName": "13层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1Ul0fwySTLHgnf_$pxyTTc"
+    },
+    "WALL-LVL-13-EXT-SOUTH-PANEL-06": {
+      "displayName": "13层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1HnraEZx9PMAkves0tuGa$"
+    },
+    "WALL-LVL-13-EXT-SOUTH-PANEL-07": {
+      "displayName": "13层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0ha5RbWBLVSfXy2uHgH6Jm"
+    },
+    "WALL-LVL-13-EXT-WEST-MAIN": {
+      "displayName": "13层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1w65h$g1rOaB9agh3enLLS"
+    },
+    "WALL-LVL-14-CORE-NORTH-CORRIDOR": {
+      "displayName": "14层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0GzwnZLQXQpBGpC$CvW8a6"
+    },
+    "WALL-LVL-14-CORE-NORTH-EAST": {
+      "displayName": "14层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1AnjPfHvnGE8vrStfGpNGd"
+    },
+    "WALL-LVL-14-CORE-NORTH-WEST": {
+      "displayName": "14层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2P6qV6UqPIM8uYvT2YlDpg"
+    },
+    "WALL-LVL-14-CORE-SOUTH-CORRIDOR": {
+      "displayName": "14层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1rOV461UrQkQJVJc9Nl16x"
+    },
+    "WALL-LVL-14-CORE-SOUTH-EAST": {
+      "displayName": "14层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "05$XwSfyPPqPt9UXqzhs9Y"
+    },
+    "WALL-LVL-14-CORE-SOUTH-WEST": {
+      "displayName": "14层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1QlJslbsvKix_CUA_s2zH2"
+    },
+    "WALL-LVL-14-EXT-EAST-MAIN": {
+      "displayName": "14层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0E1KHR_kjL$AMARy$yAsyd"
+    },
+    "WALL-LVL-14-EXT-NORTH-PANEL-01": {
+      "displayName": "14层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3jsRku7prL9BWvxWYhhqNR"
+    },
+    "WALL-LVL-14-EXT-NORTH-PANEL-02": {
+      "displayName": "14层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2ciSyXoOPU2fslQ9O97AC1"
+    },
+    "WALL-LVL-14-EXT-NORTH-PANEL-03": {
+      "displayName": "14层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "05O1$$xfPVNuta30ErY4xT"
+    },
+    "WALL-LVL-14-EXT-NORTH-PANEL-04": {
+      "displayName": "14层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3FN0Imvz1H6Q2FfZxDKOrx"
+    },
+    "WALL-LVL-14-EXT-NORTH-PANEL-05": {
+      "displayName": "14层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0$pYszbSLMZu_VFZ1yOXIN"
+    },
+    "WALL-LVL-14-EXT-NORTH-PANEL-06": {
+      "displayName": "14层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1uI3nOWwXSLx2weHBV1Jao"
+    },
+    "WALL-LVL-14-EXT-NORTH-PANEL-07": {
+      "displayName": "14层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2yttsqY6PJkuimIojEU3Ni"
+    },
+    "WALL-LVL-14-EXT-SOUTH-PANEL-01": {
+      "displayName": "14层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1hF9CIJGXK88JUFDF7BHk5"
+    },
+    "WALL-LVL-14-EXT-SOUTH-PANEL-02": {
+      "displayName": "14层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0_vmOdKpLRKQjuRKWiB$n0"
+    },
+    "WALL-LVL-14-EXT-SOUTH-PANEL-03": {
+      "displayName": "14层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3QX6rADjfQPe25Txp87VGw"
+    },
+    "WALL-LVL-14-EXT-SOUTH-PANEL-04": {
+      "displayName": "14层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0KSFAJQojM38VD3y3_RhSa"
+    },
+    "WALL-LVL-14-EXT-SOUTH-PANEL-05": {
+      "displayName": "14层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2aBW5EtsDTeQ1fcqXCH3d_"
+    },
+    "WALL-LVL-14-EXT-SOUTH-PANEL-06": {
+      "displayName": "14层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3BGqk0_VTUeOVgyf3o0D4x"
+    },
+    "WALL-LVL-14-EXT-SOUTH-PANEL-07": {
+      "displayName": "14层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0lp4r09GzNoA4EBJk19Ba2"
+    },
+    "WALL-LVL-14-EXT-WEST-MAIN": {
+      "displayName": "14层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1d$QEAZgTQzhXXKAFYXM42"
+    },
+    "WALL-LVL-15-CORE-NORTH-CORRIDOR": {
+      "displayName": "15层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0Km7lNkU9OmwyJShczO5k3"
+    },
+    "WALL-LVL-15-CORE-NORTH-EAST": {
+      "displayName": "15层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1KKj4rk4DItBO8Um4zST8n"
+    },
+    "WALL-LVL-15-CORE-NORTH-WEST": {
+      "displayName": "15层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0F2ZRBGKvOovBVgKZShJrR"
+    },
+    "WALL-LVL-15-CORE-SOUTH-CORRIDOR": {
+      "displayName": "15层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3bFJoCX4rMuPkjgyN4f6XP"
+    },
+    "WALL-LVL-15-CORE-SOUTH-EAST": {
+      "displayName": "15层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "14VrZvX35OiRxgRGvdcIYy"
+    },
+    "WALL-LVL-15-CORE-SOUTH-WEST": {
+      "displayName": "15层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2m$xd_k1bUzeH99EHBokfH"
+    },
+    "WALL-LVL-15-EXT-EAST-MAIN": {
+      "displayName": "15层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3MyRhL7qzJlBG0IRjFpHS_"
+    },
+    "WALL-LVL-15-EXT-NORTH-PANEL-01": {
+      "displayName": "15层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "17euH4faDVyuXbKck8$OzQ"
+    },
+    "WALL-LVL-15-EXT-NORTH-PANEL-02": {
+      "displayName": "15层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2Vdud_giHLTgV9zWgTrOyu"
+    },
+    "WALL-LVL-15-EXT-NORTH-PANEL-03": {
+      "displayName": "15层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1gi8nk6bXHagdP65mVnUNd"
+    },
+    "WALL-LVL-15-EXT-NORTH-PANEL-04": {
+      "displayName": "15层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3$R9dHo5LLaOi$K3gkd8xg"
+    },
+    "WALL-LVL-15-EXT-NORTH-PANEL-05": {
+      "displayName": "15层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1uccyYDTnJt9X49baki3nc"
+    },
+    "WALL-LVL-15-EXT-NORTH-PANEL-06": {
+      "displayName": "15层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1s1lwzAU9QhwXbtVu5FyYY"
+    },
+    "WALL-LVL-15-EXT-NORTH-PANEL-07": {
+      "displayName": "15层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0lt8GaXyTTqfUrI$DjS8yH"
+    },
+    "WALL-LVL-15-EXT-SOUTH-PANEL-01": {
+      "displayName": "15层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "06wKvjmj9PWuZVQWoBpw5r"
+    },
+    "WALL-LVL-15-EXT-SOUTH-PANEL-02": {
+      "displayName": "15层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0fAWhFWeHVeQmWRPQWtYn6"
+    },
+    "WALL-LVL-15-EXT-SOUTH-PANEL-03": {
+      "displayName": "15层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "29FxXPwr9NZxQsrwUBZZ9g"
+    },
+    "WALL-LVL-15-EXT-SOUTH-PANEL-04": {
+      "displayName": "15层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "12vzqFOF1HtQai8sljWBHJ"
+    },
+    "WALL-LVL-15-EXT-SOUTH-PANEL-05": {
+      "displayName": "15层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2lN5zQxjbOvw56v54u2DuJ"
+    },
+    "WALL-LVL-15-EXT-SOUTH-PANEL-06": {
+      "displayName": "15层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2oWp6GkXbNRuMNFL1c8boS"
+    },
+    "WALL-LVL-15-EXT-SOUTH-PANEL-07": {
+      "displayName": "15层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1JyEgrgDbIVxsge2qzDmV3"
+    },
+    "WALL-LVL-15-EXT-WEST-MAIN": {
+      "displayName": "15层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0jO1aDKGjVsPANd$Sk4QAB"
+    },
+    "WALL-LVL-16-CORE-NORTH-CORRIDOR": {
+      "displayName": "16层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "15_INTAK1JxeLD764rgxs5"
+    },
+    "WALL-LVL-16-CORE-NORTH-EAST": {
+      "displayName": "16层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "33AX6PQKfPdupxoxJ33j0F"
+    },
+    "WALL-LVL-16-CORE-NORTH-WEST": {
+      "displayName": "16层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1IsanEp6jPJQxvU0J72LnY"
+    },
+    "WALL-LVL-16-CORE-SOUTH-CORRIDOR": {
+      "displayName": "16层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1tamrMaa9Ml9RSChlx_3M3"
+    },
+    "WALL-LVL-16-CORE-SOUTH-EAST": {
+      "displayName": "16层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1HRlQTnUzQce$8lfpGL_8v"
+    },
+    "WALL-LVL-16-CORE-SOUTH-WEST": {
+      "displayName": "16层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1Ao5ejx15MrvHT8Lyzml_5"
+    },
+    "WALL-LVL-16-EXT-EAST-MAIN": {
+      "displayName": "16层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "22Qy4t9ULI6v9eIdOQ0gp4"
+    },
+    "WALL-LVL-16-EXT-NORTH-PANEL-01": {
+      "displayName": "16层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3iSrtLStvJAwVNwT8j1s7g"
+    },
+    "WALL-LVL-16-EXT-NORTH-PANEL-02": {
+      "displayName": "16层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1Pi0L3utnROw1PCFGEiPdz"
+    },
+    "WALL-LVL-16-EXT-NORTH-PANEL-03": {
+      "displayName": "16层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "06dPOILrrQaANJCc3i1EeG"
+    },
+    "WALL-LVL-16-EXT-NORTH-PANEL-04": {
+      "displayName": "16层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3RDKwD_HTV7x5E18l2BhpD"
+    },
+    "WALL-LVL-16-EXT-NORTH-PANEL-05": {
+      "displayName": "16层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2wB3SrkMDUnudarAsnVELu"
+    },
+    "WALL-LVL-16-EXT-NORTH-PANEL-06": {
+      "displayName": "16层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2$KhTX7OvSmfNo_X0yp5N4"
+    },
+    "WALL-LVL-16-EXT-NORTH-PANEL-07": {
+      "displayName": "16层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0jNXOuMRDRmRi$d0pN5Aaj"
+    },
+    "WALL-LVL-16-EXT-SOUTH-PANEL-01": {
+      "displayName": "16层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1QuQ8P_3HKGf355MRHGNbh"
+    },
+    "WALL-LVL-16-EXT-SOUTH-PANEL-02": {
+      "displayName": "16层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1oxcJMK85LY8TIHWfZ1lay"
+    },
+    "WALL-LVL-16-EXT-SOUTH-PANEL-03": {
+      "displayName": "16层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3TYTfaL_nQHfD3RrslBvM4"
+    },
+    "WALL-LVL-16-EXT-SOUTH-PANEL-04": {
+      "displayName": "16层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0Wh1AmD4XSgh3jiDo8P4nA"
+    },
+    "WALL-LVL-16-EXT-SOUTH-PANEL-05": {
+      "displayName": "16层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3wUdAsw1TMshpd2641dxZ8"
+    },
+    "WALL-LVL-16-EXT-SOUTH-PANEL-06": {
+      "displayName": "16层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0Q_mtdlN5GIeIhtW5Hxqw1"
+    },
+    "WALL-LVL-16-EXT-SOUTH-PANEL-07": {
+      "displayName": "16层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "21qGLu1k1UIA8PixHNx9UX"
+    },
+    "WALL-LVL-16-EXT-WEST-MAIN": {
+      "displayName": "16层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3t0VYh9bDQl8sm6ZbPJBHy"
+    },
+    "WALL-LVL-17-CORE-NORTH-CORRIDOR": {
+      "displayName": "17层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "19uAXFhYrNIhJVWkK7cUgH"
+    },
+    "WALL-LVL-17-CORE-NORTH-EAST": {
+      "displayName": "17层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0LGGztnFDSeuUDHMPAR3fS"
+    },
+    "WALL-LVL-17-CORE-NORTH-WEST": {
+      "displayName": "17层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2hwfd89f9Mjv7alDiznRre"
+    },
+    "WALL-LVL-17-CORE-SOUTH-CORRIDOR": {
+      "displayName": "17层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3e3$D6Fi9TfOUPI1wVDCly"
+    },
+    "WALL-LVL-17-CORE-SOUTH-EAST": {
+      "displayName": "17层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0oSp8UcbPHEOLP9FLNhQS7"
+    },
+    "WALL-LVL-17-CORE-SOUTH-WEST": {
+      "displayName": "17层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "20IFHpZhvGowRiN$u3FJBk"
+    },
+    "WALL-LVL-17-EXT-EAST-MAIN": {
+      "displayName": "17层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1XekGb4RjUafaQAC8_83Jh"
+    },
+    "WALL-LVL-17-EXT-NORTH-PANEL-01": {
+      "displayName": "17层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2pfGLMN69LBO7QKTngubIR"
+    },
+    "WALL-LVL-17-EXT-NORTH-PANEL-02": {
+      "displayName": "17层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2BCJrN6kXVivbm1zViqS6N"
+    },
+    "WALL-LVL-17-EXT-NORTH-PANEL-03": {
+      "displayName": "17层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0HPdullZvLjvL6$FmLo6e1"
+    },
+    "WALL-LVL-17-EXT-NORTH-PANEL-04": {
+      "displayName": "17层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2pg4jpfFvSEhgu3amqEjsG"
+    },
+    "WALL-LVL-17-EXT-NORTH-PANEL-05": {
+      "displayName": "17层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3PmcmCsWHPOQc9a7iuMffP"
+    },
+    "WALL-LVL-17-EXT-NORTH-PANEL-06": {
+      "displayName": "17层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "36sGmfEKPMJu5h98vbDVO$"
+    },
+    "WALL-LVL-17-EXT-NORTH-PANEL-07": {
+      "displayName": "17层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1rt190FfLLUA1oVzTLjnXn"
+    },
+    "WALL-LVL-17-EXT-SOUTH-PANEL-01": {
+      "displayName": "17层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1sAXz3yDDPIRMg_EXWnzAG"
+    },
+    "WALL-LVL-17-EXT-SOUTH-PANEL-02": {
+      "displayName": "17层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0j3$GJAADMwPmKkRPaCEpI"
+    },
+    "WALL-LVL-17-EXT-SOUTH-PANEL-03": {
+      "displayName": "17层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1hDg2Tpg9LAfulontjp9_N"
+    },
+    "WALL-LVL-17-EXT-SOUTH-PANEL-04": {
+      "displayName": "17层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2Rxlc0ydLNSBKRMitt787E"
+    },
+    "WALL-LVL-17-EXT-SOUTH-PANEL-05": {
+      "displayName": "17层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3t$W4mmvfO_u8T2M3N$xmT"
+    },
+    "WALL-LVL-17-EXT-SOUTH-PANEL-06": {
+      "displayName": "17层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2fxe2xYc1IBBC3qRUr2lBr"
+    },
+    "WALL-LVL-17-EXT-SOUTH-PANEL-07": {
+      "displayName": "17层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2t1X0IJGfGShfZbpmkoJuO"
+    },
+    "WALL-LVL-17-EXT-WEST-MAIN": {
+      "displayName": "17层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "22sVS3vizPCf7xLZ1ts3BJ"
+    },
+    "WALL-LVL-18-CORE-NORTH-CORRIDOR": {
+      "displayName": "18层北段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3twlE13ajHGw1khm7JuELa"
+    },
+    "WALL-LVL-18-CORE-NORTH-EAST": {
+      "displayName": "18层北段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2$9unETO1NXRJds78Uruf0"
+    },
+    "WALL-LVL-18-CORE-NORTH-WEST": {
+      "displayName": "18层北段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3Na8wk2SXMxw$9Olot_3$g"
+    },
+    "WALL-LVL-18-CORE-SOUTH-CORRIDOR": {
+      "displayName": "18层南段核心筒走廊侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3NPWGxCxHIShwIeHVdAyg1"
+    },
+    "WALL-LVL-18-CORE-SOUTH-EAST": {
+      "displayName": "18层南段核心筒东侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3_PGRW7NnNJ8ZaL3uO7xjC"
+    },
+    "WALL-LVL-18-CORE-SOUTH-WEST": {
+      "displayName": "18层南段核心筒西侧墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "08OfpKoQjSJgYkzG6gWIED"
+    },
+    "WALL-LVL-18-EXT-EAST-MAIN": {
+      "displayName": "18层东外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "29vj5aSOHU2OIeZ0LNDJ3A"
+    },
+    "WALL-LVL-18-EXT-NORTH-PANEL-01": {
+      "displayName": "18层北外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1a7OoBEk9LBgISNU_fqbW4"
+    },
+    "WALL-LVL-18-EXT-NORTH-PANEL-02": {
+      "displayName": "18层北外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1AIGAutPbMFB6UywBFl_Mb"
+    },
+    "WALL-LVL-18-EXT-NORTH-PANEL-03": {
+      "displayName": "18层北外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2UxJVDOH5J79rBUpgHpvUI"
+    },
+    "WALL-LVL-18-EXT-NORTH-PANEL-04": {
+      "displayName": "18层北外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3x$j$mEGTHAPjU5HvXqzj1"
+    },
+    "WALL-LVL-18-EXT-NORTH-PANEL-05": {
+      "displayName": "18层北外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0eygrJcgDQUugY0Sdrmiz_"
+    },
+    "WALL-LVL-18-EXT-NORTH-PANEL-06": {
+      "displayName": "18层北外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2PZjggEFXRDugZfZgHt3Je"
+    },
+    "WALL-LVL-18-EXT-NORTH-PANEL-07": {
+      "displayName": "18层北外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "23CLAhWQDLjBmeNMqyyKmg"
+    },
+    "WALL-LVL-18-EXT-SOUTH-PANEL-01": {
+      "displayName": "18层南外墙分段01",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2sRm49NwHHYgh2jpIK42gf"
+    },
+    "WALL-LVL-18-EXT-SOUTH-PANEL-02": {
+      "displayName": "18层南外墙分段02",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3tHjToChfGqvqU3VFXFsBA"
+    },
+    "WALL-LVL-18-EXT-SOUTH-PANEL-03": {
+      "displayName": "18层南外墙分段03",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3p2NsAq7jPrA3Rp7VQm8xr"
+    },
+    "WALL-LVL-18-EXT-SOUTH-PANEL-04": {
+      "displayName": "18层南外墙分段04",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3tkBCTBXPNrvlN1w4UHLSM"
+    },
+    "WALL-LVL-18-EXT-SOUTH-PANEL-05": {
+      "displayName": "18层南外墙分段05",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2wBUWjYp1T7ebgvbbQ5eCh"
+    },
+    "WALL-LVL-18-EXT-SOUTH-PANEL-06": {
+      "displayName": "18层南外墙分段06",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "31EKyC32vHOBYq3bjNMSy5"
+    },
+    "WALL-LVL-18-EXT-SOUTH-PANEL-07": {
+      "displayName": "18层南外墙分段07",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2fCZGH2ajSMA8f2FC2lIIo"
+    },
+    "WALL-LVL-18-EXT-WEST-MAIN": {
+      "displayName": "18层西外墙主体",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0ixl0NtZXGHv6lniWxU_ry"
+    },
+    "WALL-ROOF-PARAPET-EAST": {
+      "displayName": "屋面EAST女儿墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2TG7jq52nVSfR59NEcZx0I"
+    },
+    "WALL-ROOF-PARAPET-NORTH": {
+      "displayName": "屋面NORTH女儿墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0_G5DBeUvGLhuXHkY2FwuH"
+    },
+    "WALL-ROOF-PARAPET-SOUTH": {
+      "displayName": "屋面SOUTH女儿墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "1WL73u11rLHvPUZC9wXX06"
+    },
+    "WALL-ROOF-PARAPET-WEST": {
+      "displayName": "屋面WEST女儿墙",
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0bjt4VDdrQJPrNvwlTGKgV"
+    },
+    "WINDOW-LVL-01-NORTH-01": {
+      "displayName": "1层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3PJBIUGaDVl97Ni80wfnRj"
+    },
+    "WINDOW-LVL-01-NORTH-02": {
+      "displayName": "1层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "29MIK8ninMReu1WQ7lsbFm"
+    },
+    "WINDOW-LVL-01-NORTH-03": {
+      "displayName": "1层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3MYskUuHHPIf$ct86JLHGT"
+    },
+    "WINDOW-LVL-01-NORTH-04": {
+      "displayName": "1层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2rWRSVAVrNO9KNtSoh8J2e"
+    },
+    "WINDOW-LVL-01-SOUTH-01": {
+      "displayName": "1层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3KK1EslmXHpBY1gPIlQtBw"
+    },
+    "WINDOW-LVL-01-SOUTH-02": {
+      "displayName": "1层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0NlMXQtIjHdRCGtHZyEd6C"
+    },
+    "WINDOW-LVL-01-SOUTH-03": {
+      "displayName": "1层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1AQjrYfxrUtBuTgMhUCG3G"
+    },
+    "WINDOW-LVL-01-SOUTH-04": {
+      "displayName": "1层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3DtoRbowPJaOGNE1bmcev2"
+    },
+    "WINDOW-LVL-02-NORTH-01": {
+      "displayName": "2层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2x4DbK0b1IkP7WQ6Ro32kF"
+    },
+    "WINDOW-LVL-02-NORTH-02": {
+      "displayName": "2层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2E3WpUMZbVs91i6jvMijNG"
+    },
+    "WINDOW-LVL-02-NORTH-03": {
+      "displayName": "2层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2cu1ssUcXGhwuMKnrJwr4N"
+    },
+    "WINDOW-LVL-02-NORTH-04": {
+      "displayName": "2层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "17UJITHRXSlxsSbVn51aMW"
+    },
+    "WINDOW-LVL-02-SOUTH-01": {
+      "displayName": "2层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2Y96afYUTLkh79TwQZsg3e"
+    },
+    "WINDOW-LVL-02-SOUTH-02": {
+      "displayName": "2层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0DyaViPTfMGeSn8Yy64N73"
+    },
+    "WINDOW-LVL-02-SOUTH-03": {
+      "displayName": "2层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2zj2_ANMDQmfv608re8_fj"
+    },
+    "WINDOW-LVL-02-SOUTH-04": {
+      "displayName": "2层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2IxDz6CqbHABloy82Fo5dd"
+    },
+    "WINDOW-LVL-03-NORTH-01": {
+      "displayName": "3层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0ANvCeBjjSehsPuK$D0tSE"
+    },
+    "WINDOW-LVL-03-NORTH-02": {
+      "displayName": "3层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2GQrLuBMTQqAiAbT$mth3J"
+    },
+    "WINDOW-LVL-03-NORTH-03": {
+      "displayName": "3层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0iQvrccaHKXwiNj2LH67El"
+    },
+    "WINDOW-LVL-03-NORTH-04": {
+      "displayName": "3层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3E$VvkWjTN1BADOusM9IvA"
+    },
+    "WINDOW-LVL-03-SOUTH-01": {
+      "displayName": "3层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1C8r_o4grRoQ5R0Iyll_9M"
+    },
+    "WINDOW-LVL-03-SOUTH-02": {
+      "displayName": "3层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2BEod80LXPjwISW2vN_ANQ"
+    },
+    "WINDOW-LVL-03-SOUTH-03": {
+      "displayName": "3层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "32BZuXbgbMm9XRZfigKerX"
+    },
+    "WINDOW-LVL-03-SOUTH-04": {
+      "displayName": "3层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0ASCnS3BvOIhuhCtkxPW7c"
+    },
+    "WINDOW-LVL-04-NORTH-01": {
+      "displayName": "4层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "34152FwfDHgBFs0ngWIy6h"
+    },
+    "WINDOW-LVL-04-NORTH-02": {
+      "displayName": "4层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3UGzW4I4LNnONTZ8IPN$Dm"
+    },
+    "WINDOW-LVL-04-NORTH-03": {
+      "displayName": "4层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1uqox4METQ1fcISY$sA_Rh"
+    },
+    "WINDOW-LVL-04-NORTH-04": {
+      "displayName": "4层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1LW1XjbsDMY9aKQAGcjYcl"
+    },
+    "WINDOW-LVL-04-SOUTH-01": {
+      "displayName": "4层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2aj5dyesjRbQIkHNMBLshl"
+    },
+    "WINDOW-LVL-04-SOUTH-02": {
+      "displayName": "4层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3p$o2z5jLN09DcAB1vA9Eq"
+    },
+    "WINDOW-LVL-04-SOUTH-03": {
+      "displayName": "4层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1p8vxvKHTGMATozBP1ApNa"
+    },
+    "WINDOW-LVL-04-SOUTH-04": {
+      "displayName": "4层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0veAoP4t5SzR7b4$eyY4I$"
+    },
+    "WINDOW-LVL-05-NORTH-01": {
+      "displayName": "5层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3Eu$839$bITgGAC7meY8iy"
+    },
+    "WINDOW-LVL-05-NORTH-02": {
+      "displayName": "5层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2xA$q4JKPKLAEeQkksDoRB"
+    },
+    "WINDOW-LVL-05-NORTH-03": {
+      "displayName": "5层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0BSrd4Fw9HER5z1MCDsm6s"
+    },
+    "WINDOW-LVL-05-NORTH-04": {
+      "displayName": "5层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3USsCnijDMBPAN3yrMr_UV"
+    },
+    "WINDOW-LVL-05-SOUTH-01": {
+      "displayName": "5层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3HYlz_GvfOtRVDIngZ4Q_q"
+    },
+    "WINDOW-LVL-05-SOUTH-02": {
+      "displayName": "5层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3VK3RNXiXQHABvc0hl_rMi"
+    },
+    "WINDOW-LVL-05-SOUTH-03": {
+      "displayName": "5层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2FgfPXAY9SsRRR34McVmrL"
+    },
+    "WINDOW-LVL-05-SOUTH-04": {
+      "displayName": "5层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3gLJRImevPLBalnJD68qpg"
+    },
+    "WINDOW-LVL-06-NORTH-01": {
+      "displayName": "6层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1tz_rNHGbHMwOaOMetBpY0"
+    },
+    "WINDOW-LVL-06-NORTH-02": {
+      "displayName": "6层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2KeUIabuPOzR1lxb2pzblQ"
+    },
+    "WINDOW-LVL-06-NORTH-03": {
+      "displayName": "6层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "37Vy5XZkPNjxWEJjJBdiIq"
+    },
+    "WINDOW-LVL-06-NORTH-04": {
+      "displayName": "6层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2oZQE0qDvJdAD93i17d4WG"
+    },
+    "WINDOW-LVL-06-SOUTH-01": {
+      "displayName": "6层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2_rKrzYXXH$Rvx3DNhoxU1"
+    },
+    "WINDOW-LVL-06-SOUTH-02": {
+      "displayName": "6层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3982fSMOXSvRvcmO5qtVS0"
+    },
+    "WINDOW-LVL-06-SOUTH-03": {
+      "displayName": "6层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1dymKTeBHLFQhoL6SBIzYH"
+    },
+    "WINDOW-LVL-06-SOUTH-04": {
+      "displayName": "6层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2dguYJm0HHv9Kv8JzGXj9q"
+    },
+    "WINDOW-LVL-07-NORTH-01": {
+      "displayName": "7层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "26WPnRcxTRCBDq3EmqyPPl"
+    },
+    "WINDOW-LVL-07-NORTH-02": {
+      "displayName": "7层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2Fr68b66TJCP4mIGm5YURn"
+    },
+    "WINDOW-LVL-07-NORTH-03": {
+      "displayName": "7层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0$ykISpB5L2O0aWABBtkYY"
+    },
+    "WINDOW-LVL-07-NORTH-04": {
+      "displayName": "7层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1uL3eGuTDNpgs_P7Rt47PB"
+    },
+    "WINDOW-LVL-07-SOUTH-01": {
+      "displayName": "7层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1iqirKmKLJaQDo3wgLhW1a"
+    },
+    "WINDOW-LVL-07-SOUTH-02": {
+      "displayName": "7层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "26qCpHDTvI2AWGCWGZHcta"
+    },
+    "WINDOW-LVL-07-SOUTH-03": {
+      "displayName": "7层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3_gWKJNhrGNgrkWH2e9PRb"
+    },
+    "WINDOW-LVL-07-SOUTH-04": {
+      "displayName": "7层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0Me3Z6W6LU$gEO1wpEISAY"
+    },
+    "WINDOW-LVL-08-NORTH-01": {
+      "displayName": "8层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1hfrFhFbTU3wddpkuKNQNQ"
+    },
+    "WINDOW-LVL-08-NORTH-02": {
+      "displayName": "8层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1PuuCqrI1KMuJuf1Ici$Sa"
+    },
+    "WINDOW-LVL-08-NORTH-03": {
+      "displayName": "8层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2XfK9J1hTKcgRe1a3KTkAT"
+    },
+    "WINDOW-LVL-08-NORTH-04": {
+      "displayName": "8层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3kMRTQ96zK1Pr7Scdf1s3N"
+    },
+    "WINDOW-LVL-08-SOUTH-01": {
+      "displayName": "8层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2fzbNvqN1HDQkHqmRSYtIC"
+    },
+    "WINDOW-LVL-08-SOUTH-02": {
+      "displayName": "8层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0VasmHPHXUQv$t3eTFgyNJ"
+    },
+    "WINDOW-LVL-08-SOUTH-03": {
+      "displayName": "8层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2yzric6BDOehQCVazSBHf2"
+    },
+    "WINDOW-LVL-08-SOUTH-04": {
+      "displayName": "8层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0hcy7yHfXTZhEGeUfB4mPb"
+    },
+    "WINDOW-LVL-09-NORTH-01": {
+      "displayName": "9层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1Tcb_WMrjIjfjKUZTtt22C"
+    },
+    "WINDOW-LVL-09-NORTH-02": {
+      "displayName": "9层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2zhb2Me51PlvMqKfWCx7u9"
+    },
+    "WINDOW-LVL-09-NORTH-03": {
+      "displayName": "9层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1QLNnX3AHOIRxIwVyWVSiS"
+    },
+    "WINDOW-LVL-09-NORTH-04": {
+      "displayName": "9层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2eRiky8xLHH8dfMfo9UtH6"
+    },
+    "WINDOW-LVL-09-SOUTH-01": {
+      "displayName": "9层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3TmypqaR9QswccL0FJLqgP"
+    },
+    "WINDOW-LVL-09-SOUTH-02": {
+      "displayName": "9层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2gvyNLtQjVghl$Ui79XUJD"
+    },
+    "WINDOW-LVL-09-SOUTH-03": {
+      "displayName": "9层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2CrISh9WPNlQA4eGpqKwuX"
+    },
+    "WINDOW-LVL-09-SOUTH-04": {
+      "displayName": "9层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1PcGj1tDHQFA8Bgl6w3Kzt"
+    },
+    "WINDOW-LVL-10-NORTH-01": {
+      "displayName": "10层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1RQ8lqPBPH$PAnL7ZzxoZo"
+    },
+    "WINDOW-LVL-10-NORTH-02": {
+      "displayName": "10层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "25Oz3o4ybUvfYRrh$aGf0f"
+    },
+    "WINDOW-LVL-10-NORTH-03": {
+      "displayName": "10层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0XMO8r_s5LFg_6QrilGb8x"
+    },
+    "WINDOW-LVL-10-NORTH-04": {
+      "displayName": "10层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1gwMU6ZenQFR8U7v2eePly"
+    },
+    "WINDOW-LVL-10-SOUTH-01": {
+      "displayName": "10层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3GQ$zXy2XKBefXOug4Jh$u"
+    },
+    "WINDOW-LVL-10-SOUTH-02": {
+      "displayName": "10层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2rgR3rLabMawDsD67piZnS"
+    },
+    "WINDOW-LVL-10-SOUTH-03": {
+      "displayName": "10层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3qq_jNe35NZxAwrfc9hq$3"
+    },
+    "WINDOW-LVL-10-SOUTH-04": {
+      "displayName": "10层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "257GcXF25QqvwAq5jxbKKC"
+    },
+    "WINDOW-LVL-11-NORTH-01": {
+      "displayName": "11层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3W0b8mAl9LF8OZqQYrdtzs"
+    },
+    "WINDOW-LVL-11-NORTH-02": {
+      "displayName": "11层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3EodZQi99MaPRbIGtHEvtK"
+    },
+    "WINDOW-LVL-11-NORTH-03": {
+      "displayName": "11层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3UJqV89grMXO9W_CSMB7Px"
+    },
+    "WINDOW-LVL-11-NORTH-04": {
+      "displayName": "11层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0CXX4mYaHQK8PxNwg1aAL8"
+    },
+    "WINDOW-LVL-11-SOUTH-01": {
+      "displayName": "11层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2dNLBC2pvO4Pv2csnPxuNF"
+    },
+    "WINDOW-LVL-11-SOUTH-02": {
+      "displayName": "11层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2ZJBjAiuPSLQ90HQ4thIQd"
+    },
+    "WINDOW-LVL-11-SOUTH-03": {
+      "displayName": "11层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3F7$wFhsnTef4TxA$zBE6L"
+    },
+    "WINDOW-LVL-11-SOUTH-04": {
+      "displayName": "11层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0051rM1fvH4ht9zkHScGnw"
+    },
+    "WINDOW-LVL-12-NORTH-01": {
+      "displayName": "12层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "33QowgZrvQZ8iCzvFWJpmB"
+    },
+    "WINDOW-LVL-12-NORTH-02": {
+      "displayName": "12层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0$8sQZ8snQav7oyn6Xx_TU"
+    },
+    "WINDOW-LVL-12-NORTH-03": {
+      "displayName": "12层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1vKVyBYLbSbBONrTGS07JG"
+    },
+    "WINDOW-LVL-12-NORTH-04": {
+      "displayName": "12层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "15aShJoHLTuwSuaKX5u02W"
+    },
+    "WINDOW-LVL-12-SOUTH-01": {
+      "displayName": "12层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0GiuwsOEfUXQZxMybjSAex"
+    },
+    "WINDOW-LVL-12-SOUTH-02": {
+      "displayName": "12层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0mAgwo9QXVvuhtxWpu$uji"
+    },
+    "WINDOW-LVL-12-SOUTH-03": {
+      "displayName": "12层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3pLQBsIdjOBO8MTQ73QqAW"
+    },
+    "WINDOW-LVL-12-SOUTH-04": {
+      "displayName": "12层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0peiLQ7oXT$ueow77iOYKl"
+    },
+    "WINDOW-LVL-13-NORTH-01": {
+      "displayName": "13层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2GniO5iMnQtBX2qbFsqY$H"
+    },
+    "WINDOW-LVL-13-NORTH-02": {
+      "displayName": "13层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0M7t6t6hXIlOr28lyMJ9ZA"
+    },
+    "WINDOW-LVL-13-NORTH-03": {
+      "displayName": "13层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0bDO$wwmLM1x3ja$Gw8936"
+    },
+    "WINDOW-LVL-13-NORTH-04": {
+      "displayName": "13层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "027Y3_ud1QyQKKt4uTRZ7g"
+    },
+    "WINDOW-LVL-13-SOUTH-01": {
+      "displayName": "13层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3x$97q3NTHvetsEZxPQL3t"
+    },
+    "WINDOW-LVL-13-SOUTH-02": {
+      "displayName": "13层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2acPT1CwDJEvHJUwcaHKX4"
+    },
+    "WINDOW-LVL-13-SOUTH-03": {
+      "displayName": "13层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "31HMg4w6jR9fjt98HXVW$m"
+    },
+    "WINDOW-LVL-13-SOUTH-04": {
+      "displayName": "13层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2hvBRCtq9LKeRXyoADtSJA"
+    },
+    "WINDOW-LVL-14-NORTH-01": {
+      "displayName": "14层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1B62Jv5RTRIRvP3SjkX5aX"
+    },
+    "WINDOW-LVL-14-NORTH-02": {
+      "displayName": "14层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2oOyp60VzQ0953ZoamZIpt"
+    },
+    "WINDOW-LVL-14-NORTH-03": {
+      "displayName": "14层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1oAS2vssfO2hb8j1gXNY2l"
+    },
+    "WINDOW-LVL-14-NORTH-04": {
+      "displayName": "14层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2V9TDt0aDKCvOVxSZAdEYk"
+    },
+    "WINDOW-LVL-14-SOUTH-01": {
+      "displayName": "14层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2FQQKu3kTJcheZupBjofNh"
+    },
+    "WINDOW-LVL-14-SOUTH-02": {
+      "displayName": "14层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1E8i710IzJQRVaMcIAJOWw"
+    },
+    "WINDOW-LVL-14-SOUTH-03": {
+      "displayName": "14层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0SEdnpM3XT8RQOKTC4Xaqe"
+    },
+    "WINDOW-LVL-14-SOUTH-04": {
+      "displayName": "14层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2dLcM2LEHMAhrrF8AeE04B"
+    },
+    "WINDOW-LVL-15-NORTH-01": {
+      "displayName": "15层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2H6icqgVvV_fFRSKr9uPUL"
+    },
+    "WINDOW-LVL-15-NORTH-02": {
+      "displayName": "15层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3YaNgIQmXKhPlWhyjDqKn$"
+    },
+    "WINDOW-LVL-15-NORTH-03": {
+      "displayName": "15层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2wWto8JbrHjR3HSxzcJQl7"
+    },
+    "WINDOW-LVL-15-NORTH-04": {
+      "displayName": "15层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0P0GFFLoXKhxhnG3HFwEHU"
+    },
+    "WINDOW-LVL-15-SOUTH-01": {
+      "displayName": "15层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2uNiw50DHHyBabPUaKA1q7"
+    },
+    "WINDOW-LVL-15-SOUTH-02": {
+      "displayName": "15层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0UMfxllLHJTPYdyC0FBCGd"
+    },
+    "WINDOW-LVL-15-SOUTH-03": {
+      "displayName": "15层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0F7sh9tLDQsQCA8y0$phtr"
+    },
+    "WINDOW-LVL-15-SOUTH-04": {
+      "displayName": "15层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "28AQXostLIEfyTPIOMDjAx"
+    },
+    "WINDOW-LVL-16-NORTH-01": {
+      "displayName": "16层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2g5EPFh$jG5eifuwggwdZb"
+    },
+    "WINDOW-LVL-16-NORTH-02": {
+      "displayName": "16层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1kDWxwmmDMoAKZvi1qgYtg"
+    },
+    "WINDOW-LVL-16-NORTH-03": {
+      "displayName": "16层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1FXbmWo31IaQX8TdFGpMGW"
+    },
+    "WINDOW-LVL-16-NORTH-04": {
+      "displayName": "16层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2Y5vRw_IrVgQVCcLLkXHCo"
+    },
+    "WINDOW-LVL-16-SOUTH-01": {
+      "displayName": "16层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0SqvLCDqHQp9C9HQ7kCUEl"
+    },
+    "WINDOW-LVL-16-SOUTH-02": {
+      "displayName": "16层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2khXaKMgrJCOZbQrfhtSjh"
+    },
+    "WINDOW-LVL-16-SOUTH-03": {
+      "displayName": "16层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "39MTQXWwXNYx_66_xHr7rz"
+    },
+    "WINDOW-LVL-16-SOUTH-04": {
+      "displayName": "16层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3T1ETOgAzRjxBcZcGbnG4h"
+    },
+    "WINDOW-LVL-17-NORTH-01": {
+      "displayName": "17层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0baRGxJLnIPevlNt0NUc5Z"
+    },
+    "WINDOW-LVL-17-NORTH-02": {
+      "displayName": "17层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2flyM1MGnUtgEgBjvypN$2"
+    },
+    "WINDOW-LVL-17-NORTH-03": {
+      "displayName": "17层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0HFxoMN3bGGu2_LC6cAN2t"
+    },
+    "WINDOW-LVL-17-NORTH-04": {
+      "displayName": "17层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2aa8Hx33XSX9OrYp3ShCN2"
+    },
+    "WINDOW-LVL-17-SOUTH-01": {
+      "displayName": "17层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3cXTHB0n5TUuHIIwUkDniZ"
+    },
+    "WINDOW-LVL-17-SOUTH-02": {
+      "displayName": "17层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1RzVh3wcDRdOnS8s7eNQ7t"
+    },
+    "WINDOW-LVL-17-SOUTH-03": {
+      "displayName": "17层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1IjZGynXbI5ff7UVh4kM7k"
+    },
+    "WINDOW-LVL-17-SOUTH-04": {
+      "displayName": "17层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1vDHwcMD5U8OMgiY55IvZd"
+    },
+    "WINDOW-LVL-18-NORTH-01": {
+      "displayName": "18层北立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0O_DldDT1RegxYi79EcQnz"
+    },
+    "WINDOW-LVL-18-NORTH-02": {
+      "displayName": "18层北立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "0JgN5n3K5JPP52x3rCmv5X"
+    },
+    "WINDOW-LVL-18-NORTH-03": {
+      "displayName": "18层北立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2GRVY1nZPL4QAG2mCeJwaZ"
+    },
+    "WINDOW-LVL-18-NORTH-04": {
+      "displayName": "18层北立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2BXdXgrEvTahxvtmn8Dtpo"
+    },
+    "WINDOW-LVL-18-SOUTH-01": {
+      "displayName": "18层南立面窗1",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "1ciClq39PQkwPYXkU_M7FX"
+    },
+    "WINDOW-LVL-18-SOUTH-02": {
+      "displayName": "18层南立面窗2",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3G2QEaMmjMu9Hl$T8Tck1n"
+    },
+    "WINDOW-LVL-18-SOUTH-03": {
+      "displayName": "18层南立面窗3",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "3SAq3OvHnMaQ1lKVU5rQ2F"
+    },
+    "WINDOW-LVL-18-SOUTH-04": {
+      "displayName": "18层南立面窗4",
+      "ifcClass": "IfcWindow",
+      "ifcGlobalId": "2RtF$KCtTNgPI4wJK3jE9G"
+    },
+    "WP-1602-BATHROOM": {
+      "displayName": "1602卫生间防水示意层",
+      "ifcClass": "IfcCovering",
+      "ifcGlobalId": "2POPXIP6bVuwysur6mxYmg"
+    }
+  },
+  "modelStatus": "synthetic_demo",
+  "safetyPolicies": [
+    {
+      "actionClass": "LOCAL_WATER_ISOLATION",
+      "authorizationState": "NOT_REQUESTED",
+      "componentId": "VALVE-1602-CW-01",
+      "fallbackMode": "MANUAL_PROPERTY_ACTION",
+      "humanAuthorizationRequired": true
+    }
+  ],
+  "schemaVersion": "2.5.0",
+  "spaces": [
+    {
+      "businessId": "SPACE-01-LOBBY",
+      "displayName": "首层入口及公共服务空间",
+      "ifcGlobalId": "0PGwxSXjfNXO4w2yzjvxGX",
+      "parentId": "LVL-01",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-02-CORE-NORTH",
+      "displayName": "2层核心筒NORTH",
+      "ifcGlobalId": "2YJUqOC7fV4836V333i0wD",
+      "parentId": "LVL-02",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-02-CORE-SOUTH",
+      "displayName": "2层核心筒SOUTH",
+      "ifcGlobalId": "1fNuO4_LHSd9$xsnsVGTcz",
+      "parentId": "LVL-02",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-02-CORRIDOR",
+      "displayName": "2层公共走廊",
+      "ifcGlobalId": "1XTN64dcbJQQmrqCKdssM6",
+      "parentId": "LVL-02",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-03-CORE-NORTH",
+      "displayName": "3层核心筒NORTH",
+      "ifcGlobalId": "3sX5gAyLjJsBuR3af8NFjf",
+      "parentId": "LVL-03",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-03-CORE-SOUTH",
+      "displayName": "3层核心筒SOUTH",
+      "ifcGlobalId": "1lGZgnQBHSKPijAhOVw_yv",
+      "parentId": "LVL-03",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-03-CORRIDOR",
+      "displayName": "3层公共走廊",
+      "ifcGlobalId": "1L8O8L_e1PBRlP8ZO81PZV",
+      "parentId": "LVL-03",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-04-CORE-NORTH",
+      "displayName": "4层核心筒NORTH",
+      "ifcGlobalId": "0TQXw4bIbOG9jCCNkpnC16",
+      "parentId": "LVL-04",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-04-CORE-SOUTH",
+      "displayName": "4层核心筒SOUTH",
+      "ifcGlobalId": "0UQwP_U7nQkP06BmSPt6cn",
+      "parentId": "LVL-04",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-04-CORRIDOR",
+      "displayName": "4层公共走廊",
+      "ifcGlobalId": "3HflzAiDTHOR6InHkTnBPC",
+      "parentId": "LVL-04",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-05-CORE-NORTH",
+      "displayName": "5层核心筒NORTH",
+      "ifcGlobalId": "0zPDtazjjMUuWBJMwaQe_9",
+      "parentId": "LVL-05",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-05-CORE-SOUTH",
+      "displayName": "5层核心筒SOUTH",
+      "ifcGlobalId": "2e240h5d9QhRlv$KLQf7LI",
+      "parentId": "LVL-05",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-05-CORRIDOR",
+      "displayName": "5层公共走廊",
+      "ifcGlobalId": "0Fq7FbrKLTlh4EjETIRS9E",
+      "parentId": "LVL-05",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-06-CORE-NORTH",
+      "displayName": "6层核心筒NORTH",
+      "ifcGlobalId": "3bPFhj1Q1SlwsZ7wbxDg29",
+      "parentId": "LVL-06",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-06-CORE-SOUTH",
+      "displayName": "6层核心筒SOUTH",
+      "ifcGlobalId": "19OajC20bHi8Z89NSdRiAS",
+      "parentId": "LVL-06",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-06-CORRIDOR",
+      "displayName": "6层公共走廊",
+      "ifcGlobalId": "0xcbAc2ofKmOYVTnmK8Ip2",
+      "parentId": "LVL-06",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-07-CORE-NORTH",
+      "displayName": "7层核心筒NORTH",
+      "ifcGlobalId": "0e3o9NRKnVVekvJPgMT5iE",
+      "parentId": "LVL-07",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-07-CORE-SOUTH",
+      "displayName": "7层核心筒SOUTH",
+      "ifcGlobalId": "0H7f0kHNTUWw6r_fVVynEg",
+      "parentId": "LVL-07",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-07-CORRIDOR",
+      "displayName": "7层公共走廊",
+      "ifcGlobalId": "1FBRyqFQHG5R1Tvlia9q8u",
+      "parentId": "LVL-07",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-08-CORE-NORTH",
+      "displayName": "8层核心筒NORTH",
+      "ifcGlobalId": "1tJt02kqjNURiFVXMX2SFq",
+      "parentId": "LVL-08",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-08-CORE-SOUTH",
+      "displayName": "8层核心筒SOUTH",
+      "ifcGlobalId": "28Ce0$NirHCgwSd7LkBxG0",
+      "parentId": "LVL-08",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-08-CORRIDOR",
+      "displayName": "8层公共走廊",
+      "ifcGlobalId": "3FTk$bynTVGhrRc2CT5LP0",
+      "parentId": "LVL-08",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-09-CORE-NORTH",
+      "displayName": "9层核心筒NORTH",
+      "ifcGlobalId": "2nYB5YWx9I4AfUelL_7S80",
+      "parentId": "LVL-09",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-09-CORE-SOUTH",
+      "displayName": "9层核心筒SOUTH",
+      "ifcGlobalId": "3PldvMoXDK4P9vvmyEJcmL",
+      "parentId": "LVL-09",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-09-CORRIDOR",
+      "displayName": "9层公共走廊",
+      "ifcGlobalId": "1fh8sk7BnGjvqWuQvEmmbm",
+      "parentId": "LVL-09",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-10-CORE-NORTH",
+      "displayName": "10层核心筒NORTH",
+      "ifcGlobalId": "2r8MOtvMXP_9j8TqMRLBjT",
+      "parentId": "LVL-10",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-10-CORE-SOUTH",
+      "displayName": "10层核心筒SOUTH",
+      "ifcGlobalId": "368_VBnyXJlQ1ZDVfGHtlq",
+      "parentId": "LVL-10",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-10-CORRIDOR",
+      "displayName": "10层公共走廊",
+      "ifcGlobalId": "3bnu$FN8bH4vjiOSuQ4Zxd",
+      "parentId": "LVL-10",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-11-CORE-NORTH",
+      "displayName": "11层核心筒NORTH",
+      "ifcGlobalId": "0jpJF_ftbSC9ZCCJj3OtB8",
+      "parentId": "LVL-11",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-11-CORE-SOUTH",
+      "displayName": "11层核心筒SOUTH",
+      "ifcGlobalId": "0AndMYbnvSohA63RQZew0K",
+      "parentId": "LVL-11",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-11-CORRIDOR",
+      "displayName": "11层公共走廊",
+      "ifcGlobalId": "0mYtCSA4nVAR_bAsz7px_R",
+      "parentId": "LVL-11",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-12-CORE-NORTH",
+      "displayName": "12层核心筒NORTH",
+      "ifcGlobalId": "0mK_JWCpjMefW4wJMgWj83",
+      "parentId": "LVL-12",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-12-CORE-SOUTH",
+      "displayName": "12层核心筒SOUTH",
+      "ifcGlobalId": "2B87rsUxzHxQwdXt4l5eUn",
+      "parentId": "LVL-12",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-12-CORRIDOR",
+      "displayName": "12层公共走廊",
+      "ifcGlobalId": "2VP8UVMjTMfeSTn31uXwAo",
+      "parentId": "LVL-12",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-13-CORE-NORTH",
+      "displayName": "13层核心筒NORTH",
+      "ifcGlobalId": "2wH$aXSw1KOOOga1pzbB9W",
+      "parentId": "LVL-13",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-13-CORE-SOUTH",
+      "displayName": "13层核心筒SOUTH",
+      "ifcGlobalId": "2TZDRCJWzHRhfsBSfmWpEi",
+      "parentId": "LVL-13",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-13-CORRIDOR",
+      "displayName": "13层公共走廊",
+      "ifcGlobalId": "1ufWnfwd5LWwv3Xv3tLtuN",
+      "parentId": "LVL-13",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-14-CORE-NORTH",
+      "displayName": "14层核心筒NORTH",
+      "ifcGlobalId": "3j88Pa2_nMPO3CYCTVx_Wa",
+      "parentId": "LVL-14",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-14-CORE-SOUTH",
+      "displayName": "14层核心筒SOUTH",
+      "ifcGlobalId": "3yjB1iL5XKZR1hQlZet2YG",
+      "parentId": "LVL-14",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-14-CORRIDOR",
+      "displayName": "14层公共走廊",
+      "ifcGlobalId": "1M44w_UbLS1gLm35nUyTdt",
+      "parentId": "LVL-14",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-15-CORE-NORTH",
+      "displayName": "15层核心筒NORTH",
+      "ifcGlobalId": "0LojwVhCHJEwZ5iGi3uKhw",
+      "parentId": "LVL-15",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-15-CORE-SOUTH",
+      "displayName": "15层核心筒SOUTH",
+      "ifcGlobalId": "0M0S9XgSHRMQGKkUIlpIqb",
+      "parentId": "LVL-15",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-15-CORRIDOR",
+      "displayName": "15层公共走廊",
+      "ifcGlobalId": "2FvY9rR3bIXukbkpfslMlF",
+      "parentId": "LVL-15",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-16-CORE-NORTH",
+      "displayName": "16层核心筒NORTH",
+      "ifcGlobalId": "3Q2cWUokbMDRJiPcQOpKPZ",
+      "parentId": "LVL-16",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-16-CORE-SOUTH",
+      "displayName": "16层核心筒SOUTH",
+      "ifcGlobalId": "1qH0B7Fs5L4RsnfmF8pSxg",
+      "parentId": "LVL-16",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-16-CORRIDOR",
+      "displayName": "16层公共走廊",
+      "ifcGlobalId": "3rVKGSjwXQDg_PutMi_3D4",
+      "parentId": "LVL-16",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-1602-BATHROOM",
+      "displayName": "1602卫生间",
+      "ifcGlobalId": "3dkIkA51vH1ANC1RHLIll3",
+      "parentId": "UNIT-1602",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-1602-BEDROOM-2",
+      "displayName": "1602次卧",
+      "ifcGlobalId": "3FcHnOQeTUZvVWR6V_ButO",
+      "parentId": "UNIT-1602",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-1602-CIRCULATION",
+      "displayName": "1602入口与交通空间",
+      "ifcGlobalId": "1D3Adx8DbTdeoEKH7nIkWB",
+      "parentId": "UNIT-1602",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-1602-KITCHEN",
+      "displayName": "1602厨房",
+      "ifcGlobalId": "0f9srbuAHLVA$XrXUOX_oL",
+      "parentId": "UNIT-1602",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-1602-LIVING",
+      "displayName": "1602客餐厅",
+      "ifcGlobalId": "0vJ$Ux9STTdxhkIPR4PpHO",
+      "parentId": "UNIT-1602",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-1602-MASTER",
+      "displayName": "1602主卧",
+      "ifcGlobalId": "3JazST8uzVnvjI6PxBzzAy",
+      "parentId": "UNIT-1602",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-17-CORE-NORTH",
+      "displayName": "17层核心筒NORTH",
+      "ifcGlobalId": "3ubSG5YL1K2e_wlzh_22ou",
+      "parentId": "LVL-17",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-17-CORE-SOUTH",
+      "displayName": "17层核心筒SOUTH",
+      "ifcGlobalId": "0G2DV7m3nJbBK6QW5ARAaD",
+      "parentId": "LVL-17",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-17-CORRIDOR",
+      "displayName": "17层公共走廊",
+      "ifcGlobalId": "2bwRdvlS5NvQsrMQfIbWVS",
+      "parentId": "LVL-17",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-18-CORE-NORTH",
+      "displayName": "18层核心筒NORTH",
+      "ifcGlobalId": "2pc1y6LhXGSxwphH9Gkc2Y",
+      "parentId": "LVL-18",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-18-CORE-SOUTH",
+      "displayName": "18层核心筒SOUTH",
+      "ifcGlobalId": "38EOD8WBXQ0BSzm7xMMVRK",
+      "parentId": "LVL-18",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "SPACE-18-CORRIDOR",
+      "displayName": "18层公共走廊",
+      "ifcGlobalId": "2TgKjZ6M9S6eeNKXi5oq64",
+      "parentId": "LVL-18",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0201",
+      "displayName": "201户",
+      "ifcGlobalId": "1EjOl0yP5LUwL2pSIuKML0",
+      "parentId": "LVL-02",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0202",
+      "displayName": "202户",
+      "ifcGlobalId": "1yePOcKV9HquDD2ilYkr0t",
+      "parentId": "LVL-02",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0203",
+      "displayName": "203户",
+      "ifcGlobalId": "1eo_KD5x1R7ApkYJxvZ0Zu",
+      "parentId": "LVL-02",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0204",
+      "displayName": "204户",
+      "ifcGlobalId": "1bzy1qGk9JZhmpjcrc8bsn",
+      "parentId": "LVL-02",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0301",
+      "displayName": "301户",
+      "ifcGlobalId": "29ETg94G9Gxe$Gv1d7z0av",
+      "parentId": "LVL-03",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0302",
+      "displayName": "302户",
+      "ifcGlobalId": "3bhtwjHv5LahdjI9odJYB$",
+      "parentId": "LVL-03",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0303",
+      "displayName": "303户",
+      "ifcGlobalId": "110MaQ9$TMzhZ_svsFP5eL",
+      "parentId": "LVL-03",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0304",
+      "displayName": "304户",
+      "ifcGlobalId": "1e$Iocl8nUfR7WB4Pewslr",
+      "parentId": "LVL-03",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0401",
+      "displayName": "401户",
+      "ifcGlobalId": "0CRjI5x2zORP8$1hubw6F4",
+      "parentId": "LVL-04",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0402",
+      "displayName": "402户",
+      "ifcGlobalId": "0jIi3a6jbLUwSSgY_GKriP",
+      "parentId": "LVL-04",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0403",
+      "displayName": "403户",
+      "ifcGlobalId": "2JQmmxZWfJDhhdh26_92kk",
+      "parentId": "LVL-04",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0404",
+      "displayName": "404户",
+      "ifcGlobalId": "20kqdOWLPPlQmonbsFXy7N",
+      "parentId": "LVL-04",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0501",
+      "displayName": "501户",
+      "ifcGlobalId": "06fECOQ3bKIOzUBAXEQF3U",
+      "parentId": "LVL-05",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0502",
+      "displayName": "502户",
+      "ifcGlobalId": "1VLbvF1o5IgubcESbEMeFH",
+      "parentId": "LVL-05",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0503",
+      "displayName": "503户",
+      "ifcGlobalId": "1NfCs03QHMke9JnmMUbYEp",
+      "parentId": "LVL-05",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0504",
+      "displayName": "504户",
+      "ifcGlobalId": "28gDi1BpfT98axuo_tCgMk",
+      "parentId": "LVL-05",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0601",
+      "displayName": "601户",
+      "ifcGlobalId": "3$nuk5d1rJpxYDBWVC2r15",
+      "parentId": "LVL-06",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0602",
+      "displayName": "602户",
+      "ifcGlobalId": "13prJIcFPUS8oxFqk6Y8cC",
+      "parentId": "LVL-06",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0603",
+      "displayName": "603户",
+      "ifcGlobalId": "2Tl6wxW1HKRgz0yRTnDtQh",
+      "parentId": "LVL-06",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0604",
+      "displayName": "604户",
+      "ifcGlobalId": "3E4EsgRJzRHhYC5H8DY3vB",
+      "parentId": "LVL-06",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0701",
+      "displayName": "701户",
+      "ifcGlobalId": "0nW4p$vjzMVulfjpDXgpKV",
+      "parentId": "LVL-07",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0702",
+      "displayName": "702户",
+      "ifcGlobalId": "2R5sQ5tpvNZwH1Z40h3N3F",
+      "parentId": "LVL-07",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0703",
+      "displayName": "703户",
+      "ifcGlobalId": "0AsCfl4e1RXx_ncfDEVHMX",
+      "parentId": "LVL-07",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0704",
+      "displayName": "704户",
+      "ifcGlobalId": "3GxHmevtnOURhb0Vk8JitN",
+      "parentId": "LVL-07",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0801",
+      "displayName": "801户",
+      "ifcGlobalId": "3BpIPMWh9Ijh5f1upnAf87",
+      "parentId": "LVL-08",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0802",
+      "displayName": "802户",
+      "ifcGlobalId": "2_T73H$4jNj9jH7w0YhgDI",
+      "parentId": "LVL-08",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0803",
+      "displayName": "803户",
+      "ifcGlobalId": "392B4KOxLH2PUVqYlxPc6a",
+      "parentId": "LVL-08",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0804",
+      "displayName": "804户",
+      "ifcGlobalId": "1AX2UHoE9JGfYgCeRnQchJ",
+      "parentId": "LVL-08",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0901",
+      "displayName": "901户",
+      "ifcGlobalId": "0KI6HPkL9RxRr4r6bnSDA1",
+      "parentId": "LVL-09",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0902",
+      "displayName": "902户",
+      "ifcGlobalId": "1LdDWhdGHPLv5AWxx3SMER",
+      "parentId": "LVL-09",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0903",
+      "displayName": "903户",
+      "ifcGlobalId": "0nPVP_bZ5LIB9wYDQAOiVf",
+      "parentId": "LVL-09",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-0904",
+      "displayName": "904户",
+      "ifcGlobalId": "2fAhRpIt9M7v5Fq9AMttVk",
+      "parentId": "LVL-09",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1001",
+      "displayName": "1001户",
+      "ifcGlobalId": "02wHaGMZfMa88BDqUkIu_m",
+      "parentId": "LVL-10",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1002",
+      "displayName": "1002户",
+      "ifcGlobalId": "2vtp9izvjNEOfJqr4tmFUk",
+      "parentId": "LVL-10",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1003",
+      "displayName": "1003户",
+      "ifcGlobalId": "3YZ7pnKVPTtx4TJe9Xx_Yh",
+      "parentId": "LVL-10",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1004",
+      "displayName": "1004户",
+      "ifcGlobalId": "1bgK0TEcLQ$xDAGrk5ttYD",
+      "parentId": "LVL-10",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1101",
+      "displayName": "1101户",
+      "ifcGlobalId": "2PTY21AvDGgBfwC4_Cv4DL",
+      "parentId": "LVL-11",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1102",
+      "displayName": "1102户",
+      "ifcGlobalId": "0$H6nHlCjPWQK2Ba4U4mNu",
+      "parentId": "LVL-11",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1103",
+      "displayName": "1103户",
+      "ifcGlobalId": "0b4qXaqafOM9IMnoqP3rVe",
+      "parentId": "LVL-11",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1104",
+      "displayName": "1104户",
+      "ifcGlobalId": "2vCrXZVJ9OJR_LblfHTddq",
+      "parentId": "LVL-11",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1201",
+      "displayName": "1201户",
+      "ifcGlobalId": "1nMZ0G8A9Pvf3yvRnXbYOU",
+      "parentId": "LVL-12",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1202",
+      "displayName": "1202户",
+      "ifcGlobalId": "3md5CrCsrOG8fqL$pojKbm",
+      "parentId": "LVL-12",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1203",
+      "displayName": "1203户",
+      "ifcGlobalId": "3rhg$OKADQWuf0_UbzH_uP",
+      "parentId": "LVL-12",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1204",
+      "displayName": "1204户",
+      "ifcGlobalId": "27n0Z1eFvSHhHsgn7qMuli",
+      "parentId": "LVL-12",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1301",
+      "displayName": "1301户",
+      "ifcGlobalId": "1PVEIGvmbM0w019CZiqssy",
+      "parentId": "LVL-13",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1302",
+      "displayName": "1302户",
+      "ifcGlobalId": "07J4h_uQLIxBeS1gm$vATP",
+      "parentId": "LVL-13",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1303",
+      "displayName": "1303户",
+      "ifcGlobalId": "1e9Kv52MjL3PCtpUVBgvya",
+      "parentId": "LVL-13",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1304",
+      "displayName": "1304户",
+      "ifcGlobalId": "0MQAQcs8TSDheTQe08yEu$",
+      "parentId": "LVL-13",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1401",
+      "displayName": "1401户",
+      "ifcGlobalId": "1R5qsjEgrPbwArMO3yCMNP",
+      "parentId": "LVL-14",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1402",
+      "displayName": "1402户",
+      "ifcGlobalId": "0169x$bQDQMBX8PH3i50au",
+      "parentId": "LVL-14",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1403",
+      "displayName": "1403户",
+      "ifcGlobalId": "39ZGLTgsHS6QS5v7Ntppju",
+      "parentId": "LVL-14",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1404",
+      "displayName": "1404户",
+      "ifcGlobalId": "2ezoc_nX9ScQ5a8M7NuuHr",
+      "parentId": "LVL-14",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1501",
+      "displayName": "1501户",
+      "ifcGlobalId": "2K6390me9QMPlf0A_CjdOj",
+      "parentId": "LVL-15",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1502",
+      "displayName": "1502户",
+      "ifcGlobalId": "3EIHFUgfHHCR3RC7T_JxP1",
+      "parentId": "LVL-15",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1503",
+      "displayName": "1503户",
+      "ifcGlobalId": "09pmHNBKLMrxTqQyLWEkMb",
+      "parentId": "LVL-15",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1504",
+      "displayName": "1504户",
+      "ifcGlobalId": "3cffrPIr1NSxEqoIvJqetB",
+      "parentId": "LVL-15",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1601",
+      "displayName": "1601户",
+      "ifcGlobalId": "25chQrjYHOlPIbZ3BKl7w_",
+      "parentId": "LVL-16",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1602",
+      "displayName": "1602户",
+      "ifcGlobalId": "0d_L$Xag9OJu23930UJLYg",
+      "parentId": "LVL-16",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1603",
+      "displayName": "1603户",
+      "ifcGlobalId": "10WQ9A7azHw9sagj0jFJYB",
+      "parentId": "LVL-16",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1604",
+      "displayName": "1604户",
+      "ifcGlobalId": "0P8e7ejBbT88XSkAJXEQvK",
+      "parentId": "LVL-16",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1701",
+      "displayName": "1701户",
+      "ifcGlobalId": "3$70TyBEnSQwRQ_QBAqy3D",
+      "parentId": "LVL-17",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1702",
+      "displayName": "1702户",
+      "ifcGlobalId": "2zi9WvabvN3R$uceYfj2sG",
+      "parentId": "LVL-17",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1703",
+      "displayName": "1703户",
+      "ifcGlobalId": "089RLE0LbKCAj7ewa9Oa99",
+      "parentId": "LVL-17",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1704",
+      "displayName": "1704户",
+      "ifcGlobalId": "1ljfoVKmHGxPllvZxR1r3N",
+      "parentId": "LVL-17",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1801",
+      "displayName": "1801户",
+      "ifcGlobalId": "0jPEm3iSnPqPRtqUrSCxs8",
+      "parentId": "LVL-18",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1802",
+      "displayName": "1802户",
+      "ifcGlobalId": "3c3Wq6QQHUdxZFr$LjnWNR",
+      "parentId": "LVL-18",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1803",
+      "displayName": "1803户",
+      "ifcGlobalId": "116$oiTd9VGfH3YfETWfv8",
+      "parentId": "LVL-18",
+      "syntheticDemo": true
+    },
+    {
+      "businessId": "UNIT-1804",
+      "displayName": "1804户",
+      "ifcGlobalId": "3ahlcA_XvSSPefQhozHm0$",
+      "parentId": "LVL-18",
+      "syntheticDemo": true
+    }
+  ],
+  "systems": [
+    {
+      "businessId": "SYS-1602-CW",
+      "displayName": "1602卫生间生活冷水系统",
+      "ifcClass": "IfcDistributionSystem",
+      "ifcGlobalId": "119f3TwaPRpwhNJQU5v$ep",
+      "memberIds": [
+        "J-1602-CW-03",
+        "METER-1602-FLOW-01",
+        "PIPE-1602-CW-01",
+        "PIPE-1602-CW-02",
+        "VALVE-1602-CW-01"
+      ],
+      "syntheticDemo": true,
+      "systemType": "DOMESTIC_COLD_WATER"
+    },
+    {
+      "businessId": "SYS-1602-ENV",
+      "displayName": "1602卫生间环境监测系统",
+      "ifcClass": "IfcDistributionSystem",
+      "ifcGlobalId": "1JQo_qqonSUhHB9bL0KsqI",
+      "memberIds": [
+        "SENSOR-1602-HUM-01"
+      ],
+      "syntheticDemo": true,
+      "systemType": "ENVIRONMENT_MONITORING"
+    },
+    {
+      "businessId": "SYS-1602-HW",
+      "displayName": "1602卫生间生活热水系统",
+      "ifcClass": "IfcDistributionSystem",
+      "ifcGlobalId": "2EmtHWGeXJdAI3MYCHZwtw",
+      "memberIds": [
+        "PIPE-1602-HW-01"
+      ],
+      "syntheticDemo": true,
+      "systemType": "DOMESTIC_HOT_WATER"
+    }
+  ]
+}

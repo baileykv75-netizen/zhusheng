@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "cardId": "GLC-EVT-1602-LAB-001",
+  "sourceEventIds": [
+    "EVT-1602-LAB-001"
+  ],
+  "sourceEventCount": 1,
+  "sourcePackageId": "PACKAGE-EVT-1602-LAB-001",
+  "sourcePackageHash": "4c90c766d38a1cb4f894588eed38f9ee4df257fa3970985092f56e0bb8d1a88f",
+  "location": {
+    "building": {
+      "businessId": "BLD-ZS-DEMO-001",
+      "displayName": "筑生样板楼A座"
+    },
+    "storey": {
+      "businessId": "LVL-16",
+      "displayName": "16层"
+    },
+    "unit": {
+      "businessId": "UNIT-1602",
+      "displayName": "1602户"
+    },
+    "space": {
+      "businessId": "SPACE-1602-BATHROOM",
+      "displayName": "1602卫生间"
+    }
+  },
+  "targetComponent": {
+    "businessId": "J-1602-CW-03",
+    "displayName": "1602卫生间重点冷水接头",
+    "ifcClass": "IfcPipeFitting",
+    "ifcGlobalId": "335_0vB1nGSBl7rYBoGxwT"
+  },
+  "originalSymptoms": [
+    "相对湿度 82%，持续45分钟",
+    "无人用水微流量 0.06L/min，持续30分钟"
+  ],
+  "firstDiagnosis": {
+    "hypothesis": "COLD_WATER_JOINT_LEAK",
+    "targetBusinessId": "J-1602-CW-03",
+    "rawScore": 95.9,
+    "decisionConfidence": "HIGH",
+    "scoreDisclaimer": "规则分值用于透明排序，不是真实故障概率。"
+  },
+  "actualRepair": {
+    "repairRecordId": "REPAIR-EVT-1602-LAB-001-001",
+    "targetBusinessId": "J-1602-CW-03",
+    "method": "JOINT_REPLACEMENT",
+    "result": "COMPLETED",
+    "crewId": "PROPERTY-DEMO-01",
+    "completedAt": "2026-07-30T07:46:51.505Z"
+  },
+  "postRepairVerification": [
+    {
+      "observationId": "OBS-FLOW-POST-REPAIR-016",
+      "metric": "MICRO_FLOW",
+      "value": 0,
+      "unit": "L/min",
+      "quality": "GOOD",
+      "observedAt": "2026-07-30T07:46:52.520Z"
+    },
+    {
+      "observationId": "OBS-HUM-POST-REPAIR-016",
+      "metric": "RELATIVE_HUMIDITY",
+      "value": 58,
+      "unit": "%",
+      "quality": "GOOD",
+      "observedAt": "2026-07-30T07:46:52.520Z"
+    }
+  ],
+  "constructionEvidenceIds": [
+    "EVD-PIPE-LAB-001",
+    "EVD-WP-LAB-001"
+  ],
+  "workerRecordIds": [
+    "EVD-PIPE-LAB-001",
+    "EVD-WP-LAB-001"
+  ],
+  "recommendedChecks": [
+    "MiC卫生间模块封板前定位给水管道连接件",
+    "对更换连接节点及相邻上下游接口进行复核",
+    "闭水或交付验证记录同时关联空间、构件BusinessId与证据ID"
+  ],
+  "applicableScope": [
+    "下一批MiC卫生间模块试点",
+    "给水管道连接件",
+    "与JOINT_REPLACEMENT相同的维修验证情形"
+  ],
+  "excludedScope": [
+    "其他建筑系统或故障类型",
+    "未采用MiC的项目直接套用",
+    "未经过人工评审的企业标准"
+  ],
+  "unprovenClaims": [
+    "尚未证明该现象在其他项目重复出现",
+    "尚未证明属于系统性缺陷或集团规律",
+    "尚未证明与特定班组、材料批次存在因果关系",
+    "没有真实成本节省或故障率改善数据"
+  ],
+  "knownFacts": [
+    "来源事件成果包通过哈希链与重放验证",
+    "J-1602-CW-03完成JOINT_REPLACEMENT并留下不可变记录",
+    "维修后微流量与湿度重新采集且事件进入RESOLVED",
+    "2项工友施工证据被诊断与维修任务实际引用"
+  ],
+  "experienceLevel": "SINGLE_CASE_HYPOTHESIS",
+  "experienceLabel": "单事件待验证经验",
+  "confidenceBasis": [
+    "一个完整闭环事件",
+    "构件级拓扑与建筑记忆可追溯",
+    "两次设备动作均有人工作出授权",
+    "维修后观察发生在恢复供水之后"
+  ],
+  "initialReviewState": "PENDING_REVIEW",
+  "ruleVersion": "ZS-GL-1.0.0",
+  "buildingMemoryVersion": "2.5.0",
+  "eventAuditRootHash": "c2e3d0f2c34d9213c80a02e10146e610e8b2a9af4681cd91d6b47d0418dc27a9",
+  "sourceReferenceIds": [
+    "AUTH-EVT-1602-LAB-001-13",
+    "AUTH-EVT-1602-LAB-001-5",
+    "EVD-CWT-LAB-001",
+    "EVD-ISOLATION-008",
+    "EVD-METER-LAB-001",
+    "EVD-PHOTO-LAB-001",
+    "EVD-PIPE-LAB-001",
+    "EVD-REPAIR-EVT-1602-LAB-001-001",
+    "EVD-WP-LAB-001",
+    "EVT-1602-LAB-001",
+    "OBS-FLOW-POST-REPAIR-016",
+    "OBS-HUM-POST-REPAIR-016",
+    "PACKAGE-EVT-1602-LAB-001",
+    "PATCH-EVT-1602-LAB-001-16",
+    "REPAIR-EVT-1602-LAB-001-001"
+  ],
+  "syntheticDemo": true,
+  "disclaimer": "脱敏合成演示数据。当前仅有一个完整事件，本卡是单事件待验证经验，不是集团规律或企业标准。",
+  "contentHash": "aa0b16bd6619271fd160db8e6714a10cf5038b6004e76d79686aaa6be0ef11bd"
+}

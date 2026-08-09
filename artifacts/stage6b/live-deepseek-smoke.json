@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "provider": "deepseek",
+  "liveApiVerified": true,
+  "inputHash": "fb67641228f94947e92ff6c252c3d491560020986bb530ea2ea937cf7bbb1700",
+  "calls": [
+    {
+      "task": "INTERPRET_OBSERVATION",
+      "status": "SUCCEEDED",
+      "model": "deepseek-v4-flash",
+      "responseId": "a5740b03-137c-404e-8a9e-2cd426aad7cc",
+      "requestId": "f47ccb46-45a6-48af-b70b-6d00088e3931",
+      "calledAt": "2026-07-30T02:26:44.461Z",
+      "schemaValid": true
+    },
+    {
+      "task": "EXPLAIN_VERIFIED_RESULT",
+      "status": "SUCCEEDED",
+      "model": "deepseek-v4-flash",
+      "responseId": "99c8844c-05e8-4597-a3bc-58d73299e016",
+      "requestId": "9aef1f57-a72a-4109-981a-167fe777de4f",
+      "calledAt": "2026-07-30T02:26:51.213Z",
+      "schemaValid": true
+    }
+  ],
+  "structuredDraft": {
+    "spaceId": "SPACE-1602-BATHROOM",
+    "humidity": 78,
+    "humidityBaseline": null,
+    "durationMinutes": 2880,
+    "microFlow": null,
+    "microFlowBaseline": null,
+    "meterFinding": null,
+    "photoFinding": null,
+    "photoPresent": true,
+    "dataQuality": "GOOD",
+    "sourceActor": "RESIDENT"
+  },
+  "userCorrection": {
+    "humidity": {
+      "modelValue": 78,
+      "confirmedValue": 79
+    }
+  },
+  "deterministicResult": {
+    "eventId": "EVT-1602-LAB-601",
+    "state": "ASSESSED",
+    "valvePosition": "OPEN",
+    "leader": {
+      "hypothesis": "UNRESOLVED",
+      "candidateBusinessIds": [],
+      "rawScore": 25,
+      "evidenceCoverage": 0.5,
+      "gapFromLeader": 17.48,
+      "confidence": "LOW",
+      "contributions": [
+        {
+          "ruleId": "RULE-UNR-001",
+          "hypothesis": "UNRESOLVED",
+          "contribution": 25,
+          "evidenceIds": [],
+          "explanation": "关键证据缺失，当前应保持未决并继续补证"
+        }
+      ]
+    },
+    "decisionConfidence": "LOW"
+  },
+  "fallback": false,
+  "traceRootHash": "c32c55702dae35d8ddb6af7db9fabab1483989cb56efb9a84db0329558a003f7",
+  "syntheticDemo": true,
+  "disclaimer": "脱敏合成DeepSeek演示调用，不是真实工程诊断或设备控制。"
+}

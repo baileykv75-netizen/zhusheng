@@ -20,7 +20,7 @@ if ([int]($version.Split(".")[0]) -lt 20) {
   throw "筑生需要 Node.js 20 或更高版本。当前版本：$version"
 }
 
-$port = if ($env:PORT) { $env:PORT } else { "4173" }
+$port = if ($env:PORT) { $env:PORT } else { "4174" }
 $url = "http://127.0.0.1:$port"
 
 try {

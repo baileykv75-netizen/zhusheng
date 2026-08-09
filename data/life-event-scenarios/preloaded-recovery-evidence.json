@@ -1,0 +1,21 @@
+{
+  "description": "安全回归：动作发生前预置的隔离恢复证据必须被拒绝",
+  "syntheticDemo": true,
+  "steps": [
+    {
+      "eventId": "EVT-1602-PRELOADED-001",
+      "buildingId": "BLD-ZS-DEMO-001",
+      "spaceId": "SPACE-1602-BATHROOM",
+      "detectedAt": "2026-07-29T14:00:00.000Z",
+      "evaluatedAt": "2026-07-29T14:10:00.000Z",
+      "observations": [
+        { "id": "OBS-HUM-PL-01", "sensorBusinessId": "SENSOR-1602-HUM-01", "observedAt": "2026-07-29T14:02:00.000Z", "metric": "RELATIVE_HUMIDITY", "value": 58, "unit": "%", "baseline": 55, "durationMinutes": 30, "quality": "GOOD", "syntheticDemo": true },
+        { "id": "OBS-FLOW-PL-01", "sensorBusinessId": "METER-1602-FLOW-01", "observedAt": "2026-07-29T14:02:00.000Z", "metric": "MICRO_FLOW", "value": 0, "unit": "L/min", "baseline": 0, "durationMinutes": 20, "quality": "GOOD", "syntheticDemo": true }
+      ],
+      "evidence": [
+        { "id": "EVD-ISOLATION-PL-01", "type": "VALVE_ISOLATION_OBSERVATION", "status": "PRESENT", "observedValue": "OBSERVATIONS_ATTACHED", "sourceActor": "PROPERTY", "relatedBusinessIds": ["VALVE-1602-CW-01"], "capturedAt": "2026-07-29T14:05:00.000Z", "actionAuditSequence": 6, "actionTargetBusinessId": "VALVE-1602-CW-01", "relatedObservationIds": ["OBS-FLOW-PL-01", "OBS-HUM-PL-01"], "reliability": 0.98, "provenance": "故意预加载的合成无效证据", "syntheticDemo": true }
+      ],
+      "syntheticDemo": true
+    }
+  ]
+}

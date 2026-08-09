@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "syntheticDemo": true,
+  "sourceBuildingId": "BLD-ZS-DEMO-001",
+  "sourceSpaceId": "SPACE-1602-BATHROOM",
+  "files": {
+    "bathroom-1602.glb": {
+      "source": "bim/visual/bathroom-1602.glb",
+      "sha256": "e1c1ef2d8a1da67244c62857801c84cec5e23211d2324912cbaa8d02d770a07e",
+      "bytes": 948428
+    },
+    "bathroom-1602.manifest.json": {
+      "source": "bim/visual/bathroom-1602.manifest.json",
+      "sha256": "733871a1f991b55662e8eb4e518c705504a85bbbb047811349b21fc306703bfc",
+      "bytes": 33159
+    },
+    "building-memory.seed.json": {
+      "source": "bim/data/building-memory.seed.json",
+      "sha256": "684f78fa29dc1256ebb524422ceb98c3a6f2e003d40ba5960d2640565c9c0301",
+      "bytes": 163827
+    },
+    "bathroom-1602.runtime-transforms.json": {
+      "source": "bim/visual/bathroom-1602.runtime-transforms.json",
+      "sha256": "f5593a8de4499d135e3421ddd39597de1329a68f600ffd9400ee31b7693b55dc",
+      "bytes": 42658
+    }
+  }
+}

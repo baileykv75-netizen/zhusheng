@@ -1,0 +1,1359 @@
+{
+  "coordinateSystem": {
+    "axes": {
+      "x": "east",
+      "y": "north",
+      "z": "up"
+    },
+    "mode": "BUILDING_GLOBAL_ROOT_WITH_ROOM_LOCAL_CHILDREN",
+    "roomGlobalOrigin": [
+      16.299999237060547,
+      8.699999809265137,
+      45.0
+    ],
+    "roomSize": [
+      2.4,
+      1.8,
+      2.8
+    ]
+  },
+  "disclaimer": "脱敏合成演示模型，不作为施工依据",
+  "evidenceAnchors": {
+    "EVIDENCE-ANCHOR-CLOSED-WATER-TEST": {
+      "evidenceContentCreated": false,
+      "globalPosition": [
+        18.199999237060545,
+        9.999999809265137,
+        45.12
+      ],
+      "localPosition": [
+        1.9,
+        1.3,
+        0.12
+      ],
+      "nodeName": "EVIDENCE-ANCHOR-CLOSED-WATER-TEST",
+      "relatedBusinessIds": [
+        "WP-1602-BATHROOM",
+        "DRAIN-1602-FLOOR-01"
+      ]
+    },
+    "EVIDENCE-ANCHOR-METER-READING": {
+      "evidenceContentCreated": false,
+      "globalPosition": [
+        16.579999237060548,
+        10.239999809265136,
+        46.24
+      ],
+      "localPosition": [
+        0.28,
+        1.54,
+        1.24
+      ],
+      "nodeName": "EVIDENCE-ANCHOR-METER-READING",
+      "relatedBusinessIds": [
+        "METER-1602-FLOW-01"
+      ]
+    },
+    "EVIDENCE-ANCHOR-PIPE-INSTALL": {
+      "evidenceContentCreated": false,
+      "globalPosition": [
+        17.299999237060547,
+        10.239999809265136,
+        46.18
+      ],
+      "localPosition": [
+        1.0,
+        1.54,
+        1.18
+      ],
+      "nodeName": "EVIDENCE-ANCHOR-PIPE-INSTALL",
+      "relatedBusinessIds": [
+        "PIPE-1602-CW-01",
+        "PIPE-1602-HW-01"
+      ]
+    },
+    "EVIDENCE-ANCHOR-REPAIR-RESULT": {
+      "evidenceContentCreated": false,
+      "globalPosition": [
+        17.659999237060546,
+        10.319999809265138,
+        46.12
+      ],
+      "localPosition": [
+        1.36,
+        1.62,
+        1.12
+      ],
+      "nodeName": "EVIDENCE-ANCHOR-REPAIR-RESULT",
+      "relatedBusinessIds": [
+        "J-1602-CW-03"
+      ]
+    },
+    "EVIDENCE-ANCHOR-RESIDENT-WALL-PHOTO": {
+      "evidenceContentCreated": false,
+      "globalPosition": [
+        17.639999237060547,
+        10.419999809265137,
+        46.0
+      ],
+      "localPosition": [
+        1.34,
+        1.72,
+        1.0
+      ],
+      "nodeName": "EVIDENCE-ANCHOR-RESIDENT-WALL-PHOTO",
+      "relatedBusinessIds": [
+        "J-1602-CW-03",
+        "WALL-1602-BATHROOM-NORTH"
+      ]
+    },
+    "EVIDENCE-ANCHOR-WATERPROOF": {
+      "evidenceContentCreated": false,
+      "globalPosition": [
+        17.419999237060548,
+        9.619999809265137,
+        45.08
+      ],
+      "localPosition": [
+        1.12,
+        0.92,
+        0.08
+      ],
+      "nodeName": "EVIDENCE-ANCHOR-WATERPROOF",
+      "relatedBusinessIds": [
+        "WP-1602-BATHROOM"
+      ]
+    }
+  },
+  "ifcSchema": "IFC4",
+  "materials": {
+    "MAT-COLD-WATER": {
+      "baseColor": [
+        0.07,
+        0.34,
+        0.58,
+        1.0
+      ],
+      "metallic": 0.15,
+      "roughness": 0.3
+    },
+    "MAT-DAMP-LIGHT": {
+      "baseColor": [
+        0.12,
+        0.24,
+        0.25,
+        0.24
+      ],
+      "metallic": 0.0,
+      "roughness": 0.18
+    },
+    "MAT-DAMP-MODERATE": {
+      "baseColor": [
+        0.08,
+        0.18,
+        0.19,
+        0.42
+      ],
+      "metallic": 0.0,
+      "roughness": 0.14
+    },
+    "MAT-DAMP-SEVERE": {
+      "baseColor": [
+        0.04,
+        0.1,
+        0.11,
+        0.62
+      ],
+      "metallic": 0.0,
+      "roughness": 0.1
+    },
+    "MAT-EVIDENCE": {
+      "baseColor": [
+        0.94,
+        0.62,
+        0.08,
+        1.0
+      ],
+      "metallic": 0.15,
+      "roughness": 0.24
+    },
+    "MAT-GLASS": {
+      "baseColor": [
+        0.55,
+        0.76,
+        0.79,
+        0.26
+      ],
+      "metallic": 0.0,
+      "roughness": 0.08,
+      "transmission": 0.72
+    },
+    "MAT-GROUT": {
+      "baseColor": [
+        0.1,
+        0.11,
+        0.11,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.7
+    },
+    "MAT-HOT-WATER": {
+      "baseColor": [
+        0.62,
+        0.12,
+        0.08,
+        1.0
+      ],
+      "metallic": 0.15,
+      "roughness": 0.3
+    },
+    "MAT-JOINT": {
+      "baseColor": [
+        0.92,
+        0.67,
+        0.08,
+        1.0
+      ],
+      "metallic": 0.2,
+      "roughness": 0.2
+    },
+    "MAT-METAL": {
+      "baseColor": [
+        0.42,
+        0.46,
+        0.47,
+        1.0
+      ],
+      "metallic": 0.72,
+      "roughness": 0.22
+    },
+    "MAT-MIRROR": {
+      "baseColor": [
+        0.5,
+        0.58,
+        0.6,
+        1.0
+      ],
+      "metallic": 0.9,
+      "roughness": 0.04
+    },
+    "MAT-PORCELAIN": {
+      "baseColor": [
+        0.92,
+        0.93,
+        0.9,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.18
+    },
+    "MAT-REPAIR": {
+      "baseColor": [
+        0.26,
+        0.19,
+        0.13,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.8
+    },
+    "MAT-SENSOR": {
+      "baseColor": [
+        0.12,
+        0.58,
+        0.42,
+        1.0
+      ],
+      "metallic": 0.08,
+      "roughness": 0.28
+    },
+    "MAT-TILE-FLOOR": {
+      "baseColor": [
+        0.34,
+        0.38,
+        0.37,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.42
+    },
+    "MAT-TILE-WALL": {
+      "baseColor": [
+        0.78,
+        0.8,
+        0.78,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.32
+    },
+    "MAT-VALVE": {
+      "baseColor": [
+        0.78,
+        0.36,
+        0.08,
+        1.0
+      ],
+      "metallic": 0.35,
+      "roughness": 0.28
+    },
+    "MAT-VANITY": {
+      "baseColor": [
+        0.22,
+        0.25,
+        0.24,
+        1.0
+      ],
+      "metallic": 0.05,
+      "roughness": 0.36
+    },
+    "MAT-WATERPROOF": {
+      "baseColor": [
+        0.06,
+        0.5,
+        0.56,
+        0.28
+      ],
+      "metallic": 0.0,
+      "roughness": 0.4
+    }
+  },
+  "nodes": {
+    "DOOR-1602-BATHROOM": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "DOOR-1602-BATHROOM",
+      "defaultVisible": true,
+      "ifcClass": "IfcDoor",
+      "ifcGlobalId": "1GVKO1tqTH88ZEicvUqCFX",
+      "interactive": true,
+      "nodeName": "DOOR-1602-BATHROOM",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "DRAIN-1602-FLOOR-01": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "DRAIN-1602-FLOOR-01",
+      "defaultVisible": true,
+      "ifcClass": "IfcWasteTerminal",
+      "ifcGlobalId": "0pS4qx8iPKJexETXi8l1nw",
+      "interactive": true,
+      "nodeName": "DRAIN-1602-FLOOR-01",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "EVIDENCE-ANCHOR-CLOSED-WATER-TEST": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "EVIDENCE-ANCHOR-CLOSED-WATER-TEST",
+      "defaultVisible": false,
+      "ifcClass": "VisualEvidenceAnchor",
+      "ifcGlobalId": null,
+      "interactive": true,
+      "nodeName": "EVIDENCE-ANCHOR-CLOSED-WATER-TEST",
+      "viewLayers": [
+        "VIEW_CONSTRUCTION_MEMORY"
+      ],
+      "visualOnly": true
+    },
+    "EVIDENCE-ANCHOR-METER-READING": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "EVIDENCE-ANCHOR-METER-READING",
+      "defaultVisible": false,
+      "ifcClass": "VisualEvidenceAnchor",
+      "ifcGlobalId": null,
+      "interactive": true,
+      "nodeName": "EVIDENCE-ANCHOR-METER-READING",
+      "viewLayers": [
+        "VIEW_CONSTRUCTION_MEMORY"
+      ],
+      "visualOnly": true
+    },
+    "EVIDENCE-ANCHOR-PIPE-INSTALL": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "EVIDENCE-ANCHOR-PIPE-INSTALL",
+      "defaultVisible": false,
+      "ifcClass": "VisualEvidenceAnchor",
+      "ifcGlobalId": null,
+      "interactive": true,
+      "nodeName": "EVIDENCE-ANCHOR-PIPE-INSTALL",
+      "viewLayers": [
+        "VIEW_CONSTRUCTION_MEMORY"
+      ],
+      "visualOnly": true
+    },
+    "EVIDENCE-ANCHOR-REPAIR-RESULT": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "EVIDENCE-ANCHOR-REPAIR-RESULT",
+      "defaultVisible": false,
+      "ifcClass": "VisualEvidenceAnchor",
+      "ifcGlobalId": null,
+      "interactive": true,
+      "nodeName": "EVIDENCE-ANCHOR-REPAIR-RESULT",
+      "viewLayers": [
+        "VIEW_CONSTRUCTION_MEMORY"
+      ],
+      "visualOnly": true
+    },
+    "EVIDENCE-ANCHOR-RESIDENT-WALL-PHOTO": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "EVIDENCE-ANCHOR-RESIDENT-WALL-PHOTO",
+      "defaultVisible": false,
+      "ifcClass": "VisualEvidenceAnchor",
+      "ifcGlobalId": null,
+      "interactive": true,
+      "nodeName": "EVIDENCE-ANCHOR-RESIDENT-WALL-PHOTO",
+      "viewLayers": [
+        "VIEW_CONSTRUCTION_MEMORY"
+      ],
+      "visualOnly": true
+    },
+    "EVIDENCE-ANCHOR-WATERPROOF": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "EVIDENCE-ANCHOR-WATERPROOF",
+      "defaultVisible": false,
+      "ifcClass": "VisualEvidenceAnchor",
+      "ifcGlobalId": null,
+      "interactive": true,
+      "nodeName": "EVIDENCE-ANCHOR-WATERPROOF",
+      "viewLayers": [
+        "VIEW_CONSTRUCTION_MEMORY"
+      ],
+      "visualOnly": true
+    },
+    "FIXTURE-1602-BASIN-01": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "FIXTURE-1602-BASIN-01",
+      "defaultVisible": true,
+      "ifcClass": "IfcSanitaryTerminal",
+      "ifcGlobalId": "23sDdoSa9TzfxI20wLSb_Y",
+      "interactive": true,
+      "nodeName": "FIXTURE-1602-BASIN-01",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "FIXTURE-1602-SHOWER-01": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "FIXTURE-1602-SHOWER-01",
+      "defaultVisible": true,
+      "ifcClass": "IfcSanitaryTerminal",
+      "ifcGlobalId": "3ti$eETIPInRe$W0y_rl28",
+      "interactive": true,
+      "nodeName": "FIXTURE-1602-SHOWER-01",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "FIXTURE-1602-WC-01": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "FIXTURE-1602-WC-01",
+      "defaultVisible": true,
+      "ifcClass": "IfcSanitaryTerminal",
+      "ifcGlobalId": "1LdxdLIPnNTg5eHy1uuj$1",
+      "interactive": true,
+      "nodeName": "FIXTURE-1602-WC-01",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "J-1602-CW-03": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "J-1602-CW-03",
+      "defaultVisible": false,
+      "ifcClass": "IfcPipeFitting",
+      "ifcGlobalId": "335_0vB1nGSBl7rYBoGxwT",
+      "interactive": true,
+      "nodeName": "J-1602-CW-03",
+      "viewLayers": [
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "METER-1602-FLOW-01": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "METER-1602-FLOW-01",
+      "defaultVisible": false,
+      "ifcClass": "IfcFlowMeter",
+      "ifcGlobalId": "0jB2RokC9PkAHxCJo4uVuI",
+      "interactive": true,
+      "nodeName": "METER-1602-FLOW-01",
+      "viewLayers": [
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "PARTITION-1602-SHOWER-01": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "PARTITION-1602-SHOWER-01",
+      "defaultVisible": true,
+      "ifcClass": "IfcBuildingElementProxy",
+      "ifcGlobalId": "2_f9FRSBvSzuyU3waAIWDe",
+      "interactive": true,
+      "nodeName": "PARTITION-1602-SHOWER-01",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "PIPE-1602-CW-01": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "PIPE-1602-CW-01",
+      "defaultVisible": false,
+      "ifcClass": "IfcPipeSegment",
+      "ifcGlobalId": "3OvAR_zLnMMfCPWJLEqKva",
+      "interactive": true,
+      "nodeName": "PIPE-1602-CW-01",
+      "viewLayers": [
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "PIPE-1602-CW-02": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "PIPE-1602-CW-02",
+      "defaultVisible": false,
+      "ifcClass": "IfcPipeSegment",
+      "ifcGlobalId": "1gY45OQcbQ7P4PuRYcLL5_",
+      "interactive": true,
+      "nodeName": "PIPE-1602-CW-02",
+      "viewLayers": [
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "PIPE-1602-HW-01": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "PIPE-1602-HW-01",
+      "defaultVisible": false,
+      "ifcClass": "IfcPipeSegment",
+      "ifcGlobalId": "36LhsGedXPufeyYlYHt4Ls",
+      "interactive": true,
+      "nodeName": "PIPE-1602-HW-01",
+      "viewLayers": [
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "SENSOR-1602-HUM-01": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "SENSOR-1602-HUM-01",
+      "defaultVisible": false,
+      "ifcClass": "IfcSensor",
+      "ifcGlobalId": "1E8P_ko7XLTOcOHVVTBvqV",
+      "interactive": true,
+      "nodeName": "SENSOR-1602-HUM-01",
+      "viewLayers": [
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "SLAB-1602-BATHROOM": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "SLAB-1602-BATHROOM",
+      "defaultVisible": true,
+      "ifcClass": "IfcSlab",
+      "ifcGlobalId": "3q7otrgzLS6vF2JvCuCLl5",
+      "interactive": false,
+      "nodeName": "SLAB-1602-BATHROOM",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "SPACE-1602-BATHROOM": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "SPACE-1602-BATHROOM",
+      "defaultVisible": true,
+      "ifcClass": "IfcSpace",
+      "ifcGlobalId": "3dkIkA51vH1ANC1RHLIll3",
+      "interactive": true,
+      "nodeName": "SPACE-1602-BATHROOM",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "STATE-DAMP_LIGHT": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": null,
+      "defaultVisible": false,
+      "ifcClass": "VisualObject",
+      "ifcGlobalId": null,
+      "interactive": false,
+      "nodeName": "STATE-DAMP_LIGHT",
+      "viewLayers": [
+        "VIEW_DIAGNOSTIC",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": true
+    },
+    "STATE-DAMP_MODERATE": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": null,
+      "defaultVisible": false,
+      "ifcClass": "VisualObject",
+      "ifcGlobalId": null,
+      "interactive": false,
+      "nodeName": "STATE-DAMP_MODERATE",
+      "viewLayers": [
+        "VIEW_DIAGNOSTIC",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": true
+    },
+    "STATE-DAMP_SEVERE": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": null,
+      "defaultVisible": false,
+      "ifcClass": "VisualObject",
+      "ifcGlobalId": null,
+      "interactive": false,
+      "nodeName": "STATE-DAMP_SEVERE",
+      "viewLayers": [
+        "VIEW_DIAGNOSTIC",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": true
+    },
+    "STATE-REPAIR-OPEN": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": null,
+      "defaultVisible": false,
+      "ifcClass": "VisualObject",
+      "ifcGlobalId": null,
+      "interactive": false,
+      "nodeName": "STATE-REPAIR-OPEN",
+      "viewLayers": [
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": true
+    },
+    "STATE-REPAIRED": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": null,
+      "defaultVisible": false,
+      "ifcClass": "VisualObject",
+      "ifcGlobalId": null,
+      "interactive": false,
+      "nodeName": "STATE-REPAIRED",
+      "viewLayers": [
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": true
+    },
+    "VALVE-1602-CW-01": {
+      "allowedVisualStates": [
+        "OPEN",
+        "CLOSED"
+      ],
+      "businessId": "VALVE-1602-CW-01",
+      "defaultVisible": false,
+      "ifcClass": "IfcValve",
+      "ifcGlobalId": "0dZjT4flPP59fQfI4VUIOw",
+      "interactive": true,
+      "nodeName": "VALVE-1602-CW-01",
+      "viewLayers": [
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "VIS-CEILING-01": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": null,
+      "defaultVisible": true,
+      "ifcClass": "VisualObject",
+      "ifcGlobalId": null,
+      "interactive": false,
+      "nodeName": "VIS-CEILING-01",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": true
+    },
+    "VIS-CEILING-LIGHT-01": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": null,
+      "defaultVisible": true,
+      "ifcClass": "VisualObject",
+      "ifcGlobalId": null,
+      "interactive": false,
+      "nodeName": "VIS-CEILING-LIGHT-01",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": true
+    },
+    "VIS-DOOR-FRAME": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": null,
+      "defaultVisible": true,
+      "ifcClass": "VisualObject",
+      "ifcGlobalId": null,
+      "interactive": false,
+      "nodeName": "VIS-DOOR-FRAME",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": true
+    },
+    "VIS-FLOOR-TILES": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": null,
+      "defaultVisible": true,
+      "ifcClass": "VisualObject",
+      "ifcGlobalId": null,
+      "interactive": false,
+      "nodeName": "VIS-FLOOR-TILES",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": true
+    },
+    "VIS-MIRROR-CABINET-01": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": null,
+      "defaultVisible": true,
+      "ifcClass": "VisualObject",
+      "ifcGlobalId": null,
+      "interactive": false,
+      "nodeName": "VIS-MIRROR-CABINET-01",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": true
+    },
+    "VIS-WET-ZONE-THRESHOLD": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": null,
+      "defaultVisible": true,
+      "ifcClass": "VisualObject",
+      "ifcGlobalId": null,
+      "interactive": false,
+      "nodeName": "VIS-WET-ZONE-THRESHOLD",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": true
+    },
+    "WALL-1602-BATHROOM-EAST": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "WALL-1602-BATHROOM-EAST",
+      "defaultVisible": true,
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2X6XvzpHTORgfLX_M7AkwA",
+      "interactive": false,
+      "nodeName": "WALL-1602-BATHROOM-EAST",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "WALL-1602-BATHROOM-NORTH": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "WALL-1602-BATHROOM-NORTH",
+      "defaultVisible": true,
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0RNcCnVbjP5PwZ3Kgm3awP",
+      "interactive": false,
+      "nodeName": "WALL-1602-BATHROOM-NORTH",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "WALL-1602-BATHROOM-SOUTH-EAST": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "WALL-1602-BATHROOM-SOUTH-EAST",
+      "defaultVisible": true,
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "3$cIHHxMvGUB3vIraH_ol9",
+      "interactive": false,
+      "nodeName": "WALL-1602-BATHROOM-SOUTH-EAST",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "WALL-1602-BATHROOM-SOUTH-WEST": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "WALL-1602-BATHROOM-SOUTH-WEST",
+      "defaultVisible": true,
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "2YFH1JtHjJ1eESIx$GRa4a",
+      "interactive": false,
+      "nodeName": "WALL-1602-BATHROOM-SOUTH-WEST",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "WALL-1602-BATHROOM-WEST": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "WALL-1602-BATHROOM-WEST",
+      "defaultVisible": true,
+      "ifcClass": "IfcWall",
+      "ifcGlobalId": "0WA9uqAufJovOINeFnpVJk",
+      "interactive": false,
+      "nodeName": "WALL-1602-BATHROOM-WEST",
+      "viewLayers": [
+        "VIEW_RESIDENT",
+        "VIEW_DIAGNOSTIC",
+        "VIEW_CONSTRUCTION_MEMORY",
+        "VIEW_MAINTENANCE"
+      ],
+      "visualOnly": false
+    },
+    "WP-1602-BATHROOM": {
+      "allowedVisualStates": [
+        "DRY",
+        "DAMP_LIGHT",
+        "DAMP_MODERATE",
+        "DAMP_SEVERE",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ],
+      "businessId": "WP-1602-BATHROOM",
+      "defaultVisible": false,
+      "ifcClass": "IfcCovering",
+      "ifcGlobalId": "2POPXIP6bVuwysur6mxYmg",
+      "interactive": true,
+      "nodeName": "WP-1602-BATHROOM",
+      "viewLayers": [
+        "VIEW_CONSTRUCTION_MEMORY"
+      ],
+      "visualOnly": false
+    }
+  },
+  "performance": {
+    "externalTextures": 0,
+    "glbBytes": 948428,
+    "maxGlbBytes": 15728640,
+    "maxTriangles": 150000,
+    "triangleCount": 13204
+  },
+  "sceneId": "SCENE-1602-BATHROOM",
+  "sourceBuildingId": "BLD-ZS-DEMO-001",
+  "sourceIfc": "../output/ZS-DEMO-001.ifc",
+  "sourceMemory": "../data/building-memory.seed.json",
+  "sourceSpaceId": "SPACE-1602-BATHROOM",
+  "sourceSpec": "../building-spec.json",
+  "sourceStoreyId": "LVL-16",
+  "sourceUnitId": "UNIT-1602",
+  "syntheticDemo": true,
+  "views": {
+    "VIEW_CONSTRUCTION_MEMORY": {
+      "camera": "CAM_CONSTRUCTION_MEMORY",
+      "hiddenLayers": [
+        "MAINTENANCE"
+      ],
+      "hiddenNodes": [
+        "WALL-1602-BATHROOM-EAST",
+        "WALL-1602-BATHROOM-SOUTH-WEST",
+        "WALL-1602-BATHROOM-SOUTH-EAST",
+        "DOOR-1602-BATHROOM",
+        "PARTITION-1602-SHOWER-01"
+      ],
+      "visibleLayers": [
+        "ARCHITECTURE",
+        "SYSTEMS",
+        "WATERPROOFING",
+        "EVIDENCE"
+      ]
+    },
+    "VIEW_DIAGNOSTIC": {
+      "camera": "CAM_DIAGNOSTIC_CUTAWAY",
+      "hiddenLayers": [
+        "WATERPROOFING",
+        "EVIDENCE",
+        "MAINTENANCE"
+      ],
+      "hiddenNodes": [
+        "WALL-1602-BATHROOM-EAST",
+        "WALL-1602-BATHROOM-SOUTH-WEST",
+        "WALL-1602-BATHROOM-SOUTH-EAST",
+        "DOOR-1602-BATHROOM",
+        "PARTITION-1602-SHOWER-01"
+      ],
+      "visibleLayers": [
+        "ARCHITECTURE",
+        "FIXTURES",
+        "SYSTEMS"
+      ]
+    },
+    "VIEW_MAINTENANCE": {
+      "camera": "CAM_JOINT_CLOSEUP",
+      "hiddenLayers": [
+        "WATERPROOFING",
+        "EVIDENCE"
+      ],
+      "hiddenNodes": [
+        "WALL-1602-BATHROOM-EAST",
+        "WALL-1602-BATHROOM-SOUTH-WEST",
+        "WALL-1602-BATHROOM-SOUTH-EAST",
+        "DOOR-1602-BATHROOM",
+        "PARTITION-1602-SHOWER-01"
+      ],
+      "visibleLayers": [
+        "ARCHITECTURE",
+        "FIXTURES",
+        "SYSTEMS",
+        "MAINTENANCE"
+      ]
+    },
+    "VIEW_RESIDENT": {
+      "camera": "CAM_RESIDENT_OVERVIEW",
+      "hiddenLayers": [
+        "SYSTEMS",
+        "WATERPROOFING",
+        "EVIDENCE",
+        "MAINTENANCE"
+      ],
+      "hiddenNodes": [
+        "WALL-1602-BATHROOM-EAST",
+        "WALL-1602-BATHROOM-SOUTH-WEST",
+        "WALL-1602-BATHROOM-SOUTH-EAST"
+      ],
+      "visibleLayers": [
+        "ARCHITECTURE",
+        "FIXTURES"
+      ]
+    }
+  },
+  "visualStates": {
+    "containsDiagnosticConclusion": false,
+    "defaultState": "DRY",
+    "moistureLevel": {
+      "default": 0.0,
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "type": "number"
+    },
+    "neutralVisualOnly": true,
+    "repairState": {
+      "default": "CLOSED_WALL",
+      "type": "enum",
+      "values": [
+        "CLOSED_WALL",
+        "REPAIR_OPEN",
+        "REPAIRED"
+      ]
+    },
+    "stateBindings": {
+      "DAMP_LIGHT": {
+        "hiddenNodes": [
+          "STATE-DAMP_MODERATE",
+          "STATE-DAMP_SEVERE"
+        ],
+        "visibleNodes": [
+          "STATE-DAMP_LIGHT"
+        ]
+      },
+      "DAMP_MODERATE": {
+        "hiddenNodes": [
+          "STATE-DAMP_LIGHT",
+          "STATE-DAMP_SEVERE"
+        ],
+        "visibleNodes": [
+          "STATE-DAMP_MODERATE"
+        ]
+      },
+      "DAMP_SEVERE": {
+        "hiddenNodes": [
+          "STATE-DAMP_LIGHT",
+          "STATE-DAMP_MODERATE"
+        ],
+        "visibleNodes": [
+          "STATE-DAMP_SEVERE"
+        ]
+      },
+      "DRY": {
+        "hiddenNodes": [
+          "STATE-DAMP_LIGHT",
+          "STATE-DAMP_MODERATE",
+          "STATE-DAMP_SEVERE",
+          "STATE-REPAIR-OPEN",
+          "STATE-REPAIRED"
+        ],
+        "visibleNodes": []
+      },
+      "REPAIRED": {
+        "hiddenNodes": [
+          "STATE-REPAIR-OPEN"
+        ],
+        "visibleNodes": [
+          "STATE-REPAIRED"
+        ]
+      },
+      "REPAIR_OPEN": {
+        "hiddenNodes": [
+          "STATE-REPAIRED"
+        ],
+        "visibleNodes": [
+          "STATE-REPAIR-OPEN"
+        ]
+      }
+    },
+    "states": [
+      "DRY",
+      "DAMP_LIGHT",
+      "DAMP_MODERATE",
+      "DAMP_SEVERE",
+      "REPAIR_OPEN",
+      "REPAIRED"
+    ],
+    "valvePosition": {
+      "authorizationRequired": true,
+      "default": "OPEN",
+      "doesNotGrantAuthorization": true,
+      "nodeName": "MESH-VALVE-1602-CW-01-HANDLE",
+      "transforms": {
+        "CLOSED": {
+          "rotationEuler": [
+            0.0,
+            0.0,
+            1.5707963267948966
+          ]
+        },
+        "OPEN": {
+          "rotationEuler": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "type": "enum",
+      "values": [
+        "OPEN",
+        "CLOSED"
+      ]
+    }
+  }
+}

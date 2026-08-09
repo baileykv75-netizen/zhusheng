@@ -97,6 +97,14 @@ export function SceneStage({
     return () => window.clearTimeout(timer);
   }, [imageLoaded, preload]);
 
+  useEffect(() => {
+    const image = stageRef.current?.querySelector<HTMLImageElement>(".scene-picture.current img");
+    if (image?.complete && image.naturalWidth > 0) {
+      decodedScenes.add(activeScene);
+      setImageLoaded(true);
+    }
+  }, [activeScene, fallbackAttempted]);
+
   useEffect(() => () => {
     if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
     if (pointerFrame.current) cancelAnimationFrame(pointerFrame.current);

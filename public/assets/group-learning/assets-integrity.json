@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "syntheticDemo": true,
+  "sourceEventId": "EVT-1602-LAB-001",
+  "sourceFinalState": "RESOLVED",
+  "files": {
+    "EVT-1602-LAB-001.package.json": {
+      "source": "artifacts/stage4b/EVT-1602-LAB-001.package.json",
+      "sha256": "e35f73be25b97a1d7cdc26c1b863fa22edc6a845d96234ae06328a84d90e5d7b",
+      "bytes": 186352
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "blend": "D:\\Admin\\Desktop\\Project\\zhusheng-agent\\bim\\visual\\bathroom-1602.blend",
+  "blenderVersion": "4.5.12 LTS",
+  "errors": [],
+  "evidenceAnchorCount": 6,
+  "externalTextureCount": 0,
+  "glb": "D:\\Admin\\Desktop\\Project\\zhusheng-agent\\bim\\visual\\bathroom-1602.glb",
+  "glbBytes": 948428,
+  "keyNodeCount": 38,
+  "manifest": "D:\\Admin\\Desktop\\Project\\zhusheng-agent\\bim\\visual\\bathroom-1602.manifest.json",
+  "passed": true,
+  "triangleCount": 13204,
+  "viewCount": 4,
+  "visualStateCount": 6
+}
