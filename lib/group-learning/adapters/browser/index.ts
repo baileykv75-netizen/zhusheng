@@ -2,8 +2,9 @@ import { loadBrowserLifeEventAssets } from "../../../life-event-engine/adapters/
 import type { VerifiedLifeEventPackage } from "../../../life-event-engine/types.ts";
 import { createEvidenceChain, createGroupLearningCard, createWorkerContributions } from "../../generator.ts";
 import { assertVerifiedGroupLearningSource } from "../../source-validator.ts";
+import { publicAssetPath } from "../../../site-path.ts";
 
-export const GROUP_LEARNING_ASSET_ROOT = "/assets/group-learning";
+export const GROUP_LEARNING_ASSET_ROOT = publicAssetPath("/assets/group-learning");
 
 export type GroupLearningAssetIntegrity = {
   schemaVersion: 1;

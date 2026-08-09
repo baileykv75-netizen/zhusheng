@@ -1,3 +1,5 @@
+import { publicAssetPath } from "./site-path.ts";
+
 export type EvidenceAssetId = "joint" | "pressure" | "dampWall" | "waterMeter" | "repair";
 
 export type EvidenceAsset = {
@@ -13,7 +15,7 @@ export type EvidenceAsset = {
 export const evidenceAssets: Record<EvidenceAssetId, EvidenceAsset> = {
   joint: {
     id: "joint",
-    src: "/assets/v5/evidence/ev-2848-joint.webp",
+    src: publicAssetPath("/assets/v5/evidence/ev-2848-joint.webp"),
     type: "接头施工影像",
     object: "1602卫生间 · W-1602-B7",
     capturedAt: "2025.03.18 14:26",
@@ -22,7 +24,7 @@ export const evidenceAssets: Record<EvidenceAssetId, EvidenceAsset> = {
   },
   pressure: {
     id: "pressure",
-    src: "/assets/v5/evidence/ev-2848-pressure.webp",
+    src: publicAssetPath("/assets/v5/evidence/ev-2848-pressure.webp"),
     type: "保压复核",
     object: "冷热水支管 · W-1602-B7",
     capturedAt: "2025.03.18 14:31",
@@ -31,7 +33,7 @@ export const evidenceAssets: Record<EvidenceAssetId, EvidenceAsset> = {
   },
   dampWall: {
     id: "dampWall",
-    src: "/assets/v5/evidence/resident-damp-wall.webp",
+    src: publicAssetPath("/assets/v5/evidence/resident-damp-wall.webp"),
     type: "住户补充影像",
     object: "1602卫生间 · 北侧完成墙面",
     capturedAt: "2026.07.25 16:34",
@@ -40,7 +42,7 @@ export const evidenceAssets: Record<EvidenceAssetId, EvidenceAsset> = {
   },
   waterMeter: {
     id: "waterMeter",
-    src: "/assets/v5/evidence/resident-water-meter.webp",
+    src: publicAssetPath("/assets/v5/evidence/resident-water-meter.webp"),
     type: "水表状态",
     object: "1602局部供水系统",
     capturedAt: "2026.07.25 16:34",
@@ -49,7 +51,7 @@ export const evidenceAssets: Record<EvidenceAssetId, EvidenceAsset> = {
   },
   repair: {
     id: "repair",
-    src: "/assets/v5/evidence/workorder-repair.webp",
+    src: publicAssetPath("/assets/v5/evidence/workorder-repair.webp"),
     type: "维修验收影像",
     object: "WO-260725-08 · W-1602-B7",
     capturedAt: "2026.07.25 18:02",

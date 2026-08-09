@@ -1,3 +1,5 @@
+import { publicAssetPath } from "./site-path.ts";
+
 export type StageView = "building" | "worker" | "resident" | "group";
 
 export type SceneFocus = "overview" | "room-1602" | "pipe-joint" | "portfolio";
@@ -38,14 +40,14 @@ export type SceneAsset = {
 };
 
 function asset(name: string, alt: string, focalPoint = { x: 50, y: 50 }, mobileFocalPoint = focalPoint): SceneAsset {
-  const base = `/assets/v5/scenes/${name}`;
+  const base = publicAssetPath(`/assets/v5/scenes/${name}`);
   return {
     desktopAvif: `${base}.avif`,
     desktopWebp: `${base}.webp`,
     mobileAvif: `${base}-mobile.avif`,
     mobileWebp: `${base}-mobile.webp`,
-    placeholder: `/assets/v5/placeholders/${name}-blur.webp`,
-    fallback: "/assets/building-digital-twin.png",
+    placeholder: publicAssetPath(`/assets/v5/placeholders/${name}-blur.webp`),
+    fallback: publicAssetPath("/assets/building-digital-twin.png"),
     alt,
     focalPoint,
     mobileFocalPoint
