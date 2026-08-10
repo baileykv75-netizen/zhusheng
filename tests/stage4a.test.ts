@@ -38,7 +38,7 @@ test("resident free-lab client dependency graph excludes Node fs and crypto", ()
   const content = [...paths].map((path) => readFileSync(path, "utf8")).join("\n");
   assert.doesNotMatch(content, /node:fs/);
   assert.doesNotMatch(content, /node:crypto/);
-  assert.ok([...paths].some((path) => path.endsWith("adapters\\browser\\index.ts")));
+  assert.ok([...paths].some((path) => path.replaceAll("\\", "/").endsWith("adapters/browser/index.ts")));
   assert.ok(![...paths].some((path) => path.endsWith("memory-loader.ts")));
 });
 
