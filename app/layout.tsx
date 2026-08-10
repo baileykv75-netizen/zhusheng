@@ -4,6 +4,7 @@ import { DemoProvider } from "@/components/demo-provider";
 import { LifecycleJourneyProvider } from "@/components/lifecycle-journey-provider";
 import { Shell } from "@/components/shell";
 import "./globals.css";
+import "./v6.css";
 
 export const metadata: Metadata = {
   title: "筑生：一栋房子一生的AI智能体",
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f4f1ea"
+  themeColor: "#0b0d0d"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -1,45 +1,94 @@
-import Link from "next/link";
-import { ArrowDown, ArrowRight, CheckCircle2, MoveUpRight } from "lucide-react";
-import { BuildingSectionFigure } from "./BuildingSectionFigure";
+"use client";
 
-const promises = ["建造，不失忆", "居住，有回应", "经验，会生长"];
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ArrowDown, ArrowRight, CornerDownRight } from "lucide-react";
+import { BuildingHeroTwin, type HeroDrillPhase } from "@/components/v6/BuildingHeroTwin";
+
+const phaseCopy: Record<HeroDrillPhase, { index: string; label: string }> = {
+  building: { index: "01", label: "华章新筑 · 2号楼" },
+  floor: { index: "02", label: "16F" },
+  unit: { index: "03", label: "1602" },
+  space: { index: "04", label: "卫生间" }
+};
 
 export function ConceptExhibit() {
-  return <div className="concept-exhibit">
-    <section className="concept-hero" id="concept">
-      <div className="concept-hero-copy">
-        <p className="concept-kicker">筑生 / 建筑具身智能样机</p>
-        <h1>一栋房子不该在<br />交付那天失去记忆。</h1>
-        <p className="concept-lead">筑生，让建造留下的经验，在它被居住的每一天继续发挥作用。</p>
-        <Link href="/case-1602" className="concept-primary">进入1602验证舱 <ArrowRight size={18} /></Link>
-        <p className="concept-caption"><ArrowDown size={14} /> 从建筑身体地图，走进一段已经跑通的真实闭环</p>
+  const router = useRouter();
+  const [phase, setPhase] = useState<HeroDrillPhase>("building");
+  const timers = useRef<number[]>([]);
+
+  useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), []);
+
+  function enterBuilding() {
+    if (phase !== "building") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      router.push("/case-1602");
+      return;
+    }
+    setPhase("floor");
+    timers.current.push(window.setTimeout(() => setPhase("unit"), 760));
+    timers.current.push(window.setTimeout(() => setPhase("space"), 1520));
+    timers.current.push(window.setTimeout(() => router.push("/case-1602"), 2450));
+  }
+
+  return <div className="v6-home">
+    <section className="v6-hero" id="concept">
+      <div className="v6-hero-copy">
+        <p className="v6-eyebrow">LIVING BUILDING OS / 筑生</p>
+        <h1>一栋房子一生的<br /><em>AI 智能体</em></h1>
+        <p className="v6-hero-lead">它记得自己如何被建造，<br />也理解入住之后发生的每一件事。</p>
+        <button type="button" className="v6-enter-building" onClick={enterBuilding} disabled={phase !== "building"}>
+          {phase === "building" ? "进入建筑" : "正在进入1602"}<ArrowRight size={18} />
+        </button>
       </div>
-      <div className="concept-hero-model"><BuildingSectionFigure active="memory" /><span>16F · 1602</span></div>
-    </section>
 
-    <section className="concept-promise" aria-label="筑生承诺">
-      {promises.map((promise, index) => <article key={promise}><small>0{index + 1}</small><strong>{promise}</strong></article>)}
-    </section>
-
-    <section className="concept-meaning" id="meaning">
-      <div><p className="concept-kicker">不是另一套工地平台</p><h2>把一栋建筑从“交付物”，<br />变成会被持续理解的生命体。</h2></div>
-      <div className="meaning-copy"><p>中建海龙已有的MiC、BIM、数字交付与智慧建造，让房子在建造时具备可追溯的身体基础。筑生把这份基础延续到入住之后。</p><p>它不替人作决定；它让住户、工友、物业和企业在需要的时候，看见同一栋房子曾经发生过什么，以及下一步该由谁完成。</p></div>
-    </section>
-
-    <section className="concept-continuum" id="continuum">
-      <header><p className="concept-kicker">一条不断线的建筑生命</p><h2>从工友的一次留痕，<br />到下一栋房子的更好建造。</h2></header>
-      <div className="continuum-path">
-        <article><span>建造时</span><h3>留下，而不是填完表就消失</h3><p>施工口述、照片和扫码经人工确认，成为具体空间与构件可引用的记忆。</p></article>
-        <article><span>居住时</span><h3>回应，而不是从零描述问题</h3><p>异常观察回到同一份建筑记忆，定位、授权、维修和复验形成可验证闭环。</p></article>
-        <article><span>回流时</span><h3>生长，而不是把个案冒充标准</h3><p>验证通过的个案只形成待人工评审的试点经验，让下一批房子有机会更好。</p></article>
+      <div className="v6-hero-visual">
+        <BuildingHeroTwin phase={phase} onEnter={enterBuilding} />
+        <div className="v6-drill-breadcrumb" aria-live="polite">
+          {(Object.keys(phaseCopy) as HeroDrillPhase[]).map((item, index) => {
+            const phases = Object.keys(phaseCopy) as HeroDrillPhase[];
+            const currentIndex = phases.indexOf(phase);
+            return <span key={item} className={index <= currentIndex ? "active" : ""}>{phaseCopy[item].label}</span>;
+          })}
+        </div>
       </div>
+
+      <aside className="v6-building-pulse">
+        <span>BUILDING PULSE / 此刻</span>
+        <strong>16层 · 1602卫生间</strong>
+        <p>住户发现持续潮湿，建筑智能体正在重新调用这个空间的建造记忆。</p>
+        <button type="button" onClick={enterBuilding}>走进这件事 <CornerDownRight size={15} /></button>
+      </aside>
+
+      <div className="v6-hero-meta"><span>126 SPACES</span><span>750 OBJECTS</span><span><i />MEMORY ONLINE</span></div>
+      <a className="v6-scroll-cue" href="#memory"><ArrowDown size={15} />建筑的一生，从记忆开始</a>
     </section>
 
-    <section className="concept-proof" id="proof">
-      <div className="proof-model"><BuildingSectionFigure compact active="unit" /></div>
-      <div className="proof-copy"><p className="concept-kicker">已实现的落地证明</p><h2>1602卫生间<br />不是概念图。</h2><p>它连接了一条已经实现、可重放、可复验的闭环：工友施工证据 → 潮湿异常 → 人工授权 → 精准维修 → 维修后复验 → 试点经验。</p><ul><li><CheckCircle2 size={17} />建筑记忆和构件拓扑来自同一事实源</li><li><CheckCircle2 size={17} />阀门动作保留住户或物业的独立授权</li><li><CheckCircle2 size={17} />经验只能进入人工评审后的PILOT_ONLY试点</li></ul><Link href="/case-1602" className="concept-secondary">查看1602完整验证 <MoveUpRight size={16} /></Link></div>
-    </section>
+    <main className="v6-story">
+      <section className="v6-story-chapter" id="memory">
+        <div className="v6-chapter-index"><span>01</span><small>THE MEMORY</small></div>
+        <div className="v6-chapter-copy"><p>建造，不失忆</p><h2>墙封起来以后，<br />过去仍在原来的位置。</h2><div><span>施工口述</span><i /><span>人工确认</span><i /><span>构件记忆</span></div></div>
+        <p className="v6-chapter-note">工友留下的记录不在交付时结束。它继续和空间、管线、接头与检验结果保持关联，等待未来真正需要它的那一天。</p>
+      </section>
 
-    <footer className="concept-footer"><span>筑生 / 一栋房子一生的具身智能体</span><span>脱敏合成演示 · 不作为施工依据</span></footer>
+      <section className="v6-story-chapter event" id="event">
+        <div className="v6-chapter-index"><span>02</span><small>THE EVENT</small></div>
+        <div className="v6-chapter-copy"><p>居住，有回应</p><h2>今天，16层的身体里<br />发生了一件事。</h2><Link href="/case-1602">进入1602建筑生命事件 <ArrowRight size={17} /></Link></div>
+        <div className="v6-human-boundary"><small>AI 建议</small><i /><small>人类授权</small><i /><small>物业执行</small><i /><small>维修复验</small></div>
+      </section>
+
+      <section className="v6-story-chapter learning" id="learning">
+        <div className="v6-chapter-index"><span>03</span><small>THE LEARNING</small></div>
+        <div className="v6-chapter-copy"><p>经验，会生长</p><h2>一栋房子的经历，<br />成为下一栋房子的经验。</h2></div>
+        <p className="v6-chapter-note">经过验证的个案只形成待人工评审的经验候选。它可以成为试点，但不会被 AI 轻率地写成企业标准。</p>
+      </section>
+
+      <section className="v6-manifesto">
+        <p>筑生不是在给建筑加一个聊天机器人。</p>
+        <h2>它是在让一栋房子，<br />拥有一生不会中断的记忆。</h2>
+        <Link href="/case-1602">查看1602完整事件 <ArrowRight size={17} /></Link>
+      </section>
+    </main>
   </div>;
 }

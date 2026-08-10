@@ -8,6 +8,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import type { BrowserLifeEventAssets } from "@/lib/life-event-engine/adapters/browser/index.ts";
 import type { VisualDirective } from "@/lib/life-event-engine/types.ts";
 import { naturalTransform, resolveScenePlan, type TransformSnapshot } from "@/lib/life-event-lab/scene-controller.ts";
+import { publicAssetPath } from "@/lib/site-path";
 
 type Props = {
   assets: BrowserLifeEventAssets | null;
@@ -20,10 +21,24 @@ type Props = {
 };
 
 const viewLabels: Record<VisualDirective["view"], string> = {
-  VIEW_RESIDENT: "居住",
-  VIEW_DIAGNOSTIC: "诊断",
-  VIEW_CONSTRUCTION_MEMORY: "施工记忆",
-  VIEW_MAINTENANCE: "维修"
+  VIEW_RESIDENT: "空间",
+  VIEW_DIAGNOSTIC: "定位",
+  VIEW_CONSTRUCTION_MEMORY: "建造时",
+  VIEW_MAINTENANCE: "维修后"
+};
+
+const moistureLabels: Record<VisualDirective["moistureState"], string> = {
+  DRY: "当前干燥",
+  DAMP_LIGHT: "轻微潮湿",
+  DAMP_MODERATE: "潮湿持续",
+  DAMP_SEVERE: "潮湿加重",
+  REPAIR_OPEN: "维修面已打开",
+  REPAIRED: "维修已完成"
+};
+
+const valveLabels: Record<VisualDirective["valvePosition"], string> = {
+  OPEN: "供水正常",
+  CLOSED: "供水已隔离"
 };
 
 type SceneRuntime = {
@@ -63,6 +78,77 @@ function semanticBusinessId(object: THREE.Object3D | null): string | null {
   return null;
 }
 
+function premiumMaterial(source: THREE.Material, businessId: string | null) {
+  const material = source.clone() as THREE.MeshStandardMaterial;
+  if (!("roughness" in material)) return material;
+  material.roughness = Math.max(material.roughness ?? 0.5, 0.24);
+  if (businessId?.startsWith("WALL-")) {
+    material.color.set(0x8b847a);
+    material.roughness = 0.78;
+    material.metalness = 0;
+  } else if (businessId === "SLAB-1602-BATHROOM" || businessId === "VIS-FLOOR-TILES") {
+    material.color.set(0x85837d);
+    material.roughness = 0.48;
+    material.metalness = 0.02;
+  } else if (businessId?.startsWith("FIXTURE-1602-WC") || businessId?.startsWith("FIXTURE-1602-BASIN")) {
+    material.color.set(0xeeeae2);
+    material.roughness = 0.16;
+    material.metalness = 0;
+  } else if (businessId === "PARTITION-1602-SHOWER-01") {
+    material.color.set(0x9fb1ae);
+    material.roughness = 0.12;
+    material.metalness = 0.05;
+    material.transparent = true;
+    material.opacity = 0.28;
+    material.depthWrite = false;
+  } else if (businessId?.includes("PIPE-1602-CW")) {
+    material.color.set(0x5e888b);
+    material.roughness = 0.38;
+  } else if (businessId?.includes("PIPE-1602-HW")) {
+    material.color.set(0x95644f);
+    material.roughness = 0.4;
+  } else if (businessId === "J-1602-CW-03" || businessId?.startsWith("VALVE-") || businessId?.startsWith("METER-")) {
+    material.color.set(0x9b9486);
+    material.roughness = 0.28;
+    material.metalness = 0.58;
+  } else if (businessId?.startsWith("STATE-DAMP")) {
+    material.color.multiplyScalar(0.52);
+    material.roughness = 0.96;
+    material.metalness = 0;
+  } else if (businessId?.startsWith("EVIDENCE-ANCHOR")) {
+    material.color.set(0xc89a61);
+    material.emissive = new THREE.Color(0x6d3d17);
+    material.emissiveIntensity = 0.24;
+  }
+  material.needsUpdate = true;
+  return material;
+}
+
+function viewMaterial(source: THREE.Material, businessId: string | null, view: VisualDirective["view"]) {
+  if (view === "VIEW_RESIDENT") return null;
+  const material = source.clone() as THREE.MeshStandardMaterial;
+  if (!("opacity" in material)) return null;
+  if (view === "VIEW_DIAGNOSTIC") {
+    if (businessId === "WALL-1602-BATHROOM-NORTH") material.opacity = 0.52;
+    if (businessId?.includes("PIPE-1602-HW")) material.opacity = 0.34;
+  }
+  if (view === "VIEW_CONSTRUCTION_MEMORY") {
+    if (businessId?.startsWith("WALL-") || businessId === "SLAB-1602-BATHROOM") material.opacity = 0.3;
+    if (businessId?.startsWith("FIXTURE-") || businessId === "PARTITION-1602-SHOWER-01") material.opacity = 0.42;
+    if (businessId?.includes("PIPE-1602-HW")) material.opacity = 0.3;
+  }
+  if (view === "VIEW_MAINTENANCE") {
+    if (businessId === "WALL-1602-BATHROOM-NORTH") material.opacity = 0.62;
+    if (businessId?.includes("PIPE-1602-HW")) material.opacity = 0.24;
+  }
+  if (material.opacity < 0.99) {
+    material.transparent = true;
+    material.depthWrite = false;
+  }
+  material.needsUpdate = true;
+  return material;
+}
+
 export function BathroomTwinViewport({ assets, externalError, directive, view, selectedBusinessId, onViewChange, onSelect }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const runtimeRef = useRef<SceneRuntime | null>(null);
@@ -95,19 +181,21 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
     setStatus("loading");
     setError(null);
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x111315);
-    const hemisphere = new THREE.HemisphereLight(0xf7f5ee, 0x20262a, 2.4);
-    const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
+    scene.background = new THREE.Color(0x111313);
+    const hemisphere = new THREE.HemisphereLight(0xeee7da, 0x1b2020, 2.1);
+    const keyLight = new THREE.DirectionalLight(0xfff4e5, 3.45);
     keyLight.position.set(8, -10, 14);
-    const fillLight = new THREE.DirectionalLight(0x8ed8e1, 1.25);
+    const fillLight = new THREE.DirectionalLight(0x7f9fa0, 0.82);
     fillLight.position.set(-8, 6, 8);
-    scene.add(hemisphere, keyLight, fillLight);
+    const warmAccent = new THREE.PointLight(0xd79b5a, 0.75, 9, 2);
+    warmAccent.position.set(-1.8, -1.5, 2.4);
+    scene.add(hemisphere, keyLight, fillLight, warmAccent);
     const camera = new THREE.PerspectiveCamera(40, 1, 0.05, 400);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 0.94;
     host.replaceChildren(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -136,9 +224,20 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
           position: [...exact.translation], scale: [...exact.scale], quaternion: [...exact.rotation], visible: true
         } : naturalTransform(snapshot(object)));
         const mesh = object as THREE.Mesh;
-        if (mesh.isMesh) materials.set(mesh.uuid, mesh.material);
+        if (mesh.isMesh) {
+          const businessId = semanticBusinessId(object);
+          const source = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+          const premium = source.map((material) => premiumMaterial(material, businessId));
+          mesh.material = Array.isArray(mesh.material) ? premium : premium[0];
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          materials.set(mesh.uuid, mesh.material);
+        }
       });
-      const runtime: SceneRuntime = { scene, camera, renderer, controls, baselines, materials, highlightMaterials: [], frame: 0 };
+      const runtime: SceneRuntime = {
+        scene, camera, renderer, controls, baselines, materials, highlightMaterials: [],
+        frame: 0
+      };
       runtimeRef.current = runtime;
       const animate = () => {
         controls.update();
@@ -186,7 +285,17 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
       if (baseline) applySnapshot(object, baseline);
       const mesh = object as THREE.Mesh;
       const original = runtime.materials.get(mesh.uuid);
-      if (mesh.isMesh && original) mesh.material = original;
+      if (mesh.isMesh && original) {
+        mesh.material = original;
+        const businessId = semanticBusinessId(object);
+        const source = Array.isArray(original) ? original : [original];
+        const adjusted = source.map((material) => viewMaterial(material, businessId, view));
+        if (adjusted.some(Boolean)) {
+          const resolved = adjusted.map((material, index) => material ?? source[index]);
+          adjusted.filter((material): material is THREE.MeshStandardMaterial => material !== null).forEach((material) => runtime.highlightMaterials.push(material));
+          mesh.material = Array.isArray(original) ? resolved : resolved[0];
+        }
+      }
     });
     for (const [layer, visible] of Object.entries(plan.layerVisibility)) {
       const object = runtime.scene.getObjectByName(`LAYER-${layer}`);
@@ -226,8 +335,8 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
           const clone = material.clone();
           const standard = clone as THREE.MeshStandardMaterial;
           if ("emissive" in standard) {
-            standard.emissive = new THREE.Color(0x5bd3df);
-            standard.emissiveIntensity = businessId === selectedBusinessId ? 0.55 : 0.28;
+            standard.emissive = new THREE.Color(0xcf8840);
+            standard.emissiveIntensity = businessId === selectedBusinessId ? 0.46 : 0.22;
           }
           runtime.highlightMaterials.push(clone);
           return clone;
@@ -297,14 +406,14 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
       {status === "loading" || status === "waiting" ? <div className="twin-loading"><RotateCcw className="spin" size={22} /><span>正在验证并加载数字样间</span></div> : null}
       {status === "failed" ? (
         <div className="twin-fallback" role="status">
-          <picture><source srcSet="/assets/v5/scenes/bathroom-moisture-surface.avif" type="image/avif" /><img src="/assets/v5/scenes/bathroom-moisture-surface.webp" alt="1602卫生间确定性降级剖面" /></picture>
+          <picture><source srcSet={publicAssetPath("/assets/v5/scenes/bathroom-moisture-surface.avif")} type="image/avif" /><img src={publicAssetPath("/assets/v5/scenes/bathroom-moisture-surface.webp")} alt="1602卫生间确定性降级剖面" /></picture>
           <div><TriangleAlert size={20} /><strong>三维视图已降级</strong><p>{error}</p><small>输入、诊断、授权与审计仍可继续使用。</small></div>
         </div>
       ) : null}
       <div className="twin-status-strip">
-        <span><i className={`moisture-dot ${directive.moistureState.toLowerCase()}`} />{directive.moistureState}</span>
-        <span>{directive.valvePosition === "OPEN" ? <Eye size={13} /> : <EyeOff size={13} />}阀门 {directive.valvePosition}</span>
-        <span><Crosshair size={13} />高亮 {directive.highlightBusinessIds.length}</span>
+        <span><i className={`moisture-dot ${directive.moistureState.toLowerCase()}`} />{moistureLabels[directive.moistureState]}</span>
+        <span>{directive.valvePosition === "OPEN" ? <Eye size={13} /> : <EyeOff size={13} />}{valveLabels[directive.valvePosition]}</span>
+        <span><Crosshair size={13} />已定位 {directive.highlightBusinessIds.length} 处</span>
       </div>
       {selected ? (
         <aside className="component-inspector">

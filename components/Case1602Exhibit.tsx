@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, ChevronDown, CircleDot, ExternalLink, LockKeyhole, Wrench } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { BathroomTwinViewport } from "@/components/life-event/BathroomTwinViewport";
+import { deriveJourneyView } from "@/lib/journey";
 import type { VisualDirective } from "@/lib/life-event-engine/types";
 
 const emptyDirective: VisualDirective = { view: "VIEW_CONSTRUCTION_MEMORY", highlightBusinessIds: ["J-1602-CW-03"], moistureState: "DRY", valvePosition: "OPEN", evidenceAnchorIds: ["EVIDENCE-ANCHOR-PIPE-INSTALL"], allowedActions: [], authorizationRequired: false };
@@ -33,24 +35,45 @@ export function Case1602Exhibit() {
   const directive = result?.visualDirective ?? emptyDirective;
   const current = chapters[index];
   const isResolved = result?.state === "RESOLVED";
+  const journeyAction = result ? deriveJourneyView({ source: "LIFE_EVENT", state: result.state }).primaryAction : null;
+  const currentHref = journeyAction?.route ?? current.href;
+  const currentAction = journeyAction?.label ?? current.action;
+  const presentView = directive.view === "VIEW_CONSTRUCTION_MEMORY" ? "VIEW_RESIDENT" : directive.view;
+  const [view, setView] = useState<VisualDirective["view"]>(directive.view);
+  const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(directive.highlightBusinessIds[0] ?? null);
+
+  useEffect(() => {
+    setView(directive.view);
+    setSelectedBusinessId(directive.highlightBusinessIds[0] ?? null);
+  }, [directive]);
 
   return <div className="case-exhibit">
     <section className="case-intro">
-      <div><p className="concept-kicker">筑生 / 1602验证舱</p><h1>概念是否成立，<br />要回到一间真实的卫生间。</h1><p>这是一个脱敏合成样板，却使用同一份建筑记忆、构件拓扑、授权守卫和维修复验规则。它不是另一套故事，而是“房子不该失忆”的一次完整证明。</p></div>
-      <aside><span>当前验证位置</span><strong>{current.label}</strong><p>{result ? `当前事件：${result.eventId}` : "尚未开启当前事件"}</p><Link href={current.href}>继续当前验证 <ArrowRight size={15} /></Link></aside>
+      <div><p className="concept-kicker">筑生 / 1602建筑生命事件</p><h1>一件潮湿异常，<br />唤醒一栋房子的记忆。</h1><p>从建造时留下的管线与工序，到入住后的现场观察、人工授权、维修和复验，所有动作都发生在同一条事件生命线上。</p></div>
+      <aside><span>当前事件位置</span><strong>{current.label}</strong><p>{result ? `事件：${result.eventId}` : "尚未开启1602事件"}</p><Link href={currentHref}>继续处理 <ArrowRight size={15} /></Link></aside>
     </section>
 
     <section className="case-stage" aria-label="1602卫生间数字样间">
-      <div className="case-model"><BathroomTwinViewport assets={assets} externalError={assetError} directive={directive} view={directive.view} selectedBusinessId={directive.highlightBusinessIds[0] ?? null} onViewChange={() => undefined} onSelect={() => undefined} /></div>
-      <article className="case-current-card"><p>{current.label}</p><h2>{current.title}</h2><div><span>此刻发生了什么</span><strong>{current.fact}</strong></div><div><span>为什么重要</span><strong>{current.why}</strong></div><Link href={current.href} className="case-primary">{current.action} <ArrowRight size={17} /></Link><details><summary>查看验证详情 <ChevronDown size={15} /></summary><p>模型来自1602卫生间GLB；业务状态、授权与审计仍由原有确定性领域引擎维护。</p></details></article>
+      <div className="case-model">
+        <div className="case-time-switch" role="group" aria-label="数字样间时间视图">
+          <button type="button" className={view === presentView ? "active" : ""} aria-pressed={view === presentView} onClick={() => setView(presentView)}>此刻</button>
+          <button type="button" className={view === "VIEW_CONSTRUCTION_MEMORY" ? "active" : ""} aria-pressed={view === "VIEW_CONSTRUCTION_MEMORY"} onClick={() => setView("VIEW_CONSTRUCTION_MEMORY")}>建造时</button>
+        </div>
+        <BathroomTwinViewport assets={assets} externalError={assetError} directive={directive} view={view} selectedBusinessId={selectedBusinessId} onViewChange={setView} onSelect={setSelectedBusinessId} />
+      </div>
+      <article className="case-current-card"><p>{current.label}</p><h2>{current.title}</h2><div><span>此刻发生了什么</span><strong>{current.fact}</strong></div><div><span>为什么重要</span><strong>{current.why}</strong></div><Link href={currentHref} className="case-primary">{currentAction} <ArrowRight size={17} /></Link><details><summary>查看事件详情 <ChevronDown size={15} /></summary><p>空间与构件来自1602卫生间GLB；业务状态、授权与审计由原有确定性领域引擎维护。</p></details></article>
     </section>
 
-    <section className="case-route" aria-label="1602验证路径">
-      {chapters.map((chapter, chapterIndex) => <article key={chapter.id} className={chapterIndex === index ? "active" : chapterIndex < index || isResolved ? "done" : ""}>
-        <i>{chapterIndex < index || isResolved ? <CheckCircle2 size={16} /> : <CircleDot size={15} />}</i><span>{chapter.label}</span><strong>{chapter.title}</strong><Link href={chapter.href} aria-label={chapter.action}><ExternalLink size={15} /></Link>
-      </article>)}
+    <section className="case-route" aria-label="1602事件生命线">
+      {chapters.map((chapter, chapterIndex) => {
+        const available = chapterIndex <= index || isResolved;
+        return <article key={chapter.id} className={chapterIndex === index ? "active" : chapterIndex < index || isResolved ? "done" : ""} aria-current={chapterIndex === index ? "step" : undefined}>
+          <i>{chapterIndex < index || isResolved ? <CheckCircle2 size={16} /> : available ? <CircleDot size={15} /> : <LockKeyhole size={14} />}</i><span>{chapter.label}</span><strong>{chapter.title}</strong>
+          {available ? <Link href={chapterIndex === index ? currentHref : chapter.href} aria-label={chapterIndex === index ? currentAction : chapter.action}><ExternalLink size={15} /></Link> : <button type="button" disabled aria-label={`${chapter.label}尚未解锁`}><LockKeyhole size={14} /></button>}
+        </article>;
+      })}
     </section>
 
-    <section className="case-boundary"><LockKeyhole size={19} /><div><strong>这是一个有边界的验证舱。</strong><p>模型不批准授权，授权不自动执行阀门，维修记录不自动关闭事件，单次经验不自动成为企业标准。</p></div><Wrench size={19} /></section>
+    <section className="case-boundary"><LockKeyhole size={19} /><div><strong>这是一件有边界的建筑生命事件。</strong><p>模型不批准授权，授权不自动执行阀门，维修记录不自动关闭事件，单次经验不自动成为企业标准。</p></div><Wrench size={19} /></section>
   </div>;
 }

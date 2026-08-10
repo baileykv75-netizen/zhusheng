@@ -31,13 +31,16 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Verify product boundaries
+        run: |
+          pnpm run typecheck
+          pnpm test
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Build static site
         run: |
-          pnpm run sync:life-event-assets
-          pnpm run sync:group-learning-assets
-          pnpm exec next build
+          pnpm run build:next
+          pnpm run test:pages-export
         env:
           NEXT_PUBLIC_BASE_PATH: /zhusheng
       - name: Upload GitHub Pages artifact
