@@ -17,7 +17,7 @@ export function EvidenceTimeChain() {
     <ol>
       {items.map((item, index) => <li key={item.id}>
         <figure><img src={publicAssetPath(item.assetPath!)} alt={`${labels[index][1]}的AI生成脱敏合成演示`} /><figcaption>{item.disclosure}</figcaption></figure>
-        <div><small>{String(index + 1).padStart(2, "0")} / {labels[index][0]}</small><strong>{labels[index][1]}</strong><p>{item.spaceId}<br />{item.componentId ?? "未关联构件"}</p><code>{item.type}</code></div>
+        <div><small>{String(index + 1).padStart(2, "0")} / {labels[index][0]}</small><strong>{labels[index][1]}</strong><p>{item.spaceId}<br />{item.componentId ?? "未关联构件"}</p><code>{item.type}</code><details><summary>证据身份</summary><dl><div><dt>事件</dt><dd>{item.eventId}</dd></div><div><dt>提交者</dt><dd>{item.submittedBy}</dd></div><div><dt>时间</dt><dd>{new Date(item.capturedAt).toLocaleString("zh-CN", { hour12: false })}</dd></div><div><dt>来源</dt><dd>{item.source}</dd></div><div><dt>数据</dt><dd>{item.dataClass}</dd></div></dl></details></div>
         {index < items.length - 1 ? <ArrowDown aria-hidden="true" /> : null}
       </li>)}
     </ol>

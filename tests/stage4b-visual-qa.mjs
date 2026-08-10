@@ -17,8 +17,7 @@ async function assertNoOverflow(page, label) {
 }
 
 async function openLab(page) {
-  await page.goto(`${baseUrl}/resident/`, { waitUntil: "networkidle" });
-  await page.getByRole("button", { name: "高级实验" }).click();
+  await page.goto(`${baseUrl}/property?mode=lab`, { waitUntil: "networkidle" });
   await page.locator('.twin-viewport[data-model-status="ready"]').waitFor({ timeout: 30_000 });
   await page.getByRole("button", { name: "重新评估" }).waitFor();
 }
@@ -121,8 +120,8 @@ await mobile.screenshot({ path: `${output}/10-mobile-repair-task.png`, fullPage:
 const guidedContext = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 const guided = await guidedContext.newPage();
 await guided.goto(`${baseUrl}/resident/`, { waitUntil: "networkidle" });
-await guided.locator(".workspace-mode-switch").getByRole("button", { name: "任务处置" }).waitFor();
-assert.equal(await guided.locator(".professional-workspace").count(), 1);
+await guided.locator(".resident-service").waitFor();
+assert.equal(await guided.locator(".resident-service").count(), 1);
 await guided.screenshot({ path: `${output}/11-guided-demo-normal.png`, fullPage: true });
 
 for (const [route, name] of [["/", "12-home-unaffected"], ["/worker/", "13-worker-unaffected"], ["/group/", "14-group-unaffected"]]) {
@@ -138,8 +137,7 @@ for (const [route, name] of [["/", "12-home-unaffected"], ["/worker/", "13-worke
 const fallbackContext = await browser.newContext({ viewport: { width: 1024, height: 768 } });
 const fallback = await fallbackContext.newPage();
 await fallback.route("**/bathroom-1602.glb", (route) => route.abort("failed"));
-await fallback.goto(`${baseUrl}/resident/`, { waitUntil: "networkidle" });
-await fallback.getByRole("button", { name: "高级实验" }).click();
+await fallback.goto(`${baseUrl}/property?mode=lab`, { waitUntil: "networkidle" });
 await fallback.getByText("三维视图已降级", { exact: true }).waitFor({ timeout: 30_000 });
 await fallback.getByText("传感器观察", { exact: true }).waitFor();
 

@@ -32,10 +32,10 @@ export const syntheticEvidenceCatalog: BuildingEvidence[] = [
     componentId: "J-1602-CW-03",
     type: "CONSTRUCTION_MEMORY",
     source: "AI_GENERATED",
-    submittedBy: "脱敏演示资产",
-    capturedAt: "DEMO_TIME",
+    submittedBy: "匿名施工记录（脱敏演示）",
+    capturedAt: "2025-06-18T09:20:00+08:00",
     dataClass: "DEMO_SYNTHETIC",
-    assetPath: "/assets/v6/evidence/construction-pipe-install.webp",
+    assetPath: "/assets/demo-evidence/1602-construction-cold-water-joint.webp",
     disclosure: "AI生成 · 脱敏合成演示"
   },
   {
@@ -45,10 +45,10 @@ export const syntheticEvidenceCatalog: BuildingEvidence[] = [
     componentId: "WALL-1602-BATHROOM-NORTH",
     type: "USER_PHOTO",
     source: "AI_GENERATED",
-    submittedBy: "脱敏演示资产",
-    capturedAt: "DEMO_TIME",
+    submittedBy: "1602住户（脱敏演示）",
+    capturedAt: "2026-08-09T08:35:00+08:00",
     dataClass: "DEMO_SYNTHETIC",
-    assetPath: "/assets/v6/evidence/resident-north-wall.webp",
+    assetPath: "/assets/demo-evidence/1602-resident-damp-wall.webp",
     disclosure: "AI生成 · 脱敏合成演示"
   },
   {
@@ -58,10 +58,10 @@ export const syntheticEvidenceCatalog: BuildingEvidence[] = [
     componentId: "METER-1602-FLOW-01",
     type: "METER_OBSERVATION",
     source: "AI_GENERATED",
-    submittedBy: "脱敏演示资产",
-    capturedAt: "DEMO_TIME",
+    submittedBy: "1602住户（脱敏演示）",
+    capturedAt: "2026-08-09T08:42:00+08:00",
     dataClass: "DEMO_SYNTHETIC",
-    assetPath: "/assets/v6/evidence/water-meter-observation.webp",
+    assetPath: "/assets/demo-evidence/1602-water-meter-observation.webp",
     disclosure: "AI生成 · 脱敏合成演示"
   },
   {
@@ -71,8 +71,8 @@ export const syntheticEvidenceCatalog: BuildingEvidence[] = [
     componentId: "J-1602-CW-03",
     type: "PROPERTY_PHOTO",
     source: "AI_GENERATED",
-    submittedBy: "脱敏演示资产",
-    capturedAt: "DEMO_TIME",
+    submittedBy: "物业运行人员（脱敏演示）",
+    capturedAt: "2026-08-09T10:25:00+08:00",
     dataClass: "DEMO_SYNTHETIC",
     assetPath: "/assets/v6/evidence/property-joint-inspection.webp",
     disclosure: "AI生成 · 脱敏合成演示"
@@ -84,10 +84,10 @@ export const syntheticEvidenceCatalog: BuildingEvidence[] = [
     componentId: "J-1602-CW-03",
     type: "REPAIR_RECORD",
     source: "AI_GENERATED",
-    submittedBy: "脱敏演示资产",
-    capturedAt: "DEMO_TIME",
+    submittedBy: "物业维修人员（脱敏演示）",
+    capturedAt: "2026-08-09T14:10:00+08:00",
     dataClass: "DEMO_SYNTHETIC",
-    assetPath: "/assets/v6/evidence/repair-record.webp",
+    assetPath: "/assets/demo-evidence/1602-repair-open-wall.webp",
     disclosure: "AI生成 · 脱敏合成演示"
   },
   {
@@ -97,10 +97,10 @@ export const syntheticEvidenceCatalog: BuildingEvidence[] = [
     componentId: "WALL-1602-BATHROOM-NORTH",
     type: "POST_REPAIR_OBSERVATION",
     source: "AI_GENERATED",
-    submittedBy: "脱敏演示资产",
-    capturedAt: "DEMO_TIME",
+    submittedBy: "物业复验人员（脱敏演示）",
+    capturedAt: "2026-08-09T15:20:00+08:00",
     dataClass: "DEMO_SYNTHETIC",
-    assetPath: "/assets/v6/evidence/post-repair-dry.webp",
+    assetPath: "/assets/demo-evidence/1602-post-repair-wall.webp",
     disclosure: "AI生成 · 脱敏合成演示"
   }
 ];

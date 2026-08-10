@@ -1,5 +1,5 @@
 import path from "node:path";
-import { existsSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync } from "node:fs";
 import sharp from "sharp";
 
 const root = process.cwd();
@@ -27,4 +27,17 @@ for (const [source, destination, width] of jobs) {
     .webp({ quality: 82, effort: 5 })
     .toFile(destinationPath);
   console.log(`${source} -> ${destination}`);
+}
+
+const demoEvidence = [
+  ["public/assets/v6/evidence/construction-pipe-install.webp", "public/assets/demo-evidence/1602-construction-cold-water-joint.webp"],
+  ["public/assets/v6/evidence/resident-north-wall.webp", "public/assets/demo-evidence/1602-resident-damp-wall.webp"],
+  ["public/assets/v6/evidence/water-meter-observation.webp", "public/assets/demo-evidence/1602-water-meter-observation.webp"],
+  ["public/assets/v6/evidence/repair-record.webp", "public/assets/demo-evidence/1602-repair-open-wall.webp"],
+  ["public/assets/v6/evidence/post-repair-dry.webp", "public/assets/demo-evidence/1602-post-repair-wall.webp"]
+];
+mkdirSync(path.join(root, "public/assets/demo-evidence"), { recursive: true });
+for (const [source, destination] of demoEvidence) {
+  copyFileSync(path.join(root, source), path.join(root, destination));
+  console.log(`${source} => ${destination}`);
 }

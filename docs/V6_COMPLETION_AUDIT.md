@@ -28,27 +28,27 @@ V6 已完成从“1602 技术验证样机”到“建筑生命事件产品原型
 | 24—33 Diagnostic / Memory / Maintenance / Valve | 完成 | 四视图、时间切换、构件高亮、维修状态、阀门变换 | 视觉状态不能写入领域状态 |
 | 34—40 相机、动效与适度炫技 | 部分完成 | 相机过渡、聚焦、发光、高亮、减少运动 | 未加入 DOF、粒子、自由剖切面和完整爆炸视图；这些被视为可选表现项 |
 | 41—48 产品结构、Events、五事件、中文状态、Event Summary | 完成 | `/events`；`lib/product/building-events.ts` | 仅 1602 深链，其余明确为脱敏合成概览 |
-| 49—51 BuildingTask 与状态→任务 | 完成 | `lib/product/building-tasks.ts`、事件中心唯一下一步 | 每个事件有 owner、assignee、due、requiredEvidence、blockingReason |
+| 49–51 BuildingTask 与状态→任务 | 完成 | `lib/product/building-tasks.ts`、事件中心唯一下一步 | 每个事件有 owner、assignee、due、requiredEvidence、blockingReason；`REOPENED` 自动生成复检任务并保留首轮维修与复验引用 |
 | 52—57 Property 与完整专业流程 | 完成 | `/property`、物业事件队列、`PropertyWorkbench` | 诊断/执行/维修/复验归物业；沿原状态机推进 |
 | 58—61 Resident 瘦身与权限 | 完成 | `/resident` | 住户不运行专业诊断、不直接执行阀门、不填写维修结论 |
 | 62—64 Worker 与三层信息 | 完成 | `/worker` | 原话、AI 建议、人工确认正式记录分层 |
 | 65—71 Evidence、三类证据、格式与现实—模型关联 | 完成 | `EvidenceTimeChain`、`LocalEvidenceUpload`、模型定位卡 | JPG/JPEG/PNG/WEBP；当前浏览器本地预览；AI 与模型均不冒充现场照片 |
 | 72—75 Case1602、五阶段、未来章节锁定 | 完成 | `/case-1602`；章节状态守卫；浏览器断言 | 每一时刻只暴露一个主操作 |
-| 76—82 Group Constellation 与治理 | 完成 | `/group`、合成建筑星群、人工评审、三类结果 | 最高 `PILOT_ONLY`，单事件不称集团规律 |
+| 76–82 Group Constellation 与治理 | 完成 | `/group`、合成建筑星群、人工评审、三类结果、`lib/product/group-decision-tasks.ts` | 采纳生成有范围/负责人/样本/时间/指标的 `PILOT_ONLY` 任务；退回生成补证任务；暂缓生成含重启条件的等待任务 |
 | 83—86 Building Agent 与安全边界 | 完成 | 全局“问这栋房子”抽屉；草稿确认；只读工具；技术详情折叠 | 默认界面不展示模型厂商/密钥；语言模型不做领域决策 |
 | 87—88 首页数字信息与后续内容 | 完成 | 首页保留少量空间/构件/记忆状态和三幕叙事 | 未回退为控制台或功能清单 |
-| 89—104 AI 图像、五张证据时间链与能力边界 | 完成 | `public/assets/v6/evidence/` 6 张合成证据；5 张主时间链 | 每张有合成披露；不声称视觉识别或真实项目能力 |
+| 89–104 AI 图像、五张证据时间链与能力边界 | 完成 | `public/assets/demo-evidence/` 5 张精确命名主时间链；第六张物业检查示例保留在 `public/assets/v6/evidence/` | 每张证据均有提交人、时间、事件、空间、构件、类型、来源和 `dataClass`；不声称视觉识别或真实项目能力 |
 | 105—109 UI 语言、主要信息面、单主操作、详情折叠 | 完成 | 首页/案例/角色页；响应式截图 | 红色集中于风险和当前动作，技术 ID 进入详情 |
 | 110—112 会话、照片与格式 | 完成（演示级） | `sessionStorage`；本地对象 URL；显式 accept 类型 | 无服务端持久化，符合当前静态演示边界 |
 | 113 GitHub Pages | 完成（分支验证） | `/zhusheng` basePath 构建与资源检查 | 生产发布等待用户授权合并 `main` |
 | 114 LLM Gateway | 完成且未进入公网主线 | 本地安全网关、Schema、回退、脱敏 smoke artifacts | 公网静态容器不含密钥 |
 | 115 不要现在做的内容 | 明确不做 | 无新案例深链、无真实设备、无自动企业标准 | 守住“大架构、小闭环” |
 | 116—117 开发优先级与 Stage 0—12 | 完成 | 审计→Hero→1602→角色→事件→任务→证据→Group→Polish | 顺序按风险略有交错，但产物齐全 |
-| 118—130 测试、视觉 QA、降级、移动端、a11y、安全测试 | 完成 | 164/164；生产构建；四宽度展演 QA；focus/reduced-motion | 关键图片与 GLB 失败均有降级路径 |
-| 131 完整演示脚本 | 完成 | `docs/V6_DELIVERY_REPORT.md` 的演示路径；现有 pitch/video 脚本 | 以当前路由和角色分工为准 |
+| 118–130 测试、视觉 QA、降级、移动端、a11y、安全测试 | 完成 | 166/166；生产构建；四宽度展演 QA；完整跨角色生命周期 QA；focus/reduced-motion | 关键图片与 GLB 失败均有降级路径 |
+| 131 完整演示脚本 | 完成 | `tests/v6-lifecycle-qa.mjs` 真实走通住户→物业→住户→物业→集团；`docs/V6_DELIVERY_REPORT.md` 演示路径 | 截图保存在 `artifacts/v6-lifecycle/`，不是文档中的假流程 |
 | 132 四类用户价值 | 完成 | Worker / Resident / Property / Group 四工作台 | 价值通过任务而非能力清单表达 |
 | 133 最终页面验收 | 完成 | 7 个要求路由均构建并由浏览器 QA 覆盖 | 深链与返回路径已验证 |
-| 134 工程验收 | 完成（待 Pages 生产发布） | typecheck、164 tests、build、basePath、asset checks | 生产 Pages 需合并 `main` 后才能触发 |
+| 134 工程验收 | 完成（待 Pages 生产发布） | typecheck、166 tests、build、basePath、asset checks、生命周期浏览器 QA | 生产 Pages 需合并 `main` 后才能触发 |
 | 135 最终交付报告 | 完成 | `docs/V6_DELIVERY_REPORT.md` | 含资产、数据流、安全、测试和限制 |
 | 136—138 成功标准、执行原则、工作态度 | 完成 | 外层电影化、内层确定性事件系统；未破坏事实源 | 对未完成的高级 3D 项保持诚实 |
 

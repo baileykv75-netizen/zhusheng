@@ -45,8 +45,11 @@ assert(lifeEventChunk.includes(basePath), "Life-event runtime assets are missing
 for (const asset of [
   "assets/life-event/bathroom-1602.glb",
   "assets/v6/model/north-wall-locator.webp",
-  "assets/v6/evidence/resident-north-wall.webp",
-  "assets/v6/evidence/water-meter-observation.webp",
+  "assets/demo-evidence/1602-construction-cold-water-joint.webp",
+  "assets/demo-evidence/1602-resident-damp-wall.webp",
+  "assets/demo-evidence/1602-water-meter-observation.webp",
+  "assets/demo-evidence/1602-repair-open-wall.webp",
+  "assets/demo-evidence/1602-post-repair-wall.webp",
   "assets/v6/group/learning-constellation.webp"
 ]) {
   assert(existsSync(join(out, asset)), `Required public asset is missing: ${asset}`);

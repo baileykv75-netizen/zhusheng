@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Check, ChevronDown, ClipboardCheck, FileSearch, Gauge, ListTree, LockKeyhole, Play, ShieldCheck, Wrench } from "lucide-react";
 import { deriveJourneyView } from "@/lib/journey/index.ts";
 import type { LabSession } from "@/lib/life-event-lab/types.ts";
@@ -40,6 +40,8 @@ export function PropertyWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): void }
     executeValveAction, submitIsolation, submitRepair, submitPostRepair
   } = useLifecycleJourney();
   const result = session.result;
+  const [repairPhotoReady, setRepairPhotoReady] = useState(false);
+  const [postRepairPhotoReady, setPostRepairPhotoReady] = useState(false);
   const directive = result?.visualDirective ?? defaultDirective;
   const journey = result
     ? deriveJourneyView({ source: "LIFE_EVENT", state: result.state })
@@ -55,6 +57,11 @@ export function PropertyWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): void }
     requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-focus="${focus}"]`)?.focus({ preventScroll: false }));
   }, [result?.state]);
 
+  useEffect(() => {
+    if (result?.state === "REPAIR_PENDING") setRepairPhotoReady(false);
+    if (result?.state === "POST_REPAIR_VERIFYING") setPostRepairPhotoReady(false);
+  }, [result?.state]);
+
   function patch<K extends keyof LabSession>(key: K, value: LabSession[K]) {
     setSession((current) => ({ ...current, [key]: value, notice: null }));
   }
@@ -65,7 +72,8 @@ export function PropertyWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): void }
   const photoConfirmed = session.controls.residentPhoto === "PRESENT" && session.controls.photoFinding !== "UNREADABLE";
   const meterConfirmed = session.controls.meterReading === "PRESENT" && session.controls.meterFinding !== "UNREADABLE";
   const eventQueue = buildingLifeEvents(result?.state);
-  const taskQueue = buildingTasks(eventQueue);
+  const taskQueue = buildingTasks(eventQueue, result);
+  const currentTask = taskQueue.find((task) => task.eventId === "EVT-1602");
 
   return <div className="professional-workspace property-task-workspace">
     <section className="professional-scene" aria-label="1602卫生间数字孪生">
@@ -110,6 +118,7 @@ export function PropertyWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): void }
         {isFactCheck ? <section className="active-task resident-guided-task" data-focus="evidence" tabIndex={-1}>
           <div className="task-section-heading"><Gauge size={18} /><div><strong>此刻只需要核对现场事实</strong><small>系统会调用同一份建筑记忆；不会替人操作阀门。</small></div></div>
           <div className="resident-fact-groups">
+            {result?.state === "REOPENED" ? <article className="resident-fact gap reopened-history"><span>历史保留</span><strong>第一次维修与复验仍在事件链</strong><p>{currentTask?.historyRefs.length ? currentTask.historyRefs.join(" · ") : "原维修记录、复验观察与审计顺序保持不变。"}</p><small>新任务：重新检查1602卫生间；不会覆盖第一次处置。</small></article> : null}
             <article className="resident-fact known"><span>已发现</span><strong>卫生间持续潮湿</strong><p>湿度 {session.controls.humidity.value}%（基线 {session.controls.humidity.baseline ?? "—"}%），持续 {session.controls.humidity.durationMinutes} 分钟。</p></article>
             <article className="resident-fact known"><span>已发现</span><strong>无人用水仍有微流量</strong><p>{session.controls.microFlow.value} L/min，已持续 {session.controls.microFlow.durationMinutes} 分钟。</p></article>
             <article className="resident-fact memory"><span>已调取</span><strong>建造期管线与闭水记录</strong><p>施工接头、闭水试验和防水记录已关联至1602卫生间。</p></article>
@@ -164,8 +173,8 @@ export function PropertyWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): void }
             <label><span>维修人员 / 班组</span><input value={session.repairDraft.crewId} onChange={(event) => patch("repairDraft", { ...session.repairDraft, crewId: event.target.value })} /></label>
             <label><span>维修说明</span><textarea value={session.repairDraft.description} onChange={(event) => patch("repairDraft", { ...session.repairDraft, description: event.target.value })} /></label>
           </div>
-          <LocalEvidenceUpload label="选择维修现场照片" help="关联1602卫生间与当前维修构件" syntheticExample="/assets/v6/evidence/repair-record.webp" />
-          <button className="task-primary" disabled={busy || !session.repairDraft.crewId || !session.repairDraft.description} onClick={submitRepair}><ClipboardCheck size={16} />提交不可变维修记录</button>
+          <LocalEvidenceUpload label="选择维修现场照片" help="关联1602卫生间与当前维修构件" syntheticExample="/assets/demo-evidence/1602-repair-open-wall.webp" onReadyChange={setRepairPhotoReady} />
+          <button className="task-primary" disabled={busy || !session.repairDraft.crewId || !session.repairDraft.description || !repairPhotoReady} onClick={submitRepair}><ClipboardCheck size={16} />提交不可变维修记录</button>
         </section> : null}
 
         {result?.state === "REPAIR_RECORDED" ? <section className="active-task safety" data-focus="authorization" tabIndex={-1}>
@@ -181,8 +190,8 @@ export function PropertyWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): void }
             <TaskNumber label="湿度" value={session.postRepair.humidity} unit="%" min={0} max={100} onChange={(humidity) => patch("postRepair", { ...session.postRepair, humidity })} />
             <TaskNumber label="持续时间" value={session.postRepair.durationMinutes} unit="min" min={0} max={120} step={5} onChange={(durationMinutes) => patch("postRepair", { ...session.postRepair, durationMinutes })} />
           </div>
-          <LocalEvidenceUpload label="选择维修后现场照片" help="必须是恢复供水后的新观察" syntheticExample="/assets/v6/evidence/post-repair-dry.webp" />
-          <button className="task-primary" disabled={busy} onClick={submitPostRepair}><Gauge size={16} />提交维修后复验</button>
+          <LocalEvidenceUpload label="选择维修后现场照片" help="必须是恢复供水后的新观察" syntheticExample="/assets/demo-evidence/1602-post-repair-wall.webp" onReadyChange={setPostRepairPhotoReady} />
+          <button className="task-primary" disabled={busy || !postRepairPhotoReady} onClick={submitPostRepair}><Gauge size={16} />提交维修后复验</button>
         </section> : null}
 
         {result?.state === "RESOLVED" ? <section className="active-task final resolved">

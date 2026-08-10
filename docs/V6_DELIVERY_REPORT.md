@@ -61,15 +61,17 @@
 
 ## 5. AI 资产
 
-合成证据位于 `public/assets/v6/evidence/`：
+五张主时间链合成证据位于 `public/assets/demo-evidence/`：
 
-1. `construction-pipe-install.webp`：施工期接头安装。
-2. `resident-north-wall.webp`：北侧墙角潮湿。
-3. `water-meter-observation.webp`：无人用水时的水表人工观察。
-4. `repair-record.webp`：局部接头维修记录。
-5. `post-repair-dry.webp`：恢复供水后的新观察。
+1. `1602-construction-cold-water-joint.webp`：施工期接头安装。
+2. `1602-resident-damp-wall.webp`：北侧墙角潮湿。
+3. `1602-water-meter-observation.webp`：无人用水时的水表人工观察。
+4. `1602-repair-open-wall.webp`：局部接头维修记录。
+5. `1602-post-repair-wall.webp`：恢复供水后的新观察。
 
 另有 `property-joint-inspection.webp` 用于物业检查示例。所有图片都标记 `AI_GENERATED · DEMO_SYNTHETIC`，不作为真实项目照片、视觉识别结果或施工依据。
+
+每条正式证据同时显示或可展开核验：提交人、时间、事件、空间、构件、类型、来源和 `dataClass`。维修记录必须先选择维修照片；维修后复验必须再选择一张新的观察照片，不能复用首轮记录替代新观察。
 
 ## 6. 产品数据流
 
@@ -99,6 +101,7 @@ Building Agent 只负责把普通语言整理成待确认草稿、调用只读�
 - UI 和 3D 状态不能直接推进事件状态。
 - 关阀/开阀的“批准”与“执行”分离。
 - 维修后必须提交新的有效观察；持续异常进入 `REOPENED`。
+- `REOPENED` 会生成新的复检任务，并保留第一轮维修记录和第一轮复验引用，不覆盖历史。
 - AI 不批准授权、不操作设备、不关闭事件、不自动形成企业标准。
 - 工友证据贡献不用于单事件追责、处罚或排名。
 - 浏览器不保存 API Key；公网第一版不部署 DeepSeek 网关。
@@ -106,7 +109,7 @@ Building Agent 只负责把普通语言整理成待确认草稿、调用只读�
 ## 8. 测试
 
 - TypeScript：通过。
-- Node 领域与产品测试：164 / 164 通过。
+- Node 领域与产品测试：166 / 166 通过。
 - Next.js 生产构建与静态导出：通过，7 个产品路由及 404 均生成。
 - 浏览器展演 QA：通过。
   - 1440 / 1024 / 768 / 390。
@@ -116,6 +119,11 @@ Building Agent 只负责把普通语言整理成待确认草稿、调用只读�
   - Building Agent 普通语言入口和技术详情折叠。
   - 静态资源错误、运行时异常和横向溢出。
 - GitHub Pages `/zhusheng` 子路径构建与资源检查：纳入发布前最终验证。
+
+- 跨角色生命周期 QA：`pnpm run test:v6-lifecycle`。
+  - 真实走通住户补证与授权、物业执行关阀、隔离验证、带照片维修、独立开阀授权、带新照片复验、`RESOLVED` 五章解锁。
+  - 逐一验证集团“采纳为试点 / 退回补证 / 暂不采纳”都会生成有负责人、范围、时限和完成条件的后续任务。
+  - 截图位于 `artifacts/v6-lifecycle/`。
 
 关键截图位于 `artifacts/exhibit-qa/`。
 

@@ -80,7 +80,13 @@ function semanticBusinessId(object: THREE.Object3D | null): string | null {
 
 function premiumMaterial(source: THREE.Material, businessId: string | null) {
   const material = source.clone() as THREE.MeshStandardMaterial;
-  if (!("roughness" in material)) return material;
+  if (!("roughness" in source)) {
+    if ("color" in source && businessId === "J-1602-CW-03") material.color.set(0xa9673e);
+    if ("color" in source && businessId?.includes("EVIDENCE-ANCHOR")) material.color.set(0x765c42);
+    if ("color" in source && businessId?.includes("METER")) material.color.set(0x777b75);
+    material.needsUpdate = true;
+    return material;
+  }
   material.roughness = Math.max(material.roughness ?? 0.5, 0.24);
   if (businessId?.startsWith("WALL-")) {
     material.color.set(0x8b847a);
@@ -115,10 +121,11 @@ function premiumMaterial(source: THREE.Material, businessId: string | null) {
     material.color.multiplyScalar(0.52);
     material.roughness = 0.96;
     material.metalness = 0;
-  } else if (businessId?.startsWith("EVIDENCE-ANCHOR")) {
-    material.color.set(0xc89a61);
-    material.emissive = new THREE.Color(0x6d3d17);
-    material.emissiveIntensity = 0.24;
+  } else if (businessId?.includes("EVIDENCE-ANCHOR")) {
+    material.color.set(0x8f714f);
+    material.emissive = new THREE.Color(0x2f2114);
+    material.emissiveIntensity = 0.08;
+    material.roughness = 0.46;
   }
   material.needsUpdate = true;
   return material;
@@ -225,7 +232,7 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
         } : naturalTransform(snapshot(object)));
         const mesh = object as THREE.Mesh;
         if (mesh.isMesh) {
-          const businessId = semanticBusinessId(object);
+          const businessId = semanticBusinessId(object) ?? object.name;
           const source = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
           const premium = source.map((material) => premiumMaterial(material, businessId));
           mesh.material = Array.isArray(mesh.material) ? premium : premium[0];
@@ -313,18 +320,40 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
       const object = runtime.scene.getObjectByName(name);
       if (object) object.visible = true;
     }
+    const legacyJointRing = runtime.scene.getObjectByName("MESH-JOINT-HIGHLIGHT-RING");
+    if (legacyJointRing) legacyJointRing.visible = view !== "VIEW_MAINTENANCE";
     const anchorNames = Object.values(assets.manifest.evidenceAnchors).map((item) => item.nodeName);
     if (plan.evidenceAnchors.length) {
       const evidenceLayer = runtime.scene.getObjectByName("LAYER-EVIDENCE");
       if (evidenceLayer) evidenceLayer.visible = true;
       for (const name of anchorNames) {
         const object = runtime.scene.getObjectByName(name);
-        if (object) object.visible = plan.evidenceAnchors.includes(name);
+        const marker = runtime.scene.getObjectByName(`VIS-${name}-MARKER`);
+        const isSelectedAnchor = name === selectedBusinessId;
+        const isVisible = plan.evidenceAnchors.includes(name) && (view !== "VIEW_MAINTENANCE" || isSelectedAnchor);
+        if (object) object.visible = isVisible;
+        if (marker) {
+          marker.visible = isVisible;
+          if (marker.visible) {
+            const markerScale = isSelectedAnchor ? 0.26 : 0.14;
+            marker.scale.multiplyScalar(markerScale);
+          }
+        }
       }
     }
     const valveHandle = runtime.scene.getObjectByName(plan.valveNodeName);
     if (valveHandle) valveHandle.rotation.set(...plan.valveRotation);
-    const highlights = new Set([...plan.highlights, ...plan.evidenceAnchors, ...(selectedBusinessId ? [selectedBusinessId] : [])]);
+    // Evidence anchors are deliberately rendered as quiet spatial pins. Treating every
+    // anchor as a glowing component obscures the actual pipe joint and makes the twin
+    // read like a debug scene instead of a building-space diagnosis.
+    const componentHighlights = plan.highlights.filter((businessId) => !anchorNames.includes(businessId));
+    const visibleHighlights = view === "VIEW_MAINTENANCE"
+      ? componentHighlights.filter((businessId, index) => businessId === selectedBusinessId || (!selectedBusinessId && index === 0))
+      : componentHighlights;
+    const highlights = new Set([
+      ...visibleHighlights,
+      ...(selectedBusinessId ? [selectedBusinessId] : [])
+    ]);
     for (const businessId of highlights) {
       const root = runtime.scene.getObjectByName(businessId);
       root?.traverse((object) => {
@@ -335,8 +364,8 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
           const clone = material.clone();
           const standard = clone as THREE.MeshStandardMaterial;
           if ("emissive" in standard) {
-            standard.emissive = new THREE.Color(0xcf8840);
-            standard.emissiveIntensity = businessId === selectedBusinessId ? 0.46 : 0.22;
+            standard.emissive = new THREE.Color(0x8f4f2d);
+            standard.emissiveIntensity = businessId === selectedBusinessId ? 0.18 : 0.1;
           }
           runtime.highlightMaterials.push(clone);
           return clone;

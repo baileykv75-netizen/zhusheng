@@ -13,6 +13,7 @@
     "test": "node --test --experimental-strip-types tests/*.test.ts tests/life-event-engine/*.test.ts",
     "test:css-delivery": "node tests/css-delivery-qa.mjs",
     "test:exhibit": "node tests/exhibit-qa.mjs",
+    "test:v6-lifecycle": "node tests/v6-lifecycle-qa.mjs",
     "test:pages-export": "node scripts/check-pages-export.mjs",
     "test:resident-task": "node tests/resident-task-qa.mjs",
     "test:stage4a-visual": "node tests/stage4a-visual-qa.mjs",

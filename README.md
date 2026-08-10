@@ -47,6 +47,7 @@ pnpm run typecheck
 pnpm test
 pnpm run build
 pnpm run test:exhibit
+pnpm run test:v6-lifecycle
 ```
 
 `test:exhibit` 覆盖 1440、1024、768 和 390 四档宽度，并检查：
@@ -57,6 +58,8 @@ pnpm run test:exhibit
 - 住户、物业、工友、集团角色边界；
 - 1602 四种数字样间视图；
 - 静态资源、运行时错误、横向溢出和深链返回。
+
+`test:v6-lifecycle` 通过真实浏览器按状态机顺序走完住户补证与授权、物业关阀与维修、独立开阀授权、维修后新照片复验和集团三种人工治理结果；它同时检查维修照片与复验新照片的必填门槛。
 
 ## 技术边界
 
