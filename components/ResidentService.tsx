@@ -92,8 +92,8 @@ export function ResidentService() {
       {intake ? <section className="resident-intake">
         <article><div className="resident-step"><span>01</span><div><strong>发生了什么</strong><small>不用判断原因，只描述看到的现象。</small></div></div><textarea value={description} onChange={(event) => setDescription(event.target.value)} aria-label="问题描述" /></article>
         <article><div className="resident-step"><span>02</span><div><strong>补一张现场照片</strong><small>照片只在本机预览；本演示不会上传到服务器。</small></div></div>
-          <input ref={fileInput} hidden type="file" accept="image/*" onChange={(event) => choosePhoto(event.target.files?.[0])} />
-          {previewUrl ? <div className="resident-photo-preview"><img src={previewUrl} alt="住户选择的卫生间现场照片预览" /><button onClick={() => fileInput.current?.click()}><Camera size={15} />重新选择</button></div> : <button className="resident-upload" onClick={() => fileInput.current?.click()}><Upload size={19} /><span><strong>选择现场照片</strong><small>JPG / PNG · 仅本地预览</small></span></button>}
+          <input ref={fileInput} hidden type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => choosePhoto(event.target.files?.[0])} />
+          {previewUrl ? <div className="resident-photo-preview"><img src={previewUrl} alt="住户选择的卫生间现场照片预览" /><button onClick={() => fileInput.current?.click()}><Camera size={15} />重新选择</button></div> : <button className="resident-upload" onClick={() => fileInput.current?.click()}><Upload size={19} /><span><strong>选择现场照片</strong><small>JPG / JPEG / PNG / WEBP · 仅本地预览</small></span></button>}
           {syntheticPhoto ? <p className="resident-synthetic-selected"><Check size={14} />本次演示已选择AI脱敏合成照片</p> : null}
           <details className="resident-photo-guide"><summary>查看拍摄位置</summary><div><figure><img src={publicAssetPath("/assets/v6/model/north-wall-locator.webp")} alt="BIM模型中的1602卫生间北侧墙角定位" /><figcaption>BIM / GLB · MODEL_LOCATOR · 不是现场照片</figcaption></figure><section><strong>请拍摄北侧墙角</strong><p>建议画面同时包含墙面、墙地交界和相邻区域。</p><figure><img src={publicAssetPath("/assets/v6/evidence/resident-north-wall.webp")} alt="AI生成的北侧墙角脱敏合成演示照片" /><figcaption>AI生成 · 脱敏合成演示</figcaption></figure><button type="button" onClick={useSyntheticEvidence}>使用这张脱敏图继续演示</button></section></div></details>
         </article>
@@ -101,7 +101,7 @@ export function ResidentService() {
           <button className={session.controls.meterFinding === "FLOW_CONFIRMED_NO_USE" ? "active" : ""} onClick={() => setMeter("FLOW_CONFIRMED_NO_USE")}>有变化</button>
           <button className={session.controls.meterFinding === "NO_CHANGE" ? "active" : ""} onClick={() => setMeter("NO_CHANGE")}>没有变化</button>
           <button className={session.controls.meterFinding === "UNREADABLE" ? "active" : ""} onClick={() => setMeter("UNREADABLE")}>看不清</button>
-        </div></article>
+        </div><details className="resident-meter-example"><summary>查看水表观察示例</summary><figure><img src={publicAssetPath("/assets/v6/evidence/water-meter-observation.webp")} alt="AI生成的住宅水表脱敏合成演示照片" /><figcaption>AI生成 · 脱敏合成演示 · 不能代替你的人工观察</figcaption></figure></details></article>
         <button className="resident-primary" disabled={busy || !assets || !description.trim() || (!previewUrl && !syntheticPhoto)} onClick={evaluate}>{busy ? "正在交给建筑记忆核对…" : "确认现场情况"}<ArrowRight size={17} /></button>
         <p className="resident-boundary"><ShieldCheck size={14} />确认后进入同一1602事件；不会自动操作阀门。</p>
       </section> : null}

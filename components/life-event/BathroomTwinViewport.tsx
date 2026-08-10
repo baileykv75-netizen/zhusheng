@@ -398,7 +398,7 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
         <div><Box size={16} /><span>1602卫生间数字样间</span><small>脱敏合成演示模型</small></div>
         <nav aria-label="数字样间视图">
           {(Object.keys(viewLabels) as Array<VisualDirective["view"]>).map((item) => (
-            <button key={item} className={view === item ? "active" : ""} aria-pressed={view === item} onClick={() => onViewChange(item)}>{viewLabels[item]}</button>
+            <button key={item} className={view === item ? "active" : ""} aria-label={viewLabels[item]} aria-pressed={view === item} onClick={() => onViewChange(item)}>{viewLabels[item]}</button>
           ))}
         </nav>
       </header>

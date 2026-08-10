@@ -81,6 +81,8 @@ try {
     assert.equal(await casePage.locator(".case-route article").count(), 5, `${viewport.name}: case must retain all five chapters`);
     assert.equal(await casePage.locator(".case-route article > a").count(), 1, `${viewport.name}: future chapters must remain locked before the event advances`);
     assert.equal(await casePage.locator(".case-current-card .case-primary").count(), 1, `${viewport.name}: case must have one next action`);
+    assert.equal(await casePage.locator(".evidence-time-chain li").count(), 5, `${viewport.name}: case must show one five-step evidence timeline`);
+    assert.equal(await casePage.locator(".evidence-time-chain img[src*='water-meter-observation']").count(), 1, `${viewport.name}: evidence timeline must include a water-meter observation`);
     await casePage.locator(".case-time-switch button").first().click();
     await casePage.locator('.twin-viewport[data-view="VIEW_RESIDENT"]').waitFor();
     await casePage.locator(".case-time-switch button").last().click();
@@ -89,6 +91,19 @@ try {
     assert.ok(caseDimensions.html <= caseDimensions.width + 1 && caseDimensions.body <= caseDimensions.width + 1, `${viewport.name}: case overflows: ${JSON.stringify(caseDimensions)}`);
     assert.deepEqual(failedCaseAssets, [], `${viewport.name}: case asset failures: ${failedCaseAssets.join(", ")}`);
     assert.deepEqual(caseRuntimeErrors, [], `${viewport.name}: case runtime errors: ${caseRuntimeErrors.join(" | ")}`);
+    if (viewport.name === "1440") {
+      const visualViews = [
+        ["空间", "VIEW_RESIDENT", "resident"],
+        ["定位", "VIEW_DIAGNOSTIC", "diagnostic"],
+        ["建造时", "VIEW_CONSTRUCTION_MEMORY", "construction-memory"],
+        ["维修后", "VIEW_MAINTENANCE", "maintenance"]
+      ];
+      for (const [label, dataView, filename] of visualViews) {
+        await casePage.locator(".twin-toolbar button").filter({ hasText: label }).evaluate((button) => button.click());
+        await casePage.locator(`.twin-viewport[data-view="${dataView}"]`).waitFor();
+        await casePage.locator(".case-stage").screenshot({ path: `${output}/v6-1602-${filename}.png` });
+      }
+    }
     await casePage.screenshot({ path: `${output}/case-1602-${viewport.name}.png`, fullPage: true });
     await home.close();
     await casePage.close();
@@ -99,6 +114,8 @@ try {
   const drill = await context.newPage();
   await drill.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
   await drill.locator(".v6-enter-building").click();
+  await drill.locator(".v6-building-twin.phase-floor").waitFor();
+  await drill.screenshot({ path: `${output}/v6-hero-16f-focus.png`, fullPage: false });
   await drill.waitForURL(/\/case-1602\/?$/, { timeout: 6000 });
   assert.equal(await drill.locator(".case-exhibit").count(), 1, "building drill-down must end at the 1602 event");
   const deepLink = await context.newPage();
@@ -119,7 +136,7 @@ try {
     await residentPage.goto(`${baseUrl}/resident`, { waitUntil: "networkidle" });
     await residentPage.locator(".resident-service").waitFor();
     assert.equal(await residentPage.locator(".twin-viewport").count(), 0, `${viewport.name}: resident service must not expose the engineering twin`);
-    assert.equal(await residentPage.locator('input[type="file"][accept="image/*"]').count(), 1, `${viewport.name}: resident must be able to choose a local evidence image`);
+    assert.equal(await residentPage.locator('input[type="file"][accept*="image/jpeg"][accept*="image/png"][accept*="image/webp"]').count(), 1, `${viewport.name}: resident must accept JPG, PNG and WEBP local evidence`);
     assert.equal(await residentPage.locator(".resident-primary").count(), 1, `${viewport.name}: resident intake must have one primary action`);
     assert.equal(await residentPage.locator(".resident-primary").isDisabled(), true, `${viewport.name}: resident submission must wait for a local or explicitly synthetic image`);
     await residentPage.locator(".resident-photo-guide").evaluate((details) => { details.open = true; });
@@ -132,10 +149,11 @@ try {
     await propertyPage.locator(".property-task-workspace").waitFor();
     await propertyPage.locator('.twin-viewport[data-model-status="ready"]').waitFor({ timeout: 20_000 });
     assert.equal(await propertyPage.locator(".professional-task-pane .active-task").count(), 1, `${viewport.name}: property workspace must show one current task`);
+    assert.equal(await propertyPage.locator(".property-event-queue").count(), 1, `${viewport.name}: property workspace must expose its event queue`);
 
     const workerPage = await roleContext.newPage();
     await workerPage.goto(`${baseUrl}/worker`, { waitUntil: "networkidle" });
-    assert.equal(await workerPage.locator('input[type="file"][accept="image/*"]').count(), 1, `${viewport.name}: worker must support a real local construction image selection`);
+    assert.equal(await workerPage.locator('input[type="file"][accept*="image/jpeg"][accept*="image/png"][accept*="image/webp"]').count(), 1, `${viewport.name}: worker must support JPG, PNG and WEBP construction evidence`);
 
     const pages = [eventsPage, residentPage, propertyPage, workerPage];
     for (const page of pages) {
@@ -146,6 +164,12 @@ try {
     await residentPage.screenshot({ path: `${output}/v6-resident-${viewport.name}.png`, fullPage: true });
     await propertyPage.screenshot({ path: `${output}/v6-property-${viewport.name}.png`, fullPage: true });
     if (viewport.name === "1440") {
+      await eventsPage.locator(".workspace-menu summary").click();
+      await eventsPage.locator(".workspace-menu nav button").click();
+      await eventsPage.getByRole("dialog", { name: "筑生总智能体" }).waitFor();
+      assert.ok((await eventsPage.getByRole("dialog", { name: "筑生总智能体" }).innerText()).includes("问这栋房子"), "Building Agent must remain reachable in ordinary language");
+      assert.equal((await eventsPage.getByRole("dialog", { name: "筑生总智能体" }).innerText()).includes("DeepSeek"), false, "ordinary Building Agent view must not lead with provider details");
+      await eventsPage.getByRole("button", { name: "关闭", exact: true }).click();
       const groupPage = await roleContext.newPage();
       await groupPage.goto(`${baseUrl}/group`, { waitUntil: "networkidle" });
       await groupPage.locator(".group-constellation-intro").waitFor();

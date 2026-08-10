@@ -46,6 +46,7 @@ for (const asset of [
   "assets/life-event/bathroom-1602.glb",
   "assets/v6/model/north-wall-locator.webp",
   "assets/v6/evidence/resident-north-wall.webp",
+  "assets/v6/evidence/water-meter-observation.webp",
   "assets/v6/group/learning-constellation.webp"
 ]) {
   assert(existsSync(join(out, asset)), `Required public asset is missing: ${asset}`);

@@ -52,6 +52,19 @@ export const syntheticEvidenceCatalog: BuildingEvidence[] = [
     disclosure: "AI生成 · 脱敏合成演示"
   },
   {
+    id: "SYN-RESIDENT-WATER-METER",
+    eventId: "EVT-1602",
+    spaceId: "SPACE-1602-BATHROOM",
+    componentId: "METER-1602-FLOW-01",
+    type: "METER_OBSERVATION",
+    source: "AI_GENERATED",
+    submittedBy: "脱敏演示资产",
+    capturedAt: "DEMO_TIME",
+    dataClass: "DEMO_SYNTHETIC",
+    assetPath: "/assets/v6/evidence/water-meter-observation.webp",
+    disclosure: "AI生成 · 脱敏合成演示"
+  },
+  {
     id: "SYN-PROPERTY-JOINT-INSPECTION",
     eventId: "EVT-1602",
     spaceId: "SPACE-1602-BATHROOM",
@@ -91,3 +104,11 @@ export const syntheticEvidenceCatalog: BuildingEvidence[] = [
     disclosure: "AI生成 · 脱敏合成演示"
   }
 ];
+
+export const syntheticEvidenceTimelineIds = [
+  "SYN-WORKER-PIPE-INSTALL",
+  "SYN-RESIDENT-NORTH-WALL",
+  "SYN-RESIDENT-WATER-METER",
+  "SYN-REPAIR-RECORD",
+  "SYN-POST-REPAIR-DRY"
+] as const;

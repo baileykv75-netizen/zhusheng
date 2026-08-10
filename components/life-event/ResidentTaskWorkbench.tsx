@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useMemo } from "react";
-import { AlertTriangle, Check, ChevronDown, ClipboardCheck, FileSearch, Gauge, LockKeyhole, Play, ShieldCheck, Wrench } from "lucide-react";
+import { AlertTriangle, Check, ChevronDown, ClipboardCheck, FileSearch, Gauge, ListTree, LockKeyhole, Play, ShieldCheck, Wrench } from "lucide-react";
 import { deriveJourneyView } from "@/lib/journey/index.ts";
 import type { LabSession } from "@/lib/life-event-lab/types.ts";
 import { repairTaskForResult } from "@/lib/life-event-lab/model.ts";
 import type { VisualDirective } from "@/lib/life-event-engine/types.ts";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { LocalEvidenceUpload } from "@/components/LocalEvidenceUpload";
+import { buildingLifeEvents } from "@/lib/product/building-life-events";
+import { buildingTasks } from "@/lib/product/building-tasks";
 import { BathroomTwinViewport } from "./BathroomTwinViewport";
 
 const defaultDirective: VisualDirective = {
@@ -62,6 +64,8 @@ export function PropertyWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): void }
   const isFactCheck = !result || ["DETECTED", "COLLECTING_EVIDENCE", "INCONCLUSIVE", "REOPENED"].includes(result.state);
   const photoConfirmed = session.controls.residentPhoto === "PRESENT" && session.controls.photoFinding !== "UNREADABLE";
   const meterConfirmed = session.controls.meterReading === "PRESENT" && session.controls.meterFinding !== "UNREADABLE";
+  const eventQueue = buildingLifeEvents(result?.state);
+  const taskQueue = buildingTasks(eventQueue);
 
   return <div className="professional-workspace property-task-workspace">
     <section className="professional-scene" aria-label="1602卫生间数字孪生">
@@ -87,6 +91,13 @@ export function PropertyWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): void }
           <Link href="/events">返回事件中心</Link>
           <button onClick={onOpenAdvanced}>高级验证</button>
         </div>
+        <details className="property-event-queue">
+          <summary><span><ListTree size={15} /><small>物业事件队列</small><strong>{taskQueue.filter((task) => task.status !== "DONE").length} 项需处理</strong></span><em>当前 · 1602</em><ChevronDown size={14} /></summary>
+          <div>{eventQueue.map((event, queueIndex) => {
+            const task = taskQueue[queueIndex];
+            return <article key={event.id} className={event.id === "EVT-1602" ? "current" : ""}><span>{event.floor}F · {event.unitId}</span><strong>{event.title}</strong><small>{task.ownerRole} · {task.title}</small>{!event.isDeepDemo ? <em>概览事件</em> : <em>完整深链</em>}</article>;
+          })}</div>
+        </details>
         <small>物业运行席 / 1602 / {isFactCheck ? "事件接入" : journey.stateLabel}</small>
         <h2>{isFactCheck ? "1602卫生间出现潮湿" : journey.headline}</h2>
         <p>{isFactCheck ? "先把现场事实与建造记忆放在一起核对，再决定是否需要隔离验证。" : journey.summary}</p>

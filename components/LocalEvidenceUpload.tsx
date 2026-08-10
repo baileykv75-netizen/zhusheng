@@ -27,7 +27,7 @@ export function LocalEvidenceUpload({ label, help, syntheticExample, onSelected 
   }
 
   return <div className="local-evidence-upload">
-    <input ref={inputRef} hidden type="file" accept="image/*" onChange={(event) => select(event.target.files?.[0])} />
+    <input ref={inputRef} hidden type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => select(event.target.files?.[0])} />
     {previewUrl ? <div className="local-evidence-preview"><img src={previewUrl} alt={`${label}本地预览`} /><span>浏览器本地图片</span><button type="button" onClick={() => inputRef.current?.click()}><RotateCcw size={13} />重新选择</button></div> : <button type="button" className="local-evidence-trigger" onClick={() => inputRef.current?.click()}><ImagePlus size={18} /><span><strong>{label}</strong><small>{help}</small></span></button>}
     <p><Camera size={12} />当前仅在浏览器会话中预览，不上传服务器。</p>
     {syntheticExample ? <details><summary>查看脱敏演示示例</summary><div className="synthetic-evidence"><img src={publicAssetPath(syntheticExample)} alt={`${label}的AI生成脱敏合成演示`} /><span>AI生成 · 脱敏合成演示</span></div></details> : null}

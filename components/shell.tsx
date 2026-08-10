@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, BriefcaseBusiness, Building2, ChevronDown, ClipboardPenLine, House, ListTree, Menu, UsersRound } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, BriefcaseBusiness, Building2, ChevronDown, ClipboardPenLine, House, ListTree, Menu, Sparkles, UsersRound } from "lucide-react";
 import { deriveJourneyView } from "@/lib/journey/index.ts";
 import { useDemo } from "./demo-provider";
 import { useLifecycleJourney } from "./lifecycle-journey-provider";
+import { BuildingAgentDrawer } from "./building-agent/BuildingAgentDrawer";
 
 const workspaces = [
   { href: "/events", label: "建筑事件中心", icon: ListTree },
@@ -26,6 +28,7 @@ const workspaceLabels: Record<string, string> = {
 };
 
 export function Shell({ children }: { children: React.ReactNode }) {
+  const [agentOpen, setAgentOpen] = useState(false);
   const pathname = usePathname();
   const currentPath = pathname.length > 1 ? pathname.replace(/\/+$/, "") : "/";
   const { state } = useDemo();
@@ -37,16 +40,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
     ? deriveJourneyView({ source: "LIFE_EVENT", state: lifecycleSession.result.state })
     : deriveJourneyView({ source: "DEMO", snapshot: state });
 
-  if (isExhibit) return <div className="exhibit-shell">
+  if (isExhibit) return <><div className="exhibit-shell">
     <header className="exhibit-header">
       <Link href="/" className="exhibit-brand"><span>筑</span><strong>筑生</strong></Link>
-      <nav aria-label="筑生展演导航"><Link href="/#concept">概念</Link><Link href="/events">建筑事件</Link><Link href="/case-1602">1602生命事件</Link></nav>
+      <nav className="exhibit-nav" aria-label="筑生展演导航"><Link href="/#concept">概念</Link><Link href="/events">建筑事件</Link><Link href="/case-1602">1602生命事件</Link><button type="button" onClick={() => setAgentOpen(true)}><Sparkles size={13} />问这栋房子</button></nav>
       <Link href={isHome ? "/case-1602" : "/"} className="exhibit-header-action">{isHome ? "进入事件" : "返回概念"}<ArrowRight size={15} /></Link>
     </header>
     <main>{children}</main>
-  </div>;
+  </div><BuildingAgentDrawer open={agentOpen} onClose={() => setAgentOpen(false)} /></>;
 
-  return <div className="app-shell journey-shell">
+  return <><div className="app-shell journey-shell">
     <aside className="brand-rail compact-brand-rail">
       <Link href="/" className="brand-signature" aria-label="返回筑生总智能体">
         <span>筑</span><strong>筑生</strong>
@@ -65,6 +68,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <details className="workspace-menu">
         <summary aria-label="打开专业工作台菜单"><Menu size={17} /><span>专业工具</span><ChevronDown size={13} /></summary>
         <nav aria-label="专业工作台">
+          <button type="button" onClick={() => setAgentOpen(true)}><Sparkles size={15} /><span>问这栋房子</span></button>
           {workspaces.map(({ href, label, icon: Icon }) => <Link key={href} href={href}><Icon size={15} /><span>{label}</span></Link>)}
         </nav>
       </details>
@@ -74,7 +78,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
     <nav className="mobile-task-nav" aria-label="移动端工作台导航">
       <Link href="/case-1602"><Building2 size={17} /><span>1602生命事件</span></Link>
-      <details><summary><Menu size={17} /><span>{isHome ? "专业工具" : workspaceLabel}</span></summary><div>{workspaces.map(({ href, label, icon: Icon }) => <Link key={href} href={href}><Icon size={15} />{label}</Link>)}</div></details>
+      <details><summary><Menu size={17} /><span>{isHome ? "专业工具" : workspaceLabel}</span></summary><div><button type="button" onClick={() => setAgentOpen(true)}><Sparkles size={15} />问这栋房子</button>{workspaces.map(({ href, label, icon: Icon }) => <Link key={href} href={href}><Icon size={15} />{label}</Link>)}</div></details>
     </nav>
-  </div>;
+  </div><BuildingAgentDrawer open={agentOpen} onClose={() => setAgentOpen(false)} /></>;
 }

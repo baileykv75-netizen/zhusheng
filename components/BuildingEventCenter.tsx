@@ -4,10 +4,12 @@ import Link from "next/link";
 import { ArrowRight, Building2, Clock3, MapPin, UserRound } from "lucide-react";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { buildingLifeEvents } from "@/lib/product/building-life-events";
+import { buildingTasks } from "@/lib/product/building-tasks";
 
 export function BuildingEventCenter() {
   const { session } = useLifecycleJourney();
   const events = buildingLifeEvents(session.result?.state);
+  const tasks = buildingTasks(events);
   const activeFloors = new Map(events.map((event) => [event.floor, event]));
 
   return <div className="event-center">
@@ -32,11 +34,11 @@ export function BuildingEventCenter() {
 
       <section className="event-list" aria-label="建筑生命事件列表">
         <header><div><small>当前需要处理</small><h2>事件不是状态，它必须指向下一项工作。</h2></div><span>按最近更新</span></header>
-        {events.map((event) => <article key={event.id} className={event.isDeepDemo ? "deep" : ""}>
+        {events.map((event, eventIndex) => <article key={event.id} className={event.isDeepDemo ? "deep" : ""}>
           <div className="event-card-top"><span>{event.id}</span><em>{event.dataClass === "DEMO_SYNTHETIC" ? "脱敏合成" : "真实数据"}</em>{event.isDeepDemo ? <b>深度事件</b> : null}</div>
           <h3>{event.title}</h3>
           <div className="event-card-meta"><span><MapPin size={13} />{event.floor}层 · {event.space}</span><span><Clock3 size={13} />{event.updatedAt}</span></div>
-          <dl><div><dt>当前状态</dt><dd>{event.displayStatus}</dd></div><div><dt>当前责任人</dt><dd><UserRound size={13} />{event.ownerRole}</dd></div><div><dt>唯一下一步</dt><dd>{event.nextAction}</dd></div></dl>
+          <dl><div><dt>当前状态</dt><dd>{event.displayStatus}</dd></div><div><dt>当前责任人</dt><dd><UserRound size={13} />{event.ownerRole}</dd></div><div><dt>唯一下一步</dt><dd>{tasks[eventIndex].title}</dd></div></dl>
           {event.isDeepDemo
             ? <Link href="/case-1602">进入1602深度事件 <ArrowRight size={15} /></Link>
             : <p>本事件仅用于展示建筑事件中心，暂未实现完整领域闭环。</p>}
