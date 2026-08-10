@@ -76,6 +76,7 @@ try {
     await casePage.goto(`${baseUrl}/case-1602`, { waitUntil: "networkidle" });
     await casePage.locator(".case-exhibit").waitFor();
     await casePage.locator('.twin-viewport[data-model-status="ready"]').waitFor({ timeout: 20_000 });
+    assert.equal(await casePage.locator('.twin-viewport[data-visual-source="premium"]').count(), 1, `${viewport.name}: verified premium twin must be the active visual source`);
     assert.equal(await casePage.locator(".twin-canvas canvas").count(), 1, `${viewport.name}: 1602 visual twin must produce a WebGL canvas`);
     assert.equal(await casePage.locator(".case-time-switch button").count(), 2, `${viewport.name}: case must offer one simple now/construction-time switch`);
     assert.equal(await casePage.locator(".case-route article").count(), 5, `${viewport.name}: case must retain all five chapters`);

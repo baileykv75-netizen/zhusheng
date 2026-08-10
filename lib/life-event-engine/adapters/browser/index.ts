@@ -16,6 +16,8 @@ export type BrowserLifeEventAssets = {
   manifest: VisualManifest;
   integrity: AssetIntegrity;
   glbUrl: string;
+  fallbackGlbUrl?: string;
+  visualSource: "premium" | "semantic-fallback";
   runtimeTransforms: {
     schemaVersion: 1;
     sceneId: string;
@@ -60,6 +62,21 @@ export async function loadBrowserLifeEventAssets(
     loadVerifiedAsset(fetcher, root, integrity, "bathroom-1602.glb"),
     loadVerifiedAsset(fetcher, root, integrity, "bathroom-1602.runtime-transforms.json")
   ]);
+  let visualSource: BrowserLifeEventAssets["visualSource"] = "semantic-fallback";
+  let glbUrl = `${root}/bathroom-1602.glb`;
+  let fallbackGlbUrl: string | undefined;
+  try {
+    await Promise.all([
+      loadVerifiedAsset(fetcher, root, integrity, "bathroom-1602-premium.glb"),
+      loadVerifiedAsset(fetcher, root, integrity, "bathroom-1602-premium.validation.json")
+    ]);
+    visualSource = "premium";
+    glbUrl = `${root}/bathroom-1602-premium.glb`;
+    fallbackGlbUrl = `${root}/bathroom-1602.glb`;
+  } catch {
+    // The premium twin is a display derivative. Its failure must never block the
+    // verified semantic model or any deterministic event operation.
+  }
   const decoder = new TextDecoder();
   const context = validateLifeEventContext(
     JSON.parse(decoder.decode(memoryBytes)),
@@ -72,7 +89,7 @@ export async function loadBrowserLifeEventAssets(
   for (const node of Object.values(context.manifest.nodes)) {
     if (!runtimeTransforms.transforms[node.nodeName]) throw new Error(`运行时变换缺少节点 ${node.nodeName}`);
   }
-  return { ...context, integrity, runtimeTransforms, glbUrl: `${root}/bathroom-1602.glb` };
+  return { ...context, integrity, runtimeTransforms, glbUrl, fallbackGlbUrl, visualSource };
 }
 
 export function createBrowserLifeEventEngine(assets: Pick<BrowserLifeEventAssets, "memory" | "manifest">, clock?: EngineClock) {

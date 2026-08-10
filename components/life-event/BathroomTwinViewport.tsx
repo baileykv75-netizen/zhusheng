@@ -161,6 +161,7 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
   const runtimeRef = useRef<SceneRuntime | null>(null);
   const [status, setStatus] = useState<"waiting" | "loading" | "ready" | "failed">("waiting");
   const [error, setError] = useState<string | null>(null);
+  const [effectiveVisualSource, setEffectiveVisualSource] = useState<BrowserLifeEventAssets["visualSource"]>("semantic-fallback");
 
   const selected = useMemo(() => {
     if (!assets || !selectedBusinessId) return null;
@@ -187,6 +188,7 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
     }
     setStatus("loading");
     setError(null);
+    setEffectiveVisualSource(assets.visualSource);
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x111313);
     const hemisphere = new THREE.HemisphereLight(0xeee7da, 0x1b2020, 2.1);
@@ -220,7 +222,7 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
     observer.observe(host);
     resize();
     const loader = new GLTFLoader();
-    loader.load(assets.glbUrl, (gltf) => {
+    const handleLoaded: Parameters<GLTFLoader["load"]>[1] = (gltf) => {
       if (cancelled) return;
       scene.add(gltf.scene);
       const baselines = new Map<string, TransformSnapshot>();
@@ -253,11 +255,20 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
       };
       animate();
       setStatus("ready");
-    }, undefined, (reason) => {
-      if (cancelled) return;
-      setStatus("failed");
-      setError(`GLB加载失败：${reason instanceof Error ? reason.message : "未知错误"}`);
-    });
+    };
+    const loadModel = (url: string, fallbackUrl?: string) => {
+      loader.load(url, handleLoaded, undefined, (reason) => {
+        if (cancelled) return;
+        if (fallbackUrl) {
+          setEffectiveVisualSource("semantic-fallback");
+          loadModel(fallbackUrl);
+          return;
+        }
+        setStatus("failed");
+        setError(`GLB加载失败：${reason instanceof Error ? reason.message : "未知错误"}`);
+      });
+    };
+    loadModel(assets.glbUrl, assets.fallbackGlbUrl);
     return () => {
       cancelled = true;
       observer.disconnect();
@@ -422,7 +433,7 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
   }
 
   return (
-    <section className="twin-viewport" data-model-status={status} data-view={view} data-valve-position={directive.valvePosition} data-moisture-state={directive.moistureState}>
+    <section className="twin-viewport" data-model-status={status} data-visual-source={effectiveVisualSource} data-view={view} data-valve-position={directive.valvePosition} data-moisture-state={directive.moistureState}>
       <header className="twin-toolbar">
         <div><Box size={16} /><span>1602卫生间数字样间</span><small>脱敏合成演示模型</small></div>
         <nav aria-label="数字样间视图">

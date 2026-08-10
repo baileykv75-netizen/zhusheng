@@ -22,9 +22,9 @@ V6 已完成从“1602 技术验证样机”到“建筑生命事件产品原型
 | 0—4 项目理解、保护边界、作品定位 | 完成 | `docs/V6_AUDIT_AND_PLAN.md`；现有引擎/IFC 未改 | V6 在产品层和视觉层扩展 |
 | 5—12 首页不是 Dashboard、建筑即界面、连续叙事 | 完成 | `/`、`ConceptExhibit`、`BuildingHeroScene` | 无首页输入框、无指标卡墙；建筑可交互下钻 |
 | 13—14 建筑→楼层→户→空间与 Breadcrumb | 完成 | 首页 16F / 1602 聚焦；浏览器 QA 截图 | 16 层定位为第一个空间 Wow Moment |
-| 15—16 Semantic / Visual Twin 双模型与原 GLB 保护 | 完成 | IFC/Memory/Manifest + 原 `bathroom-1602.glb` | 运行时只读映射与材质增强，原资产保留 |
+| 15—16 Semantic / Visual Twin 双模型与原 GLB 保护 | 完成 | IFC/Memory/Manifest + 语义基线 `bathroom-1602.glb` + 展示派生 `bathroom-1602-premium.glb` | 浏览器先校验增强模型，失败自动回退语义基线；原资产保留 |
 | 17—18 Hero 模型与性能预算 | 部分完成 | Three.js 程序化建筑 Hero；多档响应式 QA | 未另建 `building-hero.glb`；以程序化轻量几何替代 |
-| 19—23 Premium 1602、材质、灯光、潮湿层级 | 部分完成 | `BathroomTwinViewport` 运行时材质/灯光；四视图截图 | 模型内容完整，视觉提升为运行时方案；未重做高精度 GLB |
+| 19—23 Premium 1602、材质、灯光、潮湿层级 | 完成（展示级） | `bathroom-1602-premium.blend/.glb`、机器验证报告、四视图截图、`BathroomTwinViewport` | 30 处视觉细节、22,364 三角面、1,215,904 bytes；不冒充扫描级商业孪生 |
 | 24—33 Diagnostic / Memory / Maintenance / Valve | 完成 | 四视图、时间切换、构件高亮、维修状态、阀门变换 | 视觉状态不能写入领域状态 |
 | 34—40 相机、动效与适度炫技 | 部分完成 | 相机过渡、聚焦、发光、高亮、减少运动 | 未加入 DOF、粒子、自由剖切面和完整爆炸视图；这些被视为可选表现项 |
 | 41—48 产品结构、Events、五事件、中文状态、Event Summary | 完成 | `/events`；`lib/product/building-events.ts` | 仅 1602 深链，其余明确为脱敏合成概览 |
@@ -44,18 +44,18 @@ V6 已完成从“1602 技术验证样机”到“建筑生命事件产品原型
 | 114 LLM Gateway | 完成且未进入公网主线 | 本地安全网关、Schema、回退、脱敏 smoke artifacts | 公网静态容器不含密钥 |
 | 115 不要现在做的内容 | 明确不做 | 无新案例深链、无真实设备、无自动企业标准 | 守住“大架构、小闭环” |
 | 116—117 开发优先级与 Stage 0—12 | 完成 | 审计→Hero→1602→角色→事件→任务→证据→Group→Polish | 顺序按风险略有交错，但产物齐全 |
-| 118–130 测试、视觉 QA、降级、移动端、a11y、安全测试 | 完成 | 166/166；生产构建；四宽度展演 QA；完整跨角色生命周期 QA；focus/reduced-motion | 关键图片与 GLB 失败均有降级路径 |
+| 118–130 测试、视觉 QA、降级、移动端、a11y、安全测试 | 完成 | 168/168；生产构建；四宽度展演 QA；完整跨角色生命周期 QA；focus/reduced-motion | 高级 GLB 校验/解析失败均回退语义模型；图片亦有降级路径 |
 | 131 完整演示脚本 | 完成 | `tests/v6-lifecycle-qa.mjs` 真实走通住户→物业→住户→物业→集团；`docs/V6_DELIVERY_REPORT.md` 演示路径 | 截图保存在 `artifacts/v6-lifecycle/`，不是文档中的假流程 |
 | 132 四类用户价值 | 完成 | Worker / Resident / Property / Group 四工作台 | 价值通过任务而非能力清单表达 |
 | 133 最终页面验收 | 完成 | 7 个要求路由均构建并由浏览器 QA 覆盖 | 深链与返回路径已验证 |
-| 134 工程验收 | 完成（待 Pages 生产发布） | typecheck、166 tests、build、basePath、asset checks、生命周期浏览器 QA | 生产 Pages 需合并 `main` 后才能触发 |
+| 134 工程验收 | 完成（待 Pages 生产发布） | typecheck、168 tests、build、basePath、asset checks、生命周期浏览器 QA | 生产 Pages 需合并 `main` 后才能触发 |
 | 135 最终交付报告 | 完成 | `docs/V6_DELIVERY_REPORT.md` | 含资产、数据流、安全、测试和限制 |
 | 136—138 成功标准、执行原则、工作态度 | 完成 | 外层电影化、内层确定性事件系统；未破坏事实源 | 对未完成的高级 3D 项保持诚实 |
 
 ## 关键未完成/限制
 
 1. Hero 是轻量程序化 Three.js 建筑，不是单独制作的企业级 Hero GLB。
-2. 1602 继续使用原始 948,428 bytes GLB，通过运行时 PBR 参数、灯光、相机和状态层提升；没有另造 `premium.glb`。
+2. 1602 已有独立展示级 Premium GLB，但仍使用程序化几何和原生材质、无外部纹理，不等同于扫描级或商品级写实数字孪生。
 3. 没有真实住户、物业、IoT、BMS、工单或企业知识库连接。
 4. 浏览器状态和用户上传只保存在当前标签页/设备，不是生产数据库。
 5. 其余四个事件用于建筑级产品结构演示，不具备 1602 同等级领域闭环。

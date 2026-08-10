@@ -75,6 +75,44 @@ test("browser adapter verifies every published asset before creating context", a
   assert.equal(assets.memory.buildingId, "BLD-ZS-DEMO-001");
   assert.equal(assets.manifest.sourceSpaceId, "SPACE-1602-BATHROOM");
   assert.ok(assets.runtimeTransforms.transforms["MESH-PIPE-1602-CW-01"]);
+  assert.equal(assets.visualSource, "premium");
+  assert.match(assets.glbUrl, /bathroom-1602-premium\.glb$/);
+  assert.match(assets.fallbackGlbUrl ?? "", /bathroom-1602\.glb$/);
+});
+
+test("browser adapter falls back to the semantic twin when the premium derivative is unavailable", async () => {
+  const fetcher = (async (input: string | URL | Request) => {
+    const name = String(input).split("/").at(-1)!;
+    if (name === "bathroom-1602-premium.glb") return new Response("unavailable", { status: 503 });
+    try {
+      const bytes = readFileSync(resolve(repoRoot, "public/assets/life-event", name));
+      return new Response(new Uint8Array(bytes), { status: 200 });
+    } catch {
+      return new Response("missing", { status: 404 });
+    }
+  }) as typeof fetch;
+  const assets = await loadBrowserLifeEventAssets(fetcher, "/assets/life-event");
+  assert.equal(assets.visualSource, "semantic-fallback");
+  assert.match(assets.glbUrl, /bathroom-1602\.glb$/);
+  assert.equal(assets.fallbackGlbUrl, undefined);
+});
+
+test("premium visual twin stays within display budget and preserves its semantic baseline", () => {
+  const validation = JSON.parse(readFileSync(resolve(repoRoot, "bim/visual/bathroom-1602-premium.validation.json"), "utf8")) as {
+    passed: boolean;
+    semanticBaseline: string;
+    missingCriticalNodes: string[];
+    premiumDetailCount: number;
+    triangleCount: number;
+    glbBytes: number;
+    limits: { maxGlbBytes: number; maxTriangles: number };
+  };
+  assert.equal(validation.passed, true);
+  assert.equal(validation.semanticBaseline, "bathroom-1602.glb");
+  assert.deepEqual(validation.missingCriticalNodes, []);
+  assert.ok(validation.premiumDetailCount >= 24);
+  assert.ok(validation.triangleCount <= validation.limits.maxTriangles);
+  assert.ok(validation.glbBytes <= validation.limits.maxGlbBytes);
 });
 
 test("runtime transform sidecar restores hidden system mesh geometry", () => {

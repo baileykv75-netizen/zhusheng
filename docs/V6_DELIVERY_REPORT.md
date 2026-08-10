@@ -46,17 +46,23 @@
   - 外部纹理：0。
   - 四视图：Resident、Diagnostic、Construction Memory、Maintenance。
   - 语义节点继续映射 BusinessId / IFC GlobalId。
+- `public/assets/life-event/bathroom-1602-premium.glb`
+  - 大小：1,215,904 bytes。
+  - 三角面：22,364。
+  - 外部纹理：0。
+  - 在原语义基线上增加30处展示细节，并保留全部38个关键语义节点。
+  - 浏览器完整性校验通过时优先加载；文件缺失、哈希不一致或运行时解析失败时自动回退原 GLB。
 - `bim/output/ZS-DEMO-001.ifc` 与 `bim/data/building-memory.seed.json` 保持事实源地位。
 
 ### 本轮修改方式
 
-- 没有覆盖原 GLB、IFC、Blend 或 manifest。
-- 在网页运行时升级材质参数、环境光、重点光、相机聚焦、潮湿层级、维修状态、阀门姿态和证据锚点。
+- 没有覆盖原 GLB、IFC、Blend 或 manifest；增强模型作为独立派生资产生成和发布。
+- 在 Blender 派生层升级材质、灯光、曲面、墙面收口和局部维修细节，在网页运行时继续驱动相机聚焦、潮湿层级、维修状态、阀门姿态和证据锚点。
 - 首页建筑使用程序化轻量 Three.js 几何，支持楼层定位和空间下钻；它是 Visual Twin 导航，不冒充精确 IFC 几何。
 
 ### 降级
 
-- GLB 或图片加载失败时显示明确错误/回退，不把空白画面当成成功。
+- 高级 GLB 加载失败时先自动回退经校验的语义 GLB；两者均失败或图片失败时才显示明确降级，不把空白画面当成成功。
 - `prefers-reduced-motion` 下关闭非必要动画和过渡。
 
 ## 5. AI 资产
@@ -109,7 +115,7 @@ Building Agent 只负责把普通语言整理成待确认草稿、调用只读�
 ## 8. 测试
 
 - TypeScript：通过。
-- Node 领域与产品测试：166 / 166 通过。
+- Node 领域与产品测试：168 / 168 通过。
 - Next.js 生产构建与静态导出：通过，7 个产品路由及 404 均生成。
 - 浏览器展演 QA：通过。
   - 1440 / 1024 / 768 / 390。
@@ -131,7 +137,7 @@ Building Agent 只负责把普通语言整理成待确认草稿、调用只读�
 
 - 当前是脱敏合成演示，不连接真实建筑、住户、物业或设备。
 - 只有 1602 具备完整领域闭环；其余事件是结构演示数据。
-- Hero 没有单独高精度 GLB，1602 也未另做 Premium GLB。
+- Hero 没有单独高精度 GLB；1602 Premium GLB 是展示级程序化派生模型，未使用外部纹理，不等同于扫描级商业数字孪生。
 - 浏览器上传只在当前设备预览；刷新恢复依赖 `sessionStorage`，没有服务端数据库。
 - 静态 GitHub Pages 不运行 DeepSeek 网关或任何服务端密钥。
 - 生产 Pages 更新必须在用户授权后将功能分支合并到 `main`。

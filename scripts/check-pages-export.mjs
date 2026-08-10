@@ -44,6 +44,8 @@ assert(lifeEventChunk.includes(basePath), "Life-event runtime assets are missing
 
 for (const asset of [
   "assets/life-event/bathroom-1602.glb",
+  "assets/life-event/bathroom-1602-premium.glb",
+  "assets/life-event/bathroom-1602-premium.validation.json",
   "assets/v6/model/north-wall-locator.webp",
   "assets/demo-evidence/1602-construction-cold-water-joint.webp",
   "assets/demo-evidence/1602-resident-damp-wall.webp",
