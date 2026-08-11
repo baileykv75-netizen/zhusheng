@@ -1,6 +1,7 @@
 import { ArrowDown } from "lucide-react";
 import { publicAssetPath } from "@/lib/site-path";
 import { syntheticEvidenceCatalog, syntheticEvidenceTimelineIds } from "@/lib/product/evidence";
+import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 
 const labels = [
   ["施工", "接头安装留痕"],
@@ -11,14 +12,22 @@ const labels = [
 ] as const;
 
 export function EvidenceTimeChain() {
+  const { session } = useLifecycleJourney();
   const items = syntheticEvidenceTimelineIds.map((id) => syntheticEvidenceCatalog.find((item) => item.id === id)!);
+  const productItems = session.productEvidenceTimeline ?? [];
+  const totalItems = items.length + productItems.length;
   return <section className="evidence-time-chain" aria-labelledby="evidence-time-chain-title">
     <header><p>REALITY ↔ SPACE ↔ BIM ↔ MEMORY</p><h2 id="evidence-time-chain-title">证据不是图库，<br />它们发生在同一条时间线上。</h2><span>以下图片全部为 AI_GENERATED · DEMO_SYNTHETIC，用于表达产品关系，不是真实项目照片。</span></header>
     <ol>
       {items.map((item, index) => <li key={item.id}>
         <figure><img src={publicAssetPath(item.assetPath!)} alt={`${labels[index][1]}的AI生成脱敏合成演示`} /><figcaption>{item.disclosure}</figcaption></figure>
         <div><small>{String(index + 1).padStart(2, "0")} / {labels[index][0]}</small><strong>{labels[index][1]}</strong><p>{item.spaceId}<br />{item.componentId ?? "未关联构件"}</p><code>{item.type}</code><details><summary>证据身份</summary><dl><div><dt>事件</dt><dd>{item.eventId}</dd></div><div><dt>提交者</dt><dd>{item.submittedBy}</dd></div><div><dt>时间</dt><dd>{new Date(item.capturedAt).toLocaleString("zh-CN", { hour12: false })}</dd></div><div><dt>来源</dt><dd>{item.source}</dd></div><div><dt>数据</dt><dd>{item.dataClass}</dd></div></dl></details></div>
-        {index < items.length - 1 ? <ArrowDown aria-hidden="true" /> : null}
+        {index < totalItems - 1 ? <ArrowDown aria-hidden="true" /> : null}
+      </li>)}
+      {productItems.map((item, productIndex) => <li key={item.id} className="product-evidence-entry">
+        <figure><div><span>{item.sourceActor}</span><strong>不可变产品证据</strong><small>{item.dataClass}</small></div><figcaption>{item.disclosure}</figcaption></figure>
+        <div><small>{String(items.length + productIndex + 1).padStart(2, "0")} / 产品证据</small><strong>{item.type}</strong><p>{item.observedValue}</p><code>{item.id}</code><details><summary>证据身份</summary><dl><div><dt>事件</dt><dd>{item.eventId}</dd></div><div><dt>角色</dt><dd>{item.sourceActor}</dd></div><div><dt>时间</dt><dd>{new Date(item.capturedAt).toLocaleString("zh-CN", { hour12: false })}</dd></div><div><dt>领域引用</dt><dd>{item.domainEvidenceRefs.join(" · ") || "不参与领域评分"}</dd></div></dl></details></div>
+        {items.length + productIndex < totalItems - 1 ? <ArrowDown aria-hidden="true" /> : null}
       </li>)}
     </ol>
   </section>;

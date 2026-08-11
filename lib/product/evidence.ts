@@ -1,6 +1,11 @@
 export type EvidenceType =
   | "CONSTRUCTION_MEMORY"
   | "MODEL_LOCATOR"
+  | "RESIDENT_TEXT_OBSERVATION"
+  | "RESIDENT_PHOTO_OBSERVATION"
+  | "RESIDENT_METER_OBSERVATION"
+  | "PROPERTY_EVIDENCE_REVIEW"
+  | "PROPERTY_FIELD_OBSERVATION"
   | "USER_PHOTO"
   | "PROPERTY_PHOTO"
   | "METER_OBSERVATION"
@@ -9,6 +14,95 @@ export type EvidenceType =
   | "POST_REPAIR_OBSERVATION";
 
 export type EvidenceSource = "BIM_GLTF" | "WORKER" | "RESIDENT" | "PROPERTY" | "AI_GENERATED";
+
+export type ProductEvidenceDataClass = "DEMO_SYNTHETIC" | "BROWSER_LOCAL" | "REAL";
+export type ResidentPhotoFinding = "UNCONFIRMED" | "MOISTURE_VISIBLE" | "NO_VISIBLE_MOISTURE" | "UNREADABLE";
+export type ResidentMeterFinding = "FLOW_CONFIRMED_NO_USE" | "NO_CHANGE" | "UNREADABLE";
+
+export type ProductEvidenceRecord = {
+  id: string;
+  eventId: string;
+  spaceId: "SPACE-1602-BATHROOM";
+  relatedBusinessIds: string[];
+  relatedEvidenceIds: string[];
+  type: Extract<EvidenceType,
+    | "RESIDENT_TEXT_OBSERVATION"
+    | "RESIDENT_PHOTO_OBSERVATION"
+    | "RESIDENT_METER_OBSERVATION"
+    | "PROPERTY_EVIDENCE_REVIEW"
+    | "PROPERTY_FIELD_OBSERVATION"
+  >;
+  sourceActor: "RESIDENT" | "PROPERTY";
+  capturedAt: string;
+  dataClass: ProductEvidenceDataClass;
+  status: "PRESENT" | "UNVERIFIED";
+  observedValue: string;
+  disclosure: string;
+  domainEvidenceRefs: string[];
+  immutable: true;
+};
+
+export type ResidentEvidenceSubmission = {
+  submissionId: string;
+  eventId: string;
+  submittedAt: string;
+  submittedBy: "DEMO-RESIDENT-1602";
+  evidenceIds: string[];
+  descriptionEvidenceId: string;
+  photoEvidenceId: string;
+  meterEvidenceId: string;
+  photoFinding: Exclude<ResidentPhotoFinding, "UNCONFIRMED">;
+  meterFinding: ResidentMeterFinding;
+  immutable: true;
+};
+
+export type PropertyEvidenceReview = {
+  reviewId: string;
+  eventId: string;
+  residentSubmissionId: string;
+  evidenceId: string;
+  reviewedAt: string;
+  reviewedBy: string;
+  decision: "CONSISTENT" | "NEEDS_SITE_CHECK" | "INCONCLUSIVE";
+  note: string;
+  immutable: true;
+};
+
+export type ResidentEvidenceDraft = {
+  description: string;
+  photo: {
+    dataClass: Extract<ProductEvidenceDataClass, "BROWSER_LOCAL" | "DEMO_SYNTHETIC">;
+    fileName?: string;
+    mediaType?: string;
+    size?: number;
+    assetPath?: string;
+    finding: Exclude<ResidentPhotoFinding, "UNCONFIRMED">;
+  };
+  meterFinding: ResidentMeterFinding;
+};
+
+export type PropertyReviewDraft = {
+  residentSubmissionId: string;
+  reviewedBy: string;
+  decision: PropertyEvidenceReview["decision"];
+  note: string;
+};
+
+export type ProductEvidenceAppendix = {
+  schemaVersion: 1;
+  eventId: string;
+  generatedAt: string;
+  disclosure: string;
+  residentSubmissions: ResidentEvidenceSubmission[];
+  propertyReviews: PropertyEvidenceReview[];
+  evidence: ProductEvidenceRecord[];
+};
+
+export type VerifiedProductEvidenceBundle<TVerifiedPackage> = {
+  schemaVersion: 1;
+  verifiedEventPackage: TVerifiedPackage;
+  evidenceAppendix: ProductEvidenceAppendix;
+};
 
 export type BuildingEvidence = {
   id: string;
@@ -19,10 +113,161 @@ export type BuildingEvidence = {
   source: EvidenceSource;
   submittedBy: string;
   capturedAt: string;
-  dataClass: "DEMO_SYNTHETIC" | "BROWSER_LOCAL" | "REAL";
+  dataClass: ProductEvidenceDataClass;
   assetPath?: string;
   disclosure: string;
 };
+
+function productEvidenceId(prefix: string, eventId: string, sequence: number) {
+  return `${prefix}-${eventId}-${String(sequence).padStart(2, "0")}`;
+}
+
+export function createResidentEvidenceSubmission(input: {
+  draft: ResidentEvidenceDraft;
+  eventId: string;
+  submittedAt: string;
+  domainPhotoEvidenceId?: string;
+  domainMeterEvidenceId?: string;
+}): { submission: ResidentEvidenceSubmission; evidence: ProductEvidenceRecord[] } {
+  const submissionId = `RES-SUB-${input.eventId}`;
+  const descriptionEvidenceId = productEvidenceId("PROD-RES-TEXT", input.eventId, 1);
+  const photoEvidenceId = productEvidenceId("PROD-RES-PHOTO", input.eventId, 2);
+  const meterEvidenceId = productEvidenceId("PROD-RES-METER", input.eventId, 3);
+  const photoDescription = [
+    `人工观察=${input.draft.photo.finding}`,
+    input.draft.photo.fileName ? `文件=${input.draft.photo.fileName}` : null,
+    input.draft.photo.mediaType ? `类型=${input.draft.photo.mediaType}` : null,
+    input.draft.photo.size !== undefined ? `大小=${input.draft.photo.size}` : null,
+    input.draft.photo.assetPath ? `演示资产=${input.draft.photo.assetPath}` : null
+  ].filter(Boolean).join("；");
+  const disclosure = input.draft.photo.dataClass === "DEMO_SYNTHETIC"
+    ? "AI生成 · 脱敏合成演示 · 观察结论由住户手工确认"
+    : "浏览器本地证据 · 图片不上传服务器 · 观察结论由住户手工确认";
+  const evidence: ProductEvidenceRecord[] = [
+    {
+      id: descriptionEvidenceId,
+      eventId: input.eventId,
+      spaceId: "SPACE-1602-BATHROOM",
+      relatedBusinessIds: ["SPACE-1602-BATHROOM"],
+      relatedEvidenceIds: [],
+      type: "RESIDENT_TEXT_OBSERVATION",
+      sourceActor: "RESIDENT",
+      capturedAt: input.submittedAt,
+      dataClass: input.draft.photo.dataClass,
+      status: "PRESENT",
+      observedValue: input.draft.description.trim(),
+      disclosure: "住户自然语言原文 · 仅用于来源追踪，不参与诊断评分",
+      domainEvidenceRefs: [],
+      immutable: true
+    },
+    {
+      id: photoEvidenceId,
+      eventId: input.eventId,
+      spaceId: "SPACE-1602-BATHROOM",
+      relatedBusinessIds: ["WALL-1602-BATHROOM-NORTH", "SPACE-1602-BATHROOM"],
+      relatedEvidenceIds: [descriptionEvidenceId],
+      type: "RESIDENT_PHOTO_OBSERVATION",
+      sourceActor: "RESIDENT",
+      capturedAt: input.submittedAt,
+      dataClass: input.draft.photo.dataClass,
+      status: "PRESENT",
+      observedValue: photoDescription,
+      disclosure,
+      domainEvidenceRefs: input.domainPhotoEvidenceId ? [input.domainPhotoEvidenceId] : [],
+      immutable: true
+    },
+    {
+      id: meterEvidenceId,
+      eventId: input.eventId,
+      spaceId: "SPACE-1602-BATHROOM",
+      relatedBusinessIds: ["METER-1602-FLOW-01"],
+      relatedEvidenceIds: [descriptionEvidenceId],
+      type: "RESIDENT_METER_OBSERVATION",
+      sourceActor: "RESIDENT",
+      capturedAt: input.submittedAt,
+      dataClass: input.draft.photo.dataClass,
+      status: input.draft.meterFinding === "UNREADABLE" ? "UNVERIFIED" : "PRESENT",
+      observedValue: input.draft.meterFinding,
+      disclosure: "住户人工水表观察",
+      domainEvidenceRefs: input.domainMeterEvidenceId ? [input.domainMeterEvidenceId] : [],
+      immutable: true
+    }
+  ];
+  return {
+    submission: {
+      submissionId,
+      eventId: input.eventId,
+      submittedAt: input.submittedAt,
+      submittedBy: "DEMO-RESIDENT-1602",
+      evidenceIds: evidence.map((item) => item.id),
+      descriptionEvidenceId,
+      photoEvidenceId,
+      meterEvidenceId,
+      photoFinding: input.draft.photo.finding,
+      meterFinding: input.draft.meterFinding,
+      immutable: true
+    },
+    evidence
+  };
+}
+
+export function createPropertyEvidenceReview(input: {
+  draft: PropertyReviewDraft;
+  eventId: string;
+  reviewedAt: string;
+  relatedEvidenceIds: string[];
+  sequence: number;
+}): { review: PropertyEvidenceReview; evidence: ProductEvidenceRecord } {
+  const reviewId = `PROP-REVIEW-${input.eventId}-${String(input.sequence).padStart(2, "0")}`;
+  const evidenceId = `${reviewId}-EVIDENCE`;
+  return {
+    review: {
+      reviewId,
+      eventId: input.eventId,
+      residentSubmissionId: input.draft.residentSubmissionId,
+      evidenceId,
+      reviewedAt: input.reviewedAt,
+      reviewedBy: input.draft.reviewedBy,
+      decision: input.draft.decision,
+      note: input.draft.note.trim(),
+      immutable: true
+    },
+    evidence: {
+      id: evidenceId,
+      eventId: input.eventId,
+      spaceId: "SPACE-1602-BATHROOM",
+      relatedBusinessIds: ["SPACE-1602-BATHROOM", "WALL-1602-BATHROOM-NORTH"],
+      relatedEvidenceIds: input.relatedEvidenceIds,
+      type: "PROPERTY_EVIDENCE_REVIEW",
+      sourceActor: "PROPERTY",
+      capturedAt: input.reviewedAt,
+      dataClass: "DEMO_SYNTHETIC",
+      status: "PRESENT",
+      observedValue: `${input.draft.decision}：${input.draft.note.trim()}`,
+      disclosure: "物业独立复核记录 · 不覆盖住户原始证据 · 默认不参与诊断评分",
+      domainEvidenceRefs: [],
+      immutable: true
+    }
+  };
+}
+
+export function createProductEvidenceAppendix(input: {
+  eventId: string;
+  residentSubmissions?: ResidentEvidenceSubmission[];
+  propertyReviews?: PropertyEvidenceReview[];
+  evidence?: ProductEvidenceRecord[];
+  generatedAt?: string;
+}): ProductEvidenceAppendix {
+  return {
+    schemaVersion: 1,
+    eventId: input.eventId,
+    generatedAt: input.generatedAt ?? new Date().toISOString(),
+    disclosure: "本附录记录产品层来源与人工观察；确定性结论仍以verifiedEventPackage为准。",
+    residentSubmissions: structuredClone(input.residentSubmissions ?? []),
+    propertyReviews: structuredClone(input.propertyReviews ?? []),
+    evidence: structuredClone(input.evidence ?? [])
+  };
+}
 
 export const syntheticEvidenceCatalog: BuildingEvidence[] = [
   {

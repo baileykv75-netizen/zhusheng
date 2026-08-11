@@ -73,7 +73,7 @@ export function ResidentFreeLab() {
   const {
     session, setSession, assets, assetError, engine, busy, patchControls, applyTemplate, evaluate,
     attemptUnauthorized, decideAuthorization: commitAuthorization, executeValveAction,
-    submitIsolation, submitRepair, submitPostRepair, resetLab, buildVerifiedPackage
+    submitIsolation, submitRepair, submitPostRepair, resetLab, buildProductEvidenceBundle
   } = useLifecycleJourney();
   const [authorizationOpen, setAuthorizationOpen] = useState(false);
   const [authorization, setAuthorization] = useState<LabAuthorizationDraft>({ actorType: "RESIDENT", actorId: "DEMO-RESIDENT-1602", decision: "APPROVED", reason: "同意进行本次脱敏模拟关阀验证" });
@@ -108,9 +108,9 @@ export function ResidentFreeLab() {
 
   function downloadPackage() {
     try {
-      const packageValue = buildVerifiedPackage();
-      downloadText(`${packageValue.eventId}.package.json`, JSON.stringify(packageValue, null, 2));
-      setSession((current) => ({ ...current, notice: "事件成果包已通过哈希链、重放和引用完整性校验。" }));
+      const bundle = buildProductEvidenceBundle();
+      downloadText(`${bundle.verifiedEventPackage.eventId}.package.json`, JSON.stringify(bundle, null, 2));
+      setSession((current) => ({ ...current, notice: "事件成果包已通过领域校验，并附带独立的产品证据来源附录。" }));
     } catch (reason) {
       setSession((current) => ({ ...current, notice: reason instanceof Error ? reason.message : "成果包生成失败" }));
     }

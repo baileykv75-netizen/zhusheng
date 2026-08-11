@@ -42,6 +42,8 @@ async function open(route) {
 await open("/resident");
 await page.getByText("查看拍摄位置", { exact: true }).click();
 await page.getByRole("button", { name: "使用这张脱敏图继续演示" }).click();
+assert.equal(await page.getByRole("button", { name: "确认现场情况" }).isDisabled(), true, "photo selection alone must not create a moisture finding");
+await page.getByRole("button", { name: "看见潮湿", exact: true }).click();
 await page.getByRole("button", { name: "有变化", exact: true }).click();
 await page.getByRole("button", { name: "确认现场情况" }).click();
 await waitState("AUTHORIZATION_PENDING");

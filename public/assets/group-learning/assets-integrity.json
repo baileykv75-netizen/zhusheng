@@ -6,8 +6,8 @@
   "files": {
     "EVT-1602-LAB-001.package.json": {
       "source": "artifacts/stage4b/EVT-1602-LAB-001.package.json",
-      "sha256": "8365c60965d1cc84e912b5882c86342955a0bb32a51bc2a0cf2ca0c4a6128f0f",
-      "bytes": 186352
+      "sha256": "30f16d4607cf0c9edc90786ced3a160f72b751b78468f23f70e02c88aa099078",
+      "bytes": 191699
     }
   }
 }

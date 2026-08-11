@@ -16,6 +16,7 @@
     "test:v6-lifecycle": "node tests/v6-lifecycle-qa.mjs",
     "test:pages-export": "node scripts/check-pages-export.mjs",
     "test:resident-task": "node tests/resident-task-qa.mjs",
+    "test:evidence-correctness": "node tests/evidence-correctness-qa.mjs",
     "test:stage4a-visual": "node tests/stage4a-visual-qa.mjs",
     "test:stage4b-visual": "node tests/stage4b-visual-qa.mjs",
     "event:simulate": "node --experimental-strip-types scripts/life-event-cli.ts",

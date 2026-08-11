@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Camera, Check, Clock3, House, LockKeyhole, ShieldCheck, Upload, X } from "lucide-react";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { publicAssetPath } from "@/lib/site-path";
+import type { ResidentMeterFinding, ResidentPhotoFinding } from "@/lib/product/evidence";
 
 const progressLabels: Record<string, string> = {
   ASSESSED: "物业正在查看建筑记忆",
@@ -19,10 +20,13 @@ const progressLabels: Record<string, string> = {
 };
 
 export function ResidentService() {
-  const { session, setSession, assets, busy, evaluate, decideAuthorization } = useLifecycleJourney();
+  const { session, setSession, assets, busy, submitResidentEvidence, decideAuthorization } = useLifecycleJourney();
   const result = session.result;
   const [description, setDescription] = useState("我家卫生间北侧墙角最近一直很潮。 ");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [photoMetadata, setPhotoMetadata] = useState<{ fileName: string; mediaType: string; size: number } | null>(null);
+  const [photoFinding, setPhotoFinding] = useState<ResidentPhotoFinding>("UNCONFIRMED");
+  const [meterFinding, setMeterFinding] = useState<ResidentMeterFinding | null>(null);
   const [syntheticPhoto, setSyntheticPhoto] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const intake = !result || ["DETECTED", "COLLECTING_EVIDENCE", "INCONCLUSIVE"].includes(result.state);
@@ -42,29 +46,53 @@ export function ResidentService() {
     if (!file) return;
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(URL.createObjectURL(file));
+    setPhotoMetadata({ fileName: file.name, mediaType: file.type || "application/octet-stream", size: file.size });
+    setPhotoFinding("UNCONFIRMED");
     setSyntheticPhoto(false);
     setSession((current) => ({
       ...current,
-      controls: { ...current.controls, residentPhoto: "PRESENT", photoFinding: "MOISTURE_VISIBLE" },
-      notice: "现场照片仅在本机预览；提交后只把人工确认的观察交给事件引擎。"
+      photoObservationConfirmation: "UNCONFIRMED",
+      notice: "图片已选择，但尚未形成潮湿结论。请根据画面手工确认观察结果。"
     }));
   }
 
-  function setMeter(value: "FLOW_CONFIRMED_NO_USE" | "NO_CHANGE" | "UNREADABLE") {
-    setSession((current) => ({
-      ...current,
-      controls: { ...current.controls, meterReading: value === "UNREADABLE" ? "MISSING" : "PRESENT", meterFinding: value },
-      notice: null
-    }));
+  function confirmPhotoFinding(value: Exclude<ResidentPhotoFinding, "UNCONFIRMED">) {
+    setPhotoFinding(value);
+    setSession((current) => ({ ...current, photoObservationConfirmation: value, notice: null }));
   }
 
   function useSyntheticEvidence() {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    setPhotoMetadata(null);
     setSyntheticPhoto(true);
+    setPhotoFinding("UNCONFIRMED");
     setSession((current) => ({
       ...current,
-      controls: { ...current.controls, residentPhoto: "PRESENT", photoFinding: "MOISTURE_VISIBLE" },
-      notice: "已使用明确标注的AI脱敏合成图继续演示；它不会被表述为真实项目照片。"
+      photoObservationConfirmation: "UNCONFIRMED",
+      notice: "已载入AI脱敏合成图；它仍不代表系统识别到潮湿，请继续手工确认画面观察。"
     }));
+  }
+
+  function submitEvidence() {
+    if (photoFinding === "UNCONFIRMED" || !meterFinding || (!previewUrl && !syntheticPhoto)) return;
+    submitResidentEvidence({
+      description,
+      photo: syntheticPhoto
+        ? {
+            dataClass: "DEMO_SYNTHETIC",
+            assetPath: "/assets/demo-evidence/1602-resident-damp-wall.webp",
+            finding: photoFinding
+          }
+        : {
+            dataClass: "BROWSER_LOCAL",
+            fileName: photoMetadata?.fileName,
+            mediaType: photoMetadata?.mediaType,
+            size: photoMetadata?.size,
+            finding: photoFinding
+          },
+      meterFinding
+    });
   }
 
   function authorize(decision: "APPROVED" | "REJECTED") {
@@ -95,14 +123,19 @@ export function ResidentService() {
           <input ref={fileInput} hidden type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => choosePhoto(event.target.files?.[0])} />
           {previewUrl ? <div className="resident-photo-preview"><img src={previewUrl} alt="住户选择的卫生间现场照片预览" /><button onClick={() => fileInput.current?.click()}><Camera size={15} />重新选择</button></div> : <button className="resident-upload" onClick={() => fileInput.current?.click()}><Upload size={19} /><span><strong>选择现场照片</strong><small>JPG / JPEG / PNG / WEBP · 仅本地预览</small></span></button>}
           {syntheticPhoto ? <p className="resident-synthetic-selected"><Check size={14} />本次演示已选择AI脱敏合成照片</p> : null}
+          {previewUrl || syntheticPhoto ? <div className="resident-photo-observation"><strong>这张照片中，你实际看到什么？</strong><small>上传图片不等于系统识别到潮湿；以下结论由你手工确认。</small><div className="resident-choice">
+            <button type="button" className={photoFinding === "MOISTURE_VISIBLE" ? "active" : ""} onClick={() => confirmPhotoFinding("MOISTURE_VISIBLE")}>看见潮湿</button>
+            <button type="button" className={photoFinding === "NO_VISIBLE_MOISTURE" ? "active" : ""} onClick={() => confirmPhotoFinding("NO_VISIBLE_MOISTURE")}>未见潮湿</button>
+            <button type="button" className={photoFinding === "UNREADABLE" ? "active" : ""} onClick={() => confirmPhotoFinding("UNREADABLE")}>无法判断</button>
+          </div></div> : null}
           <details className="resident-photo-guide"><summary>查看拍摄位置</summary><div><figure><img src={publicAssetPath("/assets/v6/model/north-wall-locator.webp")} alt="BIM模型中的1602卫生间北侧墙角定位" /><figcaption>BIM / GLB · MODEL_LOCATOR · 不是现场照片</figcaption></figure><section><strong>请拍摄北侧墙角</strong><p>建议画面同时包含墙面、墙地交界和相邻区域。</p><figure><img src={publicAssetPath("/assets/demo-evidence/1602-resident-damp-wall.webp")} alt="AI生成的北侧墙角脱敏合成演示照片" /><figcaption>AI生成 · 脱敏合成演示</figcaption></figure><button type="button" onClick={useSyntheticEvidence}>使用这张脱敏图继续演示</button></section></div></details>
         </article>
         <article><div className="resident-step"><span>03</span><div><strong>无人用水时，水表是否仍变化？</strong><small>选择你能确认的一项。</small></div></div><div className="resident-choice">
-          <button className={session.controls.meterFinding === "FLOW_CONFIRMED_NO_USE" ? "active" : ""} onClick={() => setMeter("FLOW_CONFIRMED_NO_USE")}>有变化</button>
-          <button className={session.controls.meterFinding === "NO_CHANGE" ? "active" : ""} onClick={() => setMeter("NO_CHANGE")}>没有变化</button>
-          <button className={session.controls.meterFinding === "UNREADABLE" ? "active" : ""} onClick={() => setMeter("UNREADABLE")}>看不清</button>
+          <button type="button" className={meterFinding === "FLOW_CONFIRMED_NO_USE" ? "active" : ""} onClick={() => setMeterFinding("FLOW_CONFIRMED_NO_USE")}>有变化</button>
+          <button type="button" className={meterFinding === "NO_CHANGE" ? "active" : ""} onClick={() => setMeterFinding("NO_CHANGE")}>没有变化</button>
+          <button type="button" className={meterFinding === "UNREADABLE" ? "active" : ""} onClick={() => setMeterFinding("UNREADABLE")}>看不清</button>
         </div><details className="resident-meter-example"><summary>查看水表观察示例</summary><figure><img src={publicAssetPath("/assets/demo-evidence/1602-water-meter-observation.webp")} alt="AI生成的住宅水表脱敏合成演示照片" /><figcaption>AI生成 · 脱敏合成演示 · 不能代替你的人工观察</figcaption></figure></details></article>
-        <button className="resident-primary" disabled={busy || !assets || !description.trim() || (!previewUrl && !syntheticPhoto)} onClick={evaluate}>{busy ? "正在交给建筑记忆核对…" : "确认现场情况"}<ArrowRight size={17} /></button>
+        <button className="resident-primary" disabled={busy || !assets || !description.trim() || (!previewUrl && !syntheticPhoto) || photoFinding === "UNCONFIRMED" || !meterFinding} onClick={submitEvidence}>{busy ? "正在交给建筑记忆核对…" : "确认现场情况"}<ArrowRight size={17} /></button>
         <p className="resident-boundary"><ShieldCheck size={14} />确认后进入同一1602事件；不会自动操作阀门。</p>
       </section> : null}
 

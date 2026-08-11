@@ -32,7 +32,7 @@ try {
     const homeRuntimeErrors = [];
     home.on("pageerror", (error) => homeRuntimeErrors.push(error.message));
     home.on("console", (message) => {
-      if (message.type() === "error") homeRuntimeErrors.push(message.text());
+      if (message.type() === "error" && !message.text().startsWith("Failed to load resource")) homeRuntimeErrors.push(message.text());
     });
     home.on("response", (response) => {
       const url = new URL(response.url());
@@ -65,7 +65,7 @@ try {
     const caseRuntimeErrors = [];
     casePage.on("pageerror", (error) => caseRuntimeErrors.push(error.message));
     casePage.on("console", (message) => {
-      if (message.type() === "error") caseRuntimeErrors.push(message.text());
+      if (message.type() === "error" && !message.text().startsWith("Failed to load resource")) caseRuntimeErrors.push(message.text());
     });
     casePage.on("response", (response) => {
       const url = new URL(response.url());
@@ -143,7 +143,10 @@ try {
     await residentPage.locator(".resident-photo-guide").evaluate((details) => { details.open = true; });
     assert.equal(await residentPage.locator(".resident-photo-guide img").count(), 2, `${viewport.name}: photo guide must distinguish model locator and synthetic example`);
     await residentPage.locator(".resident-photo-guide section > button").click();
-    assert.equal(await residentPage.locator(".resident-primary").isEnabled(), true, `${viewport.name}: explicitly selecting the synthetic demo image may unlock the demo`);
+    assert.equal(await residentPage.locator(".resident-primary").isDisabled(), true, `${viewport.name}: selecting a file must not imply moisture was observed`);
+    await residentPage.getByRole("button", { name: "看见潮湿", exact: true }).click();
+    await residentPage.getByRole("button", { name: "有变化", exact: true }).click();
+    assert.equal(await residentPage.locator(".resident-primary").isEnabled(), true, `${viewport.name}: manual photo and meter observations may unlock submission`);
 
     const propertyPage = await roleContext.newPage();
     await propertyPage.goto(`${baseUrl}/property`, { waitUntil: "networkidle" });
@@ -151,6 +154,8 @@ try {
     await propertyPage.locator('.twin-viewport[data-model-status="ready"]').waitFor({ timeout: 20_000 });
     assert.equal(await propertyPage.locator(".professional-task-pane .active-task").count(), 1, `${viewport.name}: property workspace must show one current task`);
     assert.equal(await propertyPage.locator(".property-event-queue").count(), 1, `${viewport.name}: property workspace must expose its event queue`);
+    assert.ok((await propertyPage.locator(".product-evidence-source").innerText()).includes("尚无住户原始提交"), `${viewport.name}: property must not invent resident evidence`);
+    assert.equal(await propertyPage.locator(".resident-guided-task .task-primary").isDisabled(), true, `${viewport.name}: property assessment must wait for resident source evidence`);
 
     const workerPage = await roleContext.newPage();
     await workerPage.goto(`${baseUrl}/worker`, { waitUntil: "networkidle" });

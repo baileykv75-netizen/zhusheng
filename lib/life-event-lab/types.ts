@@ -1,4 +1,5 @@
 import type { EvidenceItem, LifeEventResult, RepairMethod, RepairRecord, SensorObservation, VisualDirective } from "../life-event-engine/types.ts";
+import type { ProductEvidenceRecord, PropertyEvidenceReview, ResidentEvidenceSubmission, ResidentPhotoFinding } from "../product/evidence.ts";
 
 export const LAB_SCHEMA_VERSION = 2;
 export const LAB_SESSION_KEY = "zhusheng.life-event-lab.v2";
@@ -67,4 +68,19 @@ export type LabSession = {
   selectedBusinessId: string | null;
   activeTab: "input" | "diagnosis" | "actions" | "audit";
   notice: string | null;
+  /** Additive V2 fields: old saved sessions safely hydrate without them. */
+  residentSubmissions?: ResidentEvidenceSubmission[];
+  propertyReviews?: PropertyEvidenceReview[];
+  productEvidenceTimeline?: ProductEvidenceRecord[];
+  photoObservationConfirmation?: ResidentPhotoFinding;
 };
+
+export function withProductEvidenceDefaults(session: LabSession): LabSession {
+  return {
+    ...session,
+    residentSubmissions: session.residentSubmissions ?? [],
+    propertyReviews: session.propertyReviews ?? [],
+    productEvidenceTimeline: session.productEvidenceTimeline ?? [],
+    photoObservationConfirmation: session.photoObservationConfirmation ?? "UNCONFIRMED"
+  };
+}
