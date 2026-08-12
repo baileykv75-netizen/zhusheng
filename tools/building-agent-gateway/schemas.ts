@@ -1,4 +1,4 @@
-import { MODEL_READ_ONLY_TOOLS, type ExplainOutput, type InterpretOutput, type ModelReadOnlyTool } from "./types.ts";
+import { MODEL_READ_ONLY_TOOLS, type BuildingAnswerDraft, type ExplainOutput, type InterpretOutput, type ModelReadOnlyTool } from "./types.ts";
 
 const readOnlyTools = new Set<string>(MODEL_READ_ONLY_TOOLS);
 const intents = ["QUERY_MEMORY", "DRAFT_OBSERVATION", "EXPLAIN_DECISION", "VIEW_GROUP_LEARNING", "NAVIGATE_WORKSPACE", "UNKNOWN"] as const;
@@ -52,6 +52,30 @@ export const EXPLAIN_SCHEMA = {
     nextStep: { type: "string", minLength: 1, maxLength: 300 },
     safetyNotice: { type: "string", minLength: 1, maxLength: 300 }
   }
+} as const;
+
+export const BUILDING_ANSWER_SCHEMA = {
+  oneOf: [
+    {
+      type: "object", additionalProperties: false, required: ["claims"],
+      properties: {
+        claims: {
+          type: "array", minItems: 1, maxItems: 12,
+          items: {
+            type: "object", additionalProperties: false, required: ["text", "factIds"],
+            properties: {
+              text: { type: "string", minLength: 1, maxLength: 360 },
+              factIds: { type: "array", minItems: 1, maxItems: 20, uniqueItems: true, items: { type: "string", minLength: 1, maxLength: 180 } }
+            }
+          }
+        }
+      }
+    },
+    {
+      type: "object", additionalProperties: false, required: ["clarification"],
+      properties: { clarification: { type: "object", additionalProperties: false, required: ["question"], properties: { question: { type: "string", minLength: 1, maxLength: 240 } } } }
+    }
+  ]
 } as const;
 
 function objectValue(value: unknown, label: string): Record<string, unknown> {
@@ -123,4 +147,26 @@ export function validateExplainOutput(value: unknown): ExplainOutput {
   const prohibited = prohibitedClaims.find((claim) => combined.includes(claim));
   if (prohibited) throw new Error(`模型输出包含越权结论：${prohibited}`);
   return result;
+}
+
+export function validateBuildingAnswerDraft(value: unknown): BuildingAnswerDraft {
+  const root = objectValue(value, "建筑回答草稿");
+  const keys = Object.keys(root);
+  if (keys.length !== 1 || (keys[0] !== "claims" && keys[0] !== "clarification")) throw new Error("建筑回答必须且只能包含claims或clarification");
+  if (keys[0] === "clarification") {
+    const clarification = objectValue(root.clarification, "澄清请求");
+    exactKeys(clarification, ["question"], "澄清请求");
+    if (typeof clarification.question !== "string" || !clarification.question.trim() || clarification.question.length > 240) throw new Error("澄清问题无效");
+    return { clarification: { question: clarification.question.trim() } };
+  }
+  if (!Array.isArray(root.claims) || root.claims.length < 1 || root.claims.length > 12) throw new Error("建筑回答claims无效");
+  const claims = root.claims.map((item, index) => {
+    const claim = objectValue(item, `建筑回答claim[${index}]`);
+    exactKeys(claim, ["text", "factIds"], `建筑回答claim[${index}]`);
+    if (typeof claim.text !== "string" || !claim.text.trim() || claim.text.length > 360) throw new Error(`建筑回答claim[${index}].text无效`);
+    const factIds = stringArray(claim.factIds, `建筑回答claim[${index}].factIds`, 20);
+    if (!factIds.length || new Set(factIds).size !== factIds.length || factIds.some((id) => id.length > 180)) throw new Error(`建筑回答claim[${index}].factIds无效`);
+    return { text: claim.text.trim(), factIds };
+  });
+  return { claims };
 }

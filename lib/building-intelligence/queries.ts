@@ -14,6 +14,27 @@ function factsForEntities(entities: BuildingEntity[], predicate = "displayName")
   }));
 }
 
+const governedDetailFields = ["brand", "manufacturer", "model", "material", "specification"] as const;
+
+function sourceClasses(sourceIds: string[], dataset: BuildingIntelligenceDataset) {
+  return [...new Set(sourceIds.map((sourceId) => dataset.sources.find((source) => source.sourceId === sourceId)?.sourceClass).filter((value): value is BuildingFact["provenance"][number] => Boolean(value)))];
+}
+
+function searchedRangeSourceIds(items: Array<{ provenance: { sourceId: string } }>, fallbackSourceId: string) {
+  return [...new Set([fallbackSourceId, ...items.map((item) => item.provenance.sourceId)])].sort();
+}
+
+function notRecordedFact(tool: BuildingQueryToolName, subjectBusinessId: string, dimension: string, sourceIds: string[], dataset: BuildingIntelligenceDataset): BuildingFact {
+  return {
+    factId: `NOT_RECORDED:${tool}:${subjectBusinessId}:${dimension}`,
+    subjectBusinessId,
+    predicate: "NOT_RECORDED",
+    value: `当前建筑记忆在${dimension}数据范围内未检索到记录；未记录不等于从未发生`,
+    sourceIds,
+    provenance: sourceClasses(sourceIds, dataset)
+  };
+}
+
 function result<T>(tool: BuildingQueryToolName, status: BuildingQueryResult["status"], data: T, facts: BuildingFact[], businessIds: string[], candidates?: BuildingQueryResult["candidates"]): BuildingQueryResult<T> {
   return { tool, status, data, facts, sourceIds: [...new Set(facts.flatMap((fact) => fact.sourceIds))].sort(), businessIds: [...new Set(businessIds)].sort(), ...(candidates ? { candidates } : {}) };
 }
@@ -39,12 +60,22 @@ export function getComponentDetail(businessId: string, dataset = building1602Dat
   const facts: BuildingFact[] = factsForEntities([entity]);
   facts.push({ factId: `${businessId}:entityType`, subjectBusinessId: businessId, predicate: "entityType", value: entity.entityType, sourceIds: [entity.provenance.sourceId], provenance: [entity.provenance.sourceClass] });
   if (entity.systemId) facts.push({ factId: `${businessId}:systemId`, subjectBusinessId: businessId, predicate: "belongsToSystem", value: entity.systemId, sourceIds: [entity.provenance.sourceId], provenance: [entity.provenance.sourceClass] });
+  for (const field of governedDetailFields) {
+    const value = entity.attributes?.[field];
+    facts.push(value === undefined
+      ? notRecordedFact("get_component_detail", businessId, `component.${field}`, [entity.provenance.sourceId], dataset)
+      : { factId: `${businessId}:${field}`, subjectBusinessId: businessId, predicate: field, value, sourceIds: [entity.provenance.sourceId], provenance: [entity.provenance.sourceClass] });
+  }
   return result("get_component_detail", "OK", entity, facts, [businessId, ...(entity.systemId ? [entity.systemId] : [])]);
 }
 
 export function getSpaceComponents(spaceId: string, dataset = building1602Dataset) {
   const items = stable(dataset.components.filter((item) => item.spaceId === spaceId));
-  return items.length ? result("get_space_components", "OK", items, factsForEntities(items), items.map((item) => item.businessId)) : result("get_space_components", entityById(spaceId, dataset) ? "NOT_RECORDED" : "NOT_FOUND", [], [], []);
+  if (items.length) return result("get_space_components", "OK", items, factsForEntities(items), items.map((item) => item.businessId));
+  const space = entityById(spaceId, dataset);
+  if (!space) return result("get_space_components", "NOT_FOUND", [], [], []);
+  const sourceIds = searchedRangeSourceIds(dataset.components, space.provenance.sourceId);
+  return result("get_space_components", "NOT_RECORDED", [], [notRecordedFact("get_space_components", spaceId, "components", sourceIds, dataset)], [spaceId]);
 }
 
 export function traceSystem(systemId: string, dataset = building1602Dataset) {
@@ -61,8 +92,12 @@ export function traceSystem(systemId: string, dataset = building1602Dataset) {
 function connected(direction: "upstream" | "downstream", businessId: string, dataset = building1602Dataset) {
   const tool = direction === "upstream" ? "get_upstream" : "get_downstream";
   const connections = dataset.connections.filter((item) => direction === "upstream" ? item.toBusinessId === businessId : item.fromBusinessId === businessId);
-  if (!entityById(businessId, dataset)) return result(tool, "NOT_FOUND", [], [], []);
-  if (!connections.length) return result(tool, "NOT_RECORDED", [], [], []);
+  const entity = entityById(businessId, dataset);
+  if (!entity) return result(tool, "NOT_FOUND", [], [], []);
+  if (!connections.length) {
+    const sourceIds = searchedRangeSourceIds(dataset.connections, entity.provenance.sourceId);
+    return result(tool, "NOT_RECORDED", [], [notRecordedFact(tool, businessId, direction === "upstream" ? "functionalConnections.upstream" : "functionalConnections.downstream", sourceIds, dataset)], [businessId]);
+  }
   const ids = connections.map((item) => direction === "upstream" ? item.fromBusinessId : item.toBusinessId);
   const entities = stable(dataset.components.filter((item) => ids.includes(item.businessId)));
   const facts = connections.map((connection) => ({ factId: connection.connectionId, subjectBusinessId: connection.fromBusinessId, predicate: connection.connectionType, value: connection.toBusinessId, sourceIds: [connection.provenance.sourceId], provenance: [connection.provenance.sourceClass] } satisfies BuildingFact));
@@ -73,9 +108,13 @@ export const getUpstream = (businessId: string, dataset = building1602Dataset) =
 export const getDownstream = (businessId: string, dataset = building1602Dataset) => connected("downstream", businessId, dataset);
 
 export function getComponentsBehindSurface(surfaceBusinessId: string, dataset = building1602Dataset) {
-  if (!entityById(surfaceBusinessId, dataset)) return result("get_components_behind_surface", "NOT_FOUND", [], [], []);
+  const surface = entityById(surfaceBusinessId, dataset);
+  if (!surface) return result("get_components_behind_surface", "NOT_FOUND", [], [], []);
   const relations = dataset.spatialRelations.filter((item) => item.predicate === "BEHIND" && item.objectBusinessId === surfaceBusinessId);
-  if (!relations.length) return result("get_components_behind_surface", "NOT_RECORDED", [], [], []);
+  if (!relations.length) {
+    const sourceIds = searchedRangeSourceIds(dataset.spatialRelations, surface.provenance.sourceId);
+    return result("get_components_behind_surface", "NOT_RECORDED", [], [notRecordedFact("get_components_behind_surface", surfaceBusinessId, "spatialRelations.BEHIND", sourceIds, dataset)], [surfaceBusinessId]);
+  }
   const ids = relations.map((item) => item.subjectBusinessId);
   const entities = stable(dataset.components.filter((item) => ids.includes(item.businessId)));
   const facts = relations.map((relation) => ({ factId: relation.relationId, subjectBusinessId: relation.subjectBusinessId, predicate: relation.predicate, value: relation.objectBusinessId, sourceIds: [relation.provenance.sourceId], provenance: [relation.provenance.sourceClass] } satisfies BuildingFact));
@@ -83,9 +122,14 @@ export function getComponentsBehindSurface(surfaceBusinessId: string, dataset = 
 }
 
 function history(tool: BuildingQueryToolName, recordType: BuildingRecord["recordType"], businessId: string, dataset = building1602Dataset) {
-  if (!entityById(businessId, dataset)) return result(tool, "NOT_FOUND", [], [], []);
+  const entity = entityById(businessId, dataset);
+  if (!entity) return result(tool, "NOT_FOUND", [], [], []);
   const records = [...dataset.records].filter((record) => record.recordType === recordType && record.subjectBusinessIds.includes(businessId)).sort((a, b) => a.occurredAt.localeCompare(b.occurredAt));
-  if (!records.length) return result(tool, "NOT_RECORDED", [], [], []);
+  if (!records.length) {
+    const inspectedRange = dataset.records.filter((record) => record.recordType === recordType);
+    const sourceIds = searchedRangeSourceIds(inspectedRange, entity.provenance.sourceId);
+    return result(tool, "NOT_RECORDED", [], [notRecordedFact(tool, businessId, `records.${recordType}`, sourceIds, dataset)], [businessId]);
+  }
   const facts = records.map((record) => ({ factId: record.recordId, subjectBusinessId: businessId, predicate: `${recordType.toLowerCase()}Record`, value: `${record.occurredAt}｜${record.title}｜${record.summary}`, sourceIds: [record.provenance.sourceId], provenance: [record.provenance.sourceClass] } satisfies BuildingFact));
   return result(tool, "OK", records, facts, records.flatMap((item) => item.subjectBusinessIds));
 }

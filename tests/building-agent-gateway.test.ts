@@ -4,7 +4,11 @@ import test from "node:test";
 import { DeepSeekGatewayBuildingAgentProvider } from "../lib/building-agent/providers/deepseek-gateway.ts";
 import { loadGatewayConfig } from "../tools/building-agent-gateway/config.ts";
 import { DeepSeekChatProvider, GatewayProviderError } from "../tools/building-agent-gateway/deepseek-provider.ts";
-import { validateExplainOutput, validateInterpretOutput } from "../tools/building-agent-gateway/schemas.ts";
+import { validateBuildingAnswerDraft, validateExplainOutput, validateInterpretOutput } from "../tools/building-agent-gateway/schemas.ts";
+import { verifyGroundedClaims } from "../tools/building-agent-gateway/grounding.ts";
+import { getComponentDetail, getMaintenanceHistory } from "../lib/building-intelligence/queries.ts";
+import type { BuildingFact } from "../lib/building-intelligence/types.ts";
+import { queryBuildingAgent } from "../lib/building-intelligence/agent.ts";
 import { createGatewayServer } from "../tools/building-agent-gateway/server.ts";
 import type { GatewayConfig } from "../tools/building-agent-gateway/types.ts";
 
@@ -39,9 +43,15 @@ function deepSeekResponse(output: unknown) {
   return response({ id: "chatcmpl_live_shape_001", model: "deepseek-v4-flash", choices: [{ index: 0, message: { role: "assistant", content: JSON.stringify(output) }, finish_reason: "stop" }] });
 }
 
-function deepSeekToolResponse(name: string, args: Record<string, string>) {
-  return response({ id: "chatcmpl_tool_001", model: "deepseek-v4-flash", choices: [{ index: 0, message: { role: "assistant", content: "", tool_calls: [{ id: "call_001", type: "function", function: { name, arguments: JSON.stringify(args) } }] }, finish_reason: "tool_calls" }] });
+function deepSeekToolResponse(name: string, args: Record<string, string>, id = "call_001") {
+  return response({ id: "chatcmpl_tool_001", model: "deepseek-v4-flash", choices: [{ index: 0, message: { role: "assistant", content: "", tool_calls: [{ id, type: "function", function: { name, arguments: JSON.stringify(args) } }] }, finish_reason: "tool_calls" }] });
 }
+
+function deepSeekManyToolResponse(calls: Array<{ name: string; args: Record<string, string>; id: string }>) {
+  return response({ id: "chatcmpl_many_tools", model: "deepseek-v4-flash", choices: [{ message: { role: "assistant", content: "", tool_calls: calls.map((call) => ({ id: call.id, type: "function", function: { name: call.name, arguments: JSON.stringify(call.args) } })) }, finish_reason: "tool_calls" }] });
+}
+
+const groundedNorthWall = { claims: [{ text: "J-1602-CW-03 位于 WALL-1602-BATHROOM-NORTH 后方", factIds: ["REL-002"] }] };
 
 test("gateway config defaults to loopback and is unconfigured without a key", () => {
   const value = loadGatewayConfig({});
@@ -91,17 +101,124 @@ test("building query tool loop executes only deterministic tools and returns fac
   let calls = 0;
   const provider = new DeepSeekChatProvider(config(), { fetcher: (async (_url, init) => {
     calls += 1;
-    const body = JSON.parse(String(init?.body)) as { tools?: Array<{ function: { name: string } }>; messages?: Array<{ role: string }> };
+    const body = JSON.parse(String(init?.body)) as { tools?: Array<{ function: { name: string } }>; messages?: Array<{ role: string }>; thinking?: { type: string } };
     assert.ok(body.tools?.some((item) => item.function.name === "get_components_behind_surface"));
+    assert.equal(body.thinking?.type, "disabled");
     return calls === 1
       ? deepSeekToolResponse("get_components_behind_surface", { surfaceBusinessId: "WALL-1602-BATHROOM-NORTH" })
-      : response({ id: "chatcmpl_tool_002", model: "deepseek-v4-flash", choices: [{ message: { role: "assistant", content: "done" }, finish_reason: "stop" }] });
+      : deepSeekResponse(groundedNorthWall);
   }) as typeof fetch });
   const output = await provider.queryBuilding("北墙后面有什么？", null);
   assert.equal(output.result.mode, "LIVE_AI");
   assert.equal(output.result.toolTrace[0].tool, "get_components_behind_surface");
   assert.ok(output.result.facts.every((fact) => fact.sourceIds.length > 0));
-  assert.match(output.result.answer, /北墙后方记录了/);
+  assert.equal(output.result.answer, "J-1602-CW-03 位于 WALL-1602-BATHROOM-NORTH 后方。");
+  assert.deepEqual(output.result.usedFactIds, ["REL-002"]);
+  assert.equal(output.metadata.toolCalls, 1);
+});
+
+test("building answer schema enforces mutually exclusive claims and clarification", () => {
+  assert.deepEqual(validateBuildingAnswerDraft(groundedNorthWall), groundedNorthWall);
+  assert.deepEqual(validateBuildingAnswerDraft({ clarification: { question: "你指的是哪一个接头？" } }), { clarification: { question: "你指的是哪一个接头？" } });
+  assert.throws(() => validateBuildingAnswerDraft({ answer: "绕过claims" }), /只能包含claims或clarification/);
+  assert.throws(() => validateBuildingAnswerDraft({ claims: [], clarification: { question: "哪个？" } }), /只能包含claims或clarification/);
+  assert.throws(() => validateBuildingAnswerDraft({ claims: [{ text: "缺少factIds" }] }), /字段不完整/);
+});
+
+test("grounding rejects forged fact ids and unsupported normalized values", () => {
+  const fact: BuildingFact = { factId: "REL-002", subjectBusinessId: "J-1602-CW-03", predicate: "BEHIND", value: "WALL-1602-BATHROOM-NORTH", sourceIds: ["SRC-BUILDING-SPEC-V6"], provenance: ["BUILDING_SPEC_DERIVED"] };
+  assert.doesNotThrow(() => verifyGroundedClaims([{ text: "冷水接头位于北墙后方", factIds: ["REL-002"] }], [fact]));
+  assert.throws(() => verifyGroundedClaims([{ text: "冷水接头位于北墙后方", factIds: ["REL-FORGED"] }], [fact]), /未产生的Fact ID/);
+  assert.throws(() => verifyGroundedClaims([{ text: "J-1602-CW-03 是 DN25 金属接头", factIds: ["REL-002"] }], [fact]), /新事实值/);
+  assert.throws(() => verifyGroundedClaims([{ text: "北墙后面有什么？", factIds: ["REL-002"] }], [fact], "北墙后面有什么？"), /疑问句或原问题复述/);
+  const dated = { ...fact, factId: "REC-1", predicate: "inspectionRecord", value: "2025-03-19T14:10:00+08:00｜保压检查｜结果合格" };
+  assert.doesNotThrow(() => verifyGroundedClaims([{ text: "检查日期为 2025年3月19日", factIds: ["REC-1"] }], [dated]));
+  assert.throws(() => verifyGroundedClaims([{ text: "检查日期为 2026年3月19日", factIds: ["REC-1"] }], [dated]), /日期/);
+});
+
+test("NOT_RECORDED is a source-backed fact and supports an honest missing answer", () => {
+  const detail = getComponentDetail("J-1602-CW-03");
+  const brand = detail.facts.find((fact) => fact.factId.includes("component.brand"));
+  assert.ok(brand);
+  assert.equal(brand.predicate, "NOT_RECORDED");
+  assert.deepEqual(brand.sourceIds, ["SRC-BUILDING-MEMORY-SEED"]);
+  assert.doesNotThrow(() => verifyGroundedClaims([{ text: "当前建筑记忆未记录 J-1602-CW-03 的品牌", factIds: [brand.factId] }], detail.facts));
+  const missingMaintenance = getMaintenanceHistory("J-1602-CW-03");
+  assert.equal(missingMaintenance.status, "NOT_RECORDED");
+  assert.ok(missingMaintenance.facts[0].sourceIds.length > 0);
+});
+
+test("no-tool clarification has its own mode and factual no-tool output is never LIVE_AI", async () => {
+  const clarification = new DeepSeekChatProvider(config(), { fetcher: (async () => deepSeekResponse({ clarification: { question: "你指的是哪个构件？" } })) as typeof fetch });
+  const clarified = await clarification.queryBuilding("这个怎么样？", null);
+  assert.equal(clarified.result.mode, "LIVE_AI_CLARIFICATION");
+  assert.equal(clarified.result.answer, "");
+  assert.equal(clarified.result.clarificationQuestion, "你指的是哪个构件？");
+  let calls = 0;
+  const factual = new DeepSeekChatProvider(config(), { fetcher: (async (_url, init) => { calls += 1; const body = JSON.parse(String(init?.body)); if (calls === 2) assert.equal(body.tool_choice, "required"); return deepSeekResponse({ claims: [{ text: "猜测", factIds: ["FAKE"] }] }); }) as typeof fetch });
+  await assert.rejects(() => factual.queryBuilding("重点接头是什么品牌？", "J-1602-CW-03"), (error: unknown) => error instanceof GatewayProviderError && error.type === "MODEL_TOOL_REQUIRED");
+  assert.equal(calls, 2);
+});
+
+test("one bounded repair may rewrite rejected claims using only available facts", async () => {
+  let calls = 0;
+  const provider = new DeepSeekChatProvider(config(), { fetcher: (async () => {
+    calls += 1;
+    if (calls === 1) return deepSeekToolResponse("get_components_behind_surface", { surfaceBusinessId: "WALL-1602-BATHROOM-NORTH" });
+    if (calls === 2) return deepSeekResponse({ claims: [{ text: "J-1602-CW-03 是 DN25 接头", factIds: ["REL-002"] }] });
+    return deepSeekResponse(groundedNorthWall);
+  }) as typeof fetch });
+  const output = await provider.queryBuilding("北墙后面有什么？", null);
+  assert.equal(output.result.mode, "LIVE_AI");
+  assert.equal(calls, 3);
+});
+
+test("a second grounding failure is rejected and can never become LIVE_AI", async () => {
+  let calls = 0;
+  const provider = new DeepSeekChatProvider(config(), { fetcher: (async () => {
+    calls += 1;
+    if (calls === 1) return deepSeekToolResponse("get_components_behind_surface", { surfaceBusinessId: "WALL-1602-BATHROOM-NORTH" });
+    return deepSeekResponse({ claims: [{ text: "J-1602-CW-03 是 DN25 接头", factIds: ["REL-002"] }] });
+  }) as typeof fetch });
+  await assert.rejects(() => provider.queryBuilding("北墙后面有什么？", null), (error: unknown) => error instanceof GatewayProviderError && error.type === "GROUNDING_REJECTED");
+  assert.equal(calls, 3);
+});
+
+test("gateway failure preserves the deterministic LOCAL_READ_ONLY fallback", async () => {
+  const turn = await queryBuildingAgent("北墙后面有哪些构件？", null, (async () => { throw new Error("offline"); }) as typeof fetch);
+  assert.equal(turn.mode, "LOCAL_READ_ONLY");
+  assert.equal(turn.toolTrace[0].tool, "get_components_behind_surface");
+});
+
+test("multi-tool synthesis grounds every claim in facts from actual tools", async () => {
+  let calls = 0;
+  const provider = new DeepSeekChatProvider(config(), { fetcher: (async () => {
+    calls += 1;
+    if (calls === 1) return deepSeekToolResponse("get_construction_history", { businessId: "J-1602-CW-03" }, "call_build");
+    if (calls === 2) return deepSeekToolResponse("get_inspection_history", { businessId: "J-1602-CW-03" }, "call_check");
+    return deepSeekResponse({ claims: [
+      { text: "重点冷水接头有施工留痕", factIds: ["REC-CONSTRUCTION-J03"] },
+      { text: "施工期检查结果合格", factIds: ["REC-INSPECTION-CW"] }
+    ] });
+  }) as typeof fetch });
+  const output = await provider.queryBuilding("这个接头封闭前做过什么施工和检查？", "J-1602-CW-03");
+  assert.equal(output.result.mode, "LIVE_AI");
+  assert.equal(output.result.toolTrace.length, 2);
+  assert.deepEqual(output.result.usedFactIds, ["REC-CONSTRUCTION-J03", "REC-INSPECTION-CW"]);
+});
+
+test("tool calls beyond the eight-call budget receive protocol-safe rejection messages", async () => {
+  let calls = 0;
+  const provider = new DeepSeekChatProvider(config(), { fetcher: (async (_url, init) => {
+    calls += 1;
+    if (calls === 1) return deepSeekManyToolResponse(Array.from({ length: 9 }, (_, index) => ({ name: "get_component_detail", args: { businessId: "J-1602-CW-03" }, id: `call_${index}` })));
+    const body = JSON.parse(String(init?.body)) as { messages: Array<{ role: string; tool_call_id?: string; content?: string }> };
+    const rejected = body.messages.find((item) => item.tool_call_id === "call_3");
+    assert.match(rejected?.content ?? "", /TOOL_CALL_LIMIT/);
+    return deepSeekResponse({ claims: [{ text: "已定位 J-1602-CW-03", factIds: ["J-1602-CW-03:displayName"] }] });
+  }) as typeof fetch });
+  const output = await provider.queryBuilding("说明重点冷水接头", "J-1602-CW-03");
+  assert.equal(output.result.mode, "LIVE_AI");
   assert.equal(output.metadata.toolCalls, 1);
 });
 

@@ -108,6 +108,11 @@ export type BuildingFact = {
   provenance: SourceClass[];
 };
 
+export type GroundedBuildingClaim = {
+  text: string;
+  factIds: string[];
+};
+
 export type BuildingQueryToolName =
   | "find_space"
   | "find_component"
@@ -142,9 +147,12 @@ export type QueryVisualDirective = {
 };
 
 export type BuildingAgentTurnResult = {
-  mode: "LIVE_AI" | "LOCAL_READ_ONLY" | "LIVE_AI_UNAVAILABLE";
+  mode: "LIVE_AI" | "LIVE_AI_CLARIFICATION" | "LOCAL_READ_ONLY" | "LIVE_AI_UNAVAILABLE";
   question: string;
   answer: string;
+  groundedClaims?: GroundedBuildingClaim[];
+  usedFactIds?: string[];
+  clarificationQuestion?: string;
   toolTrace: Array<{ tool: BuildingQueryToolName; arguments: Record<string, string>; status: QueryStatus }>;
   facts: BuildingFact[];
   sources: Array<BuildingSource>;

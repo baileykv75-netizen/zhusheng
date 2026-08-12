@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 2,
+  "provider": "deepseek",
+  "liveApiVerified": true,
+  "model": "deepseek-v4-flash",
+  "apiRequestCount": 19,
+  "cases": [
+    {
+      "question": "洗手盆里的冷水在到达龙头以前会经过哪些东西？",
+      "model": "deepseek-v4-flash",
+      "toolCalls": [
+        "get_space_components",
+        "find_component",
+        "get_upstream",
+        "trace_system",
+        "get_upstream",
+        "get_upstream",
+        "get_upstream",
+        "get_downstream"
+      ],
+      "toolArguments": [
+        {
+          "spaceId": "SPACE-1602-BATHROOM"
+        },
+        {
+          "query": "洗手盆"
+        },
+        {
+          "businessId": "FIXTURE-1602-BASIN-01"
+        },
+        {
+          "systemId": "PIPE-1602-CW-02"
+        },
+        {
+          "businessId": "PIPE-1602-CW-02"
+        },
+        {
+          "businessId": "PIPE-1602-CW-01"
+        },
+        {
+          "businessId": "J-1602-CW-03"
+        },
+        {
+          "businessId": "PIPE-1602-CW-02"
+        }
+      ],
+      "factCount": 30,
+      "usedFactIds": [
+        "NOT_RECORDED:get_upstream:FIXTURE-1602-BASIN-01:functionalConnections.upstream"
+      ],
+      "finalAnswer": "1602卫生间台盆的上游连接在建筑记忆中未检索到记录。",
+      "mode": "LIVE_AI",
+      "visualDirective": null,
+      "result": "PASS",
+      "apiRequests": 5
+    },
+    {
+      "question": "这个接头被封起来以前做过哪些施工和检查？",
+      "model": "deepseek-v4-flash",
+      "toolCalls": [
+        "get_construction_history",
+        "get_inspection_history",
+        "get_component_detail"
+      ],
+      "toolArguments": [
+        {
+          "businessId": "J-1602-CW-03"
+        },
+        {
+          "businessId": "J-1602-CW-03"
+        },
+        {
+          "businessId": "J-1602-CW-03"
+        }
+      ],
+      "factCount": 10,
+      "usedFactIds": [
+        "REC-CONSTRUCTION-J03",
+        "REC-INSPECTION-CW"
+      ],
+      "finalAnswer": "该接头（1602卫生间重点冷水接头）在封起来以前，于2025-03-18进行过重点冷水接头施工留痕，关联了双角度照片、热熔参数与保压记录；该接头在封起来以前，于2025-03-19进行过冷水支路保压检查，既有种子记录显示检查结果合格（这不构成对当前运行状态的保证）。",
+      "mode": "LIVE_AI",
+      "visualDirective": {
+        "mode": "FOCUS",
+        "targetBusinessIds": [
+          "J-1602-CW-03",
+          "SYS-1602-CW"
+        ],
+        "revealBusinessIds": [
+          "J-1602-CW-03",
+          "SYS-1602-CW"
+        ],
+        "sourceTool": "get_component_detail"
+      },
+      "result": "PASS",
+      "apiRequests": 2
+    },
+    {
+      "question": "如果我要打开北墙维修，墙里面有哪些东西需要注意？",
+      "model": "deepseek-v4-flash",
+      "toolCalls": [
+        "get_space_components",
+        "get_components_behind_surface",
+        "get_component_detail",
+        "get_component_detail",
+        "get_component_detail",
+        "get_component_detail"
+      ],
+      "toolArguments": [
+        {
+          "spaceId": "SPACE-1602-BATHROOM"
+        },
+        {
+          "surfaceBusinessId": "WALL-1602-BATHROOM-NORTH"
+        },
+        {
+          "businessId": "PIPE-1602-CW-01"
+        },
+        {
+          "businessId": "PIPE-1602-CW-02"
+        },
+        {
+          "businessId": "PIPE-1602-HW-01"
+        },
+        {
+          "businessId": "J-1602-CW-03"
+        }
+      ],
+      "factCount": 57,
+      "usedFactIds": [
+        "REL-001",
+        "PIPE-1602-CW-01:displayName",
+        "REL-002",
+        "J-1602-CW-03:displayName",
+        "REL-003",
+        "PIPE-1602-CW-02:displayName",
+        "REL-004",
+        "PIPE-1602-HW-01:displayName"
+      ],
+      "finalAnswer": "1602卫生间北墙后面有1602卫生间上游冷水管段；1602卫生间北墙后面有1602卫生间重点冷水接头；1602卫生间北墙后面有1602卫生间下游冷水管段；1602卫生间北墙后面有1602卫生间热水管段。",
+      "mode": "LIVE_AI",
+      "visualDirective": {
+        "mode": "FOCUS",
+        "targetBusinessIds": [
+          "J-1602-CW-03",
+          "SYS-1602-CW"
+        ],
+        "revealBusinessIds": [
+          "J-1602-CW-03",
+          "SYS-1602-CW"
+        ],
+        "sourceTool": "get_component_detail"
+      },
+      "result": "PASS",
+      "apiRequests": 5
+    },
+    {
+      "question": "镜前灯的电从哪一路过来，线路又是怎么敷设的？",
+      "model": "deepseek-v4-flash",
+      "toolCalls": [
+        "get_space_components",
+        "find_component",
+        "find_component",
+        "find_component",
+        "find_component",
+        "trace_system",
+        "get_upstream",
+        "get_downstream"
+      ],
+      "toolArguments": [
+        {
+          "spaceId": "SPACE-1602-BATHROOM"
+        },
+        {
+          "query": "镜前灯"
+        },
+        {
+          "query": "mirror light"
+        },
+        {
+          "query": "LIGHT"
+        },
+        {
+          "query": "照明"
+        },
+        {
+          "systemId": "CIRCUIT-1602-LIGHT-01"
+        },
+        {
+          "businessId": "CABLE-1602-LIGHT-01"
+        },
+        {
+          "businessId": "CABLE-1602-LIGHT-01"
+        }
+      ],
+      "factCount": 27,
+      "usedFactIds": [
+        "CIRCUIT-1602-LIGHT-01:displayName",
+        "CABLE-1602-LIGHT-01:displayName",
+        "CONDUIT-1602-LIGHT-01:displayName",
+        "CONN-EL-01",
+        "CONN-EL-02"
+      ],
+      "finalAnswer": "镜前灯的电从卫生间照明回路接口（CIRCUIT-1602-LIGHT-01）经卫生间照明电缆（CABLE-1602-LIGHT-01）供电，线路通过卫生间照明线管（CONDUIT-1602-LIGHT-01）敷设。",
+      "mode": "LIVE_AI",
+      "visualDirective": {
+        "mode": "FOCUS",
+        "targetBusinessIds": [
+          "SWITCH-1602-LIGHT-01"
+        ],
+        "revealBusinessIds": [
+          "SWITCH-1602-LIGHT-01"
+        ],
+        "sourceTool": "get_downstream"
+      },
+      "result": "PASS",
+      "apiRequests": 5
+    },
+    {
+      "question": "J-1602-CW-03 是哪个品牌生产的？",
+      "model": "deepseek-v4-flash",
+      "toolCalls": [
+        "get_component_detail"
+      ],
+      "toolArguments": [
+        {
+          "businessId": "J-1602-CW-03"
+        }
+      ],
+      "factCount": 8,
+      "usedFactIds": [
+        "NOT_RECORDED:get_component_detail:J-1602-CW-03:component.brand"
+      ],
+      "finalAnswer": "当前建筑记忆未记录J-1602-CW-03的生产品牌。",
+      "mode": "LIVE_AI",
+      "visualDirective": {
+        "mode": "FOCUS",
+        "targetBusinessIds": [
+          "J-1602-CW-03",
+          "SYS-1602-CW"
+        ],
+        "revealBusinessIds": [
+          "J-1602-CW-03",
+          "SYS-1602-CW"
+        ],
+        "sourceTool": "get_component_detail"
+      },
+      "result": "PASS",
+      "apiRequests": 2
+    }
+  ],
+  "secretIncluded": false,
+  "syntheticDemo": true,
+  "disclaimer": "脱敏合成建筑查询演示；SYNTHETIC_ENGINEERING_RECORD 不代表真实项目竣工数据。"
+}

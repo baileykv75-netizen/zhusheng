@@ -1,10 +1,10 @@
 import { createHash, randomUUID } from "node:crypto";
-import { EXPLAIN_SCHEMA, INTERPRET_SCHEMA, validateExplainOutput, validateInterpretOutput } from "./schemas.ts";
+import { BUILDING_ANSWER_SCHEMA, EXPLAIN_SCHEMA, INTERPRET_SCHEMA, validateBuildingAnswerDraft, validateExplainOutput, validateInterpretOutput } from "./schemas.ts";
 import { redactError, sanitizeUserText, SensitiveInputError } from "./redaction.ts";
-import type { ExplainOutput, GatewayCallMetadata, GatewayConfig, InterpretOutput, ModelTask } from "./types.ts";
+import type { BuildingAnswerDraft, ExplainOutput, GatewayCallMetadata, GatewayConfig, InterpretOutput, ModelTask } from "./types.ts";
 import { buildingQueryTools } from "../../lib/building-intelligence/queries.ts";
 import { building1602Dataset } from "../../lib/building-intelligence/catalog.ts";
-import { composeAnswer, createLocalBuildingAgentTurn } from "../../lib/building-intelligence/agent.ts";
+import { verifyGroundedClaims, ClaimGroundingError } from "./grounding.ts";
 import type { BuildingAgentTurnResult, BuildingQueryResult, BuildingQueryToolName } from "../../lib/building-intelligence/types.ts";
 
 const DEEPSEEK_CHAT_COMPLETIONS_URL = "https://api.deepseek.com/chat/completions";
@@ -44,6 +44,9 @@ const QUERY_TOOL_PARAMETERS: Record<BuildingQueryToolName, Record<string, unknow
 function idSchema(key: string) { return { type: "object", additionalProperties: false, required: [key], properties: { [key]: { type: "string", pattern: "^[A-Z0-9_-]+$", maxLength: 100 } } }; }
 const queryToolDefinitions = (Object.keys(QUERY_TOOL_PARAMETERS) as BuildingQueryToolName[]).map((name) => ({ type: "function", function: { name, description: `Read-only deterministic building query: ${name}`, parameters: QUERY_TOOL_PARAMETERS[name] } }));
 
+const BUILDING_QUERY_SYSTEM_PROMPT = `你是筑生的只读建筑查询规划器。你必须先用给定工具查询，再只依据工具返回的facts组织回答。不得声称执行设备动作、改变事件状态，也不得把SYNTHETIC_ENGINEERING_RECORD表述为真实项目竣工数据。不得补充facts没有提供的材料、品牌、厂家、型号、规格、数字、日期、位置、系统关系、施工、检查、维修或观测事实。未检索到数据时，只能引用predicate为NOT_RECORDED的fact表达“当前建筑记忆未记录”，不得推断现实中从未发生。最终只能输出一个JSON对象，且只能是 {"claims":[{"text":"...","factIds":["..."]}]} 或 {"clarification":{"question":"..."}}；禁止answer字段、Markdown和额外字段。每条claim必须逐条列出直接支持它的Fact ID。`;
+const BUILDING_FINAL_SYSTEM_PROMPT = `建筑只读工具已经由受控网关执行完毕。本请求没有工具可调用。你只能依据用户消息中提供的facts生成最终JSON，不得使用常识补充任何建筑事实。不得补充facts没有提供的材料、品牌、厂家、型号、规格、数字、日期、位置、系统关系、施工、检查、维修或观测事实。NOT_RECORDED只表示当前数据范围未检索到记录，不代表现实中从未发生。只能输出 {"claims":[{"text":"...","factIds":["..."]}]} 或 {"clarification":{"question":"..."}}，禁止answer字段、Markdown、解释和额外字段。每条claim必须引用直接支持它的Fact ID。`;
+
 function exactToolArguments(name: BuildingQueryToolName, value: unknown) {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("工具参数必须是对象");
   const schema = QUERY_TOOL_PARAMETERS[name] as { required: string[] };
@@ -52,6 +55,19 @@ function exactToolArguments(name: BuildingQueryToolName, value: unknown) {
   const result: Record<string, string> = {};
   for (const key of keys) { const item = (value as Record<string, unknown>)[key]; if (typeof item !== "string" || !item.trim() || item.length > 120) throw new Error(`${name}.${key} 无效`); result[key] = item.trim(); }
   return result;
+}
+
+function isGenuinelyAmbiguous(question: string, selectedBusinessId: string | null) {
+  return !selectedBusinessId && /(它|这个|那个|该构件|该设备|该系统|这面墙|那面墙)/u.test(question);
+}
+
+function claimsAnswer(claims: Array<{ text: string }>) {
+  return claims.map((claim) => claim.text.replace(/[；;。\s]+$/u, "")).filter(Boolean).join("；") + "。";
+}
+
+function sameToolInvocation(executed: Array<{ tool: BuildingQueryToolName; arguments: Record<string, string> }>, tool: BuildingQueryToolName, args: Record<string, string>) {
+  const signature = `${tool}:${JSON.stringify(args)}`;
+  return executed.some((item) => `${item.tool}:${JSON.stringify(item.arguments)}` === signature);
 }
 
 function sha256(value: string) {
@@ -159,18 +175,22 @@ export class DeepSeekChatProvider {
     if (!this.config.apiKey) throw new GatewayProviderError("UNCONFIGURED", "DeepSeek API未配置", suppliedRequestId);
     const safeQuestion = sanitizeUserText(question, this.config.maxInputChars);
     const messages: Array<Record<string, unknown>> = [
-      { role: "system", content: "你是筑生的只读建筑查询规划器。只能调用给定工具，不得声称执行设备动作、改变事件状态或把合成工程记录说成真实项目数据。不要要求整份数据。每次根据工具结果继续或结束；最终文字不会直接展示。" },
+      { role: "system", content: `${BUILDING_QUERY_SYSTEM_PROMPT}\n严格JSON Schema：${JSON.stringify(BUILDING_ANSWER_SCHEMA)}` },
       { role: "user", content: JSON.stringify({ question: safeQuestion, selectedBusinessId, deepSpace: "SPACE-1602-BATHROOM" }) }
     ];
     const executed: Array<{ tool: BuildingQueryToolName; arguments: Record<string, string>; result: BuildingQueryResult }> = [];
     let responseId = "";
     let rounds = 0;
+    let forcedToolRetry = false;
+    let repairAttempted = false;
+    let finalDraft: BuildingAnswerDraft | null = null;
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), this.config.timeoutMs * 2);
+    const timer = setTimeout(() => controller.abort(), this.config.timeoutMs * 6);
     try {
-      while (rounds < 6 && executed.length < 8) {
+      while (rounds < 4 && executed.length < 8) {
         rounds += 1;
-        const response = await this.fetcher(DEEPSEEK_CHAT_COMPLETIONS_URL, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.config.apiKey}` }, body: JSON.stringify({ model: this.config.model, messages, tools: queryToolDefinitions, tool_choice: "auto", stream: false, max_tokens: this.config.maxOutputTokens, temperature: 0 }), signal: controller.signal });
+        const requireTool = !executed.length && forcedToolRetry;
+        const response = await this.fetcher(DEEPSEEK_CHAT_COMPLETIONS_URL, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.config.apiKey}` }, body: JSON.stringify({ model: this.config.model, messages, tools: queryToolDefinitions, tool_choice: requireTool ? "required" : "auto", response_format: { type: "json_object" }, thinking: { type: "disabled" }, stream: false, max_tokens: this.config.maxOutputTokens, temperature: 0 }), signal: controller.signal });
         const raw = await response.text();
         if (!response.ok) throw new GatewayProviderError(classifyUpstream(response.status, raw), redactError(raw), suppliedRequestId);
         const payload = JSON.parse(raw) as { id?: string; choices?: Array<{ message?: { role?: string; content?: string; tool_calls?: Array<{ id?: string; type?: string; function?: { name?: string; arguments?: string } }> } }> };
@@ -179,27 +199,103 @@ export class DeepSeekChatProvider {
         if (!message) throw new GatewayProviderError("SCHEMA_ERROR", "DeepSeek 查询响应缺少 message", suppliedRequestId);
         messages.push(message as Record<string, unknown>);
         const calls = message.tool_calls ?? [];
-        if (!calls.length) break;
-        for (const call of calls.slice(0, 8 - executed.length)) {
+        if (!calls.length) {
+          if (!executed.length) {
+            let noToolDraft: BuildingAnswerDraft | null = null;
+            try { noToolDraft = validateBuildingAnswerDraft(JSON.parse(message.content ?? "")); } catch { /* a factual query receives one forced-tool retry */ }
+            if (noToolDraft && "clarification" in noToolDraft && isGenuinelyAmbiguous(safeQuestion, selectedBusinessId)) {
+              finalDraft = noToolDraft;
+              break;
+            }
+            if (!forcedToolRetry) {
+              forcedToolRetry = true;
+              messages.push({ role: "user", content: "这是建筑事实查询。你尚未调用工具。必须调用至少一个最相关的只读工具后再回答；若对象确实无法唯一确定，才返回clarification。" });
+              continue;
+            }
+            throw new GatewayProviderError("MODEL_TOOL_REQUIRED", "DeepSeek未执行任何建筑查询工具", suppliedRequestId);
+          }
+          try { finalDraft = validateBuildingAnswerDraft(JSON.parse(message.content ?? "")); }
+          catch (error) { throw new GatewayProviderError("SCHEMA_ERROR", redactError(error), suppliedRequestId); }
+          if ("clarification" in finalDraft) break;
+          const facts = [...new Map(executed.flatMap((item) => item.result.facts).map((fact) => [fact.factId, fact])).values()];
+          try {
+            verifyGroundedClaims(finalDraft.claims, facts, safeQuestion);
+            break;
+          } catch (error) {
+            if (!(error instanceof ClaimGroundingError)) throw error;
+            if (repairAttempted) throw new GatewayProviderError("GROUNDING_REJECTED", redactError(error), suppliedRequestId);
+            repairAttempted = true;
+            finalDraft = null;
+            messages.push({ role: "user", content: JSON.stringify({ task: "REPAIR_GROUNDED_CLAIMS", instruction: "以下claims未通过确定性grounding。只能使用availableFacts重写claims；不得新增事实值，不得返回answer字段。", rejectedClaims: error.rejectedClaims, rejection: error.message, availableFacts: facts }) });
+            continue;
+          }
+        }
+        const allowedCalls = calls.slice(0, Math.min(3, 8 - executed.length));
+        let acceptedThisRound = 0;
+        for (const call of allowedCalls) {
           const name = call.function?.name as BuildingQueryToolName;
           if (!(name in buildingQueryTools)) throw new GatewayProviderError("MODEL_TOOL_REJECTED", `模型提出未允许工具 ${String(name)}`, suppliedRequestId);
           let rawArguments: unknown; try { rawArguments = JSON.parse(call.function?.arguments ?? "{}"); } catch { throw new GatewayProviderError("SCHEMA_ERROR", `${name} 参数不是 JSON`, suppliedRequestId); }
           let args: Record<string, string>;
           try { args = exactToolArguments(name, rawArguments); }
           catch (error) { throw new GatewayProviderError("SCHEMA_ERROR", redactError(error), suppliedRequestId); }
+          if (sameToolInvocation(executed, name, args)) {
+            messages.push({ role: "tool", tool_call_id: call.id, content: JSON.stringify({ status: "REJECTED", reason: "DUPLICATE_TOOL_CALL", facts: [] }) });
+            continue;
+          }
           const query = (buildingQueryTools[name] as (input: never) => BuildingQueryResult)(args as never);
           executed.push({ tool: name, arguments: args, result: query });
-          messages.push({ role: "tool", tool_call_id: call.id, content: JSON.stringify({ status: query.status, facts: query.facts, businessIds: query.businessIds, candidates: query.candidates ?? [] }) });
+          acceptedThisRound += 1;
+          messages.push({ role: "tool", tool_call_id: call.id, content: JSON.stringify({ status: query.status, facts: query.facts, businessIds: query.businessIds, candidates: query.candidates ?? [], instruction: "若问题已能由目前facts回答，请停止调用工具并输出严格JSON claims。" }) });
+        }
+        for (const call of calls.slice(allowedCalls.length)) {
+          messages.push({ role: "tool", tool_call_id: call.id, content: JSON.stringify({ status: "REJECTED", reason: "TOOL_CALL_LIMIT", facts: [] }) });
+        }
+        if (acceptedThisRound === 0 && executed.length) break;
+      }
+      if (!finalDraft && executed.length && rounds < 6) {
+        const facts = [...new Map(executed.flatMap((item) => item.result.facts).map((fact) => [fact.factId, fact])).values()];
+        const finalMessages: Array<Record<string, unknown>> = [
+          { role: "system", content: `${BUILDING_FINAL_SYSTEM_PROMPT}\n严格JSON Schema：${JSON.stringify(BUILDING_ANSWER_SCHEMA)}` },
+          { role: "user", content: JSON.stringify({ question: safeQuestion, selectedBusinessId, facts }) }
+        ];
+        let formatRetry = false;
+        while (!finalDraft && rounds < 6) {
+          rounds += 1;
+          const response = await this.fetcher(DEEPSEEK_CHAT_COMPLETIONS_URL, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.config.apiKey}` }, body: JSON.stringify({ model: this.config.model, messages: finalMessages, response_format: { type: "json_object" }, thinking: { type: "disabled" }, stream: false, max_tokens: this.config.maxOutputTokens, temperature: 0 }), signal: controller.signal });
+          const raw = await response.text();
+          if (!response.ok) throw new GatewayProviderError(classifyUpstream(response.status, raw), redactError(raw), suppliedRequestId);
+          const payload = JSON.parse(raw) as Record<string, unknown>;
+          responseId = typeof payload.id === "string" ? payload.id : responseId;
+          try {
+            const candidate = validateBuildingAnswerDraft(JSON.parse(extractOutputText(payload)));
+            if ("claims" in candidate) verifyGroundedClaims(candidate.claims, facts, safeQuestion);
+            finalDraft = candidate;
+          }
+          catch (error) {
+            if (error instanceof ClaimGroundingError) {
+              if (repairAttempted || rounds >= 6) throw new GatewayProviderError("GROUNDING_REJECTED", redactError(error), suppliedRequestId);
+              repairAttempted = true;
+              finalMessages.push({ role: "user", content: JSON.stringify({ task: "REPAIR_GROUNDED_CLAIMS", instruction: "claims未通过确定性grounding。不得复述问题；只能使用availableFacts写成陈述性claims，不得新增事实值。", rejectedClaims: error.rejectedClaims, rejection: error.message, availableFacts: facts }) });
+              continue;
+            }
+            if (formatRetry || rounds >= 6) throw new GatewayProviderError("SCHEMA_ERROR", redactError(error), suppliedRequestId);
+            formatRetry = true;
+            finalMessages.push({ role: "user", content: `上次最终内容不是符合Schema的完整JSON（${redactError(error)}）。这是唯一一次格式修复机会：只输出完整JSON claims或clarification。` });
+          }
         }
       }
-      const fallback = createLocalBuildingAgentTurn(safeQuestion, selectedBusinessId, "LIVE_AI");
-      if (!executed.length) return { result: fallback, metadata: { requestId: suppliedRequestId, model: this.config.model, responseId, rounds, toolCalls: 0, schemaValid: true } };
+      if (!finalDraft) throw new GatewayProviderError("SCHEMA_ERROR", "DeepSeek未在限定轮次内返回有效建筑回答", suppliedRequestId);
+      if ("clarification" in finalDraft) {
+        const result: BuildingAgentTurnResult = { mode: "LIVE_AI_CLARIFICATION", question: safeQuestion, answer: "", clarificationQuestion: finalDraft.clarification.question, toolTrace: executed.map((item) => ({ tool: item.tool, arguments: item.arguments, status: item.result.status })), facts: [], sources: [], visualDirective: null, selectedBusinessId };
+        return { result, metadata: { requestId: suppliedRequestId, model: this.config.model, responseId, rounds, toolCalls: executed.length, schemaValid: true } };
+      }
       const facts = [...new Map(executed.flatMap((item) => item.result.facts).map((fact) => [fact.factId, fact])).values()];
+      const verifiedClaims = verifyGroundedClaims(finalDraft.claims, facts, safeQuestion);
       const sourceIds = new Set(executed.flatMap((item) => item.result.sourceIds));
-      const localForText = createLocalBuildingAgentTurn(safeQuestion, selectedBusinessId, "LIVE_AI");
       const last = executed[executed.length - 1];
       const visualMode = last.tool === "trace_system" ? "SYSTEM_TRACE" : last.tool === "get_components_behind_surface" ? "XRAY" : last.tool === "get_construction_history" ? "CONSTRUCTION_MEMORY" : last.tool === "get_current_observations" ? "DIAGNOSTIC" : "FOCUS";
-      const result: BuildingAgentTurnResult = { ...localForText, mode: "LIVE_AI", answer: composeAnswer(executed), toolTrace: executed.map((item) => ({ tool: item.tool, arguments: item.arguments, status: item.result.status })), facts, sources: building1602Dataset.sources.filter((source) => sourceIds.has(source.sourceId)), visualDirective: last.result.status === "OK" ? { mode: visualMode, targetBusinessIds: last.result.businessIds, revealBusinessIds: last.result.businessIds, sourceTool: last.tool } : null };
+      const result: BuildingAgentTurnResult = { mode: "LIVE_AI", question: safeQuestion, answer: claimsAnswer(verifiedClaims), groundedClaims: verifiedClaims, usedFactIds: [...new Set(verifiedClaims.flatMap((claim) => claim.factIds))], toolTrace: executed.map((item) => ({ tool: item.tool, arguments: item.arguments, status: item.result.status })), facts, sources: building1602Dataset.sources.filter((source) => sourceIds.has(source.sourceId)), visualDirective: last.result.status === "OK" ? { mode: visualMode, targetBusinessIds: last.result.businessIds, revealBusinessIds: last.result.businessIds, sourceTool: last.tool } : null, selectedBusinessId };
       return { result, metadata: { requestId: suppliedRequestId, model: this.config.model, responseId, rounds, toolCalls: executed.length, schemaValid: true } };
     } catch (error) {
       if (error instanceof GatewayProviderError) throw error;
