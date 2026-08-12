@@ -3,9 +3,11 @@ import { BUILDING_ANSWER_SCHEMA, EXPLAIN_SCHEMA, INTERPRET_SCHEMA, validateBuild
 import { redactError, sanitizeUserText, SensitiveInputError } from "./redaction.ts";
 import type { BuildingAnswerDraft, ExplainOutput, GatewayCallMetadata, GatewayConfig, InterpretOutput, ModelTask } from "./types.ts";
 import { buildingQueryTools } from "../../lib/building-intelligence/queries.ts";
-import { building1602Dataset } from "../../lib/building-intelligence/catalog.ts";
+import { building1602Dataset, entityById } from "../../lib/building-intelligence/catalog.ts";
 import { verifyGroundedClaims, ClaimGroundingError } from "./grounding.ts";
-import type { BuildingAgentTurnResult, BuildingQueryResult, BuildingQueryToolName } from "../../lib/building-intelligence/types.ts";
+import type { BuildingAgentTurnResult, BuildingFact, BuildingQueryResult, BuildingQueryToolName, GroundedBuildingClaim } from "../../lib/building-intelligence/types.ts";
+import { resolveTargetEntity } from "../../lib/building-intelligence/entity-resolution.ts";
+import { resolveQueryVisualDirective } from "../../lib/building-intelligence/agent.ts";
 
 const DEEPSEEK_CHAT_COMPLETIONS_URL = "https://api.deepseek.com/chat/completions";
 
@@ -63,6 +65,27 @@ function isGenuinelyAmbiguous(question: string, selectedBusinessId: string | nul
 
 function claimsAnswer(claims: Array<{ text: string }>) {
   return claims.map((claim) => claim.text.replace(/[；;。\s]+$/u, "")).filter(Boolean).join("；") + "。";
+}
+
+function resolvedSubjectFacts(businessIds: string[]): BuildingFact[] {
+  return businessIds.flatMap((businessId) => {
+    const entity = entityById(businessId);
+    return entity ? [{ factId: `${businessId}:resolvedEntity`, subjectBusinessId: businessId, predicate: "resolvedEntity", value: entity.displayName, sourceIds: [entity.provenance.sourceId], provenance: [entity.provenance.sourceClass] }] : [];
+  });
+}
+
+function attachResolvedSubjectFacts(claims: GroundedBuildingClaim[], identityFacts: BuildingFact[]) {
+  return claims.map((claim) => {
+    const required = identityFacts.filter((fact) => {
+      const entity = entityById(fact.subjectBusinessId);
+      return entity && [entity.businessId, entity.displayName, ...(entity.aliases ?? [])].some((alias) => claim.text.includes(alias));
+    }).map((fact) => fact.factId);
+    return { ...claim, factIds: [...new Set([...claim.factIds, ...required])] };
+  });
+}
+
+function collectedFacts(executed: Array<{ result: BuildingQueryResult }>, identityFacts: BuildingFact[]) {
+  return [...new Map([...identityFacts, ...executed.flatMap((item) => item.result.facts)].map((fact) => [fact.factId, fact])).values()];
 }
 
 function sameToolInvocation(executed: Array<{ tool: BuildingQueryToolName; arguments: Record<string, string> }>, tool: BuildingQueryToolName, args: Record<string, string>) {
@@ -174,15 +197,26 @@ export class DeepSeekChatProvider {
   async queryBuilding(question: string, selectedBusinessId: string | null, suppliedRequestId = randomUUID()): Promise<{ result: BuildingAgentTurnResult; metadata: { requestId: string; model: string; responseId: string; rounds: number; toolCalls: number; schemaValid: true } }> {
     if (!this.config.apiKey) throw new GatewayProviderError("UNCONFIGURED", "DeepSeek API未配置", suppliedRequestId);
     const safeQuestion = sanitizeUserText(question, this.config.maxInputChars);
+    const targetEntityResolution = resolveTargetEntity(safeQuestion, selectedBusinessId);
+    if (targetEntityResolution && targetEntityResolution.status !== "RESOLVED") {
+      const alternatives = targetEntityResolution.candidates.map((item) => item.displayName).join("、");
+      const clarificationQuestion = targetEntityResolution.status === "AMBIGUOUS"
+        ? `“${targetEntityResolution.mention}”对应多个已记录对象（${alternatives}），请指定一个。`
+        : `当前 1602 建筑数据中没有找到“${targetEntityResolution.mention}”这一独立构件，请确认名称或选择已记录构件。`;
+      return { result: { mode: "LIVE_AI_CLARIFICATION", question: safeQuestion, answer: "", clarificationQuestion, toolTrace: [], facts: [], sources: [], visualDirective: null, selectedBusinessId, targetEntityResolution }, metadata: { requestId: suppliedRequestId, model: this.config.model, responseId: "local-entity-resolution", rounds: 0, toolCalls: 0, schemaValid: true } };
+    }
+    const resolvedSubjectBusinessIds = targetEntityResolution?.businessIds ?? [];
+    const identityFacts = resolvedSubjectFacts(resolvedSubjectBusinessIds);
     const messages: Array<Record<string, unknown>> = [
       { role: "system", content: `${BUILDING_QUERY_SYSTEM_PROMPT}\n严格JSON Schema：${JSON.stringify(BUILDING_ANSWER_SCHEMA)}` },
-      { role: "user", content: JSON.stringify({ question: safeQuestion, selectedBusinessId, deepSpace: "SPACE-1602-BATHROOM" }) }
+      { role: "user", content: JSON.stringify({ question: safeQuestion, selectedBusinessId, resolvedSubjectBusinessIds, deepSpace: "SPACE-1602-BATHROOM" }) }
     ];
     const executed: Array<{ tool: BuildingQueryToolName; arguments: Record<string, string>; result: BuildingQueryResult }> = [];
     let responseId = "";
     let rounds = 0;
     let forcedToolRetry = false;
     let repairAttempted = false;
+    let toolLoopFormatRepairAttempted = false;
     let finalDraft: BuildingAnswerDraft | null = null;
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.config.timeoutMs * 6);
@@ -215,11 +249,16 @@ export class DeepSeekChatProvider {
             throw new GatewayProviderError("MODEL_TOOL_REQUIRED", "DeepSeek未执行任何建筑查询工具", suppliedRequestId);
           }
           try { finalDraft = validateBuildingAnswerDraft(JSON.parse(message.content ?? "")); }
-          catch (error) { throw new GatewayProviderError("SCHEMA_ERROR", redactError(error), suppliedRequestId); }
+          catch (error) {
+            if (toolLoopFormatRepairAttempted) throw new GatewayProviderError("SCHEMA_ERROR", redactError(error), suppliedRequestId);
+            toolLoopFormatRepairAttempted = true;
+            finalDraft = null;
+            break;
+          }
           if ("clarification" in finalDraft) break;
-          const facts = [...new Map(executed.flatMap((item) => item.result.facts).map((fact) => [fact.factId, fact])).values()];
+          const facts = collectedFacts(executed, identityFacts);
           try {
-            verifyGroundedClaims(finalDraft.claims, facts, safeQuestion);
+            verifyGroundedClaims(attachResolvedSubjectFacts(finalDraft.claims, identityFacts), facts, safeQuestion, resolvedSubjectBusinessIds);
             break;
           } catch (error) {
             if (!(error instanceof ClaimGroundingError)) throw error;
@@ -254,12 +293,12 @@ export class DeepSeekChatProvider {
         if (acceptedThisRound === 0 && executed.length) break;
       }
       if (!finalDraft && executed.length && rounds < 6) {
-        const facts = [...new Map(executed.flatMap((item) => item.result.facts).map((fact) => [fact.factId, fact])).values()];
+        const facts = collectedFacts(executed, identityFacts);
         const finalMessages: Array<Record<string, unknown>> = [
           { role: "system", content: `${BUILDING_FINAL_SYSTEM_PROMPT}\n严格JSON Schema：${JSON.stringify(BUILDING_ANSWER_SCHEMA)}` },
-          { role: "user", content: JSON.stringify({ question: safeQuestion, selectedBusinessId, facts }) }
+          { role: "user", content: JSON.stringify({ question: safeQuestion, selectedBusinessId, resolvedSubjectBusinessIds, facts }) }
         ];
-        let formatRetry = false;
+        let formatRetry = toolLoopFormatRepairAttempted;
         while (!finalDraft && rounds < 6) {
           rounds += 1;
           const response = await this.fetcher(DEEPSEEK_CHAT_COMPLETIONS_URL, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.config.apiKey}` }, body: JSON.stringify({ model: this.config.model, messages: finalMessages, response_format: { type: "json_object" }, thinking: { type: "disabled" }, stream: false, max_tokens: this.config.maxOutputTokens, temperature: 0 }), signal: controller.signal });
@@ -269,7 +308,7 @@ export class DeepSeekChatProvider {
           responseId = typeof payload.id === "string" ? payload.id : responseId;
           try {
             const candidate = validateBuildingAnswerDraft(JSON.parse(extractOutputText(payload)));
-            if ("claims" in candidate) verifyGroundedClaims(candidate.claims, facts, safeQuestion);
+            if ("claims" in candidate) verifyGroundedClaims(attachResolvedSubjectFacts(candidate.claims, identityFacts), facts, safeQuestion, resolvedSubjectBusinessIds);
             finalDraft = candidate;
           }
           catch (error) {
@@ -290,12 +329,10 @@ export class DeepSeekChatProvider {
         const result: BuildingAgentTurnResult = { mode: "LIVE_AI_CLARIFICATION", question: safeQuestion, answer: "", clarificationQuestion: finalDraft.clarification.question, toolTrace: executed.map((item) => ({ tool: item.tool, arguments: item.arguments, status: item.result.status })), facts: [], sources: [], visualDirective: null, selectedBusinessId };
         return { result, metadata: { requestId: suppliedRequestId, model: this.config.model, responseId, rounds, toolCalls: executed.length, schemaValid: true } };
       }
-      const facts = [...new Map(executed.flatMap((item) => item.result.facts).map((fact) => [fact.factId, fact])).values()];
-      const verifiedClaims = verifyGroundedClaims(finalDraft.claims, facts, safeQuestion);
+      const facts = collectedFacts(executed, identityFacts);
+      const verifiedClaims = verifyGroundedClaims(attachResolvedSubjectFacts(finalDraft.claims, identityFacts), facts, safeQuestion, resolvedSubjectBusinessIds);
       const sourceIds = new Set(executed.flatMap((item) => item.result.sourceIds));
-      const last = executed[executed.length - 1];
-      const visualMode = last.tool === "trace_system" ? "SYSTEM_TRACE" : last.tool === "get_components_behind_surface" ? "XRAY" : last.tool === "get_construction_history" ? "CONSTRUCTION_MEMORY" : last.tool === "get_current_observations" ? "DIAGNOSTIC" : "FOCUS";
-      const result: BuildingAgentTurnResult = { mode: "LIVE_AI", question: safeQuestion, answer: claimsAnswer(verifiedClaims), groundedClaims: verifiedClaims, usedFactIds: [...new Set(verifiedClaims.flatMap((claim) => claim.factIds))], toolTrace: executed.map((item) => ({ tool: item.tool, arguments: item.arguments, status: item.result.status })), facts, sources: building1602Dataset.sources.filter((source) => sourceIds.has(source.sourceId)), visualDirective: last.result.status === "OK" ? { mode: visualMode, targetBusinessIds: last.result.businessIds, revealBusinessIds: last.result.businessIds, sourceTool: last.tool } : null, selectedBusinessId };
+      const result: BuildingAgentTurnResult = { mode: "LIVE_AI", question: safeQuestion, answer: claimsAnswer(verifiedClaims), groundedClaims: verifiedClaims, usedFactIds: [...new Set(verifiedClaims.flatMap((claim) => claim.factIds))], toolTrace: executed.map((item) => ({ tool: item.tool, arguments: item.arguments, status: item.result.status })), facts, sources: building1602Dataset.sources.filter((source) => sourceIds.has(source.sourceId)), visualDirective: resolveQueryVisualDirective(executed), selectedBusinessId, targetEntityResolution };
       return { result, metadata: { requestId: suppliedRequestId, model: this.config.model, responseId, rounds, toolCalls: executed.length, schemaValid: true } };
     } catch (error) {
       if (error instanceof GatewayProviderError) throw error;

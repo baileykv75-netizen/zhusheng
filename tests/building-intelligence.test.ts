@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { building1602Dataset, createLocalBuildingAgentTurn, getComponentsBehindSurface, traceSystem, validateBuildingDataset } from "../lib/building-intelligence/index.ts";
+import { building1602Dataset, createLocalBuildingAgentTurn, getComponentDetail, getComponentsBehindSurface, getUpstream, resolveQueryVisualDirective, resolveTargetEntity, traceSystem, validateBuildingDataset } from "../lib/building-intelligence/index.ts";
 
 test("1602 building intelligence data is referentially and engineering plausible", () => {
   const report = validateBuildingDataset(building1602Dataset);
@@ -62,4 +62,54 @@ test("selected component follow-up resolves the component before its parent syst
   const turn = createLocalBuildingAgentTurn("请说明这个构件的已记录信息", "J-1602-CW-03");
   assert.equal(turn.toolTrace[0].tool, "get_component_detail");
   assert.match(turn.answer, /重点冷水接头/);
+});
+
+for (const [label, terminalId] of [["Basin", "FIXTURE-1602-BASIN-01"], ["WC", "FIXTURE-1602-WC-01"], ["Shower", "FIXTURE-1602-SHOWER-01"]] as const) {
+  test(`${label} cold-water terminal traces through functional connections to the meter`, () => {
+    const upstream = getUpstream(terminalId);
+    assert.equal(upstream.status, "OK");
+    assert.ok(upstream.businessIds.includes("METER-1602-FLOW-01"));
+    assert.ok(upstream.businessIds.includes("TEE-1602-CW-01"));
+    assert.ok(upstream.facts.some((fact) => fact.predicate === "FLUID_FLOW" && fact.value === terminalId));
+  });
+}
+
+test("mirror light has independent functional connectivity and physical cable routing facts", () => {
+  const lighting = traceSystem("SYS-1602-EL-LIGHT");
+  assert.ok(lighting.businessIds.includes("LIGHT-1602-MIRROR-01"));
+  assert.ok(lighting.facts.some((fact) => fact.predicate === "ELECTRICAL_POWER" && fact.value === "LIGHT-1602-MIRROR-01"));
+  assert.ok(lighting.facts.some((fact) => fact.predicate === "INSIDE" && fact.subjectBusinessId === "CABLE-1602-LIGHT-01" && fact.value === "CONDUIT-1602-LIGHT-01"));
+  assert.equal(lighting.facts.some((fact) => fact.predicate === "ELECTRICAL_POWER" && (fact.subjectBusinessId.startsWith("CONDUIT-") || String(fact.value).startsWith("CONDUIT-"))), false);
+});
+
+test("target entity resolution distinguishes resolved, missing and ambiguous mentions", () => {
+  assert.deepEqual(resolveTargetEntity("镜前灯的电从哪里来？")?.businessIds, ["LIGHT-1602-MIRROR-01"]);
+  assert.equal(resolveTargetEntity("浴霸灯的电从哪里来？")?.status, "NOT_FOUND");
+  const ambiguous = resolveTargetEntity("灯具的线路怎么走？");
+  assert.equal(ambiguous?.status, "AMBIGUOUS");
+  assert.deepEqual(new Set(ambiguous?.businessIds), new Set(["LIGHT-1602-CEILING-01", "LIGHT-1602-MIRROR-01"]));
+});
+
+test("missing and ambiguous targets clarify without borrowing nearby system facts", () => {
+  const missing = createLocalBuildingAgentTurn("浴霸灯的电从哪里来？");
+  assert.equal(missing.mode, "LIVE_AI_CLARIFICATION");
+  assert.equal(missing.toolTrace.length, 0);
+  assert.doesNotMatch(missing.clarificationQuestion ?? "", /顶灯属于|照明回路供电/);
+  const ambiguous = createLocalBuildingAgentTurn("灯具的线路怎么走？");
+  assert.equal(ambiguous.mode, "LIVE_AI_CLARIFICATION");
+  assert.match(ambiguous.clarificationQuestion ?? "", /多个已记录对象/);
+});
+
+test("visual intent resolver preserves XRAY and SYSTEM_TRACE over later detail calls", () => {
+  const xray = { tool: "get_components_behind_surface" as const, arguments: { surfaceBusinessId: "WALL-1602-BATHROOM-NORTH" }, result: getComponentsBehindSurface("WALL-1602-BATHROOM-NORTH") };
+  const detail = { tool: "get_component_detail" as const, arguments: { businessId: "J-1602-CW-03" }, result: getComponentDetail("J-1602-CW-03") };
+  const xrayVisual = resolveQueryVisualDirective([xray, detail]);
+  assert.equal(xrayVisual?.mode, "XRAY");
+  assert.deepEqual(xrayVisual?.targetBusinessIds, ["WALL-1602-BATHROOM-NORTH"]);
+  assert.ok(xrayVisual?.revealBusinessIds.includes("J-1602-CW-03"));
+  const trace = { tool: "get_upstream" as const, arguments: { businessId: "FIXTURE-1602-BASIN-01" }, result: getUpstream("FIXTURE-1602-BASIN-01") };
+  const traceVisual = resolveQueryVisualDirective([trace, detail]);
+  assert.equal(traceVisual?.mode, "SYSTEM_TRACE");
+  assert.ok(traceVisual?.revealBusinessIds.includes("METER-1602-FLOW-01"));
+  assert.ok(traceVisual?.revealBusinessIds.includes("FIXTURE-1602-BASIN-01"));
 });

@@ -66,7 +66,9 @@ export function getComponentDetail(businessId: string, dataset = building1602Dat
       ? notRecordedFact("get_component_detail", businessId, `component.${field}`, [entity.provenance.sourceId], dataset)
       : { factId: `${businessId}:${field}`, subjectBusinessId: businessId, predicate: field, value, sourceIds: [entity.provenance.sourceId], provenance: [entity.provenance.sourceClass] });
   }
-  return result("get_component_detail", "OK", entity, facts, [businessId, ...(entity.systemId ? [entity.systemId] : [])]);
+  const spatialRelations = dataset.spatialRelations.filter((relation) => relation.subjectBusinessId === businessId || relation.objectBusinessId === businessId);
+  for (const relation of spatialRelations) facts.push({ factId: relation.relationId, subjectBusinessId: relation.subjectBusinessId, predicate: relation.predicate, value: relation.objectBusinessId, sourceIds: [relation.provenance.sourceId], provenance: [relation.provenance.sourceClass] });
+  return result("get_component_detail", "OK", { entity, spatialRelations }, facts, [businessId, ...(entity.systemId ? [entity.systemId] : []), ...spatialRelations.flatMap((relation) => [relation.subjectBusinessId, relation.objectBusinessId])]);
 }
 
 export function getSpaceComponents(spaceId: string, dataset = building1602Dataset) {
@@ -86,22 +88,37 @@ export function traceSystem(systemId: string, dataset = building1602Dataset) {
   const facts = factsForEntities(members);
   facts.unshift({ factId: `${systemId}:systemType`, subjectBusinessId: systemId, predicate: "systemType", value: system.systemType, sourceIds: [system.provenance.sourceId], provenance: [system.provenance.sourceClass] });
   for (const connection of connections) facts.push({ factId: connection.connectionId, subjectBusinessId: connection.fromBusinessId, predicate: connection.connectionType, value: connection.toBusinessId, sourceIds: [connection.provenance.sourceId], provenance: [connection.provenance.sourceClass] });
-  return result("trace_system", "OK", { system, members, connections }, facts, [systemId, ...system.memberIds]);
+  const memberIds = new Set(system.memberIds);
+  const routingRelations = dataset.spatialRelations.filter((relation) => memberIds.has(relation.subjectBusinessId) || memberIds.has(relation.objectBusinessId));
+  for (const relation of routingRelations) facts.push({ factId: relation.relationId, subjectBusinessId: relation.subjectBusinessId, predicate: relation.predicate, value: relation.objectBusinessId, sourceIds: [relation.provenance.sourceId], provenance: [relation.provenance.sourceClass] });
+  return result("trace_system", "OK", { system, members, connections, spatialRelations: routingRelations }, facts, [systemId, ...system.memberIds, ...routingRelations.flatMap((relation) => [relation.subjectBusinessId, relation.objectBusinessId])]);
 }
 
 function connected(direction: "upstream" | "downstream", businessId: string, dataset = building1602Dataset) {
   const tool = direction === "upstream" ? "get_upstream" : "get_downstream";
-  const connections = dataset.connections.filter((item) => direction === "upstream" ? item.toBusinessId === businessId : item.fromBusinessId === businessId);
   const entity = entityById(businessId, dataset);
   if (!entity) return result(tool, "NOT_FOUND", [], [], []);
+  const connections: typeof dataset.connections = [];
+  const visited = new Set<string>();
+  const queue = [businessId];
+  while (queue.length) {
+    const current = queue.shift()!;
+    if (visited.has(current)) continue;
+    visited.add(current);
+    const adjacent = dataset.connections.filter((item) => direction === "upstream" ? item.toBusinessId === current : item.fromBusinessId === current);
+    for (const connection of adjacent) {
+      if (!connections.some((item) => item.connectionId === connection.connectionId)) connections.push(connection);
+      queue.push(direction === "upstream" ? connection.fromBusinessId : connection.toBusinessId);
+    }
+  }
   if (!connections.length) {
     const sourceIds = searchedRangeSourceIds(dataset.connections, entity.provenance.sourceId);
     return result(tool, "NOT_RECORDED", [], [notRecordedFact(tool, businessId, direction === "upstream" ? "functionalConnections.upstream" : "functionalConnections.downstream", sourceIds, dataset)], [businessId]);
   }
-  const ids = connections.map((item) => direction === "upstream" ? item.fromBusinessId : item.toBusinessId);
+  const ids = [...new Set([businessId, ...connections.flatMap((item) => [item.fromBusinessId, item.toBusinessId])])];
   const entities = stable(dataset.components.filter((item) => ids.includes(item.businessId)));
   const facts = connections.map((connection) => ({ factId: connection.connectionId, subjectBusinessId: connection.fromBusinessId, predicate: connection.connectionType, value: connection.toBusinessId, sourceIds: [connection.provenance.sourceId], provenance: [connection.provenance.sourceClass] } satisfies BuildingFact));
-  return result(tool, "OK", entities, facts, ids);
+  return result(tool, "OK", { entities, connections }, facts, ids);
 }
 
 export const getUpstream = (businessId: string, dataset = building1602Dataset) => connected("upstream", businessId, dataset);

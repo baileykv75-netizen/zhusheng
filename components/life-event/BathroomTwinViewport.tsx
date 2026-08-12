@@ -60,6 +60,7 @@ function addQueryOverlay(scene: THREE.Scene) {
   root.name = "LAYER-BUILDING-INTELLIGENCE";
   root.visible = false;
   const drainage = new THREE.MeshStandardMaterial({ color: 0x8b735a, roughness: 0.52, transparent: true, opacity: 0.9 });
+  const coldWater = new THREE.MeshStandardMaterial({ color: 0x2e91b8, roughness: 0.38, metalness: 0.08, transparent: true, opacity: 0.92 });
   const electrical = new THREE.MeshStandardMaterial({ color: 0xd39a47, roughness: 0.45, metalness: 0.12, transparent: true, opacity: 0.88 });
   const conduit = new THREE.MeshStandardMaterial({ color: 0x687477, roughness: 0.62, metalness: 0.28, transparent: true, opacity: 0.46 });
   const addPipe = (name: string, points: Array<[number, number, number]>, radius: number, material: THREE.Material) => {
@@ -76,10 +77,16 @@ function addQueryOverlay(scene: THREE.Scene) {
   addNode("DRAIN-1602-FLOOR-01", [1.98, 1.28, 0.06], [0.16, 0.16, 0.025], drainage);
   addPipe("DRAIN-1602-BRANCH-01", [[0.82, 0.36, 0.18], [1.35, 0.85, 0.12], [2.26, 1.5, 0.1]], 0.055, drainage);
   addPipe("STACK-1602-DRAIN-IF-01", [[2.26, 1.5, 0.1], [2.26, 1.5, 1.1]], 0.07, drainage);
+  addNode("TEE-1602-CW-01", [1.26, 0.32, 1.16], [0.14, 0.14, 0.14], coldWater);
+  addPipe("PIPE-1602-CW-BASIN-01", [[1.26, 0.32, 1.16], [0.82, 0.32, 1.08], [0.54, 0.36, 0.9]], 0.026, coldWater);
+  addPipe("PIPE-1602-CW-WC-01", [[1.26, 0.32, 1.16], [1.58, 0.48, 0.82], [1.66, 0.76, 0.58]], 0.026, coldWater);
+  addPipe("PIPE-1602-CW-SHOWER-01", [[1.26, 0.32, 1.16], [2.1, 0.34, 1.24], [2.35, 0.42, 1.32]], 0.026, coldWater);
   addPipe("CONDUIT-1602-LIGHT-01", [[0.08, 0.48, 1.2], [0.08, 0.48, 2.45], [1.18, 0.9, 2.55]], 0.025, conduit);
   addPipe("CABLE-1602-LIGHT-01", [[0.08, 0.48, 1.2], [0.08, 0.48, 2.45], [1.18, 0.9, 2.55]], 0.01, electrical);
+  addNode("CIRCUIT-1602-LIGHT-01", [0.08, 0.48, 2.45], [0.1, 0.1, 0.1], electrical);
   addNode("SWITCH-1602-LIGHT-01", [0.07, 0.48, 1.2], [0.05, 0.12, 0.17], electrical);
   addNode("LIGHT-1602-CEILING-01", [1.18, 0.9, 2.6], [0.32, 0.32, 0.035], electrical);
+  addNode("LIGHT-1602-MIRROR-01", [0.54, 0.12, 1.86], [0.46, 0.035, 0.09], electrical);
   scene.add(root);
 }
 

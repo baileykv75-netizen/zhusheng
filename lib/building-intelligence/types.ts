@@ -10,6 +10,7 @@ export type SourceClass = (typeof SOURCE_CLASSES)[number];
 export type FunctionalConnectionType = "FLUID_FLOW" | "DRAINAGE_FLOW" | "ELECTRICAL_POWER" | "SIGNAL";
 export type SpatialPredicate = "BEHIND" | "INSIDE" | "ADJACENT_TO" | "ABOVE" | "BELOW";
 export type QueryStatus = "OK" | "NOT_FOUND" | "NOT_RECORDED" | "AMBIGUOUS";
+export type TargetEntityResolutionStatus = "RESOLVED" | "NOT_FOUND" | "AMBIGUOUS";
 
 export type Provenance = {
   sourceId: string;
@@ -113,6 +114,13 @@ export type GroundedBuildingClaim = {
   factIds: string[];
 };
 
+export type TargetEntityResolution = {
+  status: TargetEntityResolutionStatus;
+  mention: string;
+  businessIds: string[];
+  candidates: Array<{ businessId: string; displayName: string }>;
+};
+
 export type BuildingQueryToolName =
   | "find_space"
   | "find_component"
@@ -159,4 +167,5 @@ export type BuildingAgentTurnResult = {
   visualDirective: QueryVisualDirective | null;
   proposedAction?: { type: "CLOSE_VALVE" | "OPEN_VALVE" | "CREATE_INSPECTION_TASK"; authorizationRequired: true };
   selectedBusinessId?: string | null;
+  targetEntityResolution?: TargetEntityResolution | null;
 };

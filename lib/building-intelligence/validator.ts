@@ -55,6 +55,7 @@ export function validateBuildingDataset(dataset: BuildingIntelligenceDataset): V
   for (const relation of dataset.spatialRelations) {
     if (!entityIds.has(relation.subjectBusinessId) || !entityIds.has(relation.objectBusinessId)) errors.push({ code: "SPATIAL_ENTITY_NOT_FOUND", message: `${relation.relationId} 引用了缺失实体`, subjectId: relation.relationId });
   }
+  for (const binding of dataset.visualBindings) if (!entityIds.has(binding.businessId)) errors.push({ code: "VISUAL_ENTITY_NOT_FOUND", message: `${binding.nodeName} 引用了缺失实体 ${binding.businessId}`, subjectId: binding.businessId });
   for (const record of dataset.records) for (const id of record.subjectBusinessIds) if (!entityIds.has(id)) errors.push({ code: "RECORD_SUBJECT_NOT_FOUND", message: `${record.recordId} 引用了缺失实体 ${id}`, subjectId: record.recordId });
 
   validateWater(dataset, errors);
@@ -82,7 +83,9 @@ function validateWater(dataset: BuildingIntelligenceDataset, errors: ValidationI
   const terminals = new Set(["FIXTURE-1602-BASIN-01", "FIXTURE-1602-WC-01", "FIXTURE-1602-SHOWER-01"]);
   for (const connection of water) if (terminals.has(connection.fromBusinessId)) errors.push({ code: "WATER_TERMINAL_AS_SOURCE", message: "给水末端不能作为上游水源", subjectId: connection.connectionId });
   const cold = dataset.systems.find((item) => item.businessId === "SYS-1602-CW");
-  if (cold && !reaches("METER-1602-FLOW-01", (id) => id === "PIPE-1602-CW-02", water)) errors.push({ code: "WATER_PATH_INCOMPLETE", message: "冷水系统没有形成水表→阀门→管段/接头的基本路径", subjectId: cold.businessId });
+  if (cold) for (const terminalId of terminals) {
+    if (!reaches("METER-1602-FLOW-01", (id) => id === terminalId, water)) errors.push({ code: "WATER_PATH_INCOMPLETE", message: `冷水系统没有形成水表→${terminalId} 的完整末端路径`, subjectId: terminalId });
+  }
 }
 
 function validateDrainage(dataset: BuildingIntelligenceDataset, errors: ValidationIssue[]) {
@@ -93,7 +96,9 @@ function validateDrainage(dataset: BuildingIntelligenceDataset, errors: Validati
 
 function validateElectrical(dataset: BuildingIntelligenceDataset, errors: ValidationIssue[]) {
   const power = dataset.connections.filter((item) => item.connectionType === "ELECTRICAL_POWER");
-  if (!reaches("CIRCUIT-1602-LIGHT-01", (id) => id === "LIGHT-1602-CEILING-01", power)) errors.push({ code: "ELECTRICAL_PATH_INCOMPLETE", message: "灯具未通过电缆/开关连接至照明回路" });
+  for (const lightId of ["LIGHT-1602-CEILING-01", "LIGHT-1602-MIRROR-01"]) {
+    if (!reaches("CIRCUIT-1602-LIGHT-01", (id) => id === lightId, power)) errors.push({ code: "ELECTRICAL_PATH_INCOMPLETE", message: `${lightId} 未通过电缆/开关连接至照明回路`, subjectId: lightId });
+  }
   const cableInsideConduit = dataset.spatialRelations.some((item) => item.subjectBusinessId === "CABLE-1602-LIGHT-01" && item.predicate === "INSIDE" && item.objectBusinessId === "CONDUIT-1602-LIGHT-01");
   if (!cableInsideConduit) errors.push({ code: "ELECTRICAL_ROUTING_MISSING", message: "电缆缺少在线管内的物理敷设关系" });
 }

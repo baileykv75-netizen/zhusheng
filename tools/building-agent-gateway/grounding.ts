@@ -64,7 +64,7 @@ function governedValues(value: string) {
   ];
   for (const pattern of patterns) for (const match of value.matchAll(pattern)) {
     const candidate = match[1].replace(/(?:生产|制造|记录|数据|信息|未记录|未知).*$/u, "");
-    if (candidate && !["未", "没有", "未知", "当前", "未记录"].includes(candidate)) output.add(normalizeText(candidate));
+    if (candidate && !/^(?:未|没有|未知|当前|未记录|及|与|和|均|相关|对应)(?:记录|信息|数据|规格|型号|材料)?$/u.test(candidate)) output.add(normalizeText(candidate));
   }
   for (const match of value.matchAll(/\b(?:DN|PN|IP)\s*\d+(?:\.\d+)?\b/gi)) output.add(normalizeText(match[0]));
   const normalized = value.toLocaleLowerCase();
@@ -103,7 +103,7 @@ function unsupportedTokens(claimText: string, facts: BuildingFact[]) {
   return [...new Set(failures)];
 }
 
-export function verifyGroundedClaims(claims: GroundedBuildingClaim[], availableFacts: BuildingFact[], originalQuestion = "") {
+export function verifyGroundedClaims(claims: GroundedBuildingClaim[], availableFacts: BuildingFact[], originalQuestion = "", resolvedSubjectBusinessIds: string[] = []) {
   const byId = new Map(availableFacts.map((fact) => [fact.factId, fact]));
   const rejected: GroundedBuildingClaim[] = [];
   const reasons: string[] = [];
@@ -121,6 +121,12 @@ export function verifyGroundedClaims(claims: GroundedBuildingClaim[], availableF
       continue;
     }
     const unsupported = unsupportedTokens(claim.text, referenced as BuildingFact[]);
+    const referencedSupport = factSupportText(referenced as BuildingFact[]);
+    for (const subjectId of resolvedSubjectBusinessIds) {
+      const entity = entityById(subjectId);
+      const subjectMentioned = entity && [entity.businessId, entity.displayName, ...(entity.aliases ?? [])].some((value) => claim.text.includes(value));
+      if (subjectMentioned && !businessIds(referencedSupport).has(subjectId) && !normalizeText(referencedSupport).includes(normalizeText(entity.displayName))) unsupported.push(`目标主体:${subjectId}`);
+    }
     if (unsupported.length) {
       rejected.push(claim);
       reasons.push(`claim包含引用facts不支持的新事实值：${unsupported.join(", ")}`);

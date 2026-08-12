@@ -13,12 +13,13 @@ import {
   traceSystem
 } from "./queries.ts";
 import type { BuildingAgentTurnResult, BuildingQueryResult, BuildingQueryToolName, QueryVisualDirective } from "./types.ts";
+import { resolveTargetEntity } from "./entity-resolution.ts";
 
 export type Invocation = { tool: BuildingQueryToolName; arguments: Record<string, string>; result: BuildingQueryResult };
 
 function resolveComponent(question: string, selectedBusinessId?: string | null) {
-  const direct = building1602Dataset.components.find((item) => [item.businessId, item.displayName, ...(item.aliases ?? [])].some((value) => question.toLocaleLowerCase().includes(value.toLocaleLowerCase())));
-  if (direct) return direct.businessId;
+  const target = resolveTargetEntity(question, selectedBusinessId);
+  if (target?.status === "RESOLVED" && building1602Dataset.components.some((item) => item.businessId === target.businessIds[0])) return target.businessIds[0];
   if (selectedBusinessId && /它|这个|该构件|这个构件|选中/.test(question)) return selectedBusinessId;
   return null;
 }
@@ -87,23 +88,54 @@ export function composeAnswer(invocations: Invocation[]) {
     const date = time.slice(0, 10).replaceAll("-", ".");
     return `${date} · ${title}：${summary}`;
   }).join("；");
-  if (tool === "get_upstream") return `直接上游为：${result.businessIds.map(readableName).join("、")}。`;
-  if (tool === "get_downstream") return `直接下游为：${result.businessIds.map(readableName).join("、")}。`;
+  if (tool === "get_upstream") return `已记录的完整上游路径涉及：${result.businessIds.map(readableName).join("、")}。`;
+  if (tool === "get_downstream") return `已记录的完整下游路径涉及：${result.businessIds.map(readableName).join("、")}。`;
   if (tool === "get_space_components") return `当前 1602 深度空间共记录 ${result.businessIds.length} 个可查询构件。`;
   const names = result.businessIds.map(readableName);
   return names.length ? `已定位：${names.join("、")}。` : "已完成只读查询。";
 }
 
-function visualFor(invocation: Invocation): QueryVisualDirective | null {
-  if (invocation.result.status !== "OK" || !invocation.result.businessIds.length) return null;
-  const mode = invocation.tool === "trace_system" ? "SYSTEM_TRACE"
-    : invocation.tool === "get_components_behind_surface" ? "XRAY"
-      : invocation.tool === "get_construction_history" ? "CONSTRUCTION_MEMORY"
-        : invocation.tool === "get_current_observations" ? "DIAGNOSTIC" : "FOCUS";
-  return { mode, targetBusinessIds: invocation.result.businessIds, revealBusinessIds: invocation.result.businessIds, sourceTool: invocation.tool };
+const visualPriority: Array<{ mode: QueryVisualDirective["mode"]; tools: BuildingQueryToolName[] }> = [
+  { mode: "XRAY", tools: ["get_components_behind_surface"] },
+  { mode: "SYSTEM_TRACE", tools: ["trace_system", "get_upstream", "get_downstream"] },
+  { mode: "CONSTRUCTION_MEMORY", tools: ["get_construction_history"] },
+  { mode: "DIAGNOSTIC", tools: ["get_current_observations"] },
+  { mode: "FOCUS", tools: ["find_space", "find_component", "get_component_detail", "get_space_components", "get_inspection_history", "get_maintenance_history"] }
+];
+
+export function resolveQueryVisualDirective(invocations: Invocation[]): QueryVisualDirective | null {
+  for (const group of visualPriority) {
+    const primary = invocations.filter((item) => item.result.status === "OK" && group.tools.includes(item.tool) && item.result.businessIds.length);
+    if (!primary.length) continue;
+    const source = primary[0];
+    let allIds = [...new Set(primary.flatMap((item) => item.result.businessIds))];
+    if (group.mode === "XRAY") {
+      const surfaces = [...new Set(primary.map((item) => item.arguments.surfaceBusinessId).filter(Boolean))];
+      return { mode: group.mode, targetBusinessIds: surfaces, revealBusinessIds: allIds.filter((id) => !surfaces.includes(id)), sourceTool: source.tool };
+    }
+    if (group.mode === "SYSTEM_TRACE") {
+      const rankedSystems = building1602Dataset.systems.map((system) => ({ system, overlap: system.memberIds.filter((id) => allIds.includes(id)).length })).filter((item) => item.overlap > 0).sort((a, b) => b.overlap - a.overlap);
+      const activeSystem = rankedSystems[0]?.system;
+      if (activeSystem) {
+        const memberIds = new Set(activeSystem.memberIds);
+        const routingIds = building1602Dataset.spatialRelations.filter((relation) => memberIds.has(relation.subjectBusinessId) || memberIds.has(relation.objectBusinessId)).flatMap((relation) => [relation.subjectBusinessId, relation.objectBusinessId]);
+        allIds = [...new Set([...allIds, ...activeSystem.memberIds, ...routingIds])];
+      }
+    }
+    return { mode: group.mode, targetBusinessIds: allIds, revealBusinessIds: allIds, sourceTool: source.tool };
+  }
+  return null;
 }
 
 export function createLocalBuildingAgentTurn(question: string, selectedBusinessId?: string | null, mode: BuildingAgentTurnResult["mode"] = "LOCAL_READ_ONLY"): BuildingAgentTurnResult {
+  const targetEntityResolution = resolveTargetEntity(question, selectedBusinessId);
+  if (targetEntityResolution?.status !== undefined && targetEntityResolution.status !== "RESOLVED") {
+    const alternatives = targetEntityResolution.candidates.map((item) => item.displayName).join("、");
+    const clarificationQuestion = targetEntityResolution.status === "AMBIGUOUS"
+      ? `“${targetEntityResolution.mention}”对应多个已记录对象（${alternatives}），请指定一个。`
+      : `当前 1602 建筑数据中没有找到“${targetEntityResolution.mention}”这一独立构件，请确认名称或选择已记录构件。`;
+    return { mode: "LIVE_AI_CLARIFICATION", question, answer: "", clarificationQuestion, toolTrace: [], facts: [], sources: [], visualDirective: null, selectedBusinessId, targetEntityResolution };
+  }
   const invocations = planLocalBuildingQuery(question, selectedBusinessId);
   const facts = [...new Map(invocations.flatMap((item) => item.result.facts).map((fact) => [fact.factId, fact])).values()];
   const sourceIds = new Set(invocations.flatMap((item) => item.result.sourceIds));
@@ -118,11 +150,12 @@ export function createLocalBuildingAgentTurn(question: string, selectedBusinessI
     toolTrace: invocations.map(({ tool, arguments: args, result }) => ({ tool, arguments: args, status: result.status })),
     facts,
     sources,
-    visualDirective: visualFor(invocations[invocations.length - 1]),
+    visualDirective: resolveQueryVisualDirective(invocations),
     ...(asksClose ? { proposedAction: { type: "CLOSE_VALVE" as const, authorizationRequired: true as const } }
       : asksOpen ? { proposedAction: { type: "OPEN_VALVE" as const, authorizationRequired: true as const } }
         : asksInspection ? { proposedAction: { type: "CREATE_INSPECTION_TASK" as const, authorizationRequired: true as const } } : {}),
-    selectedBusinessId
+    selectedBusinessId,
+    targetEntityResolution
   };
 }
 

@@ -3,250 +3,1520 @@
   "provider": "deepseek",
   "liveApiVerified": true,
   "model": "deepseek-v4-flash",
-  "apiRequestCount": 19,
+  "apiRequestCount": 10,
   "cases": [
     {
+      "id": "Q1_BASIN_COLD_WATER",
       "question": "洗手盆里的冷水在到达龙头以前会经过哪些东西？",
       "model": "deepseek-v4-flash",
       "toolCalls": [
-        "get_space_components",
-        "find_component",
+        "get_component_detail",
         "get_upstream",
-        "trace_system",
-        "get_upstream",
-        "get_upstream",
-        "get_upstream",
-        "get_downstream"
+        "get_component_detail",
+        "get_component_detail",
+        "get_component_detail"
       ],
       "toolArguments": [
         {
-          "spaceId": "SPACE-1602-BATHROOM"
-        },
-        {
-          "query": "洗手盆"
+          "businessId": "FIXTURE-1602-BASIN-01"
         },
         {
           "businessId": "FIXTURE-1602-BASIN-01"
         },
         {
-          "systemId": "PIPE-1602-CW-02"
+          "businessId": "PIPE-1602-CW-BASIN-01"
         },
         {
-          "businessId": "PIPE-1602-CW-02"
-        },
-        {
-          "businessId": "PIPE-1602-CW-01"
-        },
-        {
-          "businessId": "J-1602-CW-03"
+          "businessId": "TEE-1602-CW-01"
         },
         {
           "businessId": "PIPE-1602-CW-02"
         }
       ],
-      "factCount": 30,
-      "usedFactIds": [
-        "NOT_RECORDED:get_upstream:FIXTURE-1602-BASIN-01:functionalConnections.upstream"
-      ],
-      "finalAnswer": "1602卫生间台盆的上游连接在建筑记忆中未检索到记录。",
-      "mode": "LIVE_AI",
-      "visualDirective": null,
-      "result": "PASS",
-      "apiRequests": 5
-    },
-    {
-      "question": "这个接头被封起来以前做过哪些施工和检查？",
-      "model": "deepseek-v4-flash",
-      "toolCalls": [
-        "get_construction_history",
-        "get_inspection_history",
-        "get_component_detail"
-      ],
-      "toolArguments": [
+      "factCount": 40,
+      "facts": [
         {
-          "businessId": "J-1602-CW-03"
+          "factId": "FIXTURE-1602-BASIN-01:resolvedEntity",
+          "subjectBusinessId": "FIXTURE-1602-BASIN-01",
+          "predicate": "resolvedEntity",
+          "value": "1602卫生间台盆",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
         },
         {
-          "businessId": "J-1602-CW-03"
+          "factId": "FIXTURE-1602-BASIN-01:displayName",
+          "subjectBusinessId": "FIXTURE-1602-BASIN-01",
+          "predicate": "displayName",
+          "value": "1602卫生间台盆",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
         },
         {
-          "businessId": "J-1602-CW-03"
+          "factId": "FIXTURE-1602-BASIN-01:entityType",
+          "subjectBusinessId": "FIXTURE-1602-BASIN-01",
+          "predicate": "entityType",
+          "value": "PLUMBING_FIXTURE",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:FIXTURE-1602-BASIN-01:component.brand",
+          "subjectBusinessId": "FIXTURE-1602-BASIN-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.brand数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:FIXTURE-1602-BASIN-01:component.manufacturer",
+          "subjectBusinessId": "FIXTURE-1602-BASIN-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.manufacturer数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:FIXTURE-1602-BASIN-01:component.model",
+          "subjectBusinessId": "FIXTURE-1602-BASIN-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.model数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:FIXTURE-1602-BASIN-01:component.material",
+          "subjectBusinessId": "FIXTURE-1602-BASIN-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.material数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:FIXTURE-1602-BASIN-01:component.specification",
+          "subjectBusinessId": "FIXTURE-1602-BASIN-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.specification数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        },
+        {
+          "factId": "CONN-CW-07",
+          "subjectBusinessId": "PIPE-1602-CW-BASIN-01",
+          "predicate": "FLUID_FLOW",
+          "value": "FIXTURE-1602-BASIN-01",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CONN-CW-06",
+          "subjectBusinessId": "TEE-1602-CW-01",
+          "predicate": "FLUID_FLOW",
+          "value": "PIPE-1602-CW-BASIN-01",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CONN-CW-05",
+          "subjectBusinessId": "PIPE-1602-CW-02",
+          "predicate": "FLUID_FLOW",
+          "value": "TEE-1602-CW-01",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CONN-CW-04",
+          "subjectBusinessId": "J-1602-CW-03",
+          "predicate": "FLUID_FLOW",
+          "value": "PIPE-1602-CW-02",
+          "sourceIds": [
+            "SRC-BUILDING-MEMORY-SEED"
+          ],
+          "provenance": [
+            "EXISTING_BUILDING_MEMORY"
+          ]
+        },
+        {
+          "factId": "CONN-CW-03",
+          "subjectBusinessId": "PIPE-1602-CW-01",
+          "predicate": "FLUID_FLOW",
+          "value": "J-1602-CW-03",
+          "sourceIds": [
+            "SRC-BUILDING-MEMORY-SEED"
+          ],
+          "provenance": [
+            "EXISTING_BUILDING_MEMORY"
+          ]
+        },
+        {
+          "factId": "CONN-CW-02",
+          "subjectBusinessId": "VALVE-1602-CW-01",
+          "predicate": "FLUID_FLOW",
+          "value": "PIPE-1602-CW-01",
+          "sourceIds": [
+            "SRC-BUILDING-MEMORY-SEED"
+          ],
+          "provenance": [
+            "EXISTING_BUILDING_MEMORY"
+          ]
+        },
+        {
+          "factId": "CONN-CW-01",
+          "subjectBusinessId": "METER-1602-FLOW-01",
+          "predicate": "FLUID_FLOW",
+          "value": "VALVE-1602-CW-01",
+          "sourceIds": [
+            "SRC-BUILDING-MEMORY-SEED"
+          ],
+          "provenance": [
+            "EXISTING_BUILDING_MEMORY"
+          ]
+        },
+        {
+          "factId": "PIPE-1602-CW-BASIN-01:displayName",
+          "subjectBusinessId": "PIPE-1602-CW-BASIN-01",
+          "predicate": "displayName",
+          "value": "台盆冷水支管（合成）",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "PIPE-1602-CW-BASIN-01:entityType",
+          "subjectBusinessId": "PIPE-1602-CW-BASIN-01",
+          "predicate": "entityType",
+          "value": "PIPE_SEGMENT",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "PIPE-1602-CW-BASIN-01:systemId",
+          "subjectBusinessId": "PIPE-1602-CW-BASIN-01",
+          "predicate": "belongsToSystem",
+          "value": "SYS-1602-CW",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:PIPE-1602-CW-BASIN-01:component.brand",
+          "subjectBusinessId": "PIPE-1602-CW-BASIN-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.brand数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:PIPE-1602-CW-BASIN-01:component.manufacturer",
+          "subjectBusinessId": "PIPE-1602-CW-BASIN-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.manufacturer数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:PIPE-1602-CW-BASIN-01:component.model",
+          "subjectBusinessId": "PIPE-1602-CW-BASIN-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.model数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:PIPE-1602-CW-BASIN-01:component.material",
+          "subjectBusinessId": "PIPE-1602-CW-BASIN-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.material数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:PIPE-1602-CW-BASIN-01:component.specification",
+          "subjectBusinessId": "PIPE-1602-CW-BASIN-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.specification数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "TEE-1602-CW-01:displayName",
+          "subjectBusinessId": "TEE-1602-CW-01",
+          "predicate": "displayName",
+          "value": "卫生间冷水分配三通（合成）",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "TEE-1602-CW-01:entityType",
+          "subjectBusinessId": "TEE-1602-CW-01",
+          "predicate": "entityType",
+          "value": "PIPE_FITTING",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "TEE-1602-CW-01:systemId",
+          "subjectBusinessId": "TEE-1602-CW-01",
+          "predicate": "belongsToSystem",
+          "value": "SYS-1602-CW",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:TEE-1602-CW-01:component.brand",
+          "subjectBusinessId": "TEE-1602-CW-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.brand数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:TEE-1602-CW-01:component.manufacturer",
+          "subjectBusinessId": "TEE-1602-CW-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.manufacturer数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:TEE-1602-CW-01:component.model",
+          "subjectBusinessId": "TEE-1602-CW-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.model数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:TEE-1602-CW-01:component.material",
+          "subjectBusinessId": "TEE-1602-CW-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.material数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:TEE-1602-CW-01:component.specification",
+          "subjectBusinessId": "TEE-1602-CW-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.specification数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "PIPE-1602-CW-02:displayName",
+          "subjectBusinessId": "PIPE-1602-CW-02",
+          "predicate": "displayName",
+          "value": "1602卫生间下游冷水管段",
+          "sourceIds": [
+            "SRC-BUILDING-MEMORY-SEED"
+          ],
+          "provenance": [
+            "EXISTING_BUILDING_MEMORY"
+          ]
+        },
+        {
+          "factId": "PIPE-1602-CW-02:entityType",
+          "subjectBusinessId": "PIPE-1602-CW-02",
+          "predicate": "entityType",
+          "value": "PIPE_SEGMENT",
+          "sourceIds": [
+            "SRC-BUILDING-MEMORY-SEED"
+          ],
+          "provenance": [
+            "EXISTING_BUILDING_MEMORY"
+          ]
+        },
+        {
+          "factId": "PIPE-1602-CW-02:systemId",
+          "subjectBusinessId": "PIPE-1602-CW-02",
+          "predicate": "belongsToSystem",
+          "value": "SYS-1602-CW",
+          "sourceIds": [
+            "SRC-BUILDING-MEMORY-SEED"
+          ],
+          "provenance": [
+            "EXISTING_BUILDING_MEMORY"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:PIPE-1602-CW-02:component.brand",
+          "subjectBusinessId": "PIPE-1602-CW-02",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.brand数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-BUILDING-MEMORY-SEED"
+          ],
+          "provenance": [
+            "EXISTING_BUILDING_MEMORY"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:PIPE-1602-CW-02:component.manufacturer",
+          "subjectBusinessId": "PIPE-1602-CW-02",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.manufacturer数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-BUILDING-MEMORY-SEED"
+          ],
+          "provenance": [
+            "EXISTING_BUILDING_MEMORY"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:PIPE-1602-CW-02:component.model",
+          "subjectBusinessId": "PIPE-1602-CW-02",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.model数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-BUILDING-MEMORY-SEED"
+          ],
+          "provenance": [
+            "EXISTING_BUILDING_MEMORY"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:PIPE-1602-CW-02:component.material",
+          "subjectBusinessId": "PIPE-1602-CW-02",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.material数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-BUILDING-MEMORY-SEED"
+          ],
+          "provenance": [
+            "EXISTING_BUILDING_MEMORY"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:PIPE-1602-CW-02:component.specification",
+          "subjectBusinessId": "PIPE-1602-CW-02",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.specification数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-BUILDING-MEMORY-SEED"
+          ],
+          "provenance": [
+            "EXISTING_BUILDING_MEMORY"
+          ]
+        },
+        {
+          "factId": "REL-003",
+          "subjectBusinessId": "PIPE-1602-CW-02",
+          "predicate": "BEHIND",
+          "value": "WALL-1602-BATHROOM-NORTH",
+          "sourceIds": [
+            "SRC-BUILDING-SPEC-V6"
+          ],
+          "provenance": [
+            "BUILDING_SPEC_DERIVED"
+          ]
         }
       ],
-      "factCount": 10,
-      "usedFactIds": [
-        "REC-CONSTRUCTION-J03",
-        "REC-INSPECTION-CW"
+      "groundedClaims": [
+        {
+          "text": "冷水在到达1602卫生间台盆（FIXTURE-1602-BASIN-01）前，先流经台盆冷水支管（PIPE-1602-CW-BASIN-01）。",
+          "factIds": [
+            "CONN-CW-07",
+            "PIPE-1602-CW-BASIN-01:displayName",
+            "FIXTURE-1602-BASIN-01:resolvedEntity"
+          ]
+        },
+        {
+          "text": "台盆冷水支管（PIPE-1602-CW-BASIN-01）的上游是卫生间冷水分配三通（TEE-1602-CW-01）。",
+          "factIds": [
+            "CONN-CW-06",
+            "TEE-1602-CW-01:displayName",
+            "FIXTURE-1602-BASIN-01:resolvedEntity"
+          ]
+        },
+        {
+          "text": "卫生间冷水分配三通（TEE-1602-CW-01）的上游是1602卫生间下游冷水管段（PIPE-1602-CW-02）。",
+          "factIds": [
+            "CONN-CW-05",
+            "PIPE-1602-CW-02:displayName"
+          ]
+        },
+        {
+          "text": "1602卫生间下游冷水管段（PIPE-1602-CW-02）的上游是接头J-1602-CW-03。",
+          "factIds": [
+            "CONN-CW-04"
+          ]
+        },
+        {
+          "text": "接头J-1602-CW-03的上游是冷水管段PIPE-1602-CW-01。",
+          "factIds": [
+            "CONN-CW-03"
+          ]
+        },
+        {
+          "text": "冷水管段PIPE-1602-CW-01的上游是冷水阀门VALVE-1602-CW-01。",
+          "factIds": [
+            "CONN-CW-02"
+          ]
+        },
+        {
+          "text": "冷水阀门VALVE-1602-CW-01的上游是流量计METER-1602-FLOW-01。",
+          "factIds": [
+            "CONN-CW-01"
+          ]
+        }
       ],
-      "finalAnswer": "该接头（1602卫生间重点冷水接头）在封起来以前，于2025-03-18进行过重点冷水接头施工留痕，关联了双角度照片、热熔参数与保压记录；该接头在封起来以前，于2025-03-19进行过冷水支路保压检查，既有种子记录显示检查结果合格（这不构成对当前运行状态的保证）。",
+      "usedFactIds": [
+        "CONN-CW-07",
+        "PIPE-1602-CW-BASIN-01:displayName",
+        "FIXTURE-1602-BASIN-01:resolvedEntity",
+        "CONN-CW-06",
+        "TEE-1602-CW-01:displayName",
+        "CONN-CW-05",
+        "PIPE-1602-CW-02:displayName",
+        "CONN-CW-04",
+        "CONN-CW-03",
+        "CONN-CW-02",
+        "CONN-CW-01"
+      ],
+      "finalAnswer": "冷水在到达1602卫生间台盆（FIXTURE-1602-BASIN-01）前，先流经台盆冷水支管（PIPE-1602-CW-BASIN-01）；台盆冷水支管（PIPE-1602-CW-BASIN-01）的上游是卫生间冷水分配三通（TEE-1602-CW-01）；卫生间冷水分配三通（TEE-1602-CW-01）的上游是1602卫生间下游冷水管段（PIPE-1602-CW-02）；1602卫生间下游冷水管段（PIPE-1602-CW-02）的上游是接头J-1602-CW-03；接头J-1602-CW-03的上游是冷水管段PIPE-1602-CW-01；冷水管段PIPE-1602-CW-01的上游是冷水阀门VALVE-1602-CW-01；冷水阀门VALVE-1602-CW-01的上游是流量计METER-1602-FLOW-01。",
       "mode": "LIVE_AI",
       "visualDirective": {
-        "mode": "FOCUS",
+        "mode": "SYSTEM_TRACE",
         "targetBusinessIds": [
+          "FIXTURE-1602-BASIN-01",
           "J-1602-CW-03",
-          "SYS-1602-CW"
+          "METER-1602-FLOW-01",
+          "PIPE-1602-CW-01",
+          "PIPE-1602-CW-02",
+          "PIPE-1602-CW-BASIN-01",
+          "TEE-1602-CW-01",
+          "VALVE-1602-CW-01",
+          "PIPE-1602-CW-WC-01",
+          "PIPE-1602-CW-SHOWER-01",
+          "FIXTURE-1602-WC-01",
+          "FIXTURE-1602-SHOWER-01",
+          "WALL-1602-BATHROOM-NORTH"
         ],
         "revealBusinessIds": [
+          "FIXTURE-1602-BASIN-01",
           "J-1602-CW-03",
-          "SYS-1602-CW"
+          "METER-1602-FLOW-01",
+          "PIPE-1602-CW-01",
+          "PIPE-1602-CW-02",
+          "PIPE-1602-CW-BASIN-01",
+          "TEE-1602-CW-01",
+          "VALVE-1602-CW-01",
+          "PIPE-1602-CW-WC-01",
+          "PIPE-1602-CW-SHOWER-01",
+          "FIXTURE-1602-WC-01",
+          "FIXTURE-1602-SHOWER-01",
+          "WALL-1602-BATHROOM-NORTH"
         ],
-        "sourceTool": "get_component_detail"
+        "sourceTool": "get_upstream"
       },
       "result": "PASS",
-      "apiRequests": 2
+      "apiRequests": 3
     },
     {
+      "id": "Q2_NORTH_WALL_XRAY",
       "question": "如果我要打开北墙维修，墙里面有哪些东西需要注意？",
       "model": "deepseek-v4-flash",
       "toolCalls": [
-        "get_space_components",
         "get_components_behind_surface",
-        "get_component_detail",
-        "get_component_detail",
-        "get_component_detail",
         "get_component_detail"
       ],
       "toolArguments": [
-        {
-          "spaceId": "SPACE-1602-BATHROOM"
-        },
         {
           "surfaceBusinessId": "WALL-1602-BATHROOM-NORTH"
         },
         {
-          "businessId": "PIPE-1602-CW-01"
-        },
-        {
-          "businessId": "PIPE-1602-CW-02"
-        },
-        {
-          "businessId": "PIPE-1602-HW-01"
-        },
-        {
-          "businessId": "J-1602-CW-03"
+          "businessId": "WALL-1602-BATHROOM-NORTH"
         }
       ],
-      "factCount": 57,
+      "factCount": 12,
+      "facts": [
+        {
+          "factId": "WALL-1602-BATHROOM-NORTH:resolvedEntity",
+          "subjectBusinessId": "WALL-1602-BATHROOM-NORTH",
+          "predicate": "resolvedEntity",
+          "value": "1602卫生间北墙",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        },
+        {
+          "factId": "REL-001",
+          "subjectBusinessId": "PIPE-1602-CW-01",
+          "predicate": "BEHIND",
+          "value": "WALL-1602-BATHROOM-NORTH",
+          "sourceIds": [
+            "SRC-BUILDING-SPEC-V6"
+          ],
+          "provenance": [
+            "BUILDING_SPEC_DERIVED"
+          ]
+        },
+        {
+          "factId": "REL-002",
+          "subjectBusinessId": "J-1602-CW-03",
+          "predicate": "BEHIND",
+          "value": "WALL-1602-BATHROOM-NORTH",
+          "sourceIds": [
+            "SRC-BUILDING-SPEC-V6"
+          ],
+          "provenance": [
+            "BUILDING_SPEC_DERIVED"
+          ]
+        },
+        {
+          "factId": "REL-003",
+          "subjectBusinessId": "PIPE-1602-CW-02",
+          "predicate": "BEHIND",
+          "value": "WALL-1602-BATHROOM-NORTH",
+          "sourceIds": [
+            "SRC-BUILDING-SPEC-V6"
+          ],
+          "provenance": [
+            "BUILDING_SPEC_DERIVED"
+          ]
+        },
+        {
+          "factId": "REL-004",
+          "subjectBusinessId": "PIPE-1602-HW-01",
+          "predicate": "BEHIND",
+          "value": "WALL-1602-BATHROOM-NORTH",
+          "sourceIds": [
+            "SRC-BUILDING-SPEC-V6"
+          ],
+          "provenance": [
+            "BUILDING_SPEC_DERIVED"
+          ]
+        },
+        {
+          "factId": "WALL-1602-BATHROOM-NORTH:displayName",
+          "subjectBusinessId": "WALL-1602-BATHROOM-NORTH",
+          "predicate": "displayName",
+          "value": "1602卫生间北墙",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        },
+        {
+          "factId": "WALL-1602-BATHROOM-NORTH:entityType",
+          "subjectBusinessId": "WALL-1602-BATHROOM-NORTH",
+          "predicate": "entityType",
+          "value": "SURFACE",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.brand",
+          "subjectBusinessId": "WALL-1602-BATHROOM-NORTH",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.brand数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.manufacturer",
+          "subjectBusinessId": "WALL-1602-BATHROOM-NORTH",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.manufacturer数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.model",
+          "subjectBusinessId": "WALL-1602-BATHROOM-NORTH",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.model数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.material",
+          "subjectBusinessId": "WALL-1602-BATHROOM-NORTH",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.material数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.specification",
+          "subjectBusinessId": "WALL-1602-BATHROOM-NORTH",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.specification数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-IFC-ZS-DEMO-001"
+          ],
+          "provenance": [
+            "IFC_DERIVED"
+          ]
+        }
+      ],
+      "groundedClaims": [
+        {
+          "text": "1602卫生间北墙（WALL-1602-BATHROOM-NORTH）后面有4个构件需要注意：冷水管PIPE-1602-CW-01、冷水管PIPE-1602-CW-02、热水管PIPE-1602-HW-01以及接头J-1602-CW-03。",
+          "factIds": [
+            "REL-001",
+            "REL-002",
+            "REL-003",
+            "REL-004",
+            "WALL-1602-BATHROOM-NORTH:resolvedEntity"
+          ]
+        },
+        {
+          "text": "该北墙的材质、品牌、厂家、型号及规格信息当前建筑记忆未记录。",
+          "factIds": [
+            "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.brand",
+            "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.manufacturer",
+            "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.model",
+            "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.material",
+            "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.specification",
+            "WALL-1602-BATHROOM-NORTH:resolvedEntity"
+          ]
+        }
+      ],
       "usedFactIds": [
         "REL-001",
-        "PIPE-1602-CW-01:displayName",
         "REL-002",
-        "J-1602-CW-03:displayName",
         "REL-003",
-        "PIPE-1602-CW-02:displayName",
         "REL-004",
-        "PIPE-1602-HW-01:displayName"
+        "WALL-1602-BATHROOM-NORTH:resolvedEntity",
+        "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.brand",
+        "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.manufacturer",
+        "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.model",
+        "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.material",
+        "NOT_RECORDED:get_component_detail:WALL-1602-BATHROOM-NORTH:component.specification"
       ],
-      "finalAnswer": "1602卫生间北墙后面有1602卫生间上游冷水管段；1602卫生间北墙后面有1602卫生间重点冷水接头；1602卫生间北墙后面有1602卫生间下游冷水管段；1602卫生间北墙后面有1602卫生间热水管段。",
+      "finalAnswer": "1602卫生间北墙（WALL-1602-BATHROOM-NORTH）后面有4个构件需要注意：冷水管PIPE-1602-CW-01、冷水管PIPE-1602-CW-02、热水管PIPE-1602-HW-01以及接头J-1602-CW-03；该北墙的材质、品牌、厂家、型号及规格信息当前建筑记忆未记录。",
       "mode": "LIVE_AI",
       "visualDirective": {
-        "mode": "FOCUS",
+        "mode": "XRAY",
         "targetBusinessIds": [
-          "J-1602-CW-03",
-          "SYS-1602-CW"
+          "WALL-1602-BATHROOM-NORTH"
         ],
         "revealBusinessIds": [
           "J-1602-CW-03",
-          "SYS-1602-CW"
+          "PIPE-1602-CW-01",
+          "PIPE-1602-CW-02",
+          "PIPE-1602-HW-01"
         ],
-        "sourceTool": "get_component_detail"
-      },
-      "result": "PASS",
-      "apiRequests": 5
-    },
-    {
-      "question": "镜前灯的电从哪一路过来，线路又是怎么敷设的？",
-      "model": "deepseek-v4-flash",
-      "toolCalls": [
-        "get_space_components",
-        "find_component",
-        "find_component",
-        "find_component",
-        "find_component",
-        "trace_system",
-        "get_upstream",
-        "get_downstream"
-      ],
-      "toolArguments": [
-        {
-          "spaceId": "SPACE-1602-BATHROOM"
-        },
-        {
-          "query": "镜前灯"
-        },
-        {
-          "query": "mirror light"
-        },
-        {
-          "query": "LIGHT"
-        },
-        {
-          "query": "照明"
-        },
-        {
-          "systemId": "CIRCUIT-1602-LIGHT-01"
-        },
-        {
-          "businessId": "CABLE-1602-LIGHT-01"
-        },
-        {
-          "businessId": "CABLE-1602-LIGHT-01"
-        }
-      ],
-      "factCount": 27,
-      "usedFactIds": [
-        "CIRCUIT-1602-LIGHT-01:displayName",
-        "CABLE-1602-LIGHT-01:displayName",
-        "CONDUIT-1602-LIGHT-01:displayName",
-        "CONN-EL-01",
-        "CONN-EL-02"
-      ],
-      "finalAnswer": "镜前灯的电从卫生间照明回路接口（CIRCUIT-1602-LIGHT-01）经卫生间照明电缆（CABLE-1602-LIGHT-01）供电，线路通过卫生间照明线管（CONDUIT-1602-LIGHT-01）敷设。",
-      "mode": "LIVE_AI",
-      "visualDirective": {
-        "mode": "FOCUS",
-        "targetBusinessIds": [
-          "SWITCH-1602-LIGHT-01"
-        ],
-        "revealBusinessIds": [
-          "SWITCH-1602-LIGHT-01"
-        ],
-        "sourceTool": "get_downstream"
-      },
-      "result": "PASS",
-      "apiRequests": 5
-    },
-    {
-      "question": "J-1602-CW-03 是哪个品牌生产的？",
-      "model": "deepseek-v4-flash",
-      "toolCalls": [
-        "get_component_detail"
-      ],
-      "toolArguments": [
-        {
-          "businessId": "J-1602-CW-03"
-        }
-      ],
-      "factCount": 8,
-      "usedFactIds": [
-        "NOT_RECORDED:get_component_detail:J-1602-CW-03:component.brand"
-      ],
-      "finalAnswer": "当前建筑记忆未记录J-1602-CW-03的生产品牌。",
-      "mode": "LIVE_AI",
-      "visualDirective": {
-        "mode": "FOCUS",
-        "targetBusinessIds": [
-          "J-1602-CW-03",
-          "SYS-1602-CW"
-        ],
-        "revealBusinessIds": [
-          "J-1602-CW-03",
-          "SYS-1602-CW"
-        ],
-        "sourceTool": "get_component_detail"
+        "sourceTool": "get_components_behind_surface"
       },
       "result": "PASS",
       "apiRequests": 2
+    },
+    {
+      "id": "Q3_MIRROR_LIGHT",
+      "question": "镜前灯的电从哪一路过来，线路又是怎么敷设的？",
+      "model": "deepseek-v4-flash",
+      "toolCalls": [
+        "get_component_detail",
+        "get_upstream",
+        "get_component_detail",
+        "get_component_detail",
+        "get_component_detail",
+        "get_component_detail",
+        "get_upstream",
+        "get_upstream"
+      ],
+      "toolArguments": [
+        {
+          "businessId": "LIGHT-1602-MIRROR-01"
+        },
+        {
+          "businessId": "LIGHT-1602-MIRROR-01"
+        },
+        {
+          "businessId": "CIRCUIT-1602-LIGHT-01"
+        },
+        {
+          "businessId": "CABLE-1602-LIGHT-01"
+        },
+        {
+          "businessId": "SWITCH-1602-LIGHT-01"
+        },
+        {
+          "businessId": "CONDUIT-1602-LIGHT-01"
+        },
+        {
+          "businessId": "CABLE-1602-LIGHT-01"
+        },
+        {
+          "businessId": "CIRCUIT-1602-LIGHT-01"
+        }
+      ],
+      "factCount": 47,
+      "facts": [
+        {
+          "factId": "LIGHT-1602-MIRROR-01:resolvedEntity",
+          "subjectBusinessId": "LIGHT-1602-MIRROR-01",
+          "predicate": "resolvedEntity",
+          "value": "卫生间镜前灯（合成）",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "LIGHT-1602-MIRROR-01:displayName",
+          "subjectBusinessId": "LIGHT-1602-MIRROR-01",
+          "predicate": "displayName",
+          "value": "卫生间镜前灯（合成）",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "LIGHT-1602-MIRROR-01:entityType",
+          "subjectBusinessId": "LIGHT-1602-MIRROR-01",
+          "predicate": "entityType",
+          "value": "ELECTRICAL_DEVICE",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "LIGHT-1602-MIRROR-01:systemId",
+          "subjectBusinessId": "LIGHT-1602-MIRROR-01",
+          "predicate": "belongsToSystem",
+          "value": "SYS-1602-EL-LIGHT",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:LIGHT-1602-MIRROR-01:component.brand",
+          "subjectBusinessId": "LIGHT-1602-MIRROR-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.brand数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:LIGHT-1602-MIRROR-01:component.manufacturer",
+          "subjectBusinessId": "LIGHT-1602-MIRROR-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.manufacturer数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:LIGHT-1602-MIRROR-01:component.model",
+          "subjectBusinessId": "LIGHT-1602-MIRROR-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.model数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:LIGHT-1602-MIRROR-01:component.material",
+          "subjectBusinessId": "LIGHT-1602-MIRROR-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.material数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:LIGHT-1602-MIRROR-01:component.specification",
+          "subjectBusinessId": "LIGHT-1602-MIRROR-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.specification数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "REL-010",
+          "subjectBusinessId": "LIGHT-1602-MIRROR-01",
+          "predicate": "ADJACENT_TO",
+          "value": "WALL-1602-BATHROOM-WEST",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CONN-EL-04",
+          "subjectBusinessId": "SWITCH-1602-LIGHT-01",
+          "predicate": "ELECTRICAL_POWER",
+          "value": "LIGHT-1602-MIRROR-01",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CONN-EL-02",
+          "subjectBusinessId": "CABLE-1602-LIGHT-01",
+          "predicate": "ELECTRICAL_POWER",
+          "value": "SWITCH-1602-LIGHT-01",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CONN-EL-01",
+          "subjectBusinessId": "CIRCUIT-1602-LIGHT-01",
+          "predicate": "ELECTRICAL_POWER",
+          "value": "CABLE-1602-LIGHT-01",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CIRCUIT-1602-LIGHT-01:displayName",
+          "subjectBusinessId": "CIRCUIT-1602-LIGHT-01",
+          "predicate": "displayName",
+          "value": "卫生间照明回路接口（合成）",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CIRCUIT-1602-LIGHT-01:entityType",
+          "subjectBusinessId": "CIRCUIT-1602-LIGHT-01",
+          "predicate": "entityType",
+          "value": "ELECTRICAL_CIRCUIT",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CIRCUIT-1602-LIGHT-01:systemId",
+          "subjectBusinessId": "CIRCUIT-1602-LIGHT-01",
+          "predicate": "belongsToSystem",
+          "value": "SYS-1602-EL-LIGHT",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CIRCUIT-1602-LIGHT-01:component.brand",
+          "subjectBusinessId": "CIRCUIT-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.brand数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CIRCUIT-1602-LIGHT-01:component.manufacturer",
+          "subjectBusinessId": "CIRCUIT-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.manufacturer数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CIRCUIT-1602-LIGHT-01:component.model",
+          "subjectBusinessId": "CIRCUIT-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.model数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CIRCUIT-1602-LIGHT-01:component.material",
+          "subjectBusinessId": "CIRCUIT-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.material数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CIRCUIT-1602-LIGHT-01:component.specification",
+          "subjectBusinessId": "CIRCUIT-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.specification数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CABLE-1602-LIGHT-01:displayName",
+          "subjectBusinessId": "CABLE-1602-LIGHT-01",
+          "predicate": "displayName",
+          "value": "卫生间照明电缆（合成）",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CABLE-1602-LIGHT-01:entityType",
+          "subjectBusinessId": "CABLE-1602-LIGHT-01",
+          "predicate": "entityType",
+          "value": "ELECTRICAL_CABLE",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CABLE-1602-LIGHT-01:systemId",
+          "subjectBusinessId": "CABLE-1602-LIGHT-01",
+          "predicate": "belongsToSystem",
+          "value": "SYS-1602-EL-LIGHT",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CABLE-1602-LIGHT-01:component.brand",
+          "subjectBusinessId": "CABLE-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.brand数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CABLE-1602-LIGHT-01:component.manufacturer",
+          "subjectBusinessId": "CABLE-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.manufacturer数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CABLE-1602-LIGHT-01:component.model",
+          "subjectBusinessId": "CABLE-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.model数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CABLE-1602-LIGHT-01:component.material",
+          "subjectBusinessId": "CABLE-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.material数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CABLE-1602-LIGHT-01:component.specification",
+          "subjectBusinessId": "CABLE-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.specification数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "REL-006",
+          "subjectBusinessId": "CABLE-1602-LIGHT-01",
+          "predicate": "INSIDE",
+          "value": "CONDUIT-1602-LIGHT-01",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "SWITCH-1602-LIGHT-01:displayName",
+          "subjectBusinessId": "SWITCH-1602-LIGHT-01",
+          "predicate": "displayName",
+          "value": "卫生间照明开关（合成）",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "SWITCH-1602-LIGHT-01:entityType",
+          "subjectBusinessId": "SWITCH-1602-LIGHT-01",
+          "predicate": "entityType",
+          "value": "ELECTRICAL_DEVICE",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "SWITCH-1602-LIGHT-01:systemId",
+          "subjectBusinessId": "SWITCH-1602-LIGHT-01",
+          "predicate": "belongsToSystem",
+          "value": "SYS-1602-EL-LIGHT",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:SWITCH-1602-LIGHT-01:component.brand",
+          "subjectBusinessId": "SWITCH-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.brand数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:SWITCH-1602-LIGHT-01:component.manufacturer",
+          "subjectBusinessId": "SWITCH-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.manufacturer数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:SWITCH-1602-LIGHT-01:component.model",
+          "subjectBusinessId": "SWITCH-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.model数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:SWITCH-1602-LIGHT-01:component.material",
+          "subjectBusinessId": "SWITCH-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.material数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:SWITCH-1602-LIGHT-01:component.specification",
+          "subjectBusinessId": "SWITCH-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.specification数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CONDUIT-1602-LIGHT-01:displayName",
+          "subjectBusinessId": "CONDUIT-1602-LIGHT-01",
+          "predicate": "displayName",
+          "value": "卫生间照明线管（合成）",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "CONDUIT-1602-LIGHT-01:entityType",
+          "subjectBusinessId": "CONDUIT-1602-LIGHT-01",
+          "predicate": "entityType",
+          "value": "ELECTRICAL_CONDUIT",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CONDUIT-1602-LIGHT-01:component.brand",
+          "subjectBusinessId": "CONDUIT-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.brand数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CONDUIT-1602-LIGHT-01:component.manufacturer",
+          "subjectBusinessId": "CONDUIT-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.manufacturer数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CONDUIT-1602-LIGHT-01:component.model",
+          "subjectBusinessId": "CONDUIT-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.model数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CONDUIT-1602-LIGHT-01:component.material",
+          "subjectBusinessId": "CONDUIT-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.material数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_component_detail:CONDUIT-1602-LIGHT-01:component.specification",
+          "subjectBusinessId": "CONDUIT-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在component.specification数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "REL-005",
+          "subjectBusinessId": "CONDUIT-1602-LIGHT-01",
+          "predicate": "BEHIND",
+          "value": "WALL-1602-BATHROOM-WEST",
+          "sourceIds": [
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        },
+        {
+          "factId": "NOT_RECORDED:get_upstream:CIRCUIT-1602-LIGHT-01:functionalConnections.upstream",
+          "subjectBusinessId": "CIRCUIT-1602-LIGHT-01",
+          "predicate": "NOT_RECORDED",
+          "value": "当前建筑记忆在functionalConnections.upstream数据范围内未检索到记录；未记录不等于从未发生",
+          "sourceIds": [
+            "SRC-BUILDING-MEMORY-SEED",
+            "SRC-SYNTHETIC-MEP-1602"
+          ],
+          "provenance": [
+            "EXISTING_BUILDING_MEMORY",
+            "SYNTHETIC_ENGINEERING_RECORD"
+          ]
+        }
+      ],
+      "groundedClaims": [
+        {
+          "text": "镜前灯（LIGHT-1602-MIRROR-01）由卫生间照明开关（SWITCH-1602-LIGHT-01）供电。",
+          "factIds": [
+            "CONN-EL-04",
+            "LIGHT-1602-MIRROR-01:resolvedEntity"
+          ]
+        },
+        {
+          "text": "卫生间照明开关（SWITCH-1602-LIGHT-01）由卫生间照明电缆（CABLE-1602-LIGHT-01）供电。",
+          "factIds": [
+            "CONN-EL-02"
+          ]
+        },
+        {
+          "text": "卫生间照明电缆（CABLE-1602-LIGHT-01）由卫生间照明回路接口（CIRCUIT-1602-LIGHT-01）供电。",
+          "factIds": [
+            "CONN-EL-01"
+          ]
+        },
+        {
+          "text": "卫生间照明电缆（CABLE-1602-LIGHT-01）敷设在卫生间照明线管（CONDUIT-1602-LIGHT-01）内。",
+          "factIds": [
+            "REL-006"
+          ]
+        },
+        {
+          "text": "卫生间照明线管（CONDUIT-1602-LIGHT-01）位于卫生间西墙（WALL-1602-BATHROOM-WEST）背后。",
+          "factIds": [
+            "REL-005"
+          ]
+        },
+        {
+          "text": "镜前灯（LIGHT-1602-MIRROR-01）与卫生间西墙（WALL-1602-BATHROOM-WEST）相邻。",
+          "factIds": [
+            "REL-010",
+            "LIGHT-1602-MIRROR-01:resolvedEntity"
+          ]
+        }
+      ],
+      "usedFactIds": [
+        "CONN-EL-04",
+        "LIGHT-1602-MIRROR-01:resolvedEntity",
+        "CONN-EL-02",
+        "CONN-EL-01",
+        "REL-006",
+        "REL-005",
+        "REL-010"
+      ],
+      "finalAnswer": "镜前灯（LIGHT-1602-MIRROR-01）由卫生间照明开关（SWITCH-1602-LIGHT-01）供电；卫生间照明开关（SWITCH-1602-LIGHT-01）由卫生间照明电缆（CABLE-1602-LIGHT-01）供电；卫生间照明电缆（CABLE-1602-LIGHT-01）由卫生间照明回路接口（CIRCUIT-1602-LIGHT-01）供电；卫生间照明电缆（CABLE-1602-LIGHT-01）敷设在卫生间照明线管（CONDUIT-1602-LIGHT-01）内；卫生间照明线管（CONDUIT-1602-LIGHT-01）位于卫生间西墙（WALL-1602-BATHROOM-WEST）背后；镜前灯（LIGHT-1602-MIRROR-01）与卫生间西墙（WALL-1602-BATHROOM-WEST）相邻。",
+      "mode": "LIVE_AI",
+      "visualDirective": {
+        "mode": "SYSTEM_TRACE",
+        "targetBusinessIds": [
+          "CABLE-1602-LIGHT-01",
+          "CIRCUIT-1602-LIGHT-01",
+          "LIGHT-1602-MIRROR-01",
+          "SWITCH-1602-LIGHT-01",
+          "LIGHT-1602-CEILING-01",
+          "CONDUIT-1602-LIGHT-01",
+          "WALL-1602-BATHROOM-WEST"
+        ],
+        "revealBusinessIds": [
+          "CABLE-1602-LIGHT-01",
+          "CIRCUIT-1602-LIGHT-01",
+          "LIGHT-1602-MIRROR-01",
+          "SWITCH-1602-LIGHT-01",
+          "LIGHT-1602-CEILING-01",
+          "CONDUIT-1602-LIGHT-01",
+          "WALL-1602-BATHROOM-WEST"
+        ],
+        "sourceTool": "get_upstream"
+      },
+      "result": "PASS",
+      "apiRequests": 5
     }
   ],
   "secretIncluded": false,

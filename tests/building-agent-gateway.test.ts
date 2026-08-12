@@ -6,7 +6,7 @@ import { loadGatewayConfig } from "../tools/building-agent-gateway/config.ts";
 import { DeepSeekChatProvider, GatewayProviderError } from "../tools/building-agent-gateway/deepseek-provider.ts";
 import { validateBuildingAnswerDraft, validateExplainOutput, validateInterpretOutput } from "../tools/building-agent-gateway/schemas.ts";
 import { verifyGroundedClaims } from "../tools/building-agent-gateway/grounding.ts";
-import { getComponentDetail, getMaintenanceHistory } from "../lib/building-intelligence/queries.ts";
+import { getComponentDetail, getComponentsBehindSurface, getMaintenanceHistory } from "../lib/building-intelligence/queries.ts";
 import type { BuildingFact } from "../lib/building-intelligence/types.ts";
 import { queryBuildingAgent } from "../lib/building-intelligence/agent.ts";
 import { createGatewayServer } from "../tools/building-agent-gateway/server.ts";
@@ -113,8 +113,23 @@ test("building query tool loop executes only deterministic tools and returns fac
   assert.equal(output.result.toolTrace[0].tool, "get_components_behind_surface");
   assert.ok(output.result.facts.every((fact) => fact.sourceIds.length > 0));
   assert.equal(output.result.answer, "J-1602-CW-03 位于 WALL-1602-BATHROOM-NORTH 后方。");
-  assert.deepEqual(output.result.usedFactIds, ["REL-002"]);
+  assert.ok(output.result.usedFactIds?.includes("REL-002"));
+  assert.ok(output.result.usedFactIds?.includes("WALL-1602-BATHROOM-NORTH:resolvedEntity"));
   assert.equal(output.metadata.toolCalls, 1);
+});
+
+test("live visual intent keeps XRAY when later detail tools are only supporting queries", async () => {
+  let calls = 0;
+  const provider = new DeepSeekChatProvider(config(), { fetcher: (async () => {
+    calls += 1;
+    if (calls === 1) return deepSeekToolResponse("get_components_behind_surface", { surfaceBusinessId: "WALL-1602-BATHROOM-NORTH" }, "call_xray");
+    if (calls === 2) return deepSeekToolResponse("get_component_detail", { businessId: "J-1602-CW-03" }, "call_detail");
+    return deepSeekResponse(groundedNorthWall);
+  }) as typeof fetch });
+  const output = await provider.queryBuilding("北墙后面有什么？", null);
+  assert.equal(output.result.visualDirective?.mode, "XRAY");
+  assert.deepEqual(output.result.visualDirective?.targetBusinessIds, ["WALL-1602-BATHROOM-NORTH"]);
+  assert.deepEqual(output.result.visualDirective?.revealBusinessIds, getComponentsBehindSurface("WALL-1602-BATHROOM-NORTH").businessIds.filter((id) => id !== "WALL-1602-BATHROOM-NORTH"));
 });
 
 test("building answer schema enforces mutually exclusive claims and clarification", () => {
@@ -134,6 +149,23 @@ test("grounding rejects forged fact ids and unsupported normalized values", () =
   const dated = { ...fact, factId: "REC-1", predicate: "inspectionRecord", value: "2025-03-19T14:10:00+08:00｜保压检查｜结果合格" };
   assert.doesNotThrow(() => verifyGroundedClaims([{ text: "检查日期为 2025年3月19日", factIds: ["REC-1"] }], [dated]));
   assert.throws(() => verifyGroundedClaims([{ text: "检查日期为 2026年3月19日", factIds: ["REC-1"] }], [dated]), /日期/);
+  const missingSpecification: BuildingFact = { ...fact, factId: "NOT-REC-SPEC", predicate: "NOT_RECORDED", value: "当前建筑记忆在component.specification数据范围内未检索到记录；未记录不等于从未发生" };
+  assert.doesNotThrow(() => verifyGroundedClaims([{ text: "当前未记录型号及规格", factIds: ["NOT-REC-SPEC"] }], [missingSpecification]));
+});
+
+test("subject grounding rejects a mirror-light claim backed only by ceiling-light facts", () => {
+  const ceiling = getComponentDetail("LIGHT-1602-CEILING-01").facts;
+  assert.throws(() => verifyGroundedClaims([{ text: "镜前灯属于卫生间照明回路", factIds: ["LIGHT-1602-CEILING-01:systemId"] }], ceiling, "镜前灯属于什么回路？", ["LIGHT-1602-MIRROR-01"]), /目标主体|对象别名/);
+});
+
+test("missing target is clarified locally before DeepSeek and never borrows ceiling-light facts", async () => {
+  let called = false;
+  const provider = new DeepSeekChatProvider(config(), { fetcher: (async () => { called = true; throw new Error("must not call upstream"); }) as typeof fetch });
+  const output = await provider.queryBuilding("浴霸灯的电从哪里来？", null);
+  assert.equal(output.result.mode, "LIVE_AI_CLARIFICATION");
+  assert.equal(output.result.targetEntityResolution?.status, "NOT_FOUND");
+  assert.equal(output.result.facts.length, 0);
+  assert.equal(called, false);
 });
 
 test("NOT_RECORDED is a source-backed fact and supports an honest missing answer", () => {
@@ -204,7 +236,9 @@ test("multi-tool synthesis grounds every claim in facts from actual tools", asyn
   const output = await provider.queryBuilding("这个接头封闭前做过什么施工和检查？", "J-1602-CW-03");
   assert.equal(output.result.mode, "LIVE_AI");
   assert.equal(output.result.toolTrace.length, 2);
-  assert.deepEqual(output.result.usedFactIds, ["REC-CONSTRUCTION-J03", "REC-INSPECTION-CW"]);
+  assert.ok(output.result.usedFactIds?.includes("REC-CONSTRUCTION-J03"));
+  assert.ok(output.result.usedFactIds?.includes("REC-INSPECTION-CW"));
+  assert.ok(output.result.usedFactIds?.includes("J-1602-CW-03:resolvedEntity"));
 });
 
 test("tool calls beyond the eight-call budget receive protocol-safe rejection messages", async () => {
