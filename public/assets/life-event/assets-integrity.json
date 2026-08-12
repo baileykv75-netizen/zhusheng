@@ -11,13 +11,13 @@
     },
     "bathroom-1602-premium.glb": {
       "source": "bim/visual/bathroom-1602-premium.glb",
-      "sha256": "684fcedc43e3fb5790882657975b6ce6f6f4c67b827a545e95abf7a1709259b2",
-      "bytes": 1216392
+      "sha256": "f4bc8b361e374239350c740426e9d91c35526c78d66e7d742438f9ea8ec9c416",
+      "bytes": 1322780
     },
     "bathroom-1602-premium.validation.json": {
       "source": "bim/visual/bathroom-1602-premium.validation.json",
-      "sha256": "7e8fecd0262aedce7e9e0454c518e3c8ce637ba3f9e1b9035b11d038cb18488b",
-      "bytes": 1951
+      "sha256": "41ac7a1afb4b9b6c62d93e4ccd9e0e464b1f4d09cd3fb2ff0cea1dd5dddaf419",
+      "bytes": 2598
     },
     "bathroom-1602.manifest.json": {
       "source": "bim/visual/bathroom-1602.manifest.json",

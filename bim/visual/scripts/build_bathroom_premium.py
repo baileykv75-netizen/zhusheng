@@ -342,6 +342,35 @@ def add_architectural_details(materials: dict[str, bpy.types.Material]) -> None:
         add_box(f"PREMIUM-REPAIR-EDGE-{suffix}", size, location, materials["edge"], maintenance, "repair-edge", bevel=0.008)
 
 
+def add_building_intelligence_nodes(materials: dict[str, bpy.types.Material]) -> None:
+    """Add query-only semantic geometry without changing the protected 38-node manifest."""
+    systems = bpy.data.objects["LAYER-SYSTEMS"]
+    drainage = tune_material("MAT-QUERY-DRAINAGE", (0.28, 0.20, 0.13, 1.0), 0.52, 0.08)
+    electrical = tune_material("MAT-QUERY-ELECTRICAL", (0.75, 0.43, 0.12, 1.0), 0.38, 0.12)
+    conduit = tune_material("MAT-QUERY-CONDUIT", (0.22, 0.27, 0.28, 0.7), 0.6, 0.3)
+    nodes = (
+        ("DRAIN-1602-BASIN-01", (0.54, 0.36, 0.5), (0.06, 0.06, 0.42), drainage, "synthetic-drainage"),
+        ("TRAP-1602-BASIN-01", (0.69, 0.36, 0.25), (0.3, 0.07, 0.07), drainage, "synthetic-drainage"),
+        ("DRAIN-1602-FLOOR-01", (1.98, 1.28, 0.06), (0.16, 0.16, 0.025), drainage, "synthetic-drainage"),
+        ("DRAIN-1602-BRANCH-01", (1.52, 0.92, 0.12), (1.4, 0.08, 0.08), drainage, "synthetic-drainage"),
+        ("STACK-1602-DRAIN-IF-01", (2.26, 1.5, 0.58), (0.1, 0.1, 1.04), drainage, "synthetic-drainage"),
+        ("CONDUIT-1602-LIGHT-01", (0.08, 0.48, 1.82), (0.05, 0.05, 1.25), conduit, "synthetic-routing"),
+        ("CABLE-1602-LIGHT-01", (0.08, 0.48, 1.82), (0.018, 0.018, 1.25), electrical, "synthetic-electrical-power"),
+        ("SWITCH-1602-LIGHT-01", (0.07, 0.48, 1.2), (0.05, 0.12, 0.17), electrical, "synthetic-electrical-device"),
+        ("LIGHT-1602-CEILING-01", (1.18, 0.9, 2.6), (0.32, 0.32, 0.035), electrical, "synthetic-electrical-device"),
+    )
+    for name, location, size, material, role in nodes:
+        obj = bpy.data.objects.get(name)
+        if obj is None:
+            obj = add_box(name, size, location, material, systems, role, bevel=0.006)
+        else:
+            mark_detail(obj, role)
+        obj["businessId"] = name
+        obj["sourceClass"] = "SYNTHETIC_ENGINEERING_RECORD"
+        obj["syntheticEngineeringRecord"] = True
+        obj.hide_render = True
+
+
 def set_recursive_render(root: bpy.types.Object, hidden: bool) -> None:
     root.hide_render = hidden
     for child in root.children_recursive:
@@ -422,6 +451,11 @@ def validate(args: argparse.Namespace, manifest: dict[str, Any]) -> dict[str, An
     glb_bytes = args.glb.stat().st_size
     triangles = triangle_count()
     pbr_materials = sorted(material.name for material in bpy.data.materials if material.get("pbrNormalSource") and material.get("pbrRoughnessSource"))
+    query_nodes = sorted(binding for binding in (
+        "DRAIN-1602-BASIN-01", "TRAP-1602-BASIN-01", "DRAIN-1602-FLOOR-01",
+        "DRAIN-1602-BRANCH-01", "STACK-1602-DRAIN-IF-01", "CABLE-1602-LIGHT-01",
+        "CONDUIT-1602-LIGHT-01", "SWITCH-1602-LIGHT-01", "LIGHT-1602-CEILING-01",
+    ) if bpy.data.objects.get(binding) and bpy.data.objects[binding].get("sourceClass") == "SYNTHETIC_ENGINEERING_RECORD")
     payload = {
         "schemaVersion": 1,
         "asset": args.glb.name,
@@ -438,10 +472,13 @@ def validate(args: argparse.Namespace, manifest: dict[str, Any]) -> dict[str, An
         "pbrMaterialCount": len(pbr_materials),
         "pbrMaterials": pbr_materials,
         "pbrChannels": ["baseColor", "metallic", "roughness", "normal", "transmission"],
+        "querySemanticNodeCount": len(query_nodes),
+        "querySemanticNodes": query_nodes,
+        "querySemanticSourceClass": "SYNTHETIC_ENGINEERING_RECORD",
         "limits": {"maxGlbBytes": 10 * 1024 * 1024, "maxTriangles": 150000},
         "visualPriority": ["Visual QA", "Material Quality", "Silhouette", "Lighting", "Geometry Detail", "Triangle Count"],
         "triangleCountIsBudgetNotMinimum": True,
-        "passed": not missing and len(premium_details) >= 24 and len(pbr_materials) >= 6 and glb_bytes <= 10 * 1024 * 1024 and triangles <= 150000,
+        "passed": not missing and len(premium_details) >= 24 and len(pbr_materials) >= 6 and len(query_nodes) == 9 and glb_bytes <= 10 * 1024 * 1024 and triangles <= 150000,
     }
     args.validation.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if not payload["passed"]:
@@ -459,6 +496,7 @@ def main() -> int:
     materials = tune_existing_materials()
     smooth_existing()
     add_architectural_details(materials)
+    add_building_intelligence_nodes(materials)
     render_views(args, manifest)
     export(args, manifest)
     result = validate(args, manifest)

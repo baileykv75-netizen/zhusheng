@@ -6,8 +6,10 @@ import { useEffect, useState } from "react";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { BathroomTwinViewport } from "@/components/life-event/BathroomTwinViewport";
 import { EvidenceTimeChain } from "@/components/EvidenceTimeChain";
+import { BuildingIntelligenceWorkspace } from "@/components/BuildingIntelligenceWorkspace";
 import { deriveJourneyView } from "@/lib/journey";
 import type { VisualDirective } from "@/lib/life-event-engine/types";
+import type { BuildingAgentTurnResult } from "@/lib/building-intelligence/types.ts";
 
 const emptyDirective: VisualDirective = { view: "VIEW_CONSTRUCTION_MEMORY", highlightBusinessIds: ["J-1602-CW-03"], moistureState: "DRY", valvePosition: "OPEN", evidenceAnchorIds: ["EVIDENCE-ANCHOR-PIPE-INSTALL"], allowedActions: [], authorizationRequired: false };
 
@@ -42,6 +44,8 @@ export function Case1602Exhibit() {
   const presentView = directive.view === "VIEW_CONSTRUCTION_MEMORY" ? "VIEW_RESIDENT" : directive.view;
   const [view, setView] = useState<VisualDirective["view"]>(directive.view);
   const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(directive.highlightBusinessIds[0] ?? null);
+  const [workspace, setWorkspace] = useState<"ai" | "event">("ai");
+  const [buildingTurn, setBuildingTurn] = useState<BuildingAgentTurnResult | null>(null);
 
   useEffect(() => {
     setView(directive.view);
@@ -60,9 +64,12 @@ export function Case1602Exhibit() {
           <button type="button" className={view === presentView ? "active" : ""} aria-pressed={view === presentView} onClick={() => setView(presentView)}>此刻</button>
           <button type="button" className={view === "VIEW_CONSTRUCTION_MEMORY" ? "active" : ""} aria-pressed={view === "VIEW_CONSTRUCTION_MEMORY"} onClick={() => setView("VIEW_CONSTRUCTION_MEMORY")}>建造时</button>
         </div>
-        <BathroomTwinViewport assets={assets} externalError={assetError} directive={directive} view={view} selectedBusinessId={selectedBusinessId} onViewChange={setView} onSelect={setSelectedBusinessId} />
+        <BathroomTwinViewport assets={assets} externalError={assetError} directive={directive} view={view} selectedBusinessId={selectedBusinessId} onViewChange={setView} onSelect={setSelectedBusinessId} queryVisual={workspace === "ai" ? buildingTurn?.visualDirective : null} />
       </div>
-      <article className="case-current-card"><p>{current.label}</p><h2>{current.title}</h2><div><span>此刻发生了什么</span><strong>{current.fact}</strong></div><div><span>为什么重要</span><strong>{current.why}</strong></div><Link href={currentHref} className="case-primary">{currentAction} <ArrowRight size={17} /></Link><details><summary>查看事件详情 <ChevronDown size={15} /></summary><p>空间与构件来自1602卫生间GLB；业务状态、授权与审计由原有确定性领域引擎维护。</p></details></article>
+      <div className="case-workspace">
+        <nav aria-label="1602工作区切换"><button type="button" className={workspace === "ai" ? "active" : ""} onClick={() => setWorkspace("ai")}>筑生 AI</button><button type="button" className={workspace === "event" ? "active" : ""} onClick={() => setWorkspace("event")}>事件闭环 / 专业验证</button></nav>
+        {workspace === "ai" ? <BuildingIntelligenceWorkspace selectedBusinessId={selectedBusinessId} result={buildingTurn} onResult={setBuildingTurn} /> : <article className="case-current-card"><p>{current.label}</p><h2>{current.title}</h2><div><span>此刻发生了什么</span><strong>{current.fact}</strong></div><div><span>为什么重要</span><strong>{current.why}</strong></div><Link href={currentHref} className="case-primary">{currentAction} <ArrowRight size={17} /></Link><details><summary>查看事件详情 <ChevronDown size={15} /></summary><p>空间与构件来自1602卫生间GLB；业务状态、授权与审计由原有确定性领域引擎维护。</p></details></article>}
+      </div>
     </section>
 
     <EvidenceTimeChain />

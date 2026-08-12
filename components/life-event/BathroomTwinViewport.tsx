@@ -9,6 +9,8 @@ import type { BrowserLifeEventAssets } from "@/lib/life-event-engine/adapters/br
 import type { VisualDirective } from "@/lib/life-event-engine/types.ts";
 import { naturalTransform, resolveScenePlan, type TransformSnapshot } from "@/lib/life-event-lab/scene-controller.ts";
 import { publicAssetPath } from "@/lib/site-path";
+import { building1602Dataset, entityById } from "@/lib/building-intelligence/catalog.ts";
+import type { QueryVisualDirective } from "@/lib/building-intelligence/types.ts";
 
 type Props = {
   assets: BrowserLifeEventAssets | null;
@@ -18,6 +20,7 @@ type Props = {
   selectedBusinessId: string | null;
   onViewChange(view: VisualDirective["view"]): void;
   onSelect(businessId: string | null): void;
+  queryVisual?: QueryVisualDirective | null;
 };
 
 const viewLabels: Record<VisualDirective["view"], string> = {
@@ -51,6 +54,34 @@ type SceneRuntime = {
   highlightMaterials: THREE.Material[];
   frame: number;
 };
+
+function addQueryOverlay(scene: THREE.Scene) {
+  const root = new THREE.Group();
+  root.name = "LAYER-BUILDING-INTELLIGENCE";
+  root.visible = false;
+  const drainage = new THREE.MeshStandardMaterial({ color: 0x8b735a, roughness: 0.52, transparent: true, opacity: 0.9 });
+  const electrical = new THREE.MeshStandardMaterial({ color: 0xd39a47, roughness: 0.45, metalness: 0.12, transparent: true, opacity: 0.88 });
+  const conduit = new THREE.MeshStandardMaterial({ color: 0x687477, roughness: 0.62, metalness: 0.28, transparent: true, opacity: 0.46 });
+  const addPipe = (name: string, points: Array<[number, number, number]>, radius: number, material: THREE.Material) => {
+    const curve = new THREE.CatmullRomCurve3(points.map((point) => new THREE.Vector3(...point)));
+    const object = new THREE.Mesh(new THREE.TubeGeometry(curve, 28, radius, 12, false), material);
+    object.name = name; object.userData.businessId = name; object.visible = false; root.add(object);
+  };
+  const addNode = (name: string, position: [number, number, number], size: [number, number, number], material: THREE.Material) => {
+    const object = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
+    object.name = name; object.userData.businessId = name; object.position.set(...position); object.visible = false; root.add(object);
+  };
+  addPipe("DRAIN-1602-BASIN-01", [[0.54, 0.36, 0.72], [0.54, 0.36, 0.35]], 0.035, drainage);
+  addPipe("TRAP-1602-BASIN-01", [[0.54, 0.36, 0.35], [0.68, 0.36, 0.24], [0.82, 0.36, 0.28]], 0.04, drainage);
+  addNode("DRAIN-1602-FLOOR-01", [1.98, 1.28, 0.06], [0.16, 0.16, 0.025], drainage);
+  addPipe("DRAIN-1602-BRANCH-01", [[0.82, 0.36, 0.18], [1.35, 0.85, 0.12], [2.26, 1.5, 0.1]], 0.055, drainage);
+  addPipe("STACK-1602-DRAIN-IF-01", [[2.26, 1.5, 0.1], [2.26, 1.5, 1.1]], 0.07, drainage);
+  addPipe("CONDUIT-1602-LIGHT-01", [[0.08, 0.48, 1.2], [0.08, 0.48, 2.45], [1.18, 0.9, 2.55]], 0.025, conduit);
+  addPipe("CABLE-1602-LIGHT-01", [[0.08, 0.48, 1.2], [0.08, 0.48, 2.45], [1.18, 0.9, 2.55]], 0.01, electrical);
+  addNode("SWITCH-1602-LIGHT-01", [0.07, 0.48, 1.2], [0.05, 0.12, 0.17], electrical);
+  addNode("LIGHT-1602-CEILING-01", [1.18, 0.9, 2.6], [0.32, 0.32, 0.035], electrical);
+  scene.add(root);
+}
 
 function snapshot(object: THREE.Object3D): TransformSnapshot {
   return {
@@ -103,7 +134,7 @@ function viewMaterial(source: THREE.Material, businessId: string | null, view: V
   return material;
 }
 
-export function BathroomTwinViewport({ assets, externalError, directive, view, selectedBusinessId, onViewChange, onSelect }: Props) {
+export function BathroomTwinViewport({ assets, externalError, directive, view, selectedBusinessId, onViewChange, onSelect, queryVisual = null }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const runtimeRef = useRef<SceneRuntime | null>(null);
   const [status, setStatus] = useState<"waiting" | "loading" | "ready" | "failed">("waiting");
@@ -112,9 +143,12 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
 
   const selected = useMemo(() => {
     if (!assets || !selectedBusinessId) return null;
-    return assets.manifest.nodes[selectedBusinessId]
+    const manifestNode = assets.manifest.nodes[selectedBusinessId]
       ?? Object.values(assets.manifest.nodes).find((node) => node.businessId === selectedBusinessId)
       ?? null;
+    if (manifestNode) return manifestNode;
+    const intelligence = entityById(selectedBusinessId);
+    return intelligence ? { businessId: intelligence.businessId, nodeName: intelligence.businessId, ifcClass: intelligence.entityType, ifcGlobalId: null, layer: "SYSTEMS" as const } : null;
   }, [assets, selectedBusinessId]);
 
   useEffect(() => {
@@ -242,6 +276,7 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
   useEffect(() => {
     const runtime = runtimeRef.current;
     if (!runtime || !assets || status !== "ready") return;
+    if (queryVisual && !runtime.scene.getObjectByName("LAYER-BUILDING-INTELLIGENCE")) addQueryOverlay(runtime.scene);
     const plan = resolveScenePlan(assets.manifest, directive, view);
     runtime.highlightMaterials.forEach((material) => material.dispose());
     runtime.highlightMaterials = [];
@@ -278,6 +313,30 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
       const object = runtime.scene.getObjectByName(name);
       if (object) object.visible = true;
     }
+    const queryLayer = runtime.scene.getObjectByName("LAYER-BUILDING-INTELLIGENCE");
+    if (queryLayer) {
+      queryLayer.visible = Boolean(queryVisual);
+      queryLayer.traverse((object) => {
+        if (object === queryLayer) return;
+        const id = semanticBusinessId(object);
+        object.visible = Boolean(id && queryVisual?.revealBusinessIds.includes(id));
+      });
+    }
+    if (queryVisual?.mode === "XRAY") {
+      for (const id of queryVisual.targetBusinessIds.filter((item) => item.startsWith("WALL-"))) {
+        runtime.scene.getObjectByName(id)?.traverse((object) => {
+          const mesh = object as THREE.Mesh;
+          if (!mesh.isMesh) return;
+          const source = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+          const clones = source.map((material) => {
+            const clone = material.clone() as THREE.MeshStandardMaterial;
+            clone.transparent = true; clone.opacity = 0.22; clone.depthWrite = false;
+            runtime.highlightMaterials.push(clone); return clone;
+          });
+          mesh.material = Array.isArray(mesh.material) ? clones : clones[0];
+        });
+      }
+    }
     const legacyJointRing = runtime.scene.getObjectByName("MESH-JOINT-HIGHLIGHT-RING");
     if (legacyJointRing) legacyJointRing.visible = view !== "VIEW_MAINTENANCE";
     const anchorNames = Object.values(assets.manifest.evidenceAnchors).map((item) => item.nodeName);
@@ -304,7 +363,10 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
     // Evidence anchors are deliberately rendered as quiet spatial pins. Treating every
     // anchor as a glowing component obscures the actual pipe joint and makes the twin
     // read like a debug scene instead of a building-space diagnosis.
-    const componentHighlights = plan.highlights.filter((businessId) => !anchorNames.includes(businessId));
+    const componentHighlights = [
+      ...plan.highlights.filter((businessId) => !anchorNames.includes(businessId)),
+      ...(queryVisual?.targetBusinessIds ?? [])
+    ];
     const visibleHighlights = view === "VIEW_MAINTENANCE"
       ? componentHighlights.filter((businessId, index) => businessId === selectedBusinessId || (!selectedBusinessId && index === 0))
       : componentHighlights;
@@ -339,13 +401,14 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
       runtime.camera.near = 0.05;
       runtime.camera.far = 400;
       runtime.camera.updateProjectionMatrix();
-      const box = new THREE.Box3().setFromObject(runtime.scene);
+      const box = new THREE.Box3();
+      for (const child of runtime.scene.children) if (child.name !== "LAYER-BUILDING-INTELLIGENCE") box.expandByObject(child);
       const focusDistance = box.isEmpty() ? 4 : Math.max(2, box.getSize(new THREE.Vector3()).length() * 0.8);
       const direction = sourceCamera.getWorldDirection(new THREE.Vector3());
       runtime.controls.target.copy(runtime.camera.position.clone().add(direction.multiplyScalar(focusDistance)));
     }
     runtime.controls.update();
-  }, [assets, directive, selectedBusinessId, status, view]);
+  }, [assets, directive, queryVisual, selectedBusinessId, status, view]);
 
   useEffect(() => {
     const runtime = runtimeRef.current;
@@ -400,7 +463,7 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
       <div className="twin-status-strip">
         <span><i className={`moisture-dot ${directive.moistureState.toLowerCase()}`} />{moistureLabels[directive.moistureState]}</span>
         <span>{directive.valvePosition === "OPEN" ? <Eye size={13} /> : <EyeOff size={13} />}{valveLabels[directive.valvePosition]}</span>
-        <span><Crosshair size={13} />已定位 {directive.highlightBusinessIds.length} 处</span>
+        <span><Crosshair size={13} />已定位 {queryVisual?.targetBusinessIds.length ?? directive.highlightBusinessIds.length} 处</span>
       </div>
       {selected ? (
         <aside className="component-inspector">

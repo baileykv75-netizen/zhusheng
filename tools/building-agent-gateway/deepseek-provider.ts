@@ -2,6 +2,10 @@ import { createHash, randomUUID } from "node:crypto";
 import { EXPLAIN_SCHEMA, INTERPRET_SCHEMA, validateExplainOutput, validateInterpretOutput } from "./schemas.ts";
 import { redactError, sanitizeUserText, SensitiveInputError } from "./redaction.ts";
 import type { ExplainOutput, GatewayCallMetadata, GatewayConfig, InterpretOutput, ModelTask } from "./types.ts";
+import { buildingQueryTools } from "../../lib/building-intelligence/queries.ts";
+import { building1602Dataset } from "../../lib/building-intelligence/catalog.ts";
+import { composeAnswer, createLocalBuildingAgentTurn } from "../../lib/building-intelligence/agent.ts";
+import type { BuildingAgentTurnResult, BuildingQueryResult, BuildingQueryToolName } from "../../lib/building-intelligence/types.ts";
 
 const DEEPSEEK_CHAT_COMPLETIONS_URL = "https://api.deepseek.com/chat/completions";
 
@@ -28,6 +32,27 @@ export class GatewayProviderError extends Error {
 }
 
 type ProviderOptions = { fetcher?: typeof fetch; now?: () => string };
+
+const QUERY_TOOL_PARAMETERS: Record<BuildingQueryToolName, Record<string, unknown>> = {
+  find_space: { type: "object", additionalProperties: false, required: ["query"], properties: { query: { type: "string", maxLength: 120 } } },
+  find_component: { type: "object", additionalProperties: false, required: ["query"], properties: { query: { type: "string", maxLength: 120 } } },
+  get_component_detail: idSchema("businessId"), get_space_components: idSchema("spaceId"), trace_system: idSchema("systemId"),
+  get_upstream: idSchema("businessId"), get_downstream: idSchema("businessId"), get_components_behind_surface: idSchema("surfaceBusinessId"),
+  get_construction_history: idSchema("businessId"), get_inspection_history: idSchema("businessId"), get_maintenance_history: idSchema("businessId"), get_current_observations: idSchema("businessId")
+};
+
+function idSchema(key: string) { return { type: "object", additionalProperties: false, required: [key], properties: { [key]: { type: "string", pattern: "^[A-Z0-9_-]+$", maxLength: 100 } } }; }
+const queryToolDefinitions = (Object.keys(QUERY_TOOL_PARAMETERS) as BuildingQueryToolName[]).map((name) => ({ type: "function", function: { name, description: `Read-only deterministic building query: ${name}`, parameters: QUERY_TOOL_PARAMETERS[name] } }));
+
+function exactToolArguments(name: BuildingQueryToolName, value: unknown) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("工具参数必须是对象");
+  const schema = QUERY_TOOL_PARAMETERS[name] as { required: string[] };
+  const keys = Object.keys(value as object);
+  if (keys.length !== schema.required.length || keys.some((key) => !schema.required.includes(key))) throw new Error(`${name} 工具参数不符合白名单`);
+  const result: Record<string, string> = {};
+  for (const key of keys) { const item = (value as Record<string, unknown>)[key]; if (typeof item !== "string" || !item.trim() || item.length > 120) throw new Error(`${name}.${key} 无效`); result[key] = item.trim(); }
+  return result;
+}
 
 function sha256(value: string) {
   return createHash("sha256").update(value).digest("hex");
@@ -128,5 +153,58 @@ export class DeepSeekChatProvider {
     } finally {
       clearTimeout(timer);
     }
+  }
+
+  async queryBuilding(question: string, selectedBusinessId: string | null, suppliedRequestId = randomUUID()): Promise<{ result: BuildingAgentTurnResult; metadata: { requestId: string; model: string; responseId: string; rounds: number; toolCalls: number; schemaValid: true } }> {
+    if (!this.config.apiKey) throw new GatewayProviderError("UNCONFIGURED", "DeepSeek API未配置", suppliedRequestId);
+    const safeQuestion = sanitizeUserText(question, this.config.maxInputChars);
+    const messages: Array<Record<string, unknown>> = [
+      { role: "system", content: "你是筑生的只读建筑查询规划器。只能调用给定工具，不得声称执行设备动作、改变事件状态或把合成工程记录说成真实项目数据。不要要求整份数据。每次根据工具结果继续或结束；最终文字不会直接展示。" },
+      { role: "user", content: JSON.stringify({ question: safeQuestion, selectedBusinessId, deepSpace: "SPACE-1602-BATHROOM" }) }
+    ];
+    const executed: Array<{ tool: BuildingQueryToolName; arguments: Record<string, string>; result: BuildingQueryResult }> = [];
+    let responseId = "";
+    let rounds = 0;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), this.config.timeoutMs * 2);
+    try {
+      while (rounds < 6 && executed.length < 8) {
+        rounds += 1;
+        const response = await this.fetcher(DEEPSEEK_CHAT_COMPLETIONS_URL, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.config.apiKey}` }, body: JSON.stringify({ model: this.config.model, messages, tools: queryToolDefinitions, tool_choice: "auto", stream: false, max_tokens: this.config.maxOutputTokens, temperature: 0 }), signal: controller.signal });
+        const raw = await response.text();
+        if (!response.ok) throw new GatewayProviderError(classifyUpstream(response.status, raw), redactError(raw), suppliedRequestId);
+        const payload = JSON.parse(raw) as { id?: string; choices?: Array<{ message?: { role?: string; content?: string; tool_calls?: Array<{ id?: string; type?: string; function?: { name?: string; arguments?: string } }> } }> };
+        responseId = payload.id ?? responseId;
+        const message = payload.choices?.[0]?.message;
+        if (!message) throw new GatewayProviderError("SCHEMA_ERROR", "DeepSeek 查询响应缺少 message", suppliedRequestId);
+        messages.push(message as Record<string, unknown>);
+        const calls = message.tool_calls ?? [];
+        if (!calls.length) break;
+        for (const call of calls.slice(0, 8 - executed.length)) {
+          const name = call.function?.name as BuildingQueryToolName;
+          if (!(name in buildingQueryTools)) throw new GatewayProviderError("MODEL_TOOL_REJECTED", `模型提出未允许工具 ${String(name)}`, suppliedRequestId);
+          let rawArguments: unknown; try { rawArguments = JSON.parse(call.function?.arguments ?? "{}"); } catch { throw new GatewayProviderError("SCHEMA_ERROR", `${name} 参数不是 JSON`, suppliedRequestId); }
+          let args: Record<string, string>;
+          try { args = exactToolArguments(name, rawArguments); }
+          catch (error) { throw new GatewayProviderError("SCHEMA_ERROR", redactError(error), suppliedRequestId); }
+          const query = (buildingQueryTools[name] as (input: never) => BuildingQueryResult)(args as never);
+          executed.push({ tool: name, arguments: args, result: query });
+          messages.push({ role: "tool", tool_call_id: call.id, content: JSON.stringify({ status: query.status, facts: query.facts, businessIds: query.businessIds, candidates: query.candidates ?? [] }) });
+        }
+      }
+      const fallback = createLocalBuildingAgentTurn(safeQuestion, selectedBusinessId, "LIVE_AI");
+      if (!executed.length) return { result: fallback, metadata: { requestId: suppliedRequestId, model: this.config.model, responseId, rounds, toolCalls: 0, schemaValid: true } };
+      const facts = [...new Map(executed.flatMap((item) => item.result.facts).map((fact) => [fact.factId, fact])).values()];
+      const sourceIds = new Set(executed.flatMap((item) => item.result.sourceIds));
+      const localForText = createLocalBuildingAgentTurn(safeQuestion, selectedBusinessId, "LIVE_AI");
+      const last = executed[executed.length - 1];
+      const visualMode = last.tool === "trace_system" ? "SYSTEM_TRACE" : last.tool === "get_components_behind_surface" ? "XRAY" : last.tool === "get_construction_history" ? "CONSTRUCTION_MEMORY" : last.tool === "get_current_observations" ? "DIAGNOSTIC" : "FOCUS";
+      const result: BuildingAgentTurnResult = { ...localForText, mode: "LIVE_AI", answer: composeAnswer(executed), toolTrace: executed.map((item) => ({ tool: item.tool, arguments: item.arguments, status: item.result.status })), facts, sources: building1602Dataset.sources.filter((source) => sourceIds.has(source.sourceId)), visualDirective: last.result.status === "OK" ? { mode: visualMode, targetBusinessIds: last.result.businessIds, revealBusinessIds: last.result.businessIds, sourceTool: last.tool } : null };
+      return { result, metadata: { requestId: suppliedRequestId, model: this.config.model, responseId, rounds, toolCalls: executed.length, schemaValid: true } };
+    } catch (error) {
+      if (error instanceof GatewayProviderError) throw error;
+      if (error instanceof Error && error.name === "AbortError") throw new GatewayProviderError("TIMEOUT", "DeepSeek 建筑查询超时", suppliedRequestId);
+      throw new GatewayProviderError("NETWORK_ERROR", redactError(error), suppliedRequestId);
+    } finally { clearTimeout(timer); }
   }
 }

@@ -1,0 +1,3 @@
+[
+  {"businessId":"SPACE-1602-BATHROOM","displayName":"1602卫生间","entityType":"SPACE","aliases":["卫生间","浴室","1602浴室"],"attributes":{"storey":16,"unit":"1602","widthM":2.4,"depthM":1.8,"heightM":2.7},"provenance":{"sourceId":"SRC-IFC-ZS-DEMO-001","sourceClass":"IFC_DERIVED","synthetic":false,"note":"空间实体与位置来自 IFC；尺寸由建筑规格覆盖。","fieldOverrides":{"attributes.widthM":"SRC-BUILDING-SPEC-V6","attributes.depthM":"SRC-BUILDING-SPEC-V6","attributes.heightM":"SRC-BUILDING-SPEC-V6"}}}
+]

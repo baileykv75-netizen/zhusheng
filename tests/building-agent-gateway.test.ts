@@ -39,6 +39,10 @@ function deepSeekResponse(output: unknown) {
   return response({ id: "chatcmpl_live_shape_001", model: "deepseek-v4-flash", choices: [{ index: 0, message: { role: "assistant", content: JSON.stringify(output) }, finish_reason: "stop" }] });
 }
 
+function deepSeekToolResponse(name: string, args: Record<string, string>) {
+  return response({ id: "chatcmpl_tool_001", model: "deepseek-v4-flash", choices: [{ index: 0, message: { role: "assistant", content: "", tool_calls: [{ id: "call_001", type: "function", function: { name, arguments: JSON.stringify(args) } }] }, finish_reason: "tool_calls" }] });
+}
+
 test("gateway config defaults to loopback and is unconfigured without a key", () => {
   const value = loadGatewayConfig({});
   assert.equal(value.host, "127.0.0.1");
@@ -81,6 +85,31 @@ test("DeepSeek empty JSON content receives one bounded retry without relaxing sc
   const output = await provider.call("INTERPRET_OBSERVATION", { input: "1602卫生间湿度78%" });
   assert.equal(output.metadata.schemaValid, true);
   assert.equal(calls, 2);
+});
+
+test("building query tool loop executes only deterministic tools and returns fact-backed output", async () => {
+  let calls = 0;
+  const provider = new DeepSeekChatProvider(config(), { fetcher: (async (_url, init) => {
+    calls += 1;
+    const body = JSON.parse(String(init?.body)) as { tools?: Array<{ function: { name: string } }>; messages?: Array<{ role: string }> };
+    assert.ok(body.tools?.some((item) => item.function.name === "get_components_behind_surface"));
+    return calls === 1
+      ? deepSeekToolResponse("get_components_behind_surface", { surfaceBusinessId: "WALL-1602-BATHROOM-NORTH" })
+      : response({ id: "chatcmpl_tool_002", model: "deepseek-v4-flash", choices: [{ message: { role: "assistant", content: "done" }, finish_reason: "stop" }] });
+  }) as typeof fetch });
+  const output = await provider.queryBuilding("北墙后面有什么？", null);
+  assert.equal(output.result.mode, "LIVE_AI");
+  assert.equal(output.result.toolTrace[0].tool, "get_components_behind_surface");
+  assert.ok(output.result.facts.every((fact) => fact.sourceIds.length > 0));
+  assert.match(output.result.answer, /北墙后方记录了/);
+  assert.equal(output.metadata.toolCalls, 1);
+});
+
+test("building query tool loop rejects conduit as an invented functional tool and extra arguments", async () => {
+  const unlisted = new DeepSeekChatProvider(config(), { fetcher: (async () => deepSeekToolResponse("connect_conduit_power", { businessId: "CONDUIT-1602-LIGHT-01" })) as typeof fetch });
+  await assert.rejects(() => unlisted.queryBuilding("线管是否导电？", null), (error: unknown) => error instanceof GatewayProviderError && error.type === "MODEL_TOOL_REJECTED");
+  const extra = new DeepSeekChatProvider(config(), { fetcher: (async () => deepSeekToolResponse("trace_system", { systemId: "SYS-1602-EL-LIGHT", write: "true" })) as typeof fetch });
+  await assert.rejects(() => extra.queryBuilding("照明怎么连接？", null), (error: unknown) => error instanceof GatewayProviderError && error.type === "SCHEMA_ERROR");
 });
 
 test("input minimization redacts local paths and rejects likely API keys", async () => {

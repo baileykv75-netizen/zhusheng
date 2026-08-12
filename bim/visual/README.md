@@ -51,6 +51,8 @@ powershell -ExecutionPolicy Bypass -File bim/visual/build_bathroom_scene.ps1 `
 
 `scripts/build_bathroom_premium.py`只在受保护的`bathroom-1602.blend`基础上调整材质、灯光、曲面和平面收口，并增加不参与领域判断的展示细节。它不会替换IFC、建筑记忆、manifest、运行时变换或任何业务节点。
 
+V6.5 还在 Premium 派生模型中加入排水与电气查询节点。这些节点全部标记为`SYNTHETIC_ENGINEERING_RECORD`，只用于建筑智能查询与空间高亮；其中 Cable/Device 组成`ELECTRICAL_POWER`功能拓扑，Conduit 只表示电缆的物理敷设与包含关系，不作为导电路径。语义基线GLB不变，网页运行时覆盖层是它的确定性回退。
+
 ```powershell
 & "C:\Program Files\Blender Foundation\Blender 4.5\blender.exe" bim/visual/bathroom-1602.blend --background `
   --python bim/visual/scripts/build_bathroom_premium.py -- `

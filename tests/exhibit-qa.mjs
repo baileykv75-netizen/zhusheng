@@ -84,7 +84,11 @@ try {
     assert.equal(await casePage.locator(".case-time-switch button").count(), 2, `${viewport.name}: case must offer one simple now/construction-time switch`);
     assert.equal(await casePage.locator(".case-route article").count(), 5, `${viewport.name}: case must retain all five chapters`);
     assert.equal(await casePage.locator(".case-route article > a").count(), 1, `${viewport.name}: future chapters must remain locked before the event advances`);
-    assert.equal(await casePage.locator(".case-current-card .case-primary").count(), 1, `${viewport.name}: case must have one next action`);
+    assert.equal(await casePage.locator(".building-ai-empty").count(), 1, `${viewport.name}: building AI must be the default 1602 workspace`);
+    assert.equal(await casePage.locator(".building-ai-form button[type='submit']").count(), 1, `${viewport.name}: AI workspace must expose one read-only query action`);
+    await casePage.locator(".case-workspace > nav button").filter({ hasText: "事件闭环" }).click();
+    assert.equal(await casePage.locator(".case-current-card .case-primary").count(), 1, `${viewport.name}: professional verification must retain one next action`);
+    await casePage.locator(".case-workspace > nav button").filter({ hasText: "筑生 AI" }).click();
     assert.equal(await casePage.locator(".evidence-time-chain li").count(), 5, `${viewport.name}: case must show one five-step evidence timeline`);
     assert.equal(await casePage.locator(".evidence-time-chain img[src*='water-meter-observation']").count(), 1, `${viewport.name}: evidence timeline must include a water-meter observation`);
     await casePage.locator(".case-time-switch button").first().click();
