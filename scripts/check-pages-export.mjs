@@ -43,6 +43,9 @@ assert(lifeEventChunk, "Life-event browser adapter is missing from the export");
 assert(lifeEventChunk.includes(basePath), "Life-event runtime assets are missing the Pages base path");
 
 for (const asset of [
+  "assets/v6/building/building-hero.glb",
+  "assets/v6/building/building-hero.anchors.json",
+  "assets/v6/building/building-hero.validation.json",
   "assets/life-event/bathroom-1602.glb",
   "assets/life-event/bathroom-1602-premium.glb",
   "assets/life-event/bathroom-1602-premium.validation.json",

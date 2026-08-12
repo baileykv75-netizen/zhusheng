@@ -115,6 +115,14 @@ test("premium visual twin stays within display budget and preserves its semantic
   assert.ok(validation.glbBytes <= validation.limits.maxGlbBytes);
 });
 
+test("bathroom runtime preserves Blender PBR and limits overlays to local clones", () => {
+  const source = readFileSync("components/life-event/BathroomTwinViewport.tsx", "utf8");
+  assert.equal(source.includes("function premiumMaterial"), false, "runtime must not repaint the complete premium asset");
+  assert.match(source, /Keep Blender-authored PBR materials as the immutable resident-view/);
+  assert.match(source, /if \(view === "VIEW_RESIDENT"\) return null/);
+  assert.match(source, /material\.clone\(\)/, "diagnostic overlays should use local material clones");
+});
+
 test("runtime transform sidecar restores hidden system mesh geometry", () => {
   const runtime = JSON.parse(readFileSync(resolve(repoRoot, "public/assets/life-event/bathroom-1602.runtime-transforms.json"), "utf8")) as { transforms: Record<string, { translation: number[]; scale: number[] }> };
   for (const id of ["MESH-PIPE-1602-CW-01", "J-1602-CW-03", "MESH-VALVE-1602-CW-01-HANDLE"]) {

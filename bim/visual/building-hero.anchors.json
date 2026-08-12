@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "asset": "building-hero.glb",
+  "coordinateSystem": "BUILDING_SPEC_METRES_Z_UP_SOURCE_GLTF_Y_UP",
+  "sourceSpec": "building-spec.json",
+  "anchors": {
+    "building": {
+      "node": "CAM-HERO-BUILDING",
+      "targetNode": "ANCHOR-BUILDING_CENTER"
+    },
+    "floor": {
+      "node": "CAM-HERO-FLOOR-16",
+      "targetNode": "ANCHOR-FLOOR_16"
+    },
+    "unit": {
+      "node": "CAM-HERO-UNIT-1602",
+      "targetNode": "ANCHOR-UNIT_1602"
+    },
+    "space": {
+      "node": "CAM-HERO-BATHROOM-1602",
+      "targetNode": "ANCHOR-BATHROOM_1602"
+    }
+  },
+  "eventAnchorNode": "ANCHOR-EVENT_1602",
+  "floorNodes": {
+    "1": "LVL-01",
+    "2": "LVL-02",
+    "3": "LVL-03",
+    "4": "LVL-04",
+    "5": "LVL-05",
+    "6": "LVL-06",
+    "7": "LVL-07",
+    "8": "LVL-08",
+    "9": "LVL-09",
+    "10": "LVL-10",
+    "11": "LVL-11",
+    "12": "LVL-12",
+    "13": "LVL-13",
+    "14": "LVL-14",
+    "15": "LVL-15",
+    "16": "LVL-16",
+    "17": "LVL-17",
+    "18": "LVL-18"
+  },
+  "focusNodes": {
+    "floor": "LVL-16",
+    "unit": "UNIT-1602",
+    "space": "SPACE-1602-BATHROOM"
+  }
+}

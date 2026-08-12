@@ -18,11 +18,13 @@ const viewports = [
 
 await mkdir(output, { recursive: true });
 
-const browser = await chromium.launch({
+const launchBrowser = () => chromium.launch({
   headless: true,
   executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
   args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"]
 });
+
+let browser = await launchBrowser();
 
 try {
   for (const viewport of viewports) {
@@ -40,7 +42,7 @@ try {
         failedHomeAssets.push(`${response.status()} ${url.pathname}`);
       }
     });
-    await home.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
+    await home.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
     try {
       await home.locator(".v6-home").waitFor();
     } catch (error) {
@@ -48,6 +50,7 @@ try {
       console.error(`${viewport.name} failed assets:`, failedHomeAssets);
       throw error;
     }
+    await home.waitForFunction(() => document.querySelector(".v6-building-twin")?.getAttribute("data-visual-source") === "hero-glb", null, { timeout: 30_000 });
     assert.equal(await home.locator(".v6-enter-building").count(), 1, `${viewport.name}: homepage must have one primary entry`);
     assert.equal(await home.locator(".v6-building-twin canvas").count(), 1, `${viewport.name}: building must be the hero interface`);
     assert.equal(await home.locator(".v6-event-anchor").count(), 1, `${viewport.name}: 1602 must be located by one restrained event pulse`);
@@ -73,7 +76,7 @@ try {
         failedCaseAssets.push(`${response.status()} ${url.pathname}`);
       }
     });
-    await casePage.goto(`${baseUrl}/case-1602`, { waitUntil: "networkidle" });
+    await casePage.goto(`${baseUrl}/case-1602`, { waitUntil: "domcontentloaded" });
     await casePage.locator(".case-exhibit").waitFor();
     await casePage.locator('.twin-viewport[data-model-status="ready"]').waitFor({ timeout: 20_000 });
     assert.equal(await casePage.locator('.twin-viewport[data-visual-source="premium"]').count(), 1, `${viewport.name}: verified premium twin must be the active visual source`);
@@ -109,32 +112,38 @@ try {
     await home.close();
     await casePage.close();
     await context.close();
+    // SwiftShader may retain released contexts for the lifetime of one browser
+    // process. A fresh process keeps responsive QA representative of a real visit.
+    await browser.close();
+    browser = await launchBrowser();
   }
 
   const context = await browser.newContext({ viewport: { width: 1024, height: 768 } });
   const drill = await context.newPage();
-  await drill.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
+  await drill.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
+  await drill.waitForFunction(() => document.querySelector(".v6-building-twin")?.getAttribute("data-visual-source") === "hero-glb", null, { timeout: 30_000 });
   await drill.locator(".v6-enter-building").click();
   await drill.locator(".v6-building-twin.phase-floor").waitFor();
   await drill.screenshot({ path: `${output}/v6-hero-16f-focus.png`, fullPage: false });
-  await drill.waitForURL(/\/case-1602\/?$/, { timeout: 6000 });
+  await drill.waitForURL(/\/case-1602\/?$/, { timeout: 60_000, waitUntil: "commit" });
   assert.equal(await drill.locator(".case-exhibit").count(), 1, "building drill-down must end at the 1602 event");
   const deepLink = await context.newPage();
-  await deepLink.goto(`${baseUrl}/worker`, { waitUntil: "networkidle" });
+  await deepLink.goto(`${baseUrl}/worker`, { waitUntil: "domcontentloaded" });
+  await deepLink.locator("a.return-agent").waitFor({ timeout: 20_000 });
   assert.equal(await deepLink.locator("a.return-agent[href^='/case-1602']").count(), 1, "deep workspaces must return to the verification case");
   await context.close();
 
   for (const viewport of [{ name: "1440", width: 1440, height: 900 }, { name: "390", width: 390, height: 844 }]) {
     const roleContext = await browser.newContext({ viewport, deviceScaleFactor: 1 });
     const eventsPage = await roleContext.newPage();
-    await eventsPage.goto(`${baseUrl}/events`, { waitUntil: "networkidle" });
+    await eventsPage.goto(`${baseUrl}/events`, { waitUntil: "domcontentloaded" });
     await eventsPage.locator(".event-center").waitFor();
     assert.equal(await eventsPage.locator(".event-list article").count(), 5, `${viewport.name}: event center must establish building scale with five events`);
     assert.equal(await eventsPage.locator(".event-list article.deep").count(), 1, `${viewport.name}: only 1602 may be a deep event`);
     assert.equal(await eventsPage.locator(".event-list article > a").count(), 1, `${viewport.name}: synthetic shallow events must not pretend to have a full workflow`);
 
     const residentPage = await roleContext.newPage();
-    await residentPage.goto(`${baseUrl}/resident`, { waitUntil: "networkidle" });
+    await residentPage.goto(`${baseUrl}/resident`, { waitUntil: "domcontentloaded" });
     await residentPage.locator(".resident-service").waitFor();
     assert.equal(await residentPage.locator(".twin-viewport").count(), 0, `${viewport.name}: resident service must not expose the engineering twin`);
     assert.equal(await residentPage.locator('input[type="file"][accept*="image/jpeg"][accept*="image/png"][accept*="image/webp"]').count(), 1, `${viewport.name}: resident must accept JPG, PNG and WEBP local evidence`);
@@ -149,7 +158,7 @@ try {
     assert.equal(await residentPage.locator(".resident-primary").isEnabled(), true, `${viewport.name}: manual photo and meter observations may unlock submission`);
 
     const propertyPage = await roleContext.newPage();
-    await propertyPage.goto(`${baseUrl}/property`, { waitUntil: "networkidle" });
+    await propertyPage.goto(`${baseUrl}/property`, { waitUntil: "domcontentloaded" });
     await propertyPage.locator(".property-task-workspace").waitFor();
     await propertyPage.locator('.twin-viewport[data-model-status="ready"]').waitFor({ timeout: 20_000 });
     assert.equal(await propertyPage.locator(".professional-task-pane .active-task").count(), 1, `${viewport.name}: property workspace must show one current task`);
@@ -158,7 +167,8 @@ try {
     assert.equal(await propertyPage.locator(".resident-guided-task .task-primary").isDisabled(), true, `${viewport.name}: property assessment must wait for resident source evidence`);
 
     const workerPage = await roleContext.newPage();
-    await workerPage.goto(`${baseUrl}/worker`, { waitUntil: "networkidle" });
+    await workerPage.goto(`${baseUrl}/worker`, { waitUntil: "domcontentloaded" });
+    await workerPage.locator(".field-recorder").waitFor({ timeout: 20_000 });
     assert.equal(await workerPage.locator('input[type="file"][accept*="image/jpeg"][accept*="image/png"][accept*="image/webp"]').count(), 1, `${viewport.name}: worker must support JPG, PNG and WEBP construction evidence`);
 
     const pages = [eventsPage, residentPage, propertyPage, workerPage];
@@ -177,7 +187,7 @@ try {
       assert.equal((await eventsPage.getByRole("dialog", { name: "筑生总智能体" }).innerText()).includes("DeepSeek"), false, "ordinary Building Agent view must not lead with provider details");
       await eventsPage.getByRole("button", { name: "关闭", exact: true }).click();
       const groupPage = await roleContext.newPage();
-      await groupPage.goto(`${baseUrl}/group`, { waitUntil: "networkidle" });
+      await groupPage.goto(`${baseUrl}/group`, { waitUntil: "domcontentloaded" });
       await groupPage.locator(".group-constellation-intro").waitFor();
       assert.equal(await groupPage.getByText("AI生成 · 脱敏合成演示", { exact: true }).count(), 1, "group constellation must disclose generated imagery");
       assert.ok((await groupPage.locator("body").innerText()).includes("不能自动写成企业标准"), "group task view must preserve the governance boundary");

@@ -72,6 +72,45 @@ def tune_material(
     return material
 
 
+def procedural_finish(
+    material: bpy.types.Material,
+    scale: float,
+    detail: float,
+    bump_strength: float,
+    roughness_variation: float,
+) -> None:
+    """Add exportable procedural surface response without bitmap dependencies."""
+    if not material.use_nodes or not material.node_tree:
+        return
+    tree = material.node_tree
+    bsdf = principled(material)
+    if not bsdf:
+        return
+    texcoord = tree.nodes.new("ShaderNodeTexCoord")
+    mapping = tree.nodes.new("ShaderNodeMapping")
+    noise = tree.nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = scale
+    noise.inputs["Detail"].default_value = detail
+    noise.inputs["Roughness"].default_value = 0.62
+    bump = tree.nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = bump_strength
+    bump.inputs["Distance"].default_value = 0.035
+    roughness_ramp = tree.nodes.new("ShaderNodeValToRGB")
+    roughness_ramp.color_ramp.elements[0].position = 0.18
+    roughness_ramp.color_ramp.elements[0].color = (max(0.0, 0.5 - roughness_variation),) * 3 + (1.0,)
+    roughness_ramp.color_ramp.elements[1].position = 0.82
+    roughness_ramp.color_ramp.elements[1].color = (min(1.0, 0.5 + roughness_variation),) * 3 + (1.0,)
+    tree.links.new(texcoord.outputs["Generated"], mapping.inputs["Vector"])
+    tree.links.new(mapping.outputs["Vector"], noise.inputs["Vector"])
+    tree.links.new(noise.outputs["Fac"], bump.inputs["Height"])
+    tree.links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    tree.links.new(noise.outputs["Fac"], roughness_ramp.inputs["Fac"])
+    tree.links.new(roughness_ramp.outputs["Color"], bsdf.inputs["Roughness"])
+    material["pbrNormalSource"] = "PROCEDURAL_NOISE"
+    material["pbrRoughnessSource"] = "PROCEDURAL_NOISE"
+    material["uvCoordinateMode"] = "GENERATED"
+
+
 def collection_for(parent: bpy.types.Object) -> bpy.types.Collection:
     if parent.users_collection:
         return parent.users_collection[0]
@@ -221,6 +260,12 @@ def tune_existing_materials() -> dict[str, bpy.types.Material]:
     ):
         tune_material(damp_name, color, 0.92)
     tune_material("MAT-REPAIR", (0.045, 0.048, 0.047, 1.0), 0.9)
+    procedural_finish(materials["wall"], 52.0, 4.0, 0.11, 0.16)
+    procedural_finish(materials["floor"], 34.0, 5.0, 0.16, 0.2)
+    procedural_finish(materials["vanity"], 7.5, 3.0, 0.08, 0.1)
+    procedural_finish(materials["porcelain"], 70.0, 2.0, 0.025, 0.04)
+    procedural_finish(materials["metal"], 95.0, 2.0, 0.018, 0.05)
+    procedural_finish(materials["edge"], 18.0, 3.0, 0.07, 0.12)
     return materials
 
 
@@ -376,6 +421,7 @@ def validate(args: argparse.Namespace, manifest: dict[str, Any]) -> dict[str, An
     premium_details = sorted(obj.name for obj in bpy.context.scene.objects if obj.get("premiumDetail"))
     glb_bytes = args.glb.stat().st_size
     triangles = triangle_count()
+    pbr_materials = sorted(material.name for material in bpy.data.materials if material.get("pbrNormalSource") and material.get("pbrRoughnessSource"))
     payload = {
         "schemaVersion": 1,
         "asset": args.glb.name,
@@ -389,8 +435,13 @@ def validate(args: argparse.Namespace, manifest: dict[str, Any]) -> dict[str, An
         "triangleCount": triangles,
         "glbBytes": glb_bytes,
         "externalTextureCount": 0,
+        "pbrMaterialCount": len(pbr_materials),
+        "pbrMaterials": pbr_materials,
+        "pbrChannels": ["baseColor", "metallic", "roughness", "normal", "transmission"],
         "limits": {"maxGlbBytes": 10 * 1024 * 1024, "maxTriangles": 150000},
-        "passed": not missing and len(premium_details) >= 24 and glb_bytes <= 10 * 1024 * 1024 and triangles <= 150000,
+        "visualPriority": ["Visual QA", "Material Quality", "Silhouette", "Lighting", "Geometry Detail", "Triangle Count"],
+        "triangleCountIsBudgetNotMinimum": True,
+        "passed": not missing and len(premium_details) >= 24 and len(pbr_materials) >= 6 and glb_bytes <= 10 * 1024 * 1024 and triangles <= 150000,
     }
     args.validation.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if not payload["passed"]:

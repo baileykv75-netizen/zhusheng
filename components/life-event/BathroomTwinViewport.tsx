@@ -78,59 +78,6 @@ function semanticBusinessId(object: THREE.Object3D | null): string | null {
   return null;
 }
 
-function premiumMaterial(source: THREE.Material, businessId: string | null) {
-  const material = source.clone() as THREE.MeshStandardMaterial;
-  if (!("roughness" in source)) {
-    if ("color" in source && businessId === "J-1602-CW-03") material.color.set(0xa9673e);
-    if ("color" in source && businessId?.includes("EVIDENCE-ANCHOR")) material.color.set(0x765c42);
-    if ("color" in source && businessId?.includes("METER")) material.color.set(0x777b75);
-    material.needsUpdate = true;
-    return material;
-  }
-  material.roughness = Math.max(material.roughness ?? 0.5, 0.24);
-  if (businessId?.startsWith("WALL-")) {
-    material.color.set(0x8b847a);
-    material.roughness = 0.78;
-    material.metalness = 0;
-  } else if (businessId === "SLAB-1602-BATHROOM" || businessId === "VIS-FLOOR-TILES") {
-    material.color.set(0x85837d);
-    material.roughness = 0.48;
-    material.metalness = 0.02;
-  } else if (businessId?.startsWith("FIXTURE-1602-WC") || businessId?.startsWith("FIXTURE-1602-BASIN")) {
-    material.color.set(0xeeeae2);
-    material.roughness = 0.16;
-    material.metalness = 0;
-  } else if (businessId === "PARTITION-1602-SHOWER-01") {
-    material.color.set(0x9fb1ae);
-    material.roughness = 0.12;
-    material.metalness = 0.05;
-    material.transparent = true;
-    material.opacity = 0.28;
-    material.depthWrite = false;
-  } else if (businessId?.includes("PIPE-1602-CW")) {
-    material.color.set(0x5e888b);
-    material.roughness = 0.38;
-  } else if (businessId?.includes("PIPE-1602-HW")) {
-    material.color.set(0x95644f);
-    material.roughness = 0.4;
-  } else if (businessId === "J-1602-CW-03" || businessId?.startsWith("VALVE-") || businessId?.startsWith("METER-")) {
-    material.color.set(0x9b9486);
-    material.roughness = 0.28;
-    material.metalness = 0.58;
-  } else if (businessId?.startsWith("STATE-DAMP")) {
-    material.color.multiplyScalar(0.52);
-    material.roughness = 0.96;
-    material.metalness = 0;
-  } else if (businessId?.includes("EVIDENCE-ANCHOR")) {
-    material.color.set(0x8f714f);
-    material.emissive = new THREE.Color(0x2f2114);
-    material.emissiveIntensity = 0.08;
-    material.roughness = 0.46;
-  }
-  material.needsUpdate = true;
-  return material;
-}
-
 function viewMaterial(source: THREE.Material, businessId: string | null, view: VisualDirective["view"]) {
   if (view === "VIEW_RESIDENT") return null;
   const material = source.clone() as THREE.MeshStandardMaterial;
@@ -234,10 +181,9 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
         } : naturalTransform(snapshot(object)));
         const mesh = object as THREE.Mesh;
         if (mesh.isMesh) {
-          const businessId = semanticBusinessId(object) ?? object.name;
-          const source = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-          const premium = source.map((material) => premiumMaterial(material, businessId));
-          mesh.material = Array.isArray(mesh.material) ? premium : premium[0];
+          // Keep Blender-authored PBR materials as the immutable resident-view
+          // baseline. Runtime visual modes only clone the local materials they
+          // actually need to make translucent or highlighted.
           mesh.castShadow = true;
           mesh.receiveShadow = true;
           materials.set(mesh.uuid, mesh.material);
@@ -286,6 +232,7 @@ export function BathroomTwinViewport({ assets, externalError, directive, view, s
           }
         });
         runtime.renderer.dispose();
+        runtime.renderer.forceContextLoss();
       }
       runtimeRef.current = null;
       host.replaceChildren();

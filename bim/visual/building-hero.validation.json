@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "asset": "building-hero.glb",
+  "sourceIfc": "ZS-DEMO-001.ifc",
+  "sourceIfcSha256": "1cf838779be351e428f23b0a6e7d160d53d49c86fee78ef65ac492038f50bf37",
+  "sourceSpec": "building-spec.json",
+  "lengthUnit": "METRE",
+  "toleranceDerivedFromModelScale": 0.00054,
+  "geometry": {
+    "buildingEnvelopeBoundingBox": {
+      "min": [
+        -0.09999942779541016,
+        -0.09999990463256836,
+        0.0
+      ],
+      "max": [
+        27.299999237060547,
+        14.899999618530273,
+        54.19999694824219
+      ]
+    },
+    "bodyBoundingBox": {
+      "min": [
+        0.0,
+        0.0,
+        0.12999999523162842
+      ],
+      "max": [
+        27.200000762939453,
+        14.800000190734863,
+        53.90999984741211
+      ]
+    },
+    "expectedBodyFootprint": [
+      27.2,
+      14.8
+    ],
+    "expectedEnvelopeFootprint": [
+      27.4,
+      15.0
+    ],
+    "expectedBodyHeight": 54.0,
+    "storeyCount": 18,
+    "storeyHeight": 3.0,
+    "unit1602BoundingVolume": [
+      16.0,
+      8.4,
+      45.0,
+      27.2,
+      14.8,
+      48.0
+    ],
+    "bathroom1602BoundingVolume": [
+      16.3,
+      8.7,
+      45.0,
+      18.7,
+      10.5,
+      47.8
+    ],
+    "anchorPositions": {
+      "BUILDING_CENTER": [
+        13.6,
+        7.4,
+        25.919999999999998
+      ],
+      "FLOOR_16": [
+        13.6,
+        7.4,
+        46.5
+      ],
+      "UNIT_1602": [
+        21.6,
+        11.600000000000001,
+        46.5
+      ],
+      "BATHROOM_1602": [
+        17.5,
+        9.600000000000001,
+        46.4
+      ],
+      "EVENT_1602": [
+        17.5,
+        14.92,
+        46.45
+      ]
+    }
+  },
+  "checks": {
+    "bodyWidth": true,
+    "bodyDepth": true,
+    "envelopeWidthWithSlabOverhang": true,
+    "envelopeDepthWithSlabOverhang": true,
+    "bodyHeight": true,
+    "storeyCount": true,
+    "storeyElevations": true,
+    "coreSouth": true,
+    "coreNorth": true,
+    "unit1602Node": true,
+    "bathroom1602Node": true,
+    "allAnchors": true
+  },
+  "performanceBudget": {
+    "triangleCount": 20628,
+    "glbBytes": 1486940,
+    "recommendedMaxTriangles": 75000,
+    "maxGlbBytes": 10485760
+  },
+  "visualPriority": [
+    "Visual QA",
+    "Material Quality",
+    "Silhouette",
+    "Lighting",
+    "Geometry Detail",
+    "Triangle Count"
+  ],
+  "passed": true
+}

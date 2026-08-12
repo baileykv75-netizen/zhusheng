@@ -2,47 +2,137 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { publicAssetPath } from "@/lib/site-path";
 
 export type HeroDrillPhase = "building" | "floor" | "unit" | "space";
 
-type Props = {
-  phase: HeroDrillPhase;
-  onEnter(): void;
+type Props = { phase: HeroDrillPhase; onEnter(): void };
+type AnchorManifest = {
+  anchors: Record<HeroDrillPhase, { node: string; targetNode: string }>;
+  eventAnchorNode: string;
+  floorNodes: Record<string, string>;
+  focusNodes: { floor: string; unit: string; space: string };
 };
-
 type Runtime = {
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
   renderer: THREE.WebGLRenderer;
-  tower: THREE.Group;
+  root: THREE.Group;
   eventPoint: THREE.Object3D;
-  floorMaterials: Map<number, THREE.Material[]>;
+  manifest: AnchorManifest;
+  materials: Map<string, { material: THREE.Material; opacity: number; depthWrite: boolean }>;
   cameraGoal: THREE.Vector3;
   target: THREE.Vector3;
   targetGoal: THREE.Vector3;
+  quaternionGoal: THREE.Quaternion;
+  fovGoal: number;
   frame: number;
+  lastFrameAt: number;
   reducedMotion: boolean;
+  fallback: boolean;
 };
-
-const floorCount = 18;
-const floorHeight = 0.38;
 
 function makeBox(size: [number, number, number], material: THREE.Material) {
   return new THREE.Mesh(new THREE.BoxGeometry(...size), material);
 }
 
-function cameraFor(phase: HeroDrillPhase) {
-  if (phase === "floor") return { position: new THREE.Vector3(4.7, 6.55, 5.8), target: new THREE.Vector3(0.25, 6.02, 0.1) };
-  if (phase === "unit") return { position: new THREE.Vector3(2.65, 6.28, 3.55), target: new THREE.Vector3(0.72, 6.02, 0.7) };
-  if (phase === "space") return { position: new THREE.Vector3(1.75, 6.16, 2.35), target: new THREE.Vector3(0.92, 5.98, 0.98) };
-  return { position: new THREE.Vector3(7.4, 6.2, 10.2), target: new THREE.Vector3(0, 3.55, 0) };
+function createFallbackTower() {
+  const root = new THREE.Group();
+  root.name = "PROCEDURAL-BOX-FALLBACK";
+  for (let floor = 1; floor <= 18; floor += 1) {
+    const group = new THREE.Group();
+    group.name = `LVL-${String(floor).padStart(2, "0")}`;
+    group.position.y = (floor - 1) * 0.38;
+    const shell = makeBox([3.2, 0.315, 1.9], new THREE.MeshStandardMaterial({ color: 0x77756f, roughness: 0.75 }));
+    group.add(shell);
+    [-1.08, -0.36, 0.36, 1.08].forEach((x, index) => {
+      const warm = floor === 16 && index === 3;
+      const windowMesh = makeBox([0.31, 0.19, 0.035], new THREE.MeshStandardMaterial({ color: warm ? 0xd8873a : 0x172426, emissive: warm ? 0xb96624 : 0x000000 }));
+      windowMesh.position.set(x, 0.015, 0.968);
+      group.add(windowMesh);
+    });
+    if (floor === 16) {
+      const unit = makeBox([0.63, 0.285, 0.055], new THREE.MeshStandardMaterial({ color: 0xc24f23, emissive: 0x6f1e10 }));
+      unit.name = "UNIT-1602";
+      unit.position.set(1.04, 0, 0.995);
+      group.add(unit);
+      const event = new THREE.Object3D();
+      event.name = "ANCHOR-EVENT_1602";
+      event.position.set(1.04, 0, 1.12);
+      group.add(event);
+    }
+    root.add(group);
+  }
+  root.rotation.y = -0.24;
+  return root;
 }
 
-function targetOpacity(phase: HeroDrillPhase, floor: number) {
-  if (phase === "building") return 1;
-  if (floor === 16) return 1;
-  return phase === "floor" ? 0.15 : 0.055;
+function fallbackManifest(): AnchorManifest {
+  return {
+    anchors: {
+      building: { node: "", targetNode: "PROCEDURAL-BOX-FALLBACK" },
+      floor: { node: "", targetNode: "LVL-16" },
+      unit: { node: "", targetNode: "UNIT-1602" },
+      space: { node: "", targetNode: "UNIT-1602" }
+    },
+    eventAnchorNode: "ANCHOR-EVENT_1602",
+    floorNodes: Object.fromEntries(Array.from({ length: 18 }, (_, index) => [String(index + 1), `LVL-${String(index + 1).padStart(2, "0")}`])),
+    focusNodes: { floor: "LVL-16", unit: "UNIT-1602", space: "UNIT-1602" }
+  };
+}
+
+function fallbackCamera(phase: HeroDrillPhase) {
+  if (phase === "floor") return { position: new THREE.Vector3(4.7, 6.55, 5.8), target: new THREE.Vector3(0.25, 6.02, 0.1), fov: 35 };
+  if (phase === "unit") return { position: new THREE.Vector3(2.65, 6.28, 3.55), target: new THREE.Vector3(0.72, 6.02, 0.7), fov: 35 };
+  if (phase === "space") return { position: new THREE.Vector3(1.75, 6.16, 2.35), target: new THREE.Vector3(0.92, 5.98, 0.98), fov: 35 };
+  return { position: new THREE.Vector3(7.4, 6.2, 10.2), target: new THREE.Vector3(0, 3.55, 0), fov: 35 };
+}
+
+function phaseCamera(runtime: Runtime, phase: HeroDrillPhase) {
+  const descriptor = runtime.manifest.anchors[phase];
+  const source = descriptor.node ? runtime.scene.getObjectByName(descriptor.node) as THREE.PerspectiveCamera | undefined : undefined;
+  const targetObject = runtime.scene.getObjectByName(descriptor.targetNode);
+  if (!runtime.fallback && source?.isPerspectiveCamera && targetObject) {
+    source.updateWorldMatrix(true, false);
+    targetObject.updateWorldMatrix(true, false);
+    const position = source.getWorldPosition(new THREE.Vector3());
+    const quaternion = source.getWorldQuaternion(new THREE.Quaternion());
+    return { position, target: targetObject.getWorldPosition(new THREE.Vector3()), quaternion, fov: source.fov };
+  }
+  const value = fallbackCamera(phase);
+  return { ...value, quaternion: new THREE.Quaternion() };
+}
+
+function applyPhase(runtime: Runtime, phase: HeroDrillPhase) {
+  const view = phaseCamera(runtime, phase);
+  runtime.cameraGoal.copy(view.position);
+  runtime.targetGoal.copy(view.target);
+  runtime.quaternionGoal.copy(view.quaternion);
+  runtime.fovGoal = view.fov;
+  if (runtime.reducedMotion) {
+    runtime.camera.position.copy(view.position);
+    runtime.target.copy(view.target);
+    runtime.camera.fov = view.fov;
+  }
+  Object.entries(runtime.manifest.floorNodes).forEach(([floor, nodeName]) => {
+    const root = runtime.scene.getObjectByName(nodeName);
+    const opacity = phase === "building" || floor === "16" ? 1 : phase === "floor" ? 0.18 : 0.055;
+    root?.traverse((object) => {
+      const mesh = object as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      materials.forEach((material) => {
+        material.transparent = opacity < 0.999 || material.transparent;
+        material.opacity = opacity;
+        material.depthWrite = opacity > 0.3;
+      });
+    });
+  });
+  const unit = runtime.scene.getObjectByName(runtime.manifest.focusNodes.unit);
+  const space = runtime.scene.getObjectByName(runtime.manifest.focusNodes.space);
+  if (unit) unit.visible = phase === "unit" || phase === "space";
+  if (space) space.visible = phase === "space";
 }
 
 export function BuildingHeroTwin({ phase, onEnter }: Props) {
@@ -50,155 +140,97 @@ export function BuildingHeroTwin({ phase, onEnter }: Props) {
   const eventRef = useRef<HTMLButtonElement>(null);
   const runtimeRef = useRef<Runtime | null>(null);
   const phaseRef = useRef(phase);
-  const [failed, setFailed] = useState(false);
+  const [source, setSource] = useState<"loading" | "hero-glb" | "procedural-fallback">("loading");
 
   useEffect(() => {
     phaseRef.current = phase;
-    const runtime = runtimeRef.current;
-    if (!runtime) return;
-    const camera = cameraFor(phase);
-    runtime.cameraGoal.copy(camera.position);
-    runtime.targetGoal.copy(camera.target);
-    if (runtime.reducedMotion) {
-      runtime.camera.position.copy(runtime.cameraGoal);
-      runtime.target.copy(runtime.targetGoal);
-    }
+    if (runtimeRef.current) applyPhase(runtimeRef.current, phase);
   }, [phase]);
 
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
-    const canvas = document.createElement("canvas");
-    const hasWebGl = canvas.getContext("webgl2") || canvas.getContext("webgl");
-    if (!hasWebGl) {
-      setFailed(true);
-      return;
-    }
-
+    let disposed = false;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0c0e0e, 0.045);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.7));
+    scene.background = new THREE.Color(0x090b0b);
+    scene.fog = new THREE.FogExp2(0x090b0b, 0.0065);
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
+    } catch {
+      setSource("procedural-fallback");
+      return;
+    }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.35));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.92;
-    renderer.shadowMap.enabled = !window.matchMedia("(max-width: 700px)").matches;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMappingExposure = 1.05;
+    renderer.shadowMap.enabled = false;
     host.replaceChildren(renderer.domElement);
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 400);
+    scene.add(new THREE.HemisphereLight(0xe6ddd0, 0x101515, 2.4));
+    const key = new THREE.DirectionalLight(0xffe8cc, 4.6);
+    key.position.set(-45, 70, 80);
+    const rim = new THREE.DirectionalLight(0x6d9999, 2.2);
+    rim.position.set(65, 45, -30);
+    scene.add(key, rim);
 
-    const initial = cameraFor(phaseRef.current);
-    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 80);
-    camera.position.copy(initial.position);
-    const tower = new THREE.Group();
-    tower.rotation.y = -0.24;
-    scene.add(tower);
-
-    const floorMaterials = new Map<number, THREE.Material[]>();
-    let eventPoint: THREE.Object3D | null = null;
-    for (let floor = 1; floor <= floorCount; floor += 1) {
-      const floorGroup = new THREE.Group();
-      const y = 0.33 + (floor - 1) * floorHeight;
-      floorGroup.position.y = y;
-      floorGroup.name = `VISUAL-FLOOR-${String(floor).padStart(2, "0")}`;
-      const materials: THREE.Material[] = [];
-
-      const concrete = new THREE.MeshStandardMaterial({ color: 0xaaa79f, roughness: 0.72, metalness: 0.04, transparent: true });
-      const shadowBand = new THREE.MeshStandardMaterial({ color: 0x3c3d3b, roughness: 0.82, transparent: true });
-      materials.push(concrete, shadowBand);
-      const module = makeBox([3.2, 0.315, 1.9], concrete);
-      module.castShadow = true;
-      module.receiveShadow = true;
-      floorGroup.add(module);
-      const seam = makeBox([3.28, 0.018, 1.96], shadowBand);
-      seam.position.y = -0.172;
-      floorGroup.add(seam);
-
-      const windowXs = [-1.08, -0.36, 0.36, 1.08];
-      windowXs.forEach((x, windowIndex) => {
-        const warm = ((floor * 7 + windowIndex * 3) % 13 === 0) || (floor === 16 && windowIndex === 3);
-        const glass = new THREE.MeshPhysicalMaterial({
-          color: warm ? 0x9a7950 : 0x26383a,
-          roughness: 0.26,
-          metalness: 0.05,
-          transmission: 0.12,
-          transparent: true,
-          opacity: 0.92,
-          emissive: new THREE.Color(warm ? 0xffb35d : 0x071011),
-          emissiveIntensity: warm ? 1.15 : 0.12
-        });
-        materials.push(glass);
-        const windowMesh = makeBox([0.31, 0.19, 0.035], glass);
-        windowMesh.position.set(x, 0.015, 0.968);
-        floorGroup.add(windowMesh);
+    const createRuntime = (root: THREE.Group, manifest: AnchorManifest, fallback: boolean) => {
+      if (disposed) return;
+      scene.add(root);
+      const materials = new Map<string, { material: THREE.Material; opacity: number; depthWrite: boolean }>();
+      root.traverse((object) => {
+        const mesh = object as THREE.Mesh;
+        if (!mesh.isMesh) return;
+        mesh.castShadow = false;
+        mesh.receiveShadow = false;
+        const list = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+        list.forEach((material) => materials.set(material.uuid, { material, opacity: material.opacity, depthWrite: material.depthWrite }));
       });
-
-      if (floor === 16) {
-        const unitMaterial = new THREE.MeshStandardMaterial({
-          color: 0xb97832,
-          emissive: new THREE.Color(0xcf7d2c),
-          emissiveIntensity: 0.48,
-          roughness: 0.42,
-          transparent: true,
-          opacity: 0.9
-        });
-        materials.push(unitMaterial);
-        const unit = makeBox([0.63, 0.285, 0.055], unitMaterial);
-        unit.position.set(1.04, 0, 0.995);
-        unit.name = "VISUAL-UNIT-1602";
-        floorGroup.add(unit);
-        eventPoint = new THREE.Object3D();
-        eventPoint.position.set(1.04, 0, 1.12);
-        eventPoint.name = "VISUAL-EVENT-EVT-1602";
-        floorGroup.add(eventPoint);
-      }
-
-      floorMaterials.set(floor, materials);
-      tower.add(floorGroup);
-    }
-
-    const roofMaterial = new THREE.MeshStandardMaterial({ color: 0x555653, roughness: 0.74, metalness: 0.12 });
-    const roof = makeBox([3.35, 0.12, 2.05], roofMaterial);
-    roof.position.y = 7.08;
-    roof.castShadow = true;
-    tower.add(roof);
-    const entranceMaterial = new THREE.MeshStandardMaterial({ color: 0x67331f, roughness: 0.54 });
-    const entrance = makeBox([0.38, 0.48, 0.08], entranceMaterial);
-    entrance.position.set(0, 0.18, 1.01);
-    tower.add(entrance);
-
-    const groundMaterial = new THREE.MeshPhysicalMaterial({ color: 0x111313, roughness: 0.28, metalness: 0.22, clearcoat: 0.45, clearcoatRoughness: 0.32 });
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(22, 18), groundMaterial);
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -0.02;
-    ground.receiveShadow = true;
-    scene.add(ground);
-
-    const hemisphere = new THREE.HemisphereLight(0xeae4d8, 0x171c1c, 1.7);
-    const key = new THREE.DirectionalLight(0xfff7e8, 3.8);
-    key.position.set(-4, 10, 8);
-    key.castShadow = true;
-    key.shadow.mapSize.set(1024, 1024);
-    const rim = new THREE.DirectionalLight(0x6f9b9d, 1.15);
-    rim.position.set(7, 5, -5);
-    const eventLight = new THREE.PointLight(0xe79b4b, 2.2, 4.2, 2);
-    eventLight.position.set(1.3, 6.1, 2.1);
-    scene.add(hemisphere, key, rim, eventLight);
-
-    const runtime: Runtime = {
-      scene,
-      camera,
-      renderer,
-      tower,
-      eventPoint: eventPoint ?? tower,
-      floorMaterials,
-      cameraGoal: initial.position.clone(),
-      target: initial.target.clone(),
-      targetGoal: initial.target.clone(),
-      frame: 0,
-      reducedMotion
+      const eventPoint = scene.getObjectByName(manifest.eventAnchorNode) ?? scene.getObjectByName(manifest.focusNodes.unit) ?? root;
+      const runtime: Runtime = {
+        scene, camera, renderer, root, eventPoint, manifest, materials,
+        cameraGoal: new THREE.Vector3(), target: new THREE.Vector3(), targetGoal: new THREE.Vector3(), quaternionGoal: new THREE.Quaternion(),
+        fovGoal: 40, frame: 0, lastFrameAt: 0, reducedMotion, fallback
+      };
+      runtimeRef.current = runtime;
+      const initial = phaseCamera(runtime, phaseRef.current);
+      camera.position.copy(initial.position);
+      runtime.target.copy(initial.target);
+      applyPhase(runtime, phaseRef.current);
+      setSource(fallback ? "procedural-fallback" : "hero-glb");
+      const world = new THREE.Vector3();
+      const animate = (now: number) => {
+        runtime.frame = requestAnimationFrame(animate);
+        if (document.hidden || now - runtime.lastFrameAt < 50) return;
+        runtime.lastFrameAt = now;
+        const amount = reducedMotion ? 1 : 0.065;
+        camera.position.lerp(runtime.cameraGoal, amount);
+        runtime.target.lerp(runtime.targetGoal, amount);
+        camera.fov += (runtime.fovGoal - camera.fov) * amount;
+        camera.updateProjectionMatrix();
+        camera.lookAt(runtime.target);
+        renderer.render(scene, camera);
+        const anchor = eventRef.current;
+        if (anchor) {
+          runtime.eventPoint.getWorldPosition(world);
+          world.project(camera);
+          anchor.style.left = `${(world.x * 0.5 + 0.5) * host.clientWidth}px`;
+          anchor.style.top = `${(-world.y * 0.5 + 0.5) * host.clientHeight}px`;
+          anchor.hidden = world.z > 1 || Math.abs(world.x) > 1.1 || Math.abs(world.y) > 1.1;
+        }
+      };
+      runtime.frame = requestAnimationFrame(animate);
     };
-    runtimeRef.current = runtime;
+
+    Promise.all([
+      fetch(publicAssetPath("/assets/v6/building/building-hero.anchors.json"), { cache: "no-store" }).then((response) => {
+        if (!response.ok) throw new Error(`Anchor HTTP ${response.status}`);
+        return response.json() as Promise<AnchorManifest>;
+      }),
+      new Promise<THREE.Group>((resolve, reject) => new GLTFLoader().load(publicAssetPath("/assets/v6/building/building-hero.glb"), (gltf) => resolve(gltf.scene), undefined, reject))
+    ]).then(([manifest, root]) => createRuntime(root, manifest, false)).catch(() => createRuntime(createFallbackTower(), fallbackManifest(), true));
 
     const resize = () => {
       const width = Math.max(host.clientWidth, 1);
@@ -210,57 +242,27 @@ export function BuildingHeroTwin({ phase, onEnter }: Props) {
     const observer = new ResizeObserver(resize);
     observer.observe(host);
     resize();
-
-    const world = new THREE.Vector3();
-    const animate = () => {
-      const activePhase = phaseRef.current;
-      const amount = reducedMotion ? 1 : 0.055;
-      camera.position.lerp(runtime.cameraGoal, amount);
-      runtime.target.lerp(runtime.targetGoal, amount);
-      camera.lookAt(runtime.target);
-      if (!reducedMotion && activePhase === "building") tower.rotation.y = -0.24 + Math.sin(performance.now() * 0.00018) * 0.025;
-      floorMaterials.forEach((materials, floor) => {
-        const goal = targetOpacity(activePhase, floor);
-        materials.forEach((material) => {
-          material.transparent = goal < 0.999 || material.transparent;
-          material.opacity += (goal - material.opacity) * (reducedMotion ? 1 : 0.09);
-          material.depthWrite = material.opacity > 0.3;
-        });
-      });
-      renderer.render(scene, camera);
-
-      const anchor = eventRef.current;
-      if (anchor) {
-        runtime.eventPoint.getWorldPosition(world);
-        world.project(camera);
-        anchor.style.left = `${(world.x * 0.5 + 0.5) * host.clientWidth}px`;
-        anchor.style.top = `${(-world.y * 0.5 + 0.5) * host.clientHeight}px`;
-        anchor.hidden = world.z > 1;
-      }
-      runtime.frame = requestAnimationFrame(animate);
-    };
-    animate();
-
     return () => {
+      disposed = true;
       observer.disconnect();
-      cancelAnimationFrame(runtime.frame);
+      const runtime = runtimeRef.current;
+      if (runtime) cancelAnimationFrame(runtime.frame);
       scene.traverse((object) => {
         const mesh = object as THREE.Mesh;
         mesh.geometry?.dispose();
-        if (mesh.material) {
-          const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-          materials.forEach((material) => material.dispose());
-        }
+        if (mesh.material) (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach((material) => material.dispose());
       });
       renderer.dispose();
+      renderer.forceContextLoss();
       host.replaceChildren();
       runtimeRef.current = null;
     };
   }, []);
 
-  return <div className={`v6-building-twin phase-${phase}`}>
+  return <div className={`v6-building-twin phase-${phase}`} data-visual-source={source}>
     <div ref={hostRef} className="v6-building-canvas" role="img" aria-label="华章新筑2号楼18层建筑数字孪生，16层1602存在一项建筑生命事件" />
-    {failed ? <div className="v6-building-fallback"><img src={publicAssetPath("/assets/building-digital-twin.png")} alt="华章新筑2号楼建筑模型降级画面" /></div> : null}
+    {source === "loading" ? <div className="v6-building-loading">正在核对建筑几何与空间锚点</div> : null}
+    {source === "procedural-fallback" ? <div className="v6-building-source-note">建筑资产已降级为程序化几何</div> : null}
     <button ref={eventRef} type="button" className="v6-event-anchor" onClick={onEnter} aria-label="进入16层1602卫生间建筑生命事件">
       <i /><span><strong>16F / 1602</strong><small>LIFE EVENT ACTIVE</small></span>
     </button>

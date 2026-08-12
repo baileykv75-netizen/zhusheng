@@ -40,11 +40,36 @@
     "PREMIUM-WC-FLUSH-PLATE"
   ],
   "triangleCount": 22364,
-  "glbBytes": 1215904,
+  "glbBytes": 1216392,
   "externalTextureCount": 0,
+  "pbrMaterialCount": 6,
+  "pbrMaterials": [
+    "MAT-METAL",
+    "MAT-PORCELAIN",
+    "MAT-PREMIUM-EDGE",
+    "MAT-TILE-FLOOR",
+    "MAT-TILE-WALL",
+    "MAT-VANITY"
+  ],
+  "pbrChannels": [
+    "baseColor",
+    "metallic",
+    "roughness",
+    "normal",
+    "transmission"
+  ],
   "limits": {
     "maxGlbBytes": 10485760,
     "maxTriangles": 150000
   },
+  "visualPriority": [
+    "Visual QA",
+    "Material Quality",
+    "Silhouette",
+    "Lighting",
+    "Geometry Detail",
+    "Triangle Count"
+  ],
+  "triangleCountIsBudgetNotMinimum": true,
   "passed": true
 }
