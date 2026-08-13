@@ -2,7 +2,7 @@ name: Deploy GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, gpt/step4-guarded-lifecycle]
   workflow_dispatch:
 
 permissions:
