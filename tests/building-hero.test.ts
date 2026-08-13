@@ -17,6 +17,17 @@ function sha256(path: string) {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
 }
 
+function textHashesAcrossLineEndings(path: string): Set<string> {
+  const text = readFileSync(path, "utf8");
+  const lf = text.replace(/\r\n/g, "\n");
+  const crlf = lf.replace(/\n/g, "\r\n");
+  return new Set([
+    createHash("sha256").update(text).digest("hex"),
+    createHash("sha256").update(lf).digest("hex"),
+    createHash("sha256").update(crlf).digest("hex")
+  ]);
+}
+
 test("building hero geometry remains consistent with the IFC-derived specification", () => {
   const validation = json<{
     sourceIfcSha256: string;
@@ -37,7 +48,11 @@ test("building hero geometry remains consistent with the IFC-derived specificati
     passed: boolean;
   }>(resolve(visualRoot, "building-hero.validation.json"));
 
-  assert.equal(validation.sourceIfcSha256, sha256(resolve(repoRoot, "bim/output/ZS-DEMO-001.ifc")));
+  // The IFC is STEP text. Its committed semantic content is identical on Windows
+  // and Linux even when Git checks it out with a different newline convention.
+  // Accept only hashes produced by those byte-for-byte newline variants; all other
+  // source changes still fail the geometry provenance check.
+  assert.equal(textHashesAcrossLineEndings(resolve(repoRoot, "bim/output/ZS-DEMO-001.ifc")).has(validation.sourceIfcSha256), true);
   assert.equal(validation.lengthUnit, "METRE");
   assert.ok(validation.toleranceDerivedFromModelScale > 0);
   assert.deepEqual(validation.geometry.expectedBodyFootprint, [27.2, 14.8]);
