@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Camera, Check, Clock3, House, LockKeyhole, ShieldCheck, Upload, X } from "lucide-react";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
+import { hasFreshEvidenceAfterReopen } from "@/lib/life-event-lab/reopened-cycle.ts";
 import { publicAssetPath } from "@/lib/site-path";
 import type { ResidentMeterFinding, ResidentPhotoFinding } from "@/lib/product/evidence";
 
@@ -16,7 +17,8 @@ const progressLabels: Record<string, string> = {
   ISOLATION_CONFIRMED: "异常范围已被临时控制",
   REPAIR_PENDING: "物业维修人员正在处理",
   REPAIR_RECORDED: "维修已记录，等待恢复供水确认",
-  POST_REPAIR_VERIFYING: "物业正在进行维修后复验"
+  POST_REPAIR_VERIFYING: "物业正在进行维修后复验",
+  REOPENED: "新的住户证据已提交，等待物业复测湿度与微流量"
 };
 
 export function ResidentService() {
@@ -29,7 +31,12 @@ export function ResidentService() {
   const [meterFinding, setMeterFinding] = useState<ResidentMeterFinding | null>(null);
   const [syntheticPhoto, setSyntheticPhoto] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
-  const intake = !result || ["DETECTED", "COLLECTING_EVIDENCE", "INCONCLUSIVE", "REOPENED"].includes(result.state);
+  const freshReopenEvidence = result?.state === "REOPENED"
+    ? hasFreshEvidenceAfterReopen(result, (session.residentSubmissions ?? []).map((item) => item.submittedAt))
+    : false;
+  const intake = !result
+    || ["DETECTED", "COLLECTING_EVIDENCE", "INCONCLUSIVE"].includes(result.state)
+    || (result.state === "REOPENED" && !freshReopenEvidence);
   const authorization = result?.state === "AUTHORIZATION_PENDING" ? result.authorizationRequirement : null;
   const reopening = authorization?.action === "SIMULATE_REOPEN_VALVE";
 
@@ -113,7 +120,7 @@ export function ResidentService() {
   return <div className="resident-service">
     <header className="resident-service-header"><Link href="/case-1602">1602生命事件</Link><span>住户服务</span><Link href="/events">整栋楼事件 <ArrowRight size={14} /></Link></header>
     <main>
-      <section className="resident-service-title"><p>1602 / 卫生间</p><h1>{authorization ? reopening ? "维修完成后，是否允许恢复供水？" : "物业申请临时关闭局部进水阀。" : result?.state === "RESOLVED" ? "这件事已经完成维修复验。" : result?.state === "REOPENED" ? "维修后仍观察到异常，请补充新的现场情况。" : intake ? "把眼前的异常告诉这栋房子。" : "物业正在处理这件事。"}</h1><span>你只需要报告、补充现场信息和作出授权决定。设备动作与维修记录由物业完成。</span></section>
+      <section className="resident-service-title"><p>1602 / 卫生间</p><h1>{authorization ? reopening ? "维修完成后，是否允许恢复供水？" : "物业申请临时关闭局部进水阀。" : result?.state === "RESOLVED" ? "这件事已经完成维修复验。" : result?.state === "REOPENED" ? freshReopenEvidence ? "新的现场情况已提交，等待物业复测。" : "维修后仍观察到异常，请补充新的现场情况。" : intake ? "把眼前的异常告诉这栋房子。" : "物业正在处理这件事。"}</h1><span>你只需要报告、补充现场信息和作出授权决定。设备动作与维修记录由物业完成。</span></section>
 
       {session.notice ? <div className="resident-message" role="status"><span>{session.notice}</span><button onClick={() => setSession((current) => ({ ...current, notice: null }))} aria-label="关闭提示"><X size={14} /></button></div> : null}
 
