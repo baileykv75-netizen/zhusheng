@@ -315,6 +315,13 @@ export class LifeEventEngine {
     if (state === "AUTHORIZATION_PENDING" && proposal) {
       const request = [...(previous?.auditLog ?? []), ...pending].reverse().find((item) => item.actionType === "HUMAN_AUTHORIZATION_REQUESTED" && item.actionTargetBusinessId === proposal!.targetBusinessId);
       const requestTime = "timestamp" in (request ?? {}) ? (request as AuditEvent).timestamp : input.evaluatedAt;
+      const prematurelySubmitted = (parsed.authorizationRecords ?? []).find((record) =>
+        record.eventId === input.eventId
+        && record.action === proposal!.action
+        && record.targetBusinessId === proposal!.targetBusinessId
+        && Date.parse(record.decidedAt) < Date.parse(requestTime)
+      );
+      if (prematurelySubmitted) throw new Error("Authorization time cannot precede the authorization request");
       const authorization = evaluateAuthorization(this.memory, input.eventId, proposal, input.authorizationRecords, requestTime);
       if (authorization.status === "REJECTED") {
         const alreadyLogged = previous?.auditLog.some((item) => item.authorizationRecordIds.includes(authorization.record!.authorizationId));
