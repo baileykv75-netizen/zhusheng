@@ -6,6 +6,7 @@ import { loadBrowserGroupLearningSource, loadBrowserGroupLearningSourceFromPacka
 import { appendGroupReviewDecision, createPilotChecklistItem, replayGroupReview, verifyGroupLearningBundle } from "@/lib/group-learning/index.ts";
 import type { GroupLearningBundle, GroupReviewAuditEntry, GroupReviewDecisionType } from "@/lib/group-learning/types.ts";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
+import { groupDecisionTask } from "@/lib/product/group-decision-tasks";
 
 const SESSION_KEY = "zhusheng.group-learning.v2";
 const SESSION_SCHEMA = 3;
@@ -96,6 +97,7 @@ export function GroupLearningWorkbench({ compact = false }: { compact?: boolean 
     catch (error) { return { state: "PENDING_REVIEW" as const, lastDecision: null, rootHash: "", error: error instanceof Error ? error.message : "评审审计无效" }; }
   }, [source, activeReviewAudit]);
   const checklist = useMemo(() => source ? createPilotChecklistItem(source.card, activeReviewAudit) : null, [source, activeReviewAudit]);
+  const decisionTask = useMemo(() => source && replay ? groupDecisionTask(source.card, replay) : null, [source, replay]);
 
   function buildBundle(): GroupLearningBundle {
     if (!source) throw new Error("集团学习来源尚未就绪");
@@ -198,6 +200,7 @@ export function GroupLearningWorkbench({ compact = false }: { compact?: boolean 
         <button className="group-review-submit" disabled={reviewState === "APPROVED_AS_PILOT" || !reviewerId.trim() || !comment.trim() || (needsResubmission && (!supplementId.trim() || !supplementSummary.trim() || !resubmissionReason.trim()))} onClick={submitReview}><UserCheck size={16} />{needsResubmission ? "补证并提交新一轮评审" : "提交人工评审"}</button>
         <p className="governance-boundary">采纳后只生成 <strong>PILOT_ONLY</strong> 检查项，不是企业标准。</p>
         {checklist ? <section className="pilot-checklist" aria-labelledby="pilot-title"><header><ClipboardCheck size={18} /><div><small>PILOT_ONLY</small><h3 id="pilot-title">下一批MiC卫生间试点检查项</h3></div></header><dl><div><dt>目标类型</dt><dd>{checklist.targetComponentType}</dd></div><div><dt>适用空间</dt><dd>{checklist.applicableSpaces.join(" / ")}</dd></div><div><dt>评审人</dt><dd>{checklist.reviewerId}</dd></div></dl><ol>{checklist.inspectionProcess.map((item) => <li key={item}>{item}</li>)}</ol><p>{checklist.disclaimer}</p></section> : null}
+        {decisionTask ? <section className={`group-decision-task ${decisionTask.type.toLowerCase()}`} aria-labelledby="group-decision-task-title"><header><ClipboardCheck size={17} /><div><small>人工决定后的任务</small><h3 id="group-decision-task-title">{decisionTask.title}</h3></div><em>{decisionTask.governanceStatus} · {decisionTask.status}</em></header><dl><div><dt>负责人</dt><dd>{decisionTask.owner}</dd></div><div><dt>范围</dt><dd>{decisionTask.scope}</dd></div><div><dt>样本</dt><dd>{decisionTask.sample}</dd></div><div><dt>时间</dt><dd>{decisionTask.dueAt}</dd></div></dl><strong>完成标准 / 补证要求</strong><ul>{[...decisionTask.successCriteria, ...decisionTask.requiredEvidence].map((item) => <li key={item}>{item}</li>)}</ul><p>{decisionTask.reason}</p>{decisionTask.reopenCondition ? <footer>重新开启条件：{decisionTask.reopenCondition}</footer> : null}</section> : null}
         <section className="group-review-audit"><header><History size={15} /><span>评审审计</span><small>演示级哈希链，不是数字签名</small></header>{activeReviewAudit.length ? activeReviewAudit.map((item) => <article key={item.sequence}><i>{String(item.sequence).padStart(2, "0")}</i><div><strong>第{item.reviewRound}轮 · {decisionLabels[item.decisionType]}</strong><p>{item.reviewComment}</p>{item.resubmission ? <small>补证 {item.resubmission.newEvidence.map((evidence) => evidence.evidenceId).join(" / ")} · {item.resubmission.revisionReason}</small> : null}<small>{item.reviewerId} · {new Date(item.decidedAt).toLocaleString("zh-CN", { hour12: false })}</small><code>{item.entryHash.slice(0, 12)}</code></div></article>) : <p>尚无人工评审记录。</p>}</section>
         <section className="group-downloads"><header><Download size={15} /><span>可带走成果</span></header><div><button onClick={() => download("card")}>经验卡 JSON</button><button onClick={() => download("contribution")}>工友贡献 JSON</button><button disabled={!activeReviewAudit.length} onClick={() => download("audit")}>评审审计 JSONL</button><button disabled={!checklist} onClick={() => download("checklist")}>试点检查项 JSON</button><button onClick={() => download("bundle")}>完整经验回流包</button><button onClick={() => window.print()}><FileText size={13} />打印中文报告</button></div><p>下载前重新验证来源事件、引用完整性、人工评审重放与试点状态。</p></section>
       </aside>

@@ -24,9 +24,19 @@ import {
   type LabAuthorizationDraft,
   type LabControls,
   type LabSession,
-  type LabTemplateId
+  type LabTemplateId,
+  withProductEvidenceDefaults
 } from "@/lib/life-event-lab/types.ts";
 import type { DraftFields } from "@/lib/building-agent/types.ts";
+import {
+  createProductEvidenceAppendix,
+  createPropertyEvidenceReview,
+  createResidentEvidenceSubmission,
+  type PropertyReviewDraft,
+  type ResidentEvidenceDraft,
+  type VerifiedProductEvidenceBundle
+} from "@/lib/product/evidence.ts";
+import { residentDomainEvidenceRefs, residentEvidenceToDomainControls } from "@/lib/product/evidence-adapter.ts";
 import { useDemo } from "./demo-provider";
 
 export const LIFE_EVENT_PACKAGE_KEY = "zhusheng.life-event-package.v1";
@@ -43,7 +53,11 @@ function initialSession(): LabSession {
     selectedView: "VIEW_RESIDENT",
     selectedBusinessId: null,
     activeTab: "input",
-    notice: null
+    notice: null,
+    residentSubmissions: [],
+    propertyReviews: [],
+    productEvidenceTimeline: [],
+    photoObservationConfirmation: "UNCONFIRMED"
   };
 }
 
@@ -83,7 +97,7 @@ function controlsFromDraft(fields: DraftFields): LabControls {
 function loadStoredSession(): { session: LabSession; found: boolean } {
   try {
     const value = JSON.parse(sessionStorage.getItem(LAB_SESSION_KEY) ?? "null") as LabSession | null;
-    if (value?.schemaVersion === LAB_SCHEMA_VERSION) return { session: value, found: true };
+    if (value?.schemaVersion === LAB_SCHEMA_VERSION) return { session: withProductEvidenceDefaults(value), found: true };
   } catch {
     sessionStorage.removeItem(LAB_SESSION_KEY);
   }
@@ -112,6 +126,8 @@ type LifecycleJourneyValue = {
   patchControls(patch: Partial<LabControls>): void;
   applyTemplate(id: LabTemplateId): void;
   evaluate(): void;
+  submitResidentEvidence(draft: ResidentEvidenceDraft): void;
+  submitPropertyReview(draft: PropertyReviewDraft): void;
   attemptUnauthorized(): void;
   decideAuthorization(draft: LabAuthorizationDraft): void;
   executeValveAction(): void;
@@ -122,6 +138,7 @@ type LifecycleJourneyValue = {
   markWorkerEvidenceReady(): void;
   resetLab(): void;
   buildVerifiedPackage(): VerifiedLifeEventPackage;
+  buildProductEvidenceBundle(): VerifiedProductEvidenceBundle<VerifiedLifeEventPackage>;
 };
 
 const LifecycleJourneyContext = createContext<LifecycleJourneyValue | null>(null);
@@ -234,6 +251,10 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
       activeTab: "input",
       selectedView: "VIEW_RESIDENT",
       selectedBusinessId: null,
+      residentSubmissions: [],
+      propertyReviews: [],
+      productEvidenceTimeline: [],
+      photoObservationConfirmation: "UNCONFIRMED",
       notice: "输入模板已载入，请重新评估。"
     }));
   }, []);
@@ -264,6 +285,68 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
       setBusy(false);
     }
   }, [assetError, engine, session.controls, session.eventCounter]);
+
+  const submitResidentEvidence = useCallback((draft: ResidentEvidenceDraft) => {
+    if (!engine) {
+      setSession((current) => ({ ...current, notice: assetError ?? "正在验证建筑记忆和数字样间资产" }));
+      return;
+    }
+    const counter = session.eventCounter + 1;
+    const nowMs = Date.now();
+    const controls = residentEvidenceToDomainControls(session.controls, draft);
+    setBusy(true);
+    try {
+      const result = evaluateControls(engine, controls, counter, nowMs);
+      const refs = residentDomainEvidenceRefs(result);
+      const product = createResidentEvidenceSubmission({
+        draft,
+        eventId: result.eventId,
+        submittedAt: new Date(nowMs).toISOString(),
+        domainPhotoEvidenceId: refs.photoEvidenceId,
+        domainMeterEvidenceId: refs.meterEvidenceId
+      });
+      setSession((current) => ({
+        ...current,
+        controls,
+        eventCounter: counter,
+        result,
+        residentSubmissions: [...(current.residentSubmissions ?? []), product.submission],
+        productEvidenceTimeline: [...(current.productEvidenceTimeline ?? []), ...product.evidence],
+        photoObservationConfirmation: draft.photo.finding,
+        activeTab: result.state === "INCONCLUSIVE" ? "input" : "diagnosis",
+        selectedView: result.visualDirective.view,
+        selectedBusinessId: result.visualDirective.highlightBusinessIds[0] ?? null,
+        repairDraft: defaultRepairDraft(),
+        postRepair: structuredClone(DEFAULT_POST_REPAIR_CONTROLS),
+        notice: "住户原始描述与人工观察已形成不可变产品证据；只有确认后的照片和水表观察进入确定性判断。"
+      }));
+    } catch (reason) {
+      setSession((current) => ({ ...current, notice: reason instanceof Error ? reason.message : "住户证据提交失败" }));
+    } finally {
+      setBusy(false);
+    }
+  }, [assetError, engine, session.controls, session.eventCounter]);
+
+  const submitPropertyReview = useCallback((draft: PropertyReviewDraft) => {
+    setSession((current) => {
+      const submission = (current.residentSubmissions ?? []).find((item) => item.submissionId === draft.residentSubmissionId);
+      if (!submission) return { ...current, notice: "找不到可复核的住户原始证据；物业不能代替住户补写。" };
+      if (!draft.reviewedBy.trim() || !draft.note.trim()) return { ...current, notice: "请填写复核人员和独立复核意见。" };
+      const product = createPropertyEvidenceReview({
+        draft,
+        eventId: current.result?.eventId ?? submission.eventId,
+        reviewedAt: new Date().toISOString(),
+        relatedEvidenceIds: submission.evidenceIds,
+        sequence: (current.propertyReviews ?? []).length + 1
+      });
+      return {
+        ...current,
+        propertyReviews: [...(current.propertyReviews ?? []), product.review],
+        productEvidenceTimeline: [...(current.productEvidenceTimeline ?? []), product.evidence],
+        notice: "物业独立复核已追加；住户原始证据未被修改，也不会因此自动改变诊断评分。"
+      };
+    });
+  }, []);
 
   const attemptUnauthorized = useCallback(() => {
     if (engine && session.result) {
@@ -333,6 +416,20 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
     return packageValue;
   }, [assets, session.result]);
 
+  const buildProductEvidenceBundle = useCallback(() => {
+    const verifiedEventPackage = buildVerifiedPackage();
+    return {
+      schemaVersion: 1,
+      verifiedEventPackage,
+      evidenceAppendix: createProductEvidenceAppendix({
+        eventId: verifiedEventPackage.eventId,
+        residentSubmissions: session.residentSubmissions,
+        propertyReviews: session.propertyReviews,
+        evidence: session.productEvidenceTimeline
+      })
+    } satisfies VerifiedProductEvidenceBundle<VerifiedLifeEventPackage>;
+  }, [buildVerifiedPackage, session.productEvidenceTimeline, session.propertyReviews, session.residentSubmissions]);
+
   useEffect(() => {
     if (!assets || !session.result || !["RESOLVED", "REOPENED"].includes(session.result.state)) {
       if (session.result && !["RESOLVED", "REOPENED"].includes(session.result.state)) {
@@ -369,6 +466,8 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
     patchControls,
     applyTemplate,
     evaluate,
+    submitResidentEvidence,
+    submitPropertyReview,
     attemptUnauthorized,
     decideAuthorization: decide,
     executeValveAction,
@@ -378,8 +477,9 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
     seedFromAgent,
     markWorkerEvidenceReady,
     resetLab,
-    buildVerifiedPackage
-  }), [applyTemplate, assetError, assets, attemptUnauthorized, buildVerifiedPackage, busy, currentPackage, decide, engine, evaluate, executeValveAction, hydrated, markWorkerEvidenceReady, patchControls, resetLab, seedFromAgent, session, submitIsolation, submitPostRepair, submitRepair]);
+    buildVerifiedPackage,
+    buildProductEvidenceBundle
+  }), [applyTemplate, assetError, assets, attemptUnauthorized, buildProductEvidenceBundle, buildVerifiedPackage, busy, currentPackage, decide, engine, evaluate, executeValveAction, hydrated, markWorkerEvidenceReady, patchControls, resetLab, seedFromAgent, session, submitIsolation, submitPostRepair, submitPropertyReview, submitRepair, submitResidentEvidence]);
 
   return <LifecycleJourneyContext.Provider value={value}>{children}</LifecycleJourneyContext.Provider>;
 }

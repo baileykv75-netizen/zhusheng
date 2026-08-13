@@ -37,6 +37,15 @@ export type ExplainOutput = {
   safetyNotice: string;
 };
 
+export type BuildingAnswerClaim = {
+  text: string;
+  factIds: string[];
+};
+
+export type BuildingAnswerDraft =
+  | { claims: BuildingAnswerClaim[] }
+  | { clarification: { question: string } };
+
 export type GatewayCallMetadata = {
   task: ModelTask;
   responseId: string;

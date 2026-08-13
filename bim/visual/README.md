@@ -24,6 +24,9 @@ powershell -ExecutionPolicy Bypass -File bim/visual/build_bathroom_scene.ps1 `
 
 - `bathroom-1602.blend`：可编辑场景、灯光、相机、集合和材质；
 - `bathroom-1602.glb`：嵌入全部必要资源的网页展示模型；
+- `bathroom-1602-premium.blend`：从语义基线派生的展示级场景，不改变业务身份与状态节点；
+- `bathroom-1602-premium.glb`：网页优先加载的增强模型；加载或完整性校验失败时自动回退至语义基线；
+- `bathroom-1602-premium.validation.json`：增强模型的关键节点、体积、面数和细节预算报告；
 - `bathroom-1602.manifest.json`：GLB节点与实际IFC身份、视图、状态及锚点映射；
 - `bathroom-1602.validation.json`：重开BLEND和重导GLB后的机器验证报告；
 - `screenshots/`：四张1600×900验收图；
@@ -44,8 +47,27 @@ powershell -ExecutionPolicy Bypass -File bim/visual/build_bathroom_scene.ps1 `
 
 六个证据锚点只记录相机可定位的位置和关联业务ID，不存放施工照片、读数或维修结论。
 
+## 展示级派生模型
+
+`scripts/build_bathroom_premium.py`只在受保护的`bathroom-1602.blend`基础上调整材质、灯光、曲面和平面收口，并增加不参与领域判断的展示细节。它不会替换IFC、建筑记忆、manifest、运行时变换或任何业务节点。
+
+V6.5 还在 Premium 派生模型中加入排水与电气查询节点。这些节点全部标记为`SYNTHETIC_ENGINEERING_RECORD`，只用于建筑智能查询与空间高亮；其中 Cable/Device 组成`ELECTRICAL_POWER`功能拓扑，Conduit 只表示电缆的物理敷设与包含关系，不作为导电路径。语义基线GLB不变，网页运行时覆盖层是它的确定性回退。
+
+```powershell
+& "C:\Program Files\Blender Foundation\Blender 4.5\blender.exe" bim/visual/bathroom-1602.blend --background `
+  --python bim/visual/scripts/build_bathroom_premium.py -- `
+  --manifest bim/visual/bathroom-1602.manifest.json `
+  --source-glb bim/visual/bathroom-1602.glb `
+  --blend bim/visual/bathroom-1602-premium.blend `
+  --glb bim/visual/bathroom-1602-premium.glb `
+  --validation bim/visual/bathroom-1602-premium.validation.json `
+  --screenshots bim/visual/screenshots/premium
+```
+
+生成后运行`pnpm run sync:life-event-assets`，同步脚本会同时校验原语义模型与增强模型的全部关键节点，并写入公开资产哈希清单。
+
 ## 资源与性能
 
-场景仅使用程序化低多边形几何和Blender原生材质，没有外部贴图或本机绝对资源路径。验证器限制GLB不超过15 MB、总三角面不超过150,000，并检查所有关键节点名称、IFC GlobalId、视图、状态和证据锚点。
+场景仅使用程序化几何和Blender原生材质，没有外部贴图或本机绝对资源路径。语义基线验证器限制GLB不超过15 MB；展示级派生模型限制GLB不超过10 MB。两者总三角面均不超过150,000，并检查所有关键节点名称、IFC GlobalId、视图、状态和证据锚点。
 
 本阶段不包含事件引擎、诊断评分、传感器时序、真实设备动作、工单、AI、Next.js或Three.js联动。

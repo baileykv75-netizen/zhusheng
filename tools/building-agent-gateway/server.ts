@@ -50,6 +50,13 @@ export function createGatewayServer(options: ServerOptions = {}): { server: Serv
       const remote = request.socket.remoteAddress ?? "local";
       if (!limiter.accept(remote)) throw new GatewayRequestError(429, "GATEWAY_RATE_LIMITED", "本地网关请求过于频繁");
       const body = await readJsonBody(request);
+      if (request.url === "/v1/agent/query") {
+        if (typeof body.question !== "string" || !body.question.trim()) throw new GatewayRequestError(400, "QUESTION_INVALID", "question必须是非空字符串");
+        if (body.selectedBusinessId !== undefined && body.selectedBusinessId !== null && typeof body.selectedBusinessId !== "string") throw new GatewayRequestError(400, "CONTEXT_INVALID", "selectedBusinessId必须是字符串或null");
+        const output = await provider.queryBuilding(body.question, typeof body.selectedBusinessId === "string" ? body.selectedBusinessId : null, requestId);
+        sendJson(response, 200, { ok: true, ...output });
+        return;
+      }
       let task: ModelTask;
       let payload: { input: string } | { verifiedResult: Record<string, unknown> };
       if (request.url === "/v1/agent/interpret") {

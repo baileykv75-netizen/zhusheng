@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Check, ChevronDown, ClipboardCheck, FileSearch, Gauge, LockKeyhole, Play, ShieldCheck, Wrench } from "lucide-react";
+import { AlertTriangle, Check, ChevronDown, ClipboardCheck, FileSearch, Gauge, ListTree, LockKeyhole, Play, ShieldCheck, Wrench } from "lucide-react";
 import { deriveJourneyView } from "@/lib/journey/index.ts";
-import type { LabAuthorizationDraft, LabSession } from "@/lib/life-event-lab/types.ts";
+import type { LabSession } from "@/lib/life-event-lab/types.ts";
 import { repairTaskForResult } from "@/lib/life-event-lab/model.ts";
 import type { VisualDirective } from "@/lib/life-event-engine/types.ts";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
+import { LocalEvidenceUpload } from "@/components/LocalEvidenceUpload";
+import { buildingLifeEvents } from "@/lib/product/building-life-events";
+import { buildingTasks } from "@/lib/product/building-tasks";
 import { BathroomTwinViewport } from "./BathroomTwinViewport";
 
 const defaultDirective: VisualDirective = {
@@ -31,23 +34,21 @@ function TaskNumber({ label, value, unit, min, max, step = 1, onChange }: { labe
   return <label className="task-number"><span>{label}</span><div><input type="number" min={min} max={max} step={step} value={value} onChange={(event) => onChange(Number(event.target.value))} /><em>{unit}</em></div></label>;
 }
 
-export function ResidentTaskWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): void }) {
+export function PropertyWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): void }) {
   const {
-    session, setSession, assets, assetError, engine, busy, evaluate, decideAuthorization,
-    executeValveAction, submitIsolation, submitRepair, submitPostRepair
+    session, setSession, assets, assetError, engine, busy, evaluate,
+    executeValveAction, submitIsolation, submitRepair, submitPostRepair, submitPropertyReview
   } = useLifecycleJourney();
   const result = session.result;
+  const [repairPhotoReady, setRepairPhotoReady] = useState(false);
+  const [postRepairPhotoReady, setPostRepairPhotoReady] = useState(false);
+  const [reviewerId, setReviewerId] = useState("PROPERTY-DEMO-01");
+  const [reviewDecision, setReviewDecision] = useState<"CONSISTENT" | "NEEDS_SITE_CHECK" | "INCONCLUSIVE">("NEEDS_SITE_CHECK");
+  const [reviewNote, setReviewNote] = useState("已核对住户原始描述与照片来源，建议结合现场传感器观察继续判断。");
   const directive = result?.visualDirective ?? defaultDirective;
   const journey = result
     ? deriveJourneyView({ source: "LIFE_EVENT", state: result.state })
     : deriveJourneyView({ source: "LIFE_EVENT", state: "COLLECTING_EVIDENCE" });
-  const [authorizationOpen, setAuthorizationOpen] = useState(false);
-  const [authorization, setAuthorization] = useState<LabAuthorizationDraft>({
-    actorType: "RESIDENT",
-    actorId: "DEMO-RESIDENT-1602",
-    decision: "APPROVED",
-    reason: "同意本次脱敏模拟设备动作"
-  });
   const repairTask = useMemo(() => {
     if (!engine || !result || !["REPAIR_PENDING", "REPAIR_RECORDED", "AUTHORIZATION_PENDING", "AUTHORIZED", "POST_REPAIR_VERIFYING", "RESOLVED", "REOPENED"].includes(result.state)) return null;
     try { return repairTaskForResult(engine, result); } catch { return null; }
@@ -59,21 +60,10 @@ export function ResidentTaskWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): vo
     requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-focus="${focus}"]`)?.focus({ preventScroll: false }));
   }, [result?.state]);
 
-  function openAuthorization() {
-    const reopening = result?.authorizationRequirement?.action === "SIMULATE_REOPEN_VALVE";
-    setAuthorization({
-      actorType: reopening ? "PROPERTY" : "RESIDENT",
-      actorId: reopening ? "PROPERTY-DEMO-01" : "DEMO-RESIDENT-1602",
-      decision: "APPROVED",
-      reason: reopening ? "维修记录已核验，同意模拟恢复供水并开展复验" : "同意模拟关闭1602卫生间局部进水阀"
-    });
-    setAuthorizationOpen(true);
-  }
-
-  function submitAuthorization() {
-    decideAuthorization(authorization);
-    setAuthorizationOpen(false);
-  }
+  useEffect(() => {
+    if (result?.state === "REPAIR_PENDING") setRepairPhotoReady(false);
+    if (result?.state === "POST_REPAIR_VERIFYING") setPostRepairPhotoReady(false);
+  }, [result?.state]);
 
   function patch<K extends keyof LabSession>(key: K, value: LabSession[K]) {
     setSession((current) => ({ ...current, [key]: value, notice: null }));
@@ -82,10 +72,19 @@ export function ResidentTaskWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): vo
   const leader = result?.rankedHypotheses[0];
   const reopening = result?.authorizationRequirement?.action === "SIMULATE_REOPEN_VALVE" || result?.authorizedActions.some((item) => item.action === "SIMULATE_REOPEN_VALVE");
   const isFactCheck = !result || ["DETECTED", "COLLECTING_EVIDENCE", "INCONCLUSIVE", "REOPENED"].includes(result.state);
-  const photoConfirmed = session.controls.residentPhoto === "PRESENT" && session.controls.photoFinding !== "UNREADABLE";
-  const meterConfirmed = session.controls.meterReading === "PRESENT" && session.controls.meterFinding !== "UNREADABLE";
+  const latestSubmission = session.residentSubmissions?.at(-1) ?? null;
+  const submissionEvidence = latestSubmission
+    ? (session.productEvidenceTimeline ?? []).filter((item) => latestSubmission.evidenceIds.includes(item.id))
+    : [];
+  const residentTextEvidence = submissionEvidence.find((item) => item.type === "RESIDENT_TEXT_OBSERVATION");
+  const residentPhotoEvidence = submissionEvidence.find((item) => item.type === "RESIDENT_PHOTO_OBSERVATION");
+  const photoConfirmed = Boolean(latestSubmission && latestSubmission.photoFinding !== "UNREADABLE");
+  const meterConfirmed = Boolean(latestSubmission && latestSubmission.meterFinding !== "UNREADABLE");
+  const eventQueue = buildingLifeEvents(result?.state);
+  const taskQueue = buildingTasks(eventQueue, result);
+  const currentTask = taskQueue.find((task) => task.eventId === "EVT-1602");
 
-  return <div className="professional-workspace resident-task-workspace">
+  return <div className="professional-workspace property-task-workspace">
     <section className="professional-scene" aria-label="1602卫生间数字孪生">
       <div className="professional-scene-heading">
         <small>筑生样板楼A座 / 16层 / 1602户</small>
@@ -106,10 +105,17 @@ export function ResidentTaskWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): vo
     <aside className="professional-task-pane">
       <header className="task-pane-header">
         <div className="resident-task-utility">
-          <Link href="/case-1602">返回1602验证舱</Link>
+          <Link href="/events">返回事件中心</Link>
           <button onClick={onOpenAdvanced}>高级验证</button>
         </div>
-        <small>1602验证舱 / {isFactCheck ? "02 潮湿发现" : `当前处置 · ${journey.stateLabel}`}</small>
+        <details className="property-event-queue">
+          <summary><span><ListTree size={15} /><small>物业事件队列</small><strong>{taskQueue.filter((task) => task.status !== "DONE").length} 项需处理</strong></span><em>当前 · 1602</em><ChevronDown size={14} /></summary>
+          <div>{eventQueue.map((event, queueIndex) => {
+            const task = taskQueue[queueIndex];
+            return <article key={event.id} className={event.id === "EVT-1602" ? "current" : ""}><span>{event.floor}F · {event.unitId}</span><strong>{event.title}</strong><small>{task.ownerRole} · {task.title}</small>{!event.isDeepDemo ? <em>概览事件</em> : <em>完整深链</em>}</article>;
+          })}</div>
+        </details>
+        <small>物业运行席 / 1602 / {isFactCheck ? "事件接入" : journey.stateLabel}</small>
         <h2>{isFactCheck ? "1602卫生间出现潮湿" : journey.headline}</h2>
         <p>{isFactCheck ? "先把现场事实与建造记忆放在一起核对，再决定是否需要隔离验证。" : journey.summary}</p>
       </header>
@@ -118,25 +124,48 @@ export function ResidentTaskWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): vo
       {assetError ? <div className="task-notice error"><AlertTriangle size={15} />三维资产降级：{assetError}</div> : null}
 
       <div className="task-pane-body">
+        <section className="product-evidence-source" aria-label="住户原始证据与物业独立复核">
+          <header><span>PRODUCT EVIDENCE</span><strong>{latestSubmission ? "住户原始提交 · 只读" : "尚无住户原始提交"}</strong></header>
+          {latestSubmission ? <>
+            <dl>
+              <div><dt>原始描述</dt><dd>{residentTextEvidence?.observedValue ?? "未记录"}</dd></div>
+              <div><dt>照片观察</dt><dd>{latestSubmission.photoFinding}</dd></div>
+              <div><dt>水表观察</dt><dd>{latestSubmission.meterFinding}</dd></div>
+              <div><dt>提交身份</dt><dd><code>{latestSubmission.submissionId}</code></dd></div>
+              <div><dt>来源说明</dt><dd>{residentPhotoEvidence?.disclosure ?? "住户产品证据"}</dd></div>
+            </dl>
+            <small><LockKeyhole size={12} />物业不可修改或覆盖以上住户原始证据，只能追加独立复核。</small>
+            <details className="property-review-form">
+              <summary>创建物业独立复核 <ChevronDown size={14} /></summary>
+              <div className="task-form-stack">
+                <label><span>复核人员</span><input value={reviewerId} onChange={(event) => setReviewerId(event.target.value)} /></label>
+                <label><span>复核结论</span><select value={reviewDecision} onChange={(event) => setReviewDecision(event.target.value as typeof reviewDecision)}><option value="CONSISTENT">与住户提交一致</option><option value="NEEDS_SITE_CHECK">需要现场检查</option><option value="INCONCLUSIVE">暂无法判断</option></select></label>
+                <label><span>独立复核意见</span><textarea value={reviewNote} onChange={(event) => setReviewNote(event.target.value)} /></label>
+              </div>
+              <button className="task-primary" type="button" disabled={!reviewerId.trim() || !reviewNote.trim()} onClick={() => submitPropertyReview({ residentSubmissionId: latestSubmission.submissionId, reviewedBy: reviewerId, decision: reviewDecision, note: reviewNote })}><ClipboardCheck size={15} />追加物业复核记录</button>
+            </details>
+            {session.propertyReviews?.length ? <ol className="property-review-history">{session.propertyReviews.map((review) => <li key={review.reviewId}><span>{review.decision}</span><strong>{review.note}</strong><small>{review.reviewedBy} · {new Date(review.reviewedAt).toLocaleString("zh-CN", { hour12: false })}</small></li>)}</ol> : null}
+          </> : <p>请先由住户提交描述、照片观察和水表观察。物业不能代替住户填写原始证据。</p>}
+        </section>
+
         {isFactCheck ? <section className="active-task resident-guided-task" data-focus="evidence" tabIndex={-1}>
           <div className="task-section-heading"><Gauge size={18} /><div><strong>此刻只需要核对现场事实</strong><small>系统会调用同一份建筑记忆；不会替人操作阀门。</small></div></div>
           <div className="resident-fact-groups">
+            {result?.state === "REOPENED" ? <article className="resident-fact gap reopened-history"><span>历史保留</span><strong>第一次维修与复验仍在事件链</strong><p>{currentTask?.historyRefs.length ? currentTask.historyRefs.join(" · ") : "原维修记录、复验观察与审计顺序保持不变。"}</p><small>新任务：重新检查1602卫生间；不会覆盖第一次处置。</small></article> : null}
             <article className="resident-fact known"><span>已发现</span><strong>卫生间持续潮湿</strong><p>湿度 {session.controls.humidity.value}%（基线 {session.controls.humidity.baseline ?? "—"}%），持续 {session.controls.humidity.durationMinutes} 分钟。</p></article>
             <article className="resident-fact known"><span>已发现</span><strong>无人用水仍有微流量</strong><p>{session.controls.microFlow.value} L/min，已持续 {session.controls.microFlow.durationMinutes} 分钟。</p></article>
             <article className="resident-fact memory"><span>已调取</span><strong>建造期管线与闭水记录</strong><p>施工接头、闭水试验和防水记录已关联至1602卫生间。</p></article>
             <article className="resident-fact gap"><span>{photoConfirmed && meterConfirmed ? "已核对" : "还需确认"}</span><strong>{photoConfirmed && meterConfirmed ? "住户照片与水表复核已齐全" : "补齐现场人工证据"}</strong><p>{photoConfirmed ? "墙面照片已判读。" : "需要住户确认墙面是否可见潮湿。"}{meterConfirmed ? " 水表观察已确认。" : " 需要确认停用水后水表是否仍变化。"}</p></article>
           </div>
           <details className="resident-fact-controls">
-            <summary>修正或补充现场事实 <ChevronDown size={15} /></summary>
+            <summary>补充物业现场观测 <ChevronDown size={15} /></summary>
             <div className="task-field-grid">
               <TaskNumber label="当前湿度" value={session.controls.humidity.value} unit="%" min={0} max={100} onChange={(value) => setSession((current) => ({ ...current, controls: { ...current.controls, humidity: { ...current.controls.humidity, value } } }))} />
               <TaskNumber label="无人用水微流量" value={session.controls.microFlow.value} unit="L/min" min={0} max={0.2} step={0.01} onChange={(value) => setSession((current) => ({ ...current, controls: { ...current.controls, microFlow: { ...current.controls.microFlow, value } } }))} />
-              <label><span>住户墙面照片</span><select value={session.controls.photoFinding} onChange={(event) => setSession((current) => ({ ...current, controls: { ...current.controls, residentPhoto: event.target.value === "UNREADABLE" ? "MISSING" : "PRESENT", photoFinding: event.target.value as typeof current.controls.photoFinding } }))}><option value="MOISTURE_VISIBLE">可见潮湿</option><option value="NO_VISIBLE_MOISTURE">未见潮湿</option><option value="UNREADABLE">尚未提供</option></select></label>
-              <label><span>人工水表观察</span><select value={session.controls.meterFinding} onChange={(event) => setSession((current) => ({ ...current, controls: { ...current.controls, meterReading: event.target.value === "UNREADABLE" ? "MISSING" : "PRESENT", meterFinding: event.target.value as typeof current.controls.meterFinding } }))}><option value="FLOW_CONFIRMED_NO_USE">停用水仍变化</option><option value="NO_CHANGE">无变化</option><option value="UNREADABLE">尚未确认</option></select></label>
             </div>
           </details>
           {result?.contradictions.length ? <p className="task-blocked"><AlertTriangle size={13} />{result.contradictions[0].explanation}</p> : null}
-          <button className="task-primary" disabled={busy || !assets} onClick={evaluate}><FileSearch size={16} />{busy ? "正在核对建筑记忆…" : "核对现场事实，给出下一步"}</button>
+          <button className="task-primary" disabled={busy || !assets || !latestSubmission} onClick={evaluate}><FileSearch size={16} />{busy ? "正在核对建筑记忆…" : latestSubmission ? "核对现场事实，给出下一步" : "等待住户提交原始证据"}</button>
         </section> : null}
 
         {result && !["DETECTED", "COLLECTING_EVIDENCE", "INCONCLUSIVE", "REOPENED"].includes(result.state) ? <section className="task-decision-summary" data-focus="diagnosis" tabIndex={-1}>
@@ -148,7 +177,7 @@ export function ResidentTaskWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): vo
         {result?.state === "AUTHORIZATION_PENDING" && result.authorizationRequirement ? <section className="active-task safety" data-focus="authorization" tabIndex={-1}>
           <div className="task-section-heading"><ShieldCheck size={19} /><div><strong>{reopening ? "恢复供水需要独立授权" : "等待人工授权"}</strong><small>当前阀门保持 {result.valvePosition}</small></div></div>
           <dl className="task-facts"><div><dt>模拟动作</dt><dd>{result.authorizationRequirement.action}</dd></div><div><dt>目标阀门</dt><dd>{result.authorizationRequirement.targetBusinessId}</dd></div><div><dt>有效范围</dt><dd>仅当前事件</dd></div></dl>
-          <button className="task-primary" onClick={openAuthorization}><LockKeyhole size={16} />提交人工授权</button>
+          <Link className="task-primary" href="/resident?focus=authorization"><LockKeyhole size={16} />通知住户完成授权</Link>
         </section> : null}
 
         {result?.state === "AUTHORIZED" ? <section className="active-task" data-focus="execute-valve" tabIndex={-1}>
@@ -175,7 +204,14 @@ export function ResidentTaskWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): vo
             <label><span>维修人员 / 班组</span><input value={session.repairDraft.crewId} onChange={(event) => patch("repairDraft", { ...session.repairDraft, crewId: event.target.value })} /></label>
             <label><span>维修说明</span><textarea value={session.repairDraft.description} onChange={(event) => patch("repairDraft", { ...session.repairDraft, description: event.target.value })} /></label>
           </div>
-          <button className="task-primary" disabled={busy || !session.repairDraft.crewId || !session.repairDraft.description} onClick={submitRepair}><ClipboardCheck size={16} />提交不可变维修记录</button>
+          <LocalEvidenceUpload label="选择维修现场照片" help="关联1602卫生间与当前维修构件" syntheticExample="/assets/demo-evidence/1602-repair-open-wall.webp" onReadyChange={setRepairPhotoReady} />
+          <button className="task-primary" disabled={busy || !session.repairDraft.crewId || !session.repairDraft.description || !repairPhotoReady} onClick={submitRepair}><ClipboardCheck size={16} />提交不可变维修记录</button>
+        </section> : null}
+
+        {result?.state === "REPAIR_RECORDED" ? <section className="active-task safety" data-focus="authorization" tabIndex={-1}>
+          <div className="task-section-heading"><ShieldCheck size={19} /><div><strong>维修已记录，等待独立恢复授权</strong><small>关阀授权不能用于恢复供水</small></div></div>
+          <p className="task-control-note">阀门仍保持关闭。住户完成新的人工决定后，物业才能明确执行模拟开阀。</p>
+          <Link className="task-primary" href="/resident?focus=authorization"><LockKeyhole size={16} />通知住户确认恢复供水</Link>
         </section> : null}
 
         {result?.state === "POST_REPAIR_VERIFYING" ? <section className="active-task" data-focus="post-repair" tabIndex={-1}>
@@ -185,7 +221,8 @@ export function ResidentTaskWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): vo
             <TaskNumber label="湿度" value={session.postRepair.humidity} unit="%" min={0} max={100} onChange={(humidity) => patch("postRepair", { ...session.postRepair, humidity })} />
             <TaskNumber label="持续时间" value={session.postRepair.durationMinutes} unit="min" min={0} max={120} step={5} onChange={(durationMinutes) => patch("postRepair", { ...session.postRepair, durationMinutes })} />
           </div>
-          <button className="task-primary" disabled={busy} onClick={submitPostRepair}><Gauge size={16} />提交维修后复验</button>
+          <LocalEvidenceUpload label="选择维修后现场照片" help="必须是恢复供水后的新观察" syntheticExample="/assets/demo-evidence/1602-post-repair-wall.webp" onReadyChange={setPostRepairPhotoReady} />
+          <button className="task-primary" disabled={busy || !postRepairPhotoReady} onClick={submitPostRepair}><Gauge size={16} />提交维修后复验</button>
         </section> : null}
 
         {result?.state === "RESOLVED" ? <section className="active-task final resolved">
@@ -200,16 +237,5 @@ export function ResidentTaskWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): vo
       </div>
     </aside>
 
-    {authorizationOpen && result?.authorizationRequirement ? <div className="authorization-modal" role="dialog" aria-modal="true" aria-labelledby="task-authorization-title">
-      <div><header><ShieldCheck size={22} /><span><small>HUMAN IN THE LOOP</small><h2 id="task-authorization-title">人工授权记录</h2></span><button aria-label="关闭授权窗口" onClick={() => setAuthorizationOpen(false)}>×</button></header>
-        <dl><div><dt>模拟动作</dt><dd>{result.authorizationRequirement.action}</dd></div><div><dt>目标阀门</dt><dd>{result.authorizationRequirement.targetBusinessId}</dd></div><div><dt>当前事件</dt><dd>{result.eventId}</dd></div></dl>
-        <label><span>授权人类型</span><select value={authorization.actorType} onChange={(event) => setAuthorization((current) => ({ ...current, actorType: event.target.value as LabAuthorizationDraft["actorType"] }))}><option value="RESIDENT">住户</option><option value="PROPERTY">物业</option></select></label>
-        <label><span>授权人演示ID</span><input value={authorization.actorId} onChange={(event) => setAuthorization((current) => ({ ...current, actorId: event.target.value }))} /></label>
-        <label><span>决定</span><select value={authorization.decision} onChange={(event) => setAuthorization((current) => ({ ...current, decision: event.target.value as LabAuthorizationDraft["decision"] }))}><option value="APPROVED">批准</option><option value="REJECTED">拒绝</option></select></label>
-        <label><span>原因或备注</span><textarea value={authorization.reason} onChange={(event) => setAuthorization((current) => ({ ...current, reason: event.target.value }))} /></label>
-        <p><LockKeyhole size={14} />授权不会直接改变阀门，仍需用户明确执行。</p>
-        <footer><button onClick={() => setAuthorizationOpen(false)}>取消</button><button className="lab-primary" disabled={!authorization.actorId.trim()} onClick={submitAuthorization}>提交人工决定</button></footer>
-      </div>
-    </div> : null}
   </div>;
 }

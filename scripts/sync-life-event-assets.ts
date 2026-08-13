@@ -22,6 +22,8 @@ const publicRoot = resolve(repoRoot, "public/assets/life-event");
 const checkOnly = process.argv.includes("--check");
 const assets = [
   { filename: "bathroom-1602.glb", source: "bim/visual/bathroom-1602.glb" },
+  { filename: "bathroom-1602-premium.glb", source: "bim/visual/bathroom-1602-premium.glb" },
+  { filename: "bathroom-1602-premium.validation.json", source: "bim/visual/bathroom-1602-premium.validation.json" },
   { filename: "bathroom-1602.manifest.json", source: "bim/visual/bathroom-1602.manifest.json" },
   { filename: "building-memory.seed.json", source: "bim/data/building-memory.seed.json" },
   { filename: "bathroom-1602.runtime-transforms.json", source: "bim/visual/bathroom-1602.runtime-transforms.json" }
@@ -40,16 +42,23 @@ function glbNodeNames(buffer: Buffer): Set<string> {
   return new Set((json.nodes ?? []).flatMap((node) => node.name ? [node.name] : []));
 }
 
-const manifest = JSON.parse(readFileSync(resolve(repoRoot, assets[1].source), "utf8")) as Manifest;
-const memory = JSON.parse(readFileSync(resolve(repoRoot, assets[2].source), "utf8")) as Memory;
-const runtimeTransforms = JSON.parse(readFileSync(resolve(repoRoot, assets[3].source), "utf8")) as { sceneId: string; transforms: Record<string, unknown> };
-const glbNames = glbNodeNames(readFileSync(resolve(repoRoot, assets[0].source)));
+const assetByName = Object.fromEntries(assets.map((asset) => [asset.filename, asset]));
+const manifest = JSON.parse(readFileSync(resolve(repoRoot, assetByName["bathroom-1602.manifest.json"].source), "utf8")) as Manifest;
+const memory = JSON.parse(readFileSync(resolve(repoRoot, assetByName["building-memory.seed.json"].source), "utf8")) as Memory;
+const runtimeTransforms = JSON.parse(readFileSync(resolve(repoRoot, assetByName["bathroom-1602.runtime-transforms.json"].source), "utf8")) as { sceneId: string; transforms: Record<string, unknown> };
+const semanticGlbNames = glbNodeNames(readFileSync(resolve(repoRoot, assetByName["bathroom-1602.glb"].source)));
+const premiumGlbNames = glbNodeNames(readFileSync(resolve(repoRoot, assetByName["bathroom-1602-premium.glb"].source)));
+const premiumValidation = JSON.parse(readFileSync(resolve(repoRoot, assetByName["bathroom-1602-premium.validation.json"].source), "utf8")) as { passed?: boolean; semanticBaseline?: string; missingCriticalNodes?: string[] };
 if (manifest.syntheticDemo !== true || memory.modelStatus !== "synthetic_demo") throw new Error("Only synthetic demo assets may be published");
 if (manifest.sourceBuildingId !== memory.buildingId) throw new Error("Manifest building does not match building memory");
 if (!memory.spaces.some((space) => space.businessId === manifest.sourceSpaceId)) throw new Error("Manifest space is missing from building memory");
 if (runtimeTransforms.sceneId !== "SCENE-1602-BATHROOM") throw new Error("Runtime transforms refer to a different scene");
+if (premiumValidation.passed !== true || premiumValidation.semanticBaseline !== "bathroom-1602.glb" || premiumValidation.missingCriticalNodes?.length) {
+  throw new Error("Premium visual twin has not passed semantic-baseline validation");
+}
 for (const node of Object.values(manifest.nodes)) {
-  if (!glbNames.has(node.nodeName)) throw new Error(`GLB node missing: ${node.nodeName}`);
+  if (!semanticGlbNames.has(node.nodeName)) throw new Error(`Semantic GLB node missing: ${node.nodeName}`);
+  if (!premiumGlbNames.has(node.nodeName)) throw new Error(`Premium GLB node missing: ${node.nodeName}`);
   if (!runtimeTransforms.transforms[node.nodeName]) throw new Error(`Runtime transform missing: ${node.nodeName}`);
   if (!node.visualOnly && node.businessId && node.ifcGlobalId !== memory.identityIndex[node.businessId]?.ifcGlobalId) {
     throw new Error(`IFC identity mismatch: ${node.businessId}`);

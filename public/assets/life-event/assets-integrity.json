@@ -9,6 +9,16 @@
       "sha256": "e1c1ef2d8a1da67244c62857801c84cec5e23211d2324912cbaa8d02d770a07e",
       "bytes": 948428
     },
+    "bathroom-1602-premium.glb": {
+      "source": "bim/visual/bathroom-1602-premium.glb",
+      "sha256": "f4bc8b361e374239350c740426e9d91c35526c78d66e7d742438f9ea8ec9c416",
+      "bytes": 1322780
+    },
+    "bathroom-1602-premium.validation.json": {
+      "source": "bim/visual/bathroom-1602-premium.validation.json",
+      "sha256": "41ac7a1afb4b9b6c62d93e4ccd9e0e464b1f4d09cd3fb2ff0cea1dd5dddaf419",
+      "bytes": 2598
+    },
     "bathroom-1602.manifest.json": {
       "source": "bim/visual/bathroom-1602.manifest.json",
       "sha256": "733871a1f991b55662e8eb4e518c705504a85bbbb047811349b21fc306703bfc",

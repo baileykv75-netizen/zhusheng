@@ -18,10 +18,18 @@ test("missing and contradictory outcomes never expose an authorization action", 
 });
 
 test("authorization and repair states keep distinct user actions", () => {
-  assert.equal(deriveJourneyView({ source: "LIFE_EVENT", state: "AUTHORIZATION_PENDING" }).primaryAction.label, "提交人工授权");
-  assert.equal(deriveJourneyView({ source: "LIFE_EVENT", state: "AUTHORIZED" }).primaryAction.label, "模拟执行关阀");
-  assert.equal(deriveJourneyView({ source: "LIFE_EVENT", state: "REPAIR_PENDING" }).primaryAction.label, "填写维修记录");
-  assert.equal(deriveJourneyView({ source: "LIFE_EVENT", state: "REPAIR_RECORDED" }).primaryAction.label, "申请独立开阀授权");
+  const closeApproval = deriveJourneyView({ source: "LIFE_EVENT", state: "AUTHORIZATION_PENDING" }).primaryAction;
+  const closeExecution = deriveJourneyView({ source: "LIFE_EVENT", state: "AUTHORIZED" }).primaryAction;
+  const repair = deriveJourneyView({ source: "LIFE_EVENT", state: "REPAIR_PENDING" }).primaryAction;
+  const reopenApproval = deriveJourneyView({ source: "LIFE_EVENT", state: "REPAIR_RECORDED" }).primaryAction;
+  assert.equal(closeApproval.label, "提交人工授权");
+  assert.equal(closeApproval.route, "/resident?focus=authorization");
+  assert.equal(closeExecution.label, "模拟执行关阀");
+  assert.equal(closeExecution.route, "/property");
+  assert.equal(repair.label, "填写维修记录");
+  assert.equal(repair.route, "/property");
+  assert.equal(reopenApproval.label, "确认恢复供水授权");
+  assert.equal(reopenApproval.route, "/resident?focus=authorization");
 });
 
 test("resolved state leads to group feedback without calling it an enterprise standard", () => {

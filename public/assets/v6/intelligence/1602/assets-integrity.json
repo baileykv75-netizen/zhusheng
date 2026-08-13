@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "ZS-DEMO-001/UNIT-1602/BATHROOM",
+  "syntheticEngineeringDataPresent": true,
+  "files": {
+    "sources.json": {
+      "sha256": "1daad68e9608fd742d0614bf54e030af9151e71794d6fa682d6cd7b88cb61e73",
+      "bytes": 1280
+    },
+    "spaces.json": {
+      "sha256": "3ecd784089a11f5ec3b00ee2c7ba71e0644d63caf7b90daa4ed4ced96c84d958",
+      "bytes": 538
+    },
+    "systems.json": {
+      "sha256": "3c5f1576ed49943490c56313f0ae735b5db83cb855c51708162a48dd16e859d3",
+      "bytes": 2688
+    },
+    "components.json": {
+      "sha256": "ac46dea0fa52fffb77da819eee3e1ab682d63975c015c678b6487df5efcda64e",
+      "bytes": 11391
+    },
+    "ports.json": {
+      "sha256": "2d72f0aec0215f1100cd0ef8038695a524dead22d113ccc18f8c29ba2df80e70",
+      "bytes": 8945
+    },
+    "connections.json": {
+      "sha256": "c98d1530a1c9ac5019e449633f758c0bb76d22429732b82819b73dd7e193e852",
+      "bytes": 7439
+    },
+    "spatial-relations.json": {
+      "sha256": "5ac498af3c8d1e45bc8ff1d9fa7f052a0d8436c4729a12eee180f24dda04e51c",
+      "bytes": 2974
+    },
+    "records.json": {
+      "sha256": "fc8f509cfef9b76f03eb20267da0d97cff34be223fa75813f50037d451a321ca",
+      "bytes": 1926
+    },
+    "visual-manifest.json": {
+      "sha256": "f0823328e5e5d32a85f48372a6df854ddf6b72f02f62298097d0ac42db3de3f0",
+      "bytes": 3887
+    }
+  }
+}

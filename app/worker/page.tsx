@@ -1,14 +1,17 @@
 "use client";
 
-import { Camera, Check, CheckCircle2, ChevronDown, FileImage, Mic, Pause, Play, QrCode, ShieldCheck } from "lucide-react";
+import { Check, CheckCircle2, ChevronDown, FileImage, Mic, Pause, Play, QrCode, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { SceneStage } from "@/components/scene-stage";
 import { EvidenceStrip } from "@/components/evidence-viewer";
 import { useDemo } from "@/components/demo-provider";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
+import { LocalEvidenceUpload } from "@/components/LocalEvidenceUpload";
 
 export default function WorkerPage() {
+  const router = useRouter();
   const { state, next } = useDemo();
   const { markWorkerEvidenceReady } = useLifecycleJourney();
   const [recording, setRecording] = useState(false);
@@ -44,6 +47,7 @@ export default function WorkerPage() {
   function enterResidentTask() {
     markWorkerEvidenceReady();
     next();
+    router.push("/resident");
   }
 
   return (
@@ -79,7 +83,8 @@ export default function WorkerPage() {
             {recording ? <div className="recording-actions"><button onClick={() => setPaused((value) => !value)}>{paused ? <Play size={15} /> : <Pause size={15} />}{paused ? "继续" : "暂停"}</button><button onClick={finishRecording}><Check size={15} />完成口述</button></div> : null}
             <button className="stage-decision" onClick={recorded ? next : startRecording}>{recorded ? "整理为施工记录" : "开始口述记录"}</button>
             {!recorded && !recording ? <p className="disabled-reason">完成口述后才能生成施工记录；引导演示可使用示例口述继续。</p> : null}
-            <div className="capture-tools"><button><Camera size={17} />拍摄现场</button><button className="tertiary"><QrCode size={16} />重扫房间码</button></div>
+            <LocalEvidenceUpload label="选择施工现场照片" help="原图只在本机预览，人工确认后再进入正式记录" syntheticExample="/assets/v6/evidence/construction-pipe-install.webp" />
+            <div className="capture-tools"><button className="tertiary"><QrCode size={16} />重扫房间码</button></div>
             <details className="evidence-vault"><summary>示例口述原文 <ChevronDown size={15} /></summary><textarea value={transcript} onChange={(event) => setTranscript(event.target.value)} aria-label="工友原始口述" /></details>
           </div>
         ) : stage === 2 ? (
@@ -109,7 +114,7 @@ export default function WorkerPage() {
             <EvidenceStrip ids={["joint", "pressure"]} label="EV-2848建筑记忆证据" />
             <dl className="memory-object"><div><dt>空间</dt><dd>1602卫生间</dd></div><div><dt>构件</dt><dd>W-1602-B7</dd></div><div><dt>班组</dt><dd>安装班组（脱敏）</dd></div><div><dt>验收阶段</dt><dd>隐蔽工程复核</dd></div></dl>
             <div className="contribution-line"><span>工友品质贡献</span><strong>关键隐蔽工序形成可信记录</strong></div>
-          <div className="success-links"><button className="stage-decision" onClick={enterResidentTask}>进入入住任务处置</button><Link href="/">返回筑生总智能体</Link></div>
+          <div className="success-links"><button className="stage-decision" onClick={enterResidentTask}>进入住户服务</button><Link href="/">返回筑生总智能体</Link></div>
           </div>
         )}
       </section>
