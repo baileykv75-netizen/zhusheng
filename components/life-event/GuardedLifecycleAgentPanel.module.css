@@ -1,0 +1,194 @@
+.shell {
+  margin: 18px 18px 0;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  background: linear-gradient(145deg, rgba(17, 20, 20, 0.98), rgba(25, 29, 28, 0.94));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+  color: #f4f1e9;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.header h1 {
+  max-width: 760px;
+  margin: 8px 0 6px;
+  font-size: clamp(24px, 3vw, 40px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.header p {
+  max-width: 760px;
+  margin: 0;
+  color: rgba(244, 241, 233, 0.62);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #c5a46a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.truthBadge {
+  min-width: 190px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 8px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid rgba(197, 164, 106, 0.22);
+  border-radius: 14px;
+  background: rgba(197, 164, 106, 0.06);
+}
+
+.truthBadge svg { color: #c5a46a; }
+.truthBadge span { color: rgba(244, 241, 233, 0.48); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; }
+.truthBadge strong { grid-column: 2; font-size: 12px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.65fr);
+  gap: 14px;
+}
+
+.queryPane,
+.guardPane {
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.queryPane { min-height: 520px; }
+.queryPane > section { min-height: 520px; height: 100%; }
+
+.guardPane {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+}
+
+.phaseRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.phaseRow span { color: #c5a46a; font-size: 10px; font-weight: 800; letter-spacing: 0.14em; }
+.phaseRow strong { font-size: 12px; }
+
+.summary { padding: 18px 0 14px; }
+.summary > span { color: rgba(244, 241, 233, 0.46); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+.summary h2 { margin: 8px 0; font-size: 22px; line-height: 1.25; }
+.summary p { margin: 0; color: rgba(244, 241, 233, 0.6); font-size: 12px; line-height: 1.7; }
+
+.truthGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.truthGrid div {
+  min-width: 0;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.truthGrid dt { color: rgba(244, 241, 233, 0.4); font-size: 9px; }
+.truthGrid dd { margin: 5px 0 0; overflow: hidden; text-overflow: ellipsis; color: #f4f1e9; font-size: 11px; font-weight: 700; white-space: nowrap; }
+
+.agentBoundary {
+  margin-top: 2px;
+  padding: 12px;
+  border: 1px solid rgba(122, 163, 134, 0.18);
+  border-radius: 13px;
+  background: rgba(122, 163, 134, 0.06);
+}
+
+.agentBoundary[data-has-proposal="true"] { border-color: rgba(197, 164, 106, 0.25); background: rgba(197, 164, 106, 0.07); }
+.agentBoundary[data-gate-status="VERIFIED"] { border-color: rgba(122, 163, 134, 0.34); background: rgba(122, 163, 134, 0.09); }
+.agentBoundary[data-gate-status="REJECTED"] { border-color: rgba(184, 105, 86, 0.34); background: rgba(184, 105, 86, 0.08); }
+.agentBoundary > div { display: flex; align-items: center; gap: 7px; }
+.agentBoundary svg { color: #8fb29a; }
+.agentBoundary strong { font-size: 11px; }
+.agentBoundary p { margin: 7px 0 0; color: rgba(244, 241, 233, 0.57); font-size: 10px; line-height: 1.65; }
+.agentBoundary code { color: #d6b77e; }
+
+.nextAction {
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+.nextAction > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(244, 241, 233, 0.43);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.nextAction > strong { display: block; margin: 7px 0 11px; font-size: 17px; }
+
+.primaryAction {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 12px;
+  background: #e6ded0;
+  color: #171a19;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.primaryAction:hover { background: #f1eadf; }
+.primaryAction:focus-visible { outline: 2px solid #c5a46a; outline-offset: 2px; }
+
+.syncNote {
+  display: block;
+  margin-top: 10px;
+  color: rgba(244, 241, 233, 0.34);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+@media (max-width: 1050px) {
+  .grid { grid-template-columns: 1fr; }
+  .guardPane { min-height: 430px; }
+  .queryPane, .queryPane > section { min-height: 470px; }
+}
+
+@media (max-width: 720px) {
+  .shell { margin: 10px 10px 0; padding: 12px; border-radius: 18px; }
+  .header { align-items: stretch; flex-direction: column; }
+  .truthBadge { min-width: 0; }
+  .truthGrid { grid-template-columns: 1fr; }
+  .queryPane, .queryPane > section { min-height: 430px; }
+}

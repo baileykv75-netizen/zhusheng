@@ -23,13 +23,20 @@ export function residentEvidenceToDomainControls(
   };
 }
 
+function latestResidentEvidence(active: EvidenceItem[], type: EvidenceItem["type"]): EvidenceItem | undefined {
+  return active
+    .filter((item) => item.type === type)
+    .sort((a, b) => (a.capturedAt ?? "").localeCompare(b.capturedAt ?? ""))
+    .at(-1);
+}
+
 export function residentDomainEvidenceRefs(result: LifeEventResult): {
   photoEvidenceId?: string;
   meterEvidenceId?: string;
 } {
   const active = result.input.evidence.filter((item): item is EvidenceItem => item.sourceActor === "RESIDENT");
   return {
-    photoEvidenceId: active.find((item) => item.type === "RESIDENT_WALL_PHOTO")?.id,
-    meterEvidenceId: active.find((item) => item.type === "METER_READING")?.id
+    photoEvidenceId: latestResidentEvidence(active, "RESIDENT_WALL_PHOTO")?.id,
+    meterEvidenceId: latestResidentEvidence(active, "METER_READING")?.id
   };
 }

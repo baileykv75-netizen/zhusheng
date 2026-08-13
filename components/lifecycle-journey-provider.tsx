@@ -18,6 +18,7 @@ import {
   submitPostRepairObservation,
   submitRepairRecord
 } from "@/lib/life-event-lab/model.ts";
+import { resumeReopenedAssessment } from "@/lib/life-event-lab/reopened-cycle.ts";
 import {
   LAB_SCHEMA_VERSION,
   LAB_SESSION_KEY,
@@ -264,6 +265,10 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
       setSession((current) => ({ ...current, notice: assetError ?? "正在验证建筑记忆和数字样间资产" }));
       return;
     }
+    if (session.result?.state === "REOPENED") {
+      setSession((current) => ({ ...current, notice: "事件已重新打开。必须先由住户追加新的现场描述、照片观察和水表观察；历史证据不能直接触发下一轮判断。" }));
+      return;
+    }
     const counter = session.eventCounter + 1;
     setBusy(true);
     try {
@@ -284,26 +289,31 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
     } finally {
       setBusy(false);
     }
-  }, [assetError, engine, session.controls, session.eventCounter]);
+  }, [assetError, engine, session.controls, session.eventCounter, session.result]);
 
   const submitResidentEvidence = useCallback((draft: ResidentEvidenceDraft) => {
     if (!engine) {
       setSession((current) => ({ ...current, notice: assetError ?? "正在验证建筑记忆和数字样间资产" }));
       return;
     }
-    const counter = session.eventCounter + 1;
+    const reopeningCycle = session.result?.state === "REOPENED";
+    const counter = session.eventCounter + (reopeningCycle ? 0 : 1);
     const nowMs = Date.now();
     const controls = residentEvidenceToDomainControls(session.controls, draft);
+    const submissionSequence = (session.residentSubmissions?.length ?? 0) + 1;
     setBusy(true);
     try {
-      const result = evaluateControls(engine, controls, counter, nowMs);
+      const result = reopeningCycle
+        ? resumeReopenedAssessment(engine, session.result!, controls, nowMs)
+        : evaluateControls(engine, controls, counter, nowMs);
       const refs = residentDomainEvidenceRefs(result);
       const product = createResidentEvidenceSubmission({
         draft,
         eventId: result.eventId,
         submittedAt: new Date(nowMs).toISOString(),
         domainPhotoEvidenceId: refs.photoEvidenceId,
-        domainMeterEvidenceId: refs.meterEvidenceId
+        domainMeterEvidenceId: refs.meterEvidenceId,
+        submissionSequence
       });
       setSession((current) => ({
         ...current,
@@ -318,14 +328,16 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
         selectedBusinessId: result.visualDirective.highlightBusinessIds[0] ?? null,
         repairDraft: defaultRepairDraft(),
         postRepair: structuredClone(DEFAULT_POST_REPAIR_CONTROLS),
-        notice: "住户原始描述与人工观察已形成不可变产品证据；只有确认后的照片和水表观察进入确定性判断。"
+        notice: reopeningCycle
+          ? "新的住户现场证据已追加到原事件与原审计链；第一次维修和复验记录保持不变。"
+          : "住户原始描述与人工观察已形成不可变产品证据；只有确认后的照片和水表观察进入确定性判断。"
       }));
     } catch (reason) {
       setSession((current) => ({ ...current, notice: reason instanceof Error ? reason.message : "住户证据提交失败" }));
     } finally {
       setBusy(false);
     }
-  }, [assetError, engine, session.controls, session.eventCounter]);
+  }, [assetError, engine, session.controls, session.eventCounter, session.residentSubmissions, session.result]);
 
   const submitPropertyReview = useCallback((draft: PropertyReviewDraft) => {
     setSession((current) => {

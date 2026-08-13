@@ -128,3 +128,22 @@ test("evidence appendix keeps product provenance separate from the verified even
   assert.equal(appendix.evidence.length, 3);
   assert.match(appendix.disclosure, /确定性结论仍以verifiedEventPackage为准/);
 });
+
+test("a second resident submission for the same reopened event gets unique immutable product ids", () => {
+  const first = createResidentEvidenceSubmission({
+    draft: residentDraft(),
+    eventId: "EVT-1602-LAB-001",
+    submittedAt: new Date(now).toISOString(),
+    submissionSequence: 1
+  });
+  const second = createResidentEvidenceSubmission({
+    draft: residentDraft(),
+    eventId: "EVT-1602-LAB-001",
+    submittedAt: new Date(now + 60_000).toISOString(),
+    submissionSequence: 2
+  });
+  assert.equal(first.submission.eventId, second.submission.eventId);
+  assert.notEqual(first.submission.submissionId, second.submission.submissionId);
+  assert.equal(new Set([...first.submission.evidenceIds, ...second.submission.evidenceIds]).size, 6);
+  assert.match(second.submission.submissionId, /-R02$/);
+});

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Check, ChevronDown, ClipboardCheck, FileSearch, Gauge, ListTree, LockKeyhole, Play, ShieldCheck, Wrench } from "lucide-react";
+import type { QueryVisualDirective } from "@/lib/building-intelligence/types.ts";
 import { deriveJourneyView } from "@/lib/journey/index.ts";
 import type { LabSession } from "@/lib/life-event-lab/types.ts";
 import { repairTaskForResult } from "@/lib/life-event-lab/model.ts";
@@ -34,7 +35,7 @@ function TaskNumber({ label, value, unit, min, max, step = 1, onChange }: { labe
   return <label className="task-number"><span>{label}</span><div><input type="number" min={min} max={max} step={step} value={value} onChange={(event) => onChange(Number(event.target.value))} /><em>{unit}</em></div></label>;
 }
 
-export function PropertyWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): void }) {
+export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOpenAdvanced(): void; queryVisual?: QueryVisualDirective | null }) {
   const {
     session, setSession, assets, assetError, engine, busy, evaluate,
     executeValveAction, submitIsolation, submitRepair, submitPostRepair, submitPropertyReview
@@ -97,6 +98,7 @@ export function PropertyWorkbench({ onOpenAdvanced }: { onOpenAdvanced(): void }
         directive={directive}
         view={session.selectedView}
         selectedBusinessId={session.selectedBusinessId}
+        queryVisual={queryVisual}
         onViewChange={(selectedView) => setSession((current) => ({ ...current, selectedView }))}
         onSelect={(selectedBusinessId) => setSession((current) => ({ ...current, selectedBusinessId }))}
       />

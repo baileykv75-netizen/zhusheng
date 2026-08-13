@@ -128,11 +128,15 @@ export function createResidentEvidenceSubmission(input: {
   submittedAt: string;
   domainPhotoEvidenceId?: string;
   domainMeterEvidenceId?: string;
+  submissionSequence?: number;
 }): { submission: ResidentEvidenceSubmission; evidence: ProductEvidenceRecord[] } {
-  const submissionId = `RES-SUB-${input.eventId}`;
-  const descriptionEvidenceId = productEvidenceId("PROD-RES-TEXT", input.eventId, 1);
-  const photoEvidenceId = productEvidenceId("PROD-RES-PHOTO", input.eventId, 2);
-  const meterEvidenceId = productEvidenceId("PROD-RES-METER", input.eventId, 3);
+  const submissionSequence = Math.max(1, input.submissionSequence ?? 1);
+  const cycleSuffix = submissionSequence === 1 ? "" : `-R${String(submissionSequence).padStart(2, "0")}`;
+  const productEventKey = `${input.eventId}${cycleSuffix}`;
+  const submissionId = `RES-SUB-${productEventKey}`;
+  const descriptionEvidenceId = productEvidenceId("PROD-RES-TEXT", productEventKey, 1);
+  const photoEvidenceId = productEvidenceId("PROD-RES-PHOTO", productEventKey, 2);
+  const meterEvidenceId = productEvidenceId("PROD-RES-METER", productEventKey, 3);
   const photoDescription = [
     `人工观察=${input.draft.photo.finding}`,
     input.draft.photo.fileName ? `文件=${input.draft.photo.fileName}` : null,
