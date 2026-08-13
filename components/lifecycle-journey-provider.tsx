@@ -18,7 +18,7 @@ import {
   submitPostRepairObservation,
   submitRepairRecord
 } from "@/lib/life-event-lab/model.ts";
-import { resumeReopenedAssessment } from "@/lib/life-event-lab/reopened-cycle.ts";
+import { hasFreshEvidenceAfterReopen, resumeReopenedAssessment } from "@/lib/life-event-lab/reopened-cycle.ts";
 import {
   LAB_SCHEMA_VERSION,
   LAB_SESSION_KEY,
@@ -265,10 +265,37 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
       setSession((current) => ({ ...current, notice: assetError ?? "正在验证建筑记忆和数字样间资产" }));
       return;
     }
+
     if (session.result?.state === "REOPENED") {
-      setSession((current) => ({ ...current, notice: "事件已重新打开。必须先由住户追加新的现场描述、照片观察和水表观察；历史证据不能直接触发下一轮判断。" }));
+      const freshResidentEvidence = hasFreshEvidenceAfterReopen(
+        session.result,
+        (session.residentSubmissions ?? []).map((item) => item.submittedAt)
+      );
+      if (!freshResidentEvidence) {
+        setSession((current) => ({ ...current, notice: "事件已重新打开。必须先由住户追加新的现场描述、照片观察和水表观察；历史证据不能直接触发下一轮判断。" }));
+        return;
+      }
+      setBusy(true);
+      try {
+        const result = resumeReopenedAssessment(engine, session.result, session.controls, Date.now());
+        setSession((current) => ({
+          ...current,
+          result,
+          activeTab: result.state === "INCONCLUSIVE" ? "input" : "diagnosis",
+          selectedView: result.visualDirective.view,
+          selectedBusinessId: result.visualDirective.highlightBusinessIds[0] ?? null,
+          repairDraft: defaultRepairDraft(),
+          postRepair: structuredClone(DEFAULT_POST_REPAIR_CONTROLS),
+          notice: "物业已明确确认本轮湿度与微流量观测；新传感器观察和住户新证据已追加到原事件后重新评估。"
+        }));
+      } catch (reason) {
+        setSession((current) => ({ ...current, notice: reason instanceof Error ? reason.message : "重新检查评估失败" }));
+      } finally {
+        setBusy(false);
+      }
       return;
     }
+
     const counter = session.eventCounter + 1;
     setBusy(true);
     try {
@@ -289,7 +316,7 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
     } finally {
       setBusy(false);
     }
-  }, [assetError, engine, session.controls, session.eventCounter, session.result]);
+  }, [assetError, engine, session.controls, session.eventCounter, session.residentSubmissions, session.result]);
 
   const submitResidentEvidence = useCallback((draft: ResidentEvidenceDraft) => {
     if (!engine) {
@@ -303,9 +330,25 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
     const submissionSequence = (session.residentSubmissions?.length ?? 0) + 1;
     setBusy(true);
     try {
-      const result = reopeningCycle
-        ? resumeReopenedAssessment(engine, session.result!, controls, nowMs)
-        : evaluateControls(engine, controls, counter, nowMs);
+      if (reopeningCycle) {
+        const product = createResidentEvidenceSubmission({
+          draft,
+          eventId: session.result!.eventId,
+          submittedAt: new Date(nowMs).toISOString(),
+          submissionSequence
+        });
+        setSession((current) => ({
+          ...current,
+          controls,
+          residentSubmissions: [...(current.residentSubmissions ?? []), product.submission],
+          productEvidenceTimeline: [...(current.productEvidenceTimeline ?? []), ...product.evidence],
+          photoObservationConfirmation: draft.photo.finding,
+          notice: "住户已追加重新打开后的新描述、照片观察和水表观察。事件仍保持 REOPENED；下一步由物业明确录入并确认本轮湿度与微流量后，再运行确定性评估。"
+        }));
+        return;
+      }
+
+      const result = evaluateControls(engine, controls, counter, nowMs);
       const refs = residentDomainEvidenceRefs(result);
       const product = createResidentEvidenceSubmission({
         draft,
@@ -328,9 +371,7 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
         selectedBusinessId: result.visualDirective.highlightBusinessIds[0] ?? null,
         repairDraft: defaultRepairDraft(),
         postRepair: structuredClone(DEFAULT_POST_REPAIR_CONTROLS),
-        notice: reopeningCycle
-          ? "新的住户现场证据已追加到原事件与原审计链；第一次维修和复验记录保持不变。"
-          : "住户原始描述与人工观察已形成不可变产品证据；只有确认后的照片和水表观察进入确定性判断。"
+        notice: "住户原始描述与人工观察已形成不可变产品证据；只有确认后的照片和水表观察进入确定性判断。"
       }));
     } catch (reason) {
       setSession((current) => ({ ...current, notice: reason instanceof Error ? reason.message : "住户证据提交失败" }));
