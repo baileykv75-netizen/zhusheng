@@ -97,7 +97,10 @@ export function resumeReopenedAssessment(
       sourceActor: "RESIDENT",
       relatedBusinessIds: ["WALL-1602-BATHROOM-NORTH", SPACE_ID],
       capturedAt: observedAt,
-      ...(previousPhoto ? { supersedesId: previousPhoto.id } : {})
+      ...(previousPhoto ? {
+        supersedesId: previousPhoto.id,
+        revisionReason: "事件维修后复验失败并重新打开，住户提交了新的墙面现场观察"
+      } : {})
     }),
     residentEvidence(`EVD-METER-REOPEN-${suffix}`, {
       type: "METER_READING",
@@ -106,7 +109,10 @@ export function resumeReopenedAssessment(
       sourceActor: "RESIDENT",
       relatedBusinessIds: ["METER-1602-FLOW-01"],
       capturedAt: observedAt,
-      ...(previousMeter ? { supersedesId: previousMeter.id } : {})
+      ...(previousMeter ? {
+        supersedesId: previousMeter.id,
+        revisionReason: "事件维修后复验失败并重新打开，住户提交了新的水表现场观察"
+      } : {})
     })
   ];
   const input: LifeEventInput = {
