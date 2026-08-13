@@ -36,6 +36,23 @@ function normalized(value: EvidenceItem["observedValue"]): string {
   return String(value ?? "").trim().toUpperCase();
 }
 
+function humidityIsAnomalous(item: SensorObservation | undefined): boolean {
+  return Boolean(item)
+    && item!.quality === "GOOD"
+    && item!.baseline !== undefined
+    && item!.value >= DIAGNOSTIC_THRESHOLDS.humidity.minimum
+    && item!.value - item!.baseline >= DIAGNOSTIC_THRESHOLDS.humidity.deltaFromBaseline
+    && (item!.durationMinutes ?? 0) >= DIAGNOSTIC_THRESHOLDS.humidity.durationMinutes;
+}
+
+function microFlowIsAnomalous(item: SensorObservation | undefined): boolean {
+  return Boolean(item)
+    && item!.quality === "GOOD"
+    && item!.baseline !== undefined
+    && item!.value - item!.baseline >= DIAGNOSTIC_THRESHOLDS.microFlow.deltaFromBaseline
+    && (item!.durationMinutes ?? 0) >= DIAGNOSTIC_THRESHOLDS.microFlow.durationMinutes;
+}
+
 const missingDefinitions: Array<{
   type: EvidenceType;
   reason: string;
@@ -54,19 +71,12 @@ export function evaluateEvidence(input: LifeEventInput, memory: BuildingMemory):
   const microFlow = input.observations.filter((item) => item.metric === "MICRO_FLOW");
   const latestHumidity = latest(humidity);
   const latestMicroFlow = latest(microFlow);
-  const humidityAnomaly = humidity.some((item) =>
-    item.quality === "GOOD"
-    && item.baseline !== undefined
-    && item.value >= DIAGNOSTIC_THRESHOLDS.humidity.minimum
-    && item.value - item.baseline >= DIAGNOSTIC_THRESHOLDS.humidity.deltaFromBaseline
-    && (item.durationMinutes ?? 0) >= DIAGNOSTIC_THRESHOLDS.humidity.durationMinutes
-  );
-  const microFlowAnomaly = microFlow.some((item) =>
-    item.quality === "GOOD"
-    && item.baseline !== undefined
-    && item.value - item.baseline >= DIAGNOSTIC_THRESHOLDS.microFlow.deltaFromBaseline
-    && (item.durationMinutes ?? 0) >= DIAGNOSTIC_THRESHOLDS.microFlow.durationMinutes
-  );
+
+  // Current-state diagnosis is based on the newest observation for each metric.
+  // Historical observations remain in the immutable event input/audit chain, but
+  // an old abnormal sample must not keep a reopened event abnormal forever.
+  const humidityAnomaly = humidityIsAnomalous(latestHumidity);
+  const microFlowAnomaly = microFlowIsAnomalous(latestMicroFlow);
   const microFlowNormal = Boolean(latestMicroFlow)
     && latestMicroFlow!.quality === "GOOD"
     && latestMicroFlow!.baseline !== undefined
@@ -83,8 +93,8 @@ export function evaluateEvidence(input: LifeEventInput, memory: BuildingMemory):
   const isolationRecovery = isolation.filter((item) => item.status === "PRESENT" && ["FLOW_AND_HUMIDITY_DECREASED", "RECOVERED", "TRUE"].includes(normalized(item.observedValue)));
   const isolationNoRecovery = isolation.filter((item) => item.status === "PRESENT" && ["NO_RECOVERY", "UNCHANGED", "FALSE"].includes(normalized(item.observedValue)));
 
-  const contradictions = microFlowAnomaly && meterNoChange.length
-    ? [{ contradictionId: "CONTRADICTION-MICROFLOW-METER", evidenceIds: [...microFlow.filter((item) => item.baseline !== undefined && item.value > item.baseline).map((item) => item.id), ...meterNoChange.map((item) => item.id)].sort(), explanation: "微流量传感器显示异常，但人工水表观察显示无变化", retestRequired: true }]
+  const contradictions = microFlowAnomaly && meterNoChange.length && latestMicroFlow
+    ? [{ contradictionId: "CONTRADICTION-MICROFLOW-METER", evidenceIds: [latestMicroFlow.id, ...meterNoChange.map((item) => item.id)].sort(), explanation: "最新微流量传感器显示异常，但当前有效人工水表观察显示无变化", retestRequired: true }]
     : [];
 
   const missingEvidence = missingDefinitions.flatMap((definition) => {
@@ -98,8 +108,8 @@ export function evaluateEvidence(input: LifeEventInput, memory: BuildingMemory):
   const criticalMissing = missingEvidence.some((item) => ["METER_READING", "RESIDENT_WALL_PHOTO", "PIPE_INSTALLATION_RECORD"].includes(item.evidenceType));
 
   const facts: Record<string, Fact> = {
-    HUMIDITY_ANOMALY: fact("HUMIDITY_ANOMALY", humidityAnomaly, Math.max(...humidity.map(observationReliability), 0), humidity.map((item) => item.id), "湿度达到持续异常阈值"),
-    MICRO_FLOW_ANOMALY: fact("MICRO_FLOW_ANOMALY", microFlowAnomaly, Math.max(...microFlow.map(observationReliability), 0), microFlow.map((item) => item.id), "无人用水条件下存在持续微流量"),
+    HUMIDITY_ANOMALY: fact("HUMIDITY_ANOMALY", humidityAnomaly, observationReliability(latestHumidity), latestHumidity ? [latestHumidity.id] : [], "最新湿度达到持续异常阈值"),
+    MICRO_FLOW_ANOMALY: fact("MICRO_FLOW_ANOMALY", microFlowAnomaly, observationReliability(latestMicroFlow), latestMicroFlow ? [latestMicroFlow.id] : [], "最新无人用水微流量达到持续异常阈值"),
     MICRO_FLOW_NORMAL: fact("MICRO_FLOW_NORMAL", microFlowNormal, observationReliability(latestMicroFlow), latestMicroFlow ? [latestMicroFlow.id] : [], "最新微流量处于正常范围"),
     METER_SUPPORTS_FLOW: fact("METER_SUPPORTS_FLOW", Boolean(meterSupports.length), Math.max(...meterSupports.map((item) => item.reliability), 0), meterSupports.map((item) => item.id), "人工水表观察支持持续流量"),
     METER_REPORTS_NO_CHANGE: fact("METER_REPORTS_NO_CHANGE", Boolean(meterNoChange.length), Math.max(...meterNoChange.map((item) => item.reliability), 0), meterNoChange.map((item) => item.id), "人工水表观察未见变化"),
