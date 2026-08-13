@@ -146,8 +146,7 @@ test("reopened cycle ignores resident submissions captured before the reopen aud
 });
 
 test("reopened assessment appends fresh evidence to the same event and supersedes stale resident observations", () => {
-  let capturedInput: Record<string, unknown> | null = null;
-  let capturedPrevious: unknown = null;
+  const captured: { input?: Record<string, unknown>; previous?: unknown } = {};
   const previous = {
     state: "REOPENED",
     eventId: "EVT-1602-LAB-001",
@@ -165,8 +164,8 @@ test("reopened assessment appends fresh evidence to the same event and supersede
   } as never;
   const engine = {
     evaluate(input: Record<string, unknown>, prior: unknown) {
-      capturedInput = input;
-      capturedPrevious = prior;
+      captured.input = input;
+      captured.previous = prior;
       return previous;
     }
   } as never;
@@ -184,10 +183,10 @@ test("reopened assessment appends fresh evidence to the same event and supersede
 
   const returned = resumeReopenedAssessment(engine, previous, controls, Date.parse("2026-08-13T10:00:05.000Z"));
   assert.equal(returned, previous);
-  assert.equal(capturedPrevious, previous);
-  assert.equal(capturedInput?.eventId, "EVT-1602-LAB-001");
-  const evidence = capturedInput?.evidence as Array<{ id: string; supersedesId?: string }>;
+  assert.equal(captured.previous, previous);
+  assert.equal(captured.input?.eventId, "EVT-1602-LAB-001");
+  const evidence = captured.input?.evidence as Array<{ id: string; supersedesId?: string }>;
   assert.equal(evidence.every((item) => item.id.includes("REOPEN")), true);
   assert.deepEqual(evidence.map((item) => item.supersedesId), ["OLD-PHOTO", "OLD-METER"]);
-  assert.equal((capturedInput?.observations as Array<{ observedAt: string }>).every((item) => item.observedAt > "2026-08-13T10:00:00.000Z"), true);
+  assert.equal((captured.input?.observations as Array<{ observedAt: string }>).every((item) => item.observedAt > "2026-08-13T10:00:00.000Z"), true);
 });
