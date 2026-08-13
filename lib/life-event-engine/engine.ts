@@ -108,6 +108,10 @@ function latestAction(log: readonly AuditEvent[], actionType: string): AuditEven
   return [...log].reverse().find((event) => event.actionType === actionType);
 }
 
+function latestAuthorizationRequestTime(log: readonly AuditEvent[], targetBusinessId: string): string | undefined {
+  return [...log].reverse().find((item) => item.actionType === "HUMAN_AUTHORIZATION_REQUESTED" && item.actionTargetBusinessId === targetBusinessId)?.timestamp;
+}
+
 function observationIsNormal(item: LifeEventInput["observations"][number]): boolean {
   if (item.quality !== "GOOD" || item.baseline === undefined) return false;
   if (item.metric === "MICRO_FLOW") return item.value - item.baseline < DIAGNOSTIC_THRESHOLDS.microFlow.normalDelta;
@@ -309,10 +313,9 @@ export class LifeEventEngine {
     }
 
     if (state === "AUTHORIZATION_PENDING" && proposal) {
-      const authorization = evaluateAuthorization(this.memory, input.eventId, proposal, input.authorizationRecords);
       const request = [...(previous?.auditLog ?? []), ...pending].reverse().find((item) => item.actionType === "HUMAN_AUTHORIZATION_REQUESTED" && item.actionTargetBusinessId === proposal!.targetBusinessId);
       const requestTime = "timestamp" in (request ?? {}) ? (request as AuditEvent).timestamp : input.evaluatedAt;
-      if (authorization.record && Date.parse(authorization.record.decidedAt) < Date.parse(requestTime)) throw new Error("Authorization time cannot precede the authorization request");
+      const authorization = evaluateAuthorization(this.memory, input.eventId, proposal, input.authorizationRecords, requestTime);
       if (authorization.status === "REJECTED") {
         const alreadyLogged = previous?.auditLog.some((item) => item.authorizationRecordIds.includes(authorization.record!.authorizationId));
         if (!alreadyLogged) pending.push({
@@ -379,7 +382,8 @@ export class LifeEventEngine {
     }, auditClock);
 
     const visualDirective = createVisualDirective(this.memory, this.manifest, top, evidence, state, valvePosition, allowedActions, authorizationRequests.length > 0);
-    const authorization = proposal ? evaluateAuthorization(this.memory, input.eventId, proposal, input.authorizationRecords) : null;
+    const currentRequestTime = proposal ? latestAuthorizationRequestTime(auditLog, proposal.targetBusinessId) : undefined;
+    const authorization = proposal ? evaluateAuthorization(this.memory, input.eventId, proposal, input.authorizationRecords, currentRequestTime) : null;
     return {
       eventId: input.eventId, state, valvePosition, rankedHypotheses: ranking,
       decisionConfidence: top.confidence as LifeEventResult["decisionConfidence"], supportingEvidence: evidence.supportingEvidence,
