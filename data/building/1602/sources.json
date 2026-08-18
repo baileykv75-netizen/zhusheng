@@ -35,9 +35,9 @@
     "sourceId": "SRC-SYNTHETIC-MEMORY-1602",
     "sourceClass": "SYNTHETIC_ENGINEERING_RECORD",
     "synthetic": true,
-    "label": "1602 合成施工记忆包",
-    "path": "data/building/1602/records.json",
-    "note": "为演示建筑记忆如何影响后续诊断而构造，按常见施工协调、返工与验收逻辑组织，不代表真实项目竣工记录。"
+    "label": "1602 完整生命周期合成施工记忆包",
+    "path": "data/building/1602/memory-*.json",
+    "note": "包含正常施工、隐蔽检查、现场协调、少量返工、交付基线与运行观察；用于演示建筑历史如何影响后续诊断，按工程逻辑组织但不代表真实项目竣工档案。"
   },
   {
     "sourceId": "SRC-RUNTIME-1602",
