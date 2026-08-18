@@ -50,7 +50,7 @@ export function createGatewayServer(options: ServerOptions = {}): { server: Serv
           provider: "deepseek",
           providerConfigured: Boolean(config.apiKey),
           model: config.model,
-          deploymentMode: config.publicMode ? "public" : "local"
+          ...(config.publicMode ? { deploymentMode: "public" as const } : {})
         });
         return;
       }
