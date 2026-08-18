@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { DemoProvider } from "@/components/demo-provider";
 import { LifecycleJourneyProvider } from "@/components/lifecycle-journey-provider";
+import { BuildingContextProvider } from "@/components/product/BuildingContextProvider";
 import { Shell } from "@/components/shell";
 import "./globals.css";
 import "./v6.css";
@@ -25,7 +26,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Suspense fallback={null}>
           <DemoProvider>
             <LifecycleJourneyProvider>
-              <Shell>{children}</Shell>
+              <BuildingContextProvider>
+                <Shell>{children}</Shell>
+              </BuildingContextProvider>
             </LifecycleJourneyProvider>
           </DemoProvider>
         </Suspense>
