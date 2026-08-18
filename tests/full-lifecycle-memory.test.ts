@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { building1602Dataset } from "../lib/building-intelligence/catalog.ts";
 import { getConstructionHistory, getInspectionHistory } from "../lib/building-intelligence/queries.ts";
-import type { BuildingRecord } from "../lib/building-intelligence/types.ts";
+import type { BuildingMemoryTrade, BuildingRecord } from "../lib/building-intelligence/types.ts";
 
 const records: BuildingRecord[] = building1602Dataset.records;
 
@@ -21,8 +21,13 @@ test("1602 full lifecycle memory pack has enough depth without becoming an anoma
 });
 
 test("memory pack covers the bathroom's major trades and lifecycle stages", () => {
-  const trades = new Set(records.map((record) => record.memory?.trade).filter(Boolean));
-  for (const trade of ["COLD_WATER", "HOT_WATER", "DRAINAGE", "WATERPROOFING", "ELECTRICAL", "FIXTURES", "ARCHITECTURE", "ENVIRONMENT", "HANDOVER", "OPERATIONS"]) {
+  const trades = new Set<BuildingMemoryTrade>(
+    records
+      .map((record) => record.memory?.trade)
+      .filter((trade): trade is BuildingMemoryTrade => trade !== undefined)
+  );
+  const requiredTrades: BuildingMemoryTrade[] = ["COLD_WATER", "HOT_WATER", "DRAINAGE", "WATERPROOFING", "ELECTRICAL", "FIXTURES", "ARCHITECTURE", "ENVIRONMENT", "HANDOVER", "OPERATIONS"];
+  for (const trade of requiredTrades) {
     assert.ok(trades.has(trade), `missing trade ${trade}`);
   }
 
