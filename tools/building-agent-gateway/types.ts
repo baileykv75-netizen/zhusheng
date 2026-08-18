@@ -70,9 +70,10 @@ export type GatewayFailure = {
 export type GatewayConfig = {
   apiKey: string;
   model: string;
-  host: "127.0.0.1" | "localhost" | "::1";
+  host: "127.0.0.1" | "localhost" | "::1" | "0.0.0.0";
   port: number;
   allowedOrigins: string[];
+  publicMode: boolean;
   timeoutMs: number;
   maxInputChars: number;
   maxOutputTokens: number;
