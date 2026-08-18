@@ -1,0 +1,44 @@
+/* Display-copy typography rules. Prose keeps normal Chinese punctuation; cinematic headings do not. */
+.display-headline {
+  text-wrap: balance;
+  line-break: strict;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.display-headline-line {
+  display: block;
+}
+
+/* Keep the homepage chapter scale cinematic without forcing the last one or two Han characters onto a third line. */
+.v6-chapter-copy h2.display-headline {
+  font-size: clamp(36px, 3.7vw, 60px);
+  line-height: 1.16;
+  letter-spacing: -.04em;
+}
+
+.v6-manifesto h2.display-headline,
+.case-intro h1.display-headline,
+.case-current-card h2.display-headline {
+  text-wrap: balance;
+}
+
+/* On wide exhibition screens the authored two-line phrases should stay intact. */
+@media (min-width: 1450px) {
+  .v6-chapter-copy h2.display-headline .display-headline-line,
+  .v6-manifesto h2.display-headline .display-headline-line,
+  .case-intro h1.display-headline .display-headline-line {
+    white-space: nowrap;
+  }
+}
+
+/* On narrower screens wrapping is allowed again rather than overflowing the content column. */
+@media (max-width: 1449px) {
+  .v6-chapter-copy h2.display-headline {
+    font-size: clamp(34px, 4vw, 56px);
+  }
+
+  .display-headline-line {
+    white-space: normal;
+  }
+}
