@@ -138,6 +138,24 @@ export function getComponentsBehindSurface(surfaceBusinessId: string, dataset = 
   return result("get_components_behind_surface", "OK", entities, facts, [surfaceBusinessId, ...ids]);
 }
 
+function historyFactValue(record: BuildingRecord) {
+  const parts = [record.occurredAt, record.title, record.summary];
+  const memory = record.memory;
+  if (!memory) return parts.join("｜");
+  if (memory.memoryClass) parts.push(`记忆分类:${memory.memoryClass}`);
+  if (memory.reason) parts.push(`形成原因:${memory.reason}`);
+  if (memory.fieldDecision) parts.push(`现场处理:${memory.fieldDecision}`);
+  if (memory.workerStatement) parts.push(`工友留痕:${memory.workerStatement}`);
+  if (memory.verification) {
+    parts.push(`验证方法:${memory.verification.method}`);
+    parts.push(`验证结果:${memory.verification.result}`);
+    if (memory.verification.checkedItems.length) parts.push(`已检查:${memory.verification.checkedItems.join("、")}`);
+    if (memory.verification.uncheckedItems.length) parts.push(`未检查:${memory.verification.uncheckedItems.join("、")}`);
+  }
+  if (memory.residualRisk) parts.push(`事实边界:${memory.residualRisk}`);
+  return parts.join("｜");
+}
+
 function history(tool: BuildingQueryToolName, recordType: BuildingRecord["recordType"], businessId: string, dataset = building1602Dataset) {
   const entity = entityById(businessId, dataset);
   if (!entity) return result(tool, "NOT_FOUND", [], [], []);
@@ -147,7 +165,7 @@ function history(tool: BuildingQueryToolName, recordType: BuildingRecord["record
     const sourceIds = searchedRangeSourceIds(inspectedRange, entity.provenance.sourceId);
     return result(tool, "NOT_RECORDED", [], [notRecordedFact(tool, businessId, `records.${recordType}`, sourceIds, dataset)], [businessId]);
   }
-  const facts = records.map((record) => ({ factId: record.recordId, subjectBusinessId: businessId, predicate: `${recordType.toLowerCase()}Record`, value: `${record.occurredAt}｜${record.title}｜${record.summary}`, sourceIds: [record.provenance.sourceId], provenance: [record.provenance.sourceClass] } satisfies BuildingFact));
+  const facts = records.map((record) => ({ factId: record.recordId, subjectBusinessId: businessId, predicate: `${recordType.toLowerCase()}Record`, value: historyFactValue(record), sourceIds: [record.provenance.sourceId], provenance: [record.provenance.sourceClass] } satisfies BuildingFact));
   return result(tool, "OK", records, facts, records.flatMap((item) => item.subjectBusinessIds));
 }
 
