@@ -6,8 +6,8 @@ services:
     region: singapore
     repo: https://github.com/baileykv75-netizen/zhusheng
     branch: gpt/step4-guarded-lifecycle
-    buildCommand: corepack enable && pnpm install --frozen-lockfile
-    startCommand: corepack enable && pnpm agent:gateway
+    buildCommand: pnpm install --frozen-lockfile
+    startCommand: pnpm agent:gateway
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
