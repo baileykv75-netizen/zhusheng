@@ -11,9 +11,15 @@ import styles from "./BuildingIntelligenceWorkspace.module.css";
 
 const examples = ["卫生间有臭味可能是什么原因？", "卫生间墙脚潮湿可能是什么原因？", "北墙后面有哪些构件？", "重点冷水接头留下了哪些施工记录？"];
 const memoryTradeCount = new Set(building1602Dataset.records.map((record) => record.memory?.trade).filter(Boolean)).size;
-type Props = { selectedBusinessId: string | null; result: BuildingAgentTurnResult | null; onResult(result: BuildingAgentTurnResult | null): void };
+type Props = {
+  selectedBusinessId: string | null;
+  result: BuildingAgentTurnResult | null;
+  onResult(result: BuildingAgentTurnResult | null): void;
+  idPrefix?: string;
+  showVisualState?: boolean;
+};
 
-export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onResult }: Props) {
+export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onResult, idPrefix = "building", showVisualState = true }: Props) {
   const [question, setQuestion] = useState("");
   const [busy, setBusy] = useState(false);
   const [health, setHealth] = useState<GatewayHealth | null>(null);
@@ -32,7 +38,7 @@ export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onRe
     <div className={styles.memoryScope}><strong>{building1602Dataset.records.length}</strong><span>条生命周期记忆</span><i /><strong>{memoryTradeCount}</strong><span>类专业/阶段</span><i /><span>施工 → 验收 → 交付 → 运行</span></div>
     {selected ? <button className="selected-context" type="button" onClick={() => setQuestion(`请说明${selected.displayName}的已记录信息`)}><LocateFixed size={14} /><span>已选中 {selected.displayName}</span><strong>问筑生这个构件</strong></button> : null}
     <div className="building-ai-examples">{examples.map((item) => <button key={item} type="button" onClick={() => setQuestion(item)}>{item}<ArrowUp size={13} /></button>)}</div>
-    <QuestionForm question={question} busy={busy} setQuestion={setQuestion} ask={ask} />
+    <QuestionForm idPrefix={idPrefix} question={question} busy={busy} setQuestion={setQuestion} ask={ask} />
     {!health ? <p className="building-ai-unavailable"><TriangleAlert size={13} /> LIVE AI UNAVAILABLE · 可继续使用本地确定性只读查询</p> : null}
   </section>;
 
@@ -81,7 +87,7 @@ export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onRe
 
       {synthetic ? <div className={styles.demoNote}><TriangleAlert size={13} /><span>DEMO DATA</span><p>部分工程记录为合成数据；用于演示“建筑历史如何改变诊断顺序”，不冒充真实竣工档案。</p></div> : null}
 
-      {result.visualDirective ? <div className="ai-visual-state"><Box size={14} /><span>3D 已响应</span><strong>{result.visualDirective.mode}</strong><small>{result.visualDirective.targetBusinessIds.length} 个空间对象</small></div> : null}
+      {showVisualState && result.visualDirective ? <div className="ai-visual-state"><Box size={14} /><span>3D 已响应</span><strong>{result.visualDirective.mode}</strong><small>{result.visualDirective.targetBusinessIds.length} 个空间对象</small></div> : null}
       {result.proposedAction ? <div className="ai-proposed-action"><ShieldCheck size={15} /><p><strong>只提出下一步：{result.proposedAction.type}</strong>需要独立人工授权；本次查询没有执行任何设备动作或事件状态变更。</p></div> : null}
 
       <details className={styles.technicalDetails}>
@@ -92,9 +98,9 @@ export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onRe
           <section className="ai-sources"><header><ShieldCheck size={14} /><span>来源</span></header>{result.sources.map((source) => <article key={source.sourceId}><div><strong>{source.label}</strong><small>{source.sourceClass}</small></div><em className={source.synthetic ? "synthetic" : "verified"}>{source.synthetic ? "合成记录" : "可追溯"}</em><p>{source.note}</p></article>)}</section>
         </div>
       </details>
-    </div><QuestionForm question={question} busy={busy} setQuestion={setQuestion} ask={ask} compact />
+    </div><QuestionForm idPrefix={idPrefix} question={question} busy={busy} setQuestion={setQuestion} ask={ask} compact />
   </section>;
 }
 
 function GatewayBadge({ health, mode }: { health: GatewayHealth | null; mode?: BuildingAgentTurnResult["mode"] }) { const live = mode === "LIVE_AI" || mode === "LIVE_AI_CLARIFICATION" || (!mode && health?.providerConfigured); return <span className={`gateway-badge ${live ? "live" : "local"}`}><i />{live ? `${mode === "LIVE_AI_CLARIFICATION" ? "LIVE AI · CLARIFICATION" : "LIVE AI"} · ${health?.model ?? "DeepSeek"}` : "LOCAL READ-ONLY QUERY"}</span>; }
-function QuestionForm({ question, busy, setQuestion, ask, compact = false }: { question: string; busy: boolean; setQuestion(value: string): void; ask(event?: FormEvent): void; compact?: boolean }) { return <form className={`building-ai-form ${compact ? "compact" : ""}`} onSubmit={ask}><label htmlFor={compact ? "building-question-next" : "building-question"}>向筑生提问</label><textarea id={compact ? "building-question-next" : "building-question"} value={question} onChange={(event) => setQuestion(event.target.value)} rows={compact ? 1 : 2} placeholder="例如：卫生间有臭味可能是什么原因？" /><button type="submit" aria-label="发送问题" disabled={!question.trim() || busy}>{busy ? <LoaderCircle className="spin" size={17} /> : <ArrowUp size={17} />}</button></form>; }
+function QuestionForm({ idPrefix, question, busy, setQuestion, ask, compact = false }: { idPrefix: string; question: string; busy: boolean; setQuestion(value: string): void; ask(event?: FormEvent): void; compact?: boolean }) { const id = `${idPrefix}-${compact ? "next" : "question"}`; return <form className={`building-ai-form ${compact ? "compact" : ""}`} onSubmit={ask}><label htmlFor={id}>向筑生提问</label><textarea id={id} value={question} onChange={(event) => setQuestion(event.target.value)} rows={compact ? 1 : 2} placeholder="例如：卫生间有臭味可能是什么原因？" /><button type="submit" aria-label="发送问题" disabled={!question.trim() || busy}>{busy ? <LoaderCircle className="spin" size={17} /> : <ArrowUp size={17} />}</button></form>; }
