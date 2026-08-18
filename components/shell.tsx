@@ -1,55 +1,52 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ArrowRight, BriefcaseBusiness, Building2, ChevronDown, ClipboardPenLine, House, ListTree, Menu, Sparkles, UsersRound } from "lucide-react";
 import { deriveJourneyView } from "@/lib/journey/index.ts";
+import { productNavigation } from "@/lib/product/product-navigation";
 import { useDemo } from "./demo-provider";
 import { useLifecycleJourney } from "./lifecycle-journey-provider";
 import { BuildingAgentDrawer } from "./building-agent/BuildingAgentDrawer";
+import { useBuildingProductContext } from "./product/BuildingContextProvider";
 
-const workspaces = [
-  { href: "/events", label: "建筑事件中心", icon: ListTree },
-  { href: "/worker", label: "施工证据采集", icon: ClipboardPenLine },
-  { href: "/resident", label: "住户服务", icon: House },
-  { href: "/property", label: "物业运行席", icon: BriefcaseBusiness },
-  { href: "/group?mode=task", label: "集团人工治理", icon: UsersRound }
-] as const;
+const iconByHref = {
+  "/events": ListTree,
+  "/worker": ClipboardPenLine,
+  "/resident": House,
+  "/property": BriefcaseBusiness,
+  "/group?mode=task": UsersRound
+} as const;
 
-const workspaceLabels: Record<string, string> = {
-  "/": "筑生总智能体",
-  "/case-1602": "1602建筑生命事件",
-  "/events": "建筑生命事件中心",
-  "/worker": "施工证据采集",
-  "/resident": "住户服务",
-  "/property": "物业运行席",
-  "/group": "集团人工治理"
-};
+const workspaceLinks = productNavigation.flatMap((item) => {
+  if (!item.available || item.id === "OVERVIEW" || item.id === "MEMORY") return [];
+  if (item.children) return item.children.map((child) => ({ ...child, group: item.label, english: item.english }));
+  if (!item.href) return [];
+  return [{ href: item.href, label: item.label, group: item.label, english: item.english }];
+});
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const [agentOpen, setAgentOpen] = useState(false);
-  const pathname = usePathname();
-  const currentPath = pathname.length > 1 ? pathname.replace(/\/+$/, "") : "/";
   const { state } = useDemo();
   const { session: lifecycleSession } = useLifecycleJourney();
-  const isHome = currentPath === "/";
-  const isExhibit = isHome || currentPath === "/case-1602";
-  const workspaceLabel = workspaceLabels[currentPath] ?? "专业工作台";
+  const product = useBuildingProductContext();
+  const isHome = product.currentPath === "/";
+  const isCinematic = product.presentationMode === "CINEMATIC";
   const journey = lifecycleSession.result
     ? deriveJourneyView({ source: "LIFE_EVENT", state: lifecycleSession.result.state })
     : deriveJourneyView({ source: "DEMO", snapshot: state });
+  const locationContext = [product.floorId, product.unitId, product.spaceLabel].filter(Boolean).join(" / ");
 
-  if (isExhibit) return <><div className="exhibit-shell">
+  if (isCinematic) return <><div className="exhibit-shell" data-product-mode="cinematic" data-product-area={product.area.toLowerCase()}>
     <header className="exhibit-header">
       <Link href="/" className="exhibit-brand"><span>筑</span><strong>筑生</strong></Link>
-      <nav className="exhibit-nav" aria-label="筑生展演导航"><Link href="/#concept">概念</Link><Link href="/events">建筑事件</Link><Link href="/case-1602">1602生命事件</Link><button type="button" onClick={() => setAgentOpen(true)}><Sparkles size={13} />问这栋房子</button></nav>
-      <Link href={isHome ? "/case-1602" : "/"} className="exhibit-header-action">{isHome ? "进入事件" : "返回概念"}<ArrowRight size={15} /></Link>
+      <nav className="exhibit-nav" aria-label="筑生产品导航"><Link href="/#concept">概念</Link><Link href="/events">生命事件</Link><Link href="/case-1602">1602深度事件</Link><button type="button" onClick={() => setAgentOpen(true)}><Sparkles size={13} />问这栋房子</button></nav>
+      <Link href={isHome ? "/case-1602" : "/"} className="exhibit-header-action">{isHome ? "进入建筑事件" : "返回产品概念"}<ArrowRight size={15} /></Link>
     </header>
     <main>{children}</main>
   </div><BuildingAgentDrawer open={agentOpen} onClose={() => setAgentOpen(false)} /></>;
 
-  return <><div className="app-shell journey-shell">
+  return <><div className="app-shell journey-shell" data-product-mode="work" data-product-area={product.area.toLowerCase()}>
     <aside className="brand-rail compact-brand-rail">
       <Link href="/" className="brand-signature" aria-label="返回筑生总智能体">
         <span>筑</span><strong>筑生</strong>
@@ -58,27 +55,31 @@ export function Shell({ children }: { children: React.ReactNode }) {
     </aside>
 
     <header className="floating-project-bar journey-project-bar">
-      <Link href="/" className="project-identity" aria-label="筑生总智能体首页">
+      <Link href="/" className="project-identity" aria-label="筑生建筑总览">
         <span className="project-pulse" />
-        <div><small>BUILDING LIFE / 02</small><strong>华章新筑 · 2号楼</strong></div>
+        <div><small>BUILDING LIFE / 02</small><strong>{product.buildingLabel}</strong></div>
       </Link>
-      <div className="workspace-context"><span>{workspaceLabel}</span><em>{journey.stateLabel}</em></div>
-      <div className="project-meta"><span>BLD-HZZ-02</span><span className="runtime-mode"><i />脱敏演示数据</span></div>
-      {!isHome ? <Link className="return-agent" href={currentPath === "/events" ? "/" : "/case-1602"}><Building2 size={15} />{currentPath === "/events" ? "返回筑生" : "返回1602事件"}</Link> : null}
+      <div className="workspace-context"><span>{product.workspaceLabel}</span><em>{locationContext || journey.stateLabel}</em></div>
+      <div className="project-meta"><span>{product.buildingId}</span><span className="runtime-mode"><i />脱敏演示数据</span></div>
+      <Link className="return-agent" href={product.currentPath === "/events" ? "/" : "/case-1602"}><Building2 size={15} />{product.currentPath === "/events" ? "返回建筑总览" : "返回1602事件"}</Link>
       <details className="workspace-menu">
-        <summary aria-label="打开专业工作台菜单"><Menu size={17} /><span>专业工具</span><ChevronDown size={13} /></summary>
-        <nav aria-label="专业工作台">
+        <summary aria-label="打开筑生产品导航"><Menu size={17} /><span>产品导航</span><ChevronDown size={13} /></summary>
+        <nav aria-label="筑生产品导航">
           <button type="button" onClick={() => setAgentOpen(true)}><Sparkles size={15} /><span>问这栋房子</span></button>
-          {workspaces.map(({ href, label, icon: Icon }) => <Link key={href} href={href}><Icon size={15} /><span>{label}</span></Link>)}
+          {workspaceLinks.map(({ href, label, group, english }) => {
+            const Icon = iconByHref[href as keyof typeof iconByHref] ?? Building2;
+            const displayLabel = group === label ? label : `${group} · ${label}`;
+            return <Link key={href} href={href} title={`${group} / ${english}`}><Icon size={15} /><span>{displayLabel}</span></Link>;
+          })}
         </nav>
       </details>
     </header>
 
     <main data-journey-stage={journey.stage}>{children}</main>
 
-    <nav className="mobile-task-nav" aria-label="移动端工作台导航">
-      <Link href="/case-1602"><Building2 size={17} /><span>1602生命事件</span></Link>
-      <details><summary><Menu size={17} /><span>{isHome ? "专业工具" : workspaceLabel}</span></summary><div><button type="button" onClick={() => setAgentOpen(true)}><Sparkles size={15} />问这栋房子</button>{workspaces.map(({ href, label, icon: Icon }) => <Link key={href} href={href}><Icon size={15} />{label}</Link>)}</div></details>
+    <nav className="mobile-task-nav" aria-label="移动端产品导航">
+      <Link href="/case-1602"><Building2 size={17} /><span>{product.eventId ? "1602生命事件" : "建筑总览"}</span></Link>
+      <details><summary><Menu size={17} /><span>{product.workspaceLabel}</span></summary><div><button type="button" onClick={() => setAgentOpen(true)}><Sparkles size={15} />问这栋房子</button>{workspaceLinks.map(({ href, label, group }) => { const Icon = iconByHref[href as keyof typeof iconByHref] ?? Building2; return <Link key={href} href={href}><Icon size={15} />{group === label ? label : `${group} · ${label}`}</Link>; })}</div></details>
     </nav>
   </div><BuildingAgentDrawer open={agentOpen} onClose={() => setAgentOpen(false)} /></>;
 }
