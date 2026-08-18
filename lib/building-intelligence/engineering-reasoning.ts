@@ -41,9 +41,9 @@ function hasTag(record: BuildingRecord, tag: string) {
   return record.memory?.diagnosticTags?.includes(tag) ?? false;
 }
 
-function overlap(a: string[], b: string[]) {
-  const right = new Set(b);
-  return a.some((id) => right.has(id));
+function componentOverlap(a: string[], b: string[]) {
+  const right = new Set(b.filter((id) => !id.startsWith("SYS-")));
+  return a.some((id) => !id.startsWith("SYS-") && right.has(id));
 }
 
 function memoryCandidates(tag: string, facts: BuildingFact[]) {
@@ -59,7 +59,7 @@ function matchingInspection(record: BuildingRecord, tag: string, facts: Building
     candidate.recordType === "INSPECTION"
     && queried.has(candidate.recordId)
     && hasTag(candidate, tag)
-    && overlap(candidate.subjectBusinessIds, record.subjectBusinessIds)
+    && componentOverlap(candidate.subjectBusinessIds, record.subjectBusinessIds)
   );
 }
 
