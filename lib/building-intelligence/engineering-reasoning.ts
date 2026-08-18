@@ -47,11 +47,6 @@ function hasAnyTag(record: BuildingRecord, tags: string[]) {
   return tags.some((tag) => current.has(tag));
 }
 
-function overlap(a: string[], b: string[]) {
-  const right = new Set(b);
-  return a.some((id) => right.has(id));
-}
-
 function memoryCandidates(tags: string[], facts: BuildingFact[]) {
   const queried = queriedRecordIds(facts);
   return building1602Dataset.records
@@ -69,14 +64,22 @@ function memoryCandidates(tags: string[], facts: BuildingFact[]) {
     );
 }
 
+function inspectionMatchScore(record: BuildingRecord, candidate: BuildingRecord) {
+  const specific = (ids: string[]) => ids.filter((id) => !id.startsWith("SPACE-") && !id.startsWith("SYS-"));
+  const candidateSpecific = new Set(specific(candidate.subjectBusinessIds));
+  const candidateAll = new Set(candidate.subjectBusinessIds);
+  const sharedSpecific = specific(record.subjectBusinessIds).filter((id) => candidateSpecific.has(id)).length;
+  const sharedAll = record.subjectBusinessIds.filter((id) => candidateAll.has(id)).length;
+  return sharedSpecific * 100 + sharedAll;
+}
+
 function matchingInspection(record: BuildingRecord, tags: string[], facts: BuildingFact[]) {
   const queried = queriedRecordIds(facts);
-  return building1602Dataset.records.find((candidate) =>
-    candidate.recordType === "INSPECTION"
-    && queried.has(candidate.recordId)
-    && hasAnyTag(candidate, tags)
-    && overlap(candidate.subjectBusinessIds, record.subjectBusinessIds)
-  );
+  return building1602Dataset.records
+    .filter((candidate) => candidate.recordType === "INSPECTION" && queried.has(candidate.recordId) && hasAnyTag(candidate, tags))
+    .map((candidate) => ({ candidate, score: inspectionMatchScore(record, candidate) }))
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score || a.candidate.occurredAt.localeCompare(b.candidate.occurredAt))[0]?.candidate;
 }
 
 function dateLabel(value: string) {
@@ -108,9 +111,7 @@ function lightingFacts(facts: BuildingFact[]) {
 function profileForQuestion(question: string): DiagnosticProfile | null {
   if (/(臭味|异味|返味|反味|臭气|下水道味)/u.test(question)) {
     return {
-      kind: "DRAINAGE_ODOR",
-      tags: ["ODOR"],
-      label: "返味",
+      kind: "DRAINAGE_ODOR", tags: ["ODOR"], label: "返味",
       fallback: [
         { id: "WATER_SEAL_LOW", title: "地漏或台盆水封不足", mechanism: "水封不足或干涸时，排水管内气体可能通过排水末端进入室内。", verification: "先检查地漏与台盆存水状态；补水后短时间观察气味是否明显减弱。", priority: 1 },
         { id: "DRAIN_INTERFACE_SEAL", title: "排水接口密封异常", mechanism: "器具与排水接口之间如果出现密封失效，可能形成绕过水封的气味通道。", verification: "检查坐便器底部、台盆排水接口和地漏周边是否存在松动、开裂或密封缺口。", priority: 2 },
@@ -120,9 +121,7 @@ function profileForQuestion(question: string): DiagnosticProfile | null {
   }
   if (/(镜前灯|顶灯|照明|灯具)/u.test(question) && /(不亮|闪烁|跳闸|异常|故障|原因|为什么|排查)/u.test(question)) {
     return {
-      kind: "LIGHTING_FAULT",
-      tags: ["LIGHTING", "FLICKER"],
-      label: "照明异常",
+      kind: "LIGHTING_FAULT", tags: ["LIGHTING", "FLICKER"], label: "照明异常",
       fallback: [
         { id: "LIGHT_TERMINAL", title: "灯具端子或出线盒接触异常", mechanism: "灯具端子或出线盒连接状态异常可能造成间歇性不亮或闪烁。", verification: "先检查对应灯具端子与出线盒，再结合上游回路状态继续排查。", priority: 1 },
         { id: "UPSTREAM_POWER", title: "上游供电或开关异常", mechanism: "若灯具端部正常，应继续核对开关和照明回路供电。", verification: "检查开关动作与同回路其他灯具表现，再决定是否向上游回路排查。", priority: 2 }
@@ -131,9 +130,7 @@ function profileForQuestion(question: string): DiagnosticProfile | null {
   }
   if (/(排水不畅|排水变慢|下水慢|地漏堵|排水异常)/u.test(question)) {
     return {
-      kind: "SLOW_DRAIN",
-      tags: ["SLOW_DRAIN", "LOCAL_DEPOSIT"],
-      label: "排水变慢",
+      kind: "SLOW_DRAIN", tags: ["SLOW_DRAIN", "LOCAL_DEPOSIT"], label: "排水变慢",
       fallback: [
         { id: "LOCAL_BLOCKAGE", title: "排水末端或支管局部积污", mechanism: "地漏、存水弯或支管内局部积污可能造成排水变慢。", verification: "先从可维护末端清洁与通水观察开始，再决定是否继续检查支管。", priority: 1 },
         { id: "ROUTE_SLOPE", title: "局部坡度或排水路径问题", mechanism: "局部坡度不连续或路径阻力增大也可能造成排水迟缓。", verification: "在末端无明显堵塞后，再结合管线历史与现场通水表现检查支管。", priority: 2 }
@@ -142,9 +139,7 @@ function profileForQuestion(question: string): DiagnosticProfile | null {
   }
   if (/(潮湿|返潮|湿痕|水印|渗水|漏水|墙脚湿|地面湿|微流量)/u.test(question)) {
     return {
-      kind: "DAMPNESS",
-      tags: ["DAMPNESS", "LEAKAGE", "COLD_WATER_LEAK", "MICROFLOW"],
-      label: "潮湿/渗漏",
+      kind: "DAMPNESS", tags: ["DAMPNESS", "LEAKAGE", "COLD_WATER_LEAK", "MICROFLOW"], label: "潮湿/渗漏",
       fallback: [
         { id: "PRESSURIZED_WATER", title: "给水微漏", mechanism: "墙内给水连接点或管段的微漏可能形成持续湿痕，并与静置微流量相互印证。", verification: "先比较微流量、湿度与空间位置，再通过人工授权后的局部隔离验证缩小范围。", priority: 1 },
         { id: "WATERPROOF_NODE", title: "湿区防水节点异常", mechanism: "地漏根部或墙地交界等防水节点在用水后可能表现为局部潮湿。", verification: "观察潮湿与淋浴用水的时间关系，并先做非破坏性表面含水与下层观察。", priority: 2 }
