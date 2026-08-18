@@ -9,6 +9,7 @@ import { useDemo } from "./demo-provider";
 import { useLifecycleJourney } from "./lifecycle-journey-provider";
 import { BuildingAgentDrawer } from "./building-agent/BuildingAgentDrawer";
 import { useBuildingProductContext } from "./product/BuildingContextProvider";
+import { ProductShellFrame } from "./product/ProductShellFrame";
 
 const iconByHref = {
   "/events": ListTree,
@@ -37,16 +38,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
     : deriveJourneyView({ source: "DEMO", snapshot: state });
   const locationContext = [product.floorId, product.unitId, product.spaceLabel].filter(Boolean).join(" / ");
 
-  if (isCinematic) return <><div className="exhibit-shell" data-product-mode="cinematic" data-product-area={product.area.toLowerCase()}>
+  if (isCinematic) return <><ProductShellFrame mode={product.presentationMode} area={product.area}>
     <header className="exhibit-header">
       <Link href="/" className="exhibit-brand"><span>筑</span><strong>筑生</strong></Link>
       <nav className="exhibit-nav" aria-label="筑生产品导航"><Link href="/#concept">概念</Link><Link href="/events">生命事件</Link><Link href="/case-1602">1602深度事件</Link><button type="button" onClick={() => setAgentOpen(true)}><Sparkles size={13} />问这栋房子</button></nav>
       <Link href={isHome ? "/case-1602" : "/"} className="exhibit-header-action">{isHome ? "进入建筑事件" : "返回产品概念"}<ArrowRight size={15} /></Link>
     </header>
     <main>{children}</main>
-  </div><BuildingAgentDrawer open={agentOpen} onClose={() => setAgentOpen(false)} /></>;
+  </ProductShellFrame><BuildingAgentDrawer open={agentOpen} onClose={() => setAgentOpen(false)} /></>;
 
-  return <><div className="app-shell journey-shell" data-product-mode="work" data-product-area={product.area.toLowerCase()}>
+  return <><ProductShellFrame mode={product.presentationMode} area={product.area}>
     <aside className="brand-rail compact-brand-rail">
       <Link href="/" className="brand-signature" aria-label="返回筑生总智能体">
         <span>筑</span><strong>筑生</strong>
@@ -81,5 +82,5 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <Link href="/case-1602"><Building2 size={17} /><span>{product.eventId ? "1602生命事件" : "建筑总览"}</span></Link>
       <details><summary><Menu size={17} /><span>{product.workspaceLabel}</span></summary><div><button type="button" onClick={() => setAgentOpen(true)}><Sparkles size={15} />问这栋房子</button>{workspaceLinks.map(({ href, label, group }) => { const Icon = iconByHref[href as keyof typeof iconByHref] ?? Building2; return <Link key={href} href={href}><Icon size={15} />{group === label ? label : `${group} · ${label}`}</Link>; })}</div></details>
     </nav>
-  </div><BuildingAgentDrawer open={agentOpen} onClose={() => setAgentOpen(false)} /></>;
+  </ProductShellFrame><BuildingAgentDrawer open={agentOpen} onClose={() => setAgentOpen(false)} /></>;
 }
