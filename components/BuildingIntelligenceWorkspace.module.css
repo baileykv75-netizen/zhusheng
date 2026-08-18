@@ -1,0 +1,199 @@
+.reasoningStack {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0 6px;
+}
+
+.confirmedCard,
+.hypothesisCard,
+.nextStepCard,
+.boundaryCard {
+  border: 1px solid rgba(12, 13, 14, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.confirmedCard,
+.nextStepCard,
+.boundaryCard {
+  padding: 16px 18px;
+}
+
+.sectionLabel {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 8px;
+  color: #6e7477;
+  font: 700 10px/1.3 Consolas, monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.confirmedCard p,
+.nextStepCard p,
+.boundaryCard p {
+  margin: 0;
+  color: #202426;
+  font-size: 13px;
+  line-height: 1.72;
+}
+
+.confirmedCard strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #111415;
+  font-size: 15px;
+  font-weight: 680;
+}
+
+.hypothesisBlock {
+  display: grid;
+  gap: 9px;
+}
+
+.hypothesisHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hypothesisHeader > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #6e7477;
+  font: 700 10px/1.3 Consolas, monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hypothesisHeader em {
+  padding: 4px 7px;
+  border: 1px solid rgba(212, 33, 33, 0.22);
+  border-radius: 999px;
+  color: #a51d1d;
+  background: rgba(212, 33, 33, 0.05);
+  font: 700 9px/1 Consolas, monospace;
+  font-style: normal;
+}
+
+.hypothesisGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.hypothesisCard {
+  padding: 14px 15px;
+}
+
+.hypothesisCard strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #151819;
+  font-size: 13px;
+}
+
+.hypothesisCard p {
+  margin: 0;
+  color: #555d60;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.hypothesisCard small {
+  display: block;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(12, 13, 14, 0.08);
+  color: #2c555c;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.nextStepCard {
+  border-color: rgba(82, 200, 215, 0.3);
+  background: rgba(82, 200, 215, 0.07);
+}
+
+.nextStepCard strong {
+  display: block;
+  margin-bottom: 7px;
+  color: #0d5e68;
+  font-size: 14px;
+}
+
+.boundaryCard {
+  background: rgba(12, 13, 14, 0.035);
+}
+
+.boundaryCard p {
+  color: #73797b;
+  font-size: 10px;
+}
+
+.demoNote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  color: #7c6843;
+  font-size: 10px;
+}
+
+.demoNote > span {
+  flex: 0 0 auto;
+  padding: 3px 6px;
+  border: 1px solid rgba(124, 104, 67, 0.26);
+  border-radius: 999px;
+  font: 700 9px/1 Consolas, monospace;
+}
+
+.demoNote p {
+  margin: 0;
+  color: #81775f;
+}
+
+.technicalDetails {
+  margin-top: 18px;
+  border-top: 1px solid rgba(12, 13, 14, 0.12);
+}
+
+.technicalDetails > summary {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  color: #656d70;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.technicalDetails > summary::-webkit-details-marker {
+  display: none;
+}
+
+.technicalDetails > summary b {
+  margin-left: auto;
+  color: #232728;
+  font: 700 10px/1 Consolas, monospace;
+}
+
+.technicalBody {
+  padding-bottom: 12px;
+}
+
+.knownFactLine {
+  color: #343a3c;
+  font-size: 13px;
+  line-height: 1.72;
+}
+
+@media (max-width: 760px) {
+  .hypothesisGrid {
+    grid-template-columns: 1fr;
+  }
+}
