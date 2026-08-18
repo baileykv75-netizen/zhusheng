@@ -1,3 +1,29 @@
+.memoryScope {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: -6px 0 18px;
+  padding: 10px 12px;
+  border: 1px solid rgba(12, 13, 14, 0.08);
+  border-radius: 6px;
+  background: rgba(12, 13, 14, 0.025);
+  color: #6d7477;
+  font: 10px/1.4 Consolas, monospace;
+}
+
+.memoryScope strong {
+  color: #183f46;
+  font-size: 13px;
+}
+
+.memoryScope i {
+  width: 1px;
+  height: 12px;
+  margin: 0 3px;
+  background: rgba(12, 13, 14, 0.12);
+}
+
 .reasoningStack {
   display: grid;
   gap: 14px;
@@ -226,5 +252,9 @@
 @media (max-width: 760px) {
   .hypothesisGrid {
     grid-template-columns: 1fr;
+  }
+
+  .memoryScope {
+    align-items: flex-start;
   }
 }
