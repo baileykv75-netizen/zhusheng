@@ -25,6 +25,15 @@ test("synthetic engineering records are explicitly classified", () => {
   assert.ok(memoryRecords.every((item) => item.provenance.synthetic && item.provenance.sourceClass === "SYNTHETIC_ENGINEERING_RECORD"));
 });
 
+test("construction memory keeps verification scope and residual-risk semantics", () => {
+  const offset = building1602Dataset.records.find((item) => item.recordId === "REC-CONST-DRAIN-OFFSET-01");
+  assert.ok(offset?.memory);
+  assert.match(offset.memory.reason ?? "", /预留位置/);
+  assert.ok(offset.memory.verification?.checkedItems.includes("通水情况"));
+  assert.ok(offset.memory.verification?.uncheckedItems.includes("偏置短段局部坡度连续实测"));
+  assert.match(offset.memory.residualRisk ?? "", /不等于存在施工缺陷/);
+});
+
 test("conduit is physical routing and never an electrical functional connection", () => {
   assert.equal(building1602Dataset.connections.some((item) => item.fromBusinessId.startsWith("CONDUIT-") || item.toBusinessId.startsWith("CONDUIT-")), false);
   assert.ok(building1602Dataset.spatialRelations.some((item) => item.predicate === "INSIDE" && item.subjectBusinessId === "CABLE-1602-LIGHT-01" && item.objectBusinessId === "CONDUIT-1602-LIGHT-01"));
@@ -117,7 +126,7 @@ test("visual intent resolver preserves XRAY and SYSTEM_TRACE over later detail c
   assert.ok(traceVisual?.revealBusinessIds.includes("FIXTURE-1602-BASIN-01"));
 });
 
-test("diagnostic query automatically pulls this system's construction and inspection memory", async () => {
+test("odor diagnostic query automatically pulls drainage construction and inspection memory", async () => {
   const offlineFetcher = (async () => { throw new Error("offline"); }) as typeof fetch;
   const turn = await queryBuildingAgent("卫生间有臭味可能是什么原因？", null, offlineFetcher);
   assert.equal(turn.mode, "LOCAL_READ_ONLY");
@@ -127,6 +136,22 @@ test("diagnostic query automatically pulls this system's construction and inspec
   assert.ok(turn.facts.some((fact) => fact.factId === "REC-CONST-WC-REWORK-01"));
   assert.ok(turn.sources.some((source) => source.sourceId === "SRC-SYNTHETIC-MEMORY-1602"));
   assert.equal(turn.visualDirective?.mode, "CONSTRUCTION_MEMORY");
+});
+
+test("generic dampness diagnostic pulls both water-supply and waterproof histories", async () => {
+  const offlineFetcher = (async () => { throw new Error("offline"); }) as typeof fetch;
+  const turn = await queryBuildingAgent("卫生间墙脚潮湿可能是什么原因？", null, offlineFetcher);
+  assert.ok(turn.toolTrace.some((item) => item.tool === "get_construction_history" && item.arguments.businessId === "SYS-1602-CW"));
+  assert.ok(turn.toolTrace.some((item) => item.tool === "get_construction_history" && item.arguments.businessId === "WP-1602-BATHROOM"));
+  assert.ok(turn.facts.some((fact) => fact.factId === "REC-CONST-CW-J03-REWORK-01"));
+  assert.ok(turn.facts.some((fact) => fact.factId === "REC-CONST-WP-DRAIN-01"));
+});
+
+test("mirror-light diagnostic pulls the actual lighting construction memory", async () => {
+  const offlineFetcher = (async () => { throw new Error("offline"); }) as typeof fetch;
+  const turn = await queryBuildingAgent("镜前灯偶尔闪烁可能是什么原因？", null, offlineFetcher);
+  assert.ok(turn.toolTrace.some((item) => item.tool === "get_construction_history" && item.arguments.businessId === "SYS-1602-EL-LIGHT"));
+  assert.ok(turn.facts.some((fact) => fact.factId === "REC-CONST-EL-MIRROR-BOX-01"));
 });
 
 test("ordinary fact query does not auto-attach diagnostic history", async () => {
