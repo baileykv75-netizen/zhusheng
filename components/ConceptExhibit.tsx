@@ -68,25 +68,25 @@ export function ConceptExhibit() {
     <main className="v6-story">
       <section className="v6-story-chapter" id="memory">
         <div className="v6-chapter-index"><span>01</span><small>THE MEMORY</small></div>
-        <div className="v6-chapter-copy"><p>建造，不失忆</p><h2>墙封起来以后，<br />过去仍在原来的位置。</h2><div><span>施工口述</span><i /><span>人工确认</span><i /><span>构件记忆</span></div></div>
+        <div className="v6-chapter-copy"><p>建造，不失忆</p><h2 className="display-headline"><span className="display-headline-line">墙封起来以后，</span><span className="display-headline-line">过去仍在原来的位置</span></h2><div><span>施工口述</span><i /><span>人工确认</span><i /><span>构件记忆</span></div></div>
         <p className="v6-chapter-note">工友留下的记录不在交付时结束。它继续和空间、管线、接头与检验结果保持关联，等待未来真正需要它的那一天。</p>
       </section>
 
       <section className="v6-story-chapter event" id="event">
         <div className="v6-chapter-index"><span>02</span><small>THE EVENT</small></div>
-        <div className="v6-chapter-copy"><p>居住，有回应</p><h2>今天，16层的身体里<br />发生了一件事。</h2><Link href="/case-1602">进入1602建筑生命事件 <ArrowRight size={17} /></Link></div>
+        <div className="v6-chapter-copy"><p>居住，有回应</p><h2 className="display-headline"><span className="display-headline-line">今天，16层的身体里</span><span className="display-headline-line">发生了一件事</span></h2><Link href="/case-1602">进入1602建筑生命事件 <ArrowRight size={17} /></Link></div>
         <div className="v6-human-boundary"><small>AI 建议</small><i /><small>人类授权</small><i /><small>物业执行</small><i /><small>维修复验</small></div>
       </section>
 
       <section className="v6-story-chapter learning" id="learning">
         <div className="v6-chapter-index"><span>03</span><small>THE LEARNING</small></div>
-        <div className="v6-chapter-copy"><p>经验，会生长</p><h2>一栋房子的经历，<br />成为下一栋房子的经验。</h2></div>
+        <div className="v6-chapter-copy"><p>经验，会生长</p><h2 className="display-headline"><span className="display-headline-line">一栋房子的经历，</span><span className="display-headline-line">成为下一栋房子的经验</span></h2></div>
         <p className="v6-chapter-note">经过验证的个案只形成待人工评审的经验候选。它可以成为试点，但不会被 AI 轻率地写成企业标准。</p>
       </section>
 
       <section className="v6-manifesto">
         <p>筑生不是在给建筑加一个聊天机器人。</p>
-        <h2>它是在让一栋房子，<br />拥有一生不会中断的记忆。</h2>
+        <h2 className="display-headline"><span className="display-headline-line">它是在让一栋房子，</span><span className="display-headline-line">拥有一生不会中断的记忆</span></h2>
         <Link href="/case-1602">查看1602完整事件 <ArrowRight size={17} /></Link>
       </section>
     </main>
