@@ -47,22 +47,23 @@ function invoke(tool: BuildingQueryToolName, args: Record<string, string>): Invo
   }
 }
 
-function diagnosticSystemForQuestion(question: string) {
-  if (/(臭味|异味|返味|反味|臭气|下水道味|排水不畅|地漏)/u.test(question)) return "SYS-1602-DRAIN";
-  if (/(镜前灯|顶灯|照明|灯具|不亮|闪烁|跳闸)/u.test(question)) return "SYS-1602-EL-LIGHT";
-  if (/(冷水|微流量|冷水管|冷水接头)/u.test(question) && /(漏|渗|潮|异常|原因|为什么|排查)/u.test(question)) return "SYS-1602-CW";
-  if (/(热水|热水管)/u.test(question) && /(漏|渗|潮|异常|原因|为什么|排查)/u.test(question)) return "SYS-1602-HW";
-  return null;
+function diagnosticTargetsForQuestion(question: string) {
+  if (/(臭味|异味|返味|反味|臭气|下水道味|排水不畅|地漏)/u.test(question)) return ["SYS-1602-DRAIN"];
+  if (/(潮湿|返潮|湿痕|水印|渗水|漏水|墙脚湿|地面湿)/u.test(question)) return ["SYS-1602-CW", "WP-1602-BATHROOM"];
+  if (/(镜前灯|顶灯|照明|灯具)/u.test(question) && /(不亮|闪烁|跳闸|异常|故障|原因|为什么|排查)/u.test(question)) return ["SYS-1602-EL-LIGHT"];
+  if (/(冷水|微流量|冷水管|冷水接头)/u.test(question) && /(漏|渗|潮|异常|原因|为什么|排查)/u.test(question)) return ["SYS-1602-CW"];
+  if (/(热水|热水管)/u.test(question) && /(漏|渗|潮|异常|原因|为什么|排查)/u.test(question)) return ["SYS-1602-HW"];
+  return [];
 }
 
 function diagnosticMemoryInvocations(question: string): Invocation[] {
-  const systemId = diagnosticSystemForQuestion(question);
-  if (!systemId) return [];
-  if (!/(为什么|原因|可能|异常|故障|排查|解决|怎么处理|怎么修|臭味|异味|返味|反味|漏|渗|潮|不亮|闪烁|跳闸)/u.test(question)) return [];
-  return [
-    invoke("get_construction_history", { businessId: systemId }),
-    invoke("get_inspection_history", { businessId: systemId })
-  ];
+  const targets = diagnosticTargetsForQuestion(question);
+  if (!targets.length) return [];
+  if (!/(为什么|原因|可能|异常|故障|排查|解决|怎么处理|怎么修|臭味|异味|返味|反味|漏|渗|潮|湿|不亮|闪烁|跳闸)/u.test(question)) return [];
+  return targets.flatMap((businessId) => [
+    invoke("get_construction_history", { businessId }),
+    invoke("get_inspection_history", { businessId })
+  ]);
 }
 
 function mergeInvocations(primary: Invocation[], extras: Invocation[]) {
