@@ -37,6 +37,7 @@ jobs:
           pnpm run typecheck
           pnpm run sync:life-event-assets
           pnpm run sync:group-learning-assets
+          pnpm run sync:building-intelligence-assets
           pnpm test
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
