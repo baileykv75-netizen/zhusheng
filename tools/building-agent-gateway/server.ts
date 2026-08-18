@@ -33,22 +33,30 @@ export function createGatewayServer(options: ServerOptions = {}): { server: Serv
   const limiter = options.rateLimiter ?? new MemoryRateLimiter();
   const server = createServer(async (request: IncomingMessage, response: ServerResponse) => {
     const requestId = randomUUID();
+    let responseOrigin: string | undefined;
     response.setHeader("X-Request-Id", requestId);
     try {
-      const origin = verifyOrigin(request, config);
-      applySecurityHeaders(response, origin);
+      const isHealth = request.method === "GET" && request.url === "/health";
+      responseOrigin = verifyOrigin(request, config, config.publicMode && !isHealth);
+      applySecurityHeaders(response, responseOrigin);
       if (request.method === "OPTIONS") {
         response.statusCode = 204;
         response.end();
         return;
       }
-      if (request.method === "GET" && request.url === "/health") {
-        sendJson(response, 200, { status: "ok", provider: "deepseek", providerConfigured: Boolean(config.apiKey), model: config.model });
+      if (isHealth) {
+        sendJson(response, 200, {
+          status: "ok",
+          provider: "deepseek",
+          providerConfigured: Boolean(config.apiKey),
+          model: config.model,
+          deploymentMode: config.publicMode ? "public" : "local"
+        });
         return;
       }
       if (request.method !== "POST") throw new GatewayRequestError(405, "METHOD_NOT_ALLOWED", "不支持的请求方法");
-      const remote = request.socket.remoteAddress ?? "local";
-      if (!limiter.accept(remote)) throw new GatewayRequestError(429, "GATEWAY_RATE_LIMITED", "本地网关请求过于频繁");
+      const remote = request.socket.remoteAddress ?? "unknown";
+      if (!limiter.accept(remote)) throw new GatewayRequestError(429, "GATEWAY_RATE_LIMITED", "AI 网关请求过于频繁，请稍后再试");
       const body = await readJsonBody(request);
       if (request.url === "/v1/agent/query") {
         if (typeof body.question !== "string" || !body.question.trim()) throw new GatewayRequestError(400, "QUESTION_INVALID", "question必须是非空字符串");
@@ -76,7 +84,7 @@ export function createGatewayServer(options: ServerOptions = {}): { server: Serv
         : await provider.call(task, payload as { input: string }, requestId);
       sendJson(response, 200, { ok: true, ...output });
     } catch (error) {
-      applySecurityHeaders(response);
+      applySecurityHeaders(response, responseOrigin);
       if (error instanceof GatewayRequestError) {
         sendJson(response, error.status, { ok: false, error: { type: error.type, message: error.message, requestId } });
       } else if (error instanceof GatewayProviderError) {
@@ -92,7 +100,7 @@ export function createGatewayServer(options: ServerOptions = {}): { server: Serv
 export function startGateway() {
   const { server, config } = createGatewayServer();
   server.listen(config.port, config.host, () => {
-    console.log(`[building-agent-gateway] listening on http://${config.host}:${config.port}; providerConfigured=${Boolean(config.apiKey)}; model=${config.model}`);
+    console.log(`[building-agent-gateway] listening on http://${config.host}:${config.port}; mode=${config.publicMode ? "public" : "local"}; providerConfigured=${Boolean(config.apiKey)}; model=${config.model}`);
   });
   const shutdown = () => server.close(() => process.exit(0));
   process.once("SIGINT", shutdown);
