@@ -1,27 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import recordsJson from "../data/building/1602/records.json" with { type: "json" };
+import { building1602Dataset } from "../lib/building-intelligence/catalog.ts";
 import { getConstructionHistory, getInspectionHistory } from "../lib/building-intelligence/queries.ts";
+import type { BuildingRecord } from "../lib/building-intelligence/types.ts";
 
-type MemoryRecord = {
-  recordId: string;
-  recordType: string;
-  subjectBusinessIds: string[];
-  title: string;
-  summary: string;
-  memory?: {
-    trade?: string;
-    memoryClass?: string;
-    verification?: { checkedItems: string[]; uncheckedItems: string[] };
-    workerStatement?: string;
-  };
-  provenance: { sourceClass: string; synthetic: boolean };
-};
-
-const records = recordsJson as MemoryRecord[];
+const records: BuildingRecord[] = building1602Dataset.records;
 
 test("1602 full lifecycle memory pack has enough depth without becoming an anomaly scrapbook", () => {
-  assert.ok(records.length >= 65, `expected >=65 records, got ${records.length}`);
+  assert.equal(records.length, 70, `expected 70 records, got ${records.length}`);
   const ids = records.map((record) => record.recordId);
   assert.equal(new Set(ids).size, ids.length, "record IDs must stay unique");
 
@@ -36,7 +22,7 @@ test("1602 full lifecycle memory pack has enough depth without becoming an anoma
 
 test("memory pack covers the bathroom's major trades and lifecycle stages", () => {
   const trades = new Set(records.map((record) => record.memory?.trade).filter(Boolean));
-  for (const trade of ["COLD_WATER", "HOT_WATER", "DRAINAGE", "WATERPROOFING", "ELECTRICAL", "FIXTURES", "ARCHITECTURE", "ENVIRONMENT", "HANDOVER"]) {
+  for (const trade of ["COLD_WATER", "HOT_WATER", "DRAINAGE", "WATERPROOFING", "ELECTRICAL", "FIXTURES", "ARCHITECTURE", "ENVIRONMENT", "HANDOVER", "OPERATIONS"]) {
     assert.ok(trades.has(trade), `missing trade ${trade}`);
   }
 
@@ -44,6 +30,8 @@ test("memory pack covers the bathroom's major trades and lifecycle stages", () =
   assert.ok(records.some((record) => record.recordType === "INSPECTION"));
   assert.ok(records.some((record) => record.recordType === "OBSERVATION"));
   assert.ok(records.some((record) => record.recordType === "MAINTENANCE"));
+  assert.ok(records.some((record) => record.memory?.phase === "HANDOVER"));
+  assert.ok(records.some((record) => record.memory?.phase === "EARLY_OPERATION"));
 });
 
 test("normal records provide negative evidence instead of making every location suspicious", () => {
