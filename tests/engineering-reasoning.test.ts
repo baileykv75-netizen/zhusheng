@@ -18,8 +18,12 @@ test("odor question prioritizes this bathroom's queried construction memory", ()
   assert.equal(reasoning.hypotheses[1].sourceRecordId, "REC-CONST-WC-REWORK-01");
   assert.match(reasoning.hypotheses[0].title, /地漏排水偏置段/);
   assert.match(reasoning.hypotheses[0].evidence ?? "", /90 mm/);
+  assert.match(reasoning.hypotheses[0].evidence ?? "", /排水偏置段通水复核/);
   assert.match(reasoning.hypotheses[0].evidence ?? "", /未单独覆盖/);
   assert.match(reasoning.hypotheses[1].title, /坐便器排水密封接口/);
+  assert.match(reasoning.hypotheses[1].evidence ?? "", /坐便器返工后冲水验收/);
+  assert.match(reasoning.hypotheses[1].evidence ?? "", /气密/);
+  assert.doesNotMatch(reasoning.hypotheses[1].evidence ?? "", /排水偏置段通水复核/);
   assert.match(reasoning.summary, /不从通用原因随机排查/);
   assert.match(reasoning.nextStep, /DRAIN-1602-FLOOR-01/);
   assert.match(reasoning.boundary, /不能直接证明今天的臭味/);
