@@ -16,11 +16,11 @@ const emptyDirective: VisualDirective = { view: "VIEW_CONSTRUCTION_MEMORY", high
 type Chapter = { id: string; label: string; title: string; fact: string; why: string; href: string; action: string };
 
 const chapters: Chapter[] = [
-  { id: "memory", label: "01 / 施工留痕", title: "一份工友记录，后来真的被用上了。", fact: "冷热水支管接头的施工口述、照片和保压结果已关联至1602卫生间。", why: "建造不是交付时被归档的过去，它是未来定位问题的第一份证据。", href: "/worker?from=case", action: "查看施工记忆" },
-  { id: "observe", label: "02 / 潮湿发现", title: "住户只需描述眼前的异常。", fact: "潮湿、微流量和水表变化进入同一栋房子的事件上下文。", why: "住户无需理解管线；系统先回到空间、构件和已经留下的记忆。", href: "/resident?mode=task", action: "进入联合诊断" },
-  { id: "authorize", label: "03 / 人工授权", title: "关键动作，始终由人决定。", fact: "关阀与恢复供水分别需要住户或物业的独立人工授权。", why: "智能体可以解释和编排，不能代替住户批准设备动作。", href: "/resident?mode=task&focus=authorization", action: "查看人工授权" },
-  { id: "verify", label: "04 / 维修复验", title: "维修记录不是结论，新观察才是。", fact: "维修后必须恢复供水，并以新的湿度和微流量观察验证结果。", why: "只有可重放的复验通过，事件才会被标记为已解决。", href: "/property?mode=task", action: "进入物业维修复验" },
-  { id: "feedback", label: "05 / 经验回流", title: "一件事，不会被轻率地写成企业标准。", fact: "已验证事件只生成单事件经验，经人工评审后最多形成PILOT_ONLY试点项。", why: "让经验生长，但不让系统用单个案例替人下结论。", href: "/group?mode=task", action: "进入人工评审" }
+  { id: "memory", label: "01 / 施工留痕", title: "一份工友记录，后来真的被用上了", fact: "冷热水支管接头的施工口述、照片和保压结果已关联至1602卫生间。", why: "建造不是交付时被归档的过去，它是未来定位问题的第一份证据。", href: "/worker?from=case", action: "查看施工记忆" },
+  { id: "observe", label: "02 / 潮湿发现", title: "住户只需描述眼前的异常", fact: "潮湿、微流量和水表变化进入同一栋房子的事件上下文。", why: "住户无需理解管线；系统先回到空间、构件和已经留下的记忆。", href: "/resident?mode=task", action: "进入联合诊断" },
+  { id: "authorize", label: "03 / 人工授权", title: "关键动作，始终由人决定", fact: "关阀与恢复供水分别需要住户或物业的独立人工授权。", why: "智能体可以解释和编排，不能代替住户批准设备动作。", href: "/resident?mode=task&focus=authorization", action: "查看人工授权" },
+  { id: "verify", label: "04 / 维修复验", title: "维修记录不是结论，新观察才是", fact: "维修后必须恢复供水，并以新的湿度和微流量观察验证结果。", why: "只有可重放的复验通过，事件才会被标记为已解决。", href: "/property?mode=task", action: "进入物业维修复验" },
+  { id: "feedback", label: "05 / 经验回流", title: "一件事，不会被轻率地写成企业标准", fact: "已验证事件只生成单事件经验，经人工评审后最多形成PILOT_ONLY试点项。", why: "让经验生长，但不让系统用单个案例替人下结论。", href: "/group?mode=task", action: "进入人工评审" }
 ];
 
 function activeChapter(resultState?: string) {
@@ -54,7 +54,7 @@ export function Case1602Exhibit() {
 
   return <div className="case-exhibit">
     <section className="case-intro">
-      <div><p className="concept-kicker">筑生 / 1602建筑生命事件</p><h1>一件潮湿异常，<br />唤醒一栋房子的记忆。</h1><p>从建造时留下的管线与工序，到入住后的现场观察、人工授权、维修和复验，所有动作都发生在同一条事件生命线上。</p></div>
+      <div><p className="concept-kicker">筑生 / 1602建筑生命事件</p><h1 className="display-headline"><span className="display-headline-line">一件潮湿异常，</span><span className="display-headline-line">唤醒一栋房子的记忆</span></h1><p>从建造时留下的管线与工序，到入住后的现场观察、人工授权、维修和复验，所有动作都发生在同一条事件生命线上。</p></div>
       <aside><span>当前事件位置</span><strong>{current.label}</strong><p>{result ? `事件：${result.eventId}` : "尚未开启1602事件"}</p><Link href={currentHref}>继续处理 <ArrowRight size={15} /></Link></aside>
     </section>
 
@@ -68,7 +68,7 @@ export function Case1602Exhibit() {
       </div>
       <div className="case-workspace">
         <nav aria-label="1602工作区切换"><button type="button" className={workspace === "ai" ? "active" : ""} onClick={() => setWorkspace("ai")}>筑生 AI</button><button type="button" className={workspace === "event" ? "active" : ""} onClick={() => setWorkspace("event")}>事件闭环 / 专业验证</button></nav>
-        {workspace === "ai" ? <BuildingIntelligenceWorkspace selectedBusinessId={selectedBusinessId} result={buildingTurn} onResult={setBuildingTurn} /> : <article className="case-current-card"><p>{current.label}</p><h2>{current.title}</h2><div><span>此刻发生了什么</span><strong>{current.fact}</strong></div><div><span>为什么重要</span><strong>{current.why}</strong></div><Link href={currentHref} className="case-primary">{currentAction} <ArrowRight size={17} /></Link><details><summary>查看事件详情 <ChevronDown size={15} /></summary><p>空间与构件来自1602卫生间GLB；业务状态、授权与审计由原有确定性领域引擎维护。</p></details></article>}
+        {workspace === "ai" ? <BuildingIntelligenceWorkspace selectedBusinessId={selectedBusinessId} result={buildingTurn} onResult={setBuildingTurn} /> : <article className="case-current-card"><p>{current.label}</p><h2 className="display-headline">{current.title}</h2><div><span>此刻发生了什么</span><strong>{current.fact}</strong></div><div><span>为什么重要</span><strong>{current.why}</strong></div><Link href={currentHref} className="case-primary">{currentAction} <ArrowRight size={17} /></Link><details><summary>查看事件详情 <ChevronDown size={15} /></summary><p>空间与构件来自1602卫生间GLB；业务状态、授权与审计由原有确定性领域引擎维护。</p></details></article>}
       </div>
     </section>
 
@@ -84,6 +84,6 @@ export function Case1602Exhibit() {
       })}
     </section>
 
-    <section className="case-boundary"><LockKeyhole size={19} /><div><strong>这是一件有边界的建筑生命事件。</strong><p>模型不批准授权，授权不自动执行阀门，维修记录不自动关闭事件，单次经验不自动成为企业标准。</p></div><Wrench size={19} /></section>
+    <section className="case-boundary"><LockKeyhole size={19} /><div><strong>这是一件有边界的建筑生命事件</strong><p>模型不批准授权，授权不自动执行阀门，维修记录不自动关闭事件，单次经验不自动成为企业标准。</p></div><Wrench size={19} /></section>
   </div>;
 }
