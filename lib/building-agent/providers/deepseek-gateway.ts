@@ -1,9 +1,18 @@
 import { MODEL_READ_ONLY_TOOL_NAMES, type BuildingAgentProvider, type ModelProviderCall, type ProviderAnalysis, type ProviderExplanation } from "../types.ts";
 import type { LifeEventResult } from "../../life-event-engine/types.ts";
 
-export const DEFAULT_BUILDING_AGENT_GATEWAY_URL = "http://127.0.0.1:4180";
+export const LOCAL_BUILDING_AGENT_GATEWAY_URL = "http://127.0.0.1:4180";
 
-export type GatewayHealth = { status: "ok"; provider: "deepseek"; providerConfigured: boolean; model: string };
+function normalizedGatewayUrl(value: string) {
+  return value.trim().replace(/\/+$/, "");
+}
+
+export function getBuildingAgentGatewayUrl() {
+  const configured = process.env.NEXT_PUBLIC_BUILDING_AGENT_GATEWAY_URL?.trim();
+  return normalizedGatewayUrl(configured || LOCAL_BUILDING_AGENT_GATEWAY_URL);
+}
+
+export type GatewayHealth = { status: "ok"; provider: "deepseek"; providerConfigured: boolean; model: string; deploymentMode?: "local" | "public" };
 type GatewayMetadata = { task: ModelProviderCall["task"]; responseId: string; model: string; calledAt: string; requestId: string; schemaValid: true };
 type GatewayErrorBody = { ok: false; error: { type: string; message: string; requestId: string } };
 
@@ -17,9 +26,9 @@ export class DeepSeekGatewayClientError extends Error {
 
 async function jsonRequest<T>(url: string, init: RequestInit, fetcher: typeof fetch): Promise<{ result: T; metadata: GatewayMetadata }> {
   let response: Response;
-  try { response = await fetcher(url, init); } catch { throw new DeepSeekGatewayClientError("GATEWAY_UNREACHABLE", "本地DeepSeek网关不可用"); }
+  try { response = await fetcher(url, init); } catch { throw new DeepSeekGatewayClientError("GATEWAY_UNREACHABLE", "DeepSeek 网关不可用"); }
   let payload: unknown;
-  try { payload = await response.json(); } catch { throw new DeepSeekGatewayClientError("GATEWAY_INVALID_RESPONSE", "本地DeepSeek网关返回了无效响应"); }
+  try { payload = await response.json(); } catch { throw new DeepSeekGatewayClientError("GATEWAY_INVALID_RESPONSE", "DeepSeek 网关返回了无效响应"); }
   if (!response.ok) {
     const failure = payload as GatewayErrorBody;
     throw new DeepSeekGatewayClientError(failure.error?.type ?? "GATEWAY_ERROR", failure.error?.message ?? `网关HTTP ${response.status}`, failure.error?.requestId);
@@ -29,9 +38,9 @@ async function jsonRequest<T>(url: string, init: RequestInit, fetcher: typeof fe
   return success;
 }
 
-export async function probeBuildingAgentGateway(fetcher: typeof fetch = fetch, baseUrl = DEFAULT_BUILDING_AGENT_GATEWAY_URL): Promise<GatewayHealth> {
+export async function probeBuildingAgentGateway(fetcher: typeof fetch = fetch, baseUrl = getBuildingAgentGatewayUrl()): Promise<GatewayHealth> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 1500);
+  const timer = setTimeout(() => controller.abort(), 4_000);
   try {
     const response = await fetcher(`${baseUrl}/health`, { signal: controller.signal, cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -42,13 +51,13 @@ export async function probeBuildingAgentGateway(fetcher: typeof fetch = fetch, b
 }
 
 export class DeepSeekGatewayBuildingAgentProvider implements BuildingAgentProvider {
-  readonly name = "DeepSeek Chat Completions via local gateway";
+  readonly name = "DeepSeek Chat Completions via guarded gateway";
   readonly mode = "llm-enhanced" as const;
   private calls: ModelProviderCall[] = [];
   private readonly fetcher: typeof fetch;
   private readonly baseUrl: string;
 
-  constructor(fetcher: typeof fetch = fetch, baseUrl = DEFAULT_BUILDING_AGENT_GATEWAY_URL) { this.fetcher = fetcher; this.baseUrl = baseUrl; }
+  constructor(fetcher: typeof fetch = fetch, baseUrl = getBuildingAgentGatewayUrl()) { this.fetcher = fetcher; this.baseUrl = normalizedGatewayUrl(baseUrl); }
 
   beginTurn() { this.calls = []; }
   getCallHistory() { return [...this.calls]; }
