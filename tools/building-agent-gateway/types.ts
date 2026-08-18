@@ -73,7 +73,7 @@ export type GatewayConfig = {
   host: "127.0.0.1" | "localhost" | "::1" | "0.0.0.0";
   port: number;
   allowedOrigins: string[];
-  publicMode: boolean;
+  publicMode?: boolean;
   timeoutMs: number;
   maxInputChars: number;
   maxOutputTokens: number;
