@@ -46,6 +46,7 @@ jobs:
           pnpm run test:pages-export
         env:
           NEXT_PUBLIC_BASE_PATH: /zhusheng
+          NEXT_PUBLIC_BUILDING_AGENT_GATEWAY_URL: ${{ vars.BUILDING_AGENT_GATEWAY_URL }}
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
