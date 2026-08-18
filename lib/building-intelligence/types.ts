@@ -68,7 +68,23 @@ export type SpatialRelation = {
   provenance: Provenance;
 };
 
+export type BuildingMemoryClass = "NORMAL" | "BASELINE" | "INSPECTION_LIMIT" | "REWORK" | "FIELD_CHANGE" | "HANDOVER" | "RUNTIME";
+export type BuildingMemoryTrade =
+  | "ARCHITECTURE"
+  | "COORDINATION"
+  | "COLD_WATER"
+  | "HOT_WATER"
+  | "DRAINAGE"
+  | "WATERPROOFING"
+  | "ELECTRICAL"
+  | "FIXTURES"
+  | "ENVIRONMENT"
+  | "HANDOVER"
+  | "OPERATIONS";
+
 export type BuildingRecordMemory = {
+  trade?: BuildingMemoryTrade;
+  memoryClass?: BuildingMemoryClass;
   phase?: string;
   issueType?: string;
   originalDesign?: string;
