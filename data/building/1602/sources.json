@@ -1,7 +1,50 @@
 [
-  {"sourceId":"SRC-IFC-ZS-DEMO-001","sourceClass":"IFC_DERIVED","synthetic":false,"label":"ZS-DEMO-001 IFC 实体模型","path":"bim/output/ZS-DEMO-001.ifc","note":"空间、既有构件与几何标识派生自项目 IFC 演示模型。"},
-  {"sourceId":"SRC-BUILDING-SPEC-V6","sourceClass":"BUILDING_SPEC_DERIVED","synthetic":false,"label":"筑生建筑规格","path":"bim/building-spec.json","note":"1602 空间、给水系统和语义构件来自可重复生成的建筑规格。"},
-  {"sourceId":"SRC-BUILDING-MEMORY-SEED","sourceClass":"EXISTING_BUILDING_MEMORY","synthetic":false,"label":"建筑记忆种子","path":"bim/data/building-memory.seed.json","note":"既有施工证据、系统拓扑与稳定 BusinessId 的建筑记忆。"},
-  {"sourceId":"SRC-SYNTHETIC-MEP-1602","sourceClass":"SYNTHETIC_ENGINEERING_RECORD","synthetic":true,"label":"1602 合成工程语义补充","path":"data/building/1602","note":"为展示查询能力补充的给排水、电气工程语义，不代表真实竣工项目记录。"},
-  {"sourceId":"SRC-RUNTIME-1602","sourceClass":"RUNTIME_OBSERVATION","synthetic":false,"label":"1602 运行时观察","path":"life-event session","note":"来自当前演示会话的传感器或人工观察；具体事实以事件会话时间为准。"}
+  {
+    "sourceId": "SRC-IFC-ZS-DEMO-001",
+    "sourceClass": "IFC_DERIVED",
+    "synthetic": false,
+    "label": "ZS-DEMO-001 IFC 实体模型",
+    "path": "bim/output/ZS-DEMO-001.ifc",
+    "note": "空间、既有构件与几何标识派生自项目 IFC 演示模型。"
+  },
+  {
+    "sourceId": "SRC-BUILDING-SPEC-V6",
+    "sourceClass": "BUILDING_SPEC_DERIVED",
+    "synthetic": false,
+    "label": "筑生建筑规格",
+    "path": "bim/building-spec.json",
+    "note": "1602 空间、给水系统和语义构件来自可重复生成的建筑规格。"
+  },
+  {
+    "sourceId": "SRC-BUILDING-MEMORY-SEED",
+    "sourceClass": "EXISTING_BUILDING_MEMORY",
+    "synthetic": false,
+    "label": "建筑记忆种子",
+    "path": "bim/data/building-memory.seed.json",
+    "note": "既有施工证据、系统拓扑与稳定 BusinessId 的建筑记忆。"
+  },
+  {
+    "sourceId": "SRC-SYNTHETIC-MEP-1602",
+    "sourceClass": "SYNTHETIC_ENGINEERING_RECORD",
+    "synthetic": true,
+    "label": "1602 合成工程语义补充",
+    "path": "data/building/1602",
+    "note": "为展示查询能力补充的给排水、电气工程语义，不代表真实竣工项目记录。"
+  },
+  {
+    "sourceId": "SRC-SYNTHETIC-MEMORY-1602",
+    "sourceClass": "SYNTHETIC_ENGINEERING_RECORD",
+    "synthetic": true,
+    "label": "1602 合成施工记忆包",
+    "path": "data/building/1602/records.json",
+    "note": "为演示建筑记忆如何影响后续诊断而构造，按常见施工协调、返工与验收逻辑组织，不代表真实项目竣工记录。"
+  },
+  {
+    "sourceId": "SRC-RUNTIME-1602",
+    "sourceClass": "RUNTIME_OBSERVATION",
+    "synthetic": false,
+    "label": "1602 运行时观察",
+    "path": "life-event session",
+    "note": "来自当前演示会话的传感器或人工观察；具体事实以事件会话时间为准。"
+  }
 ]

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { building1602Dataset, createLocalBuildingAgentTurn, getComponentDetail, getComponentsBehindSurface, getUpstream, resolveQueryVisualDirective, resolveTargetEntity, traceSystem, validateBuildingDataset } from "../lib/building-intelligence/index.ts";
+import { building1602Dataset, createLocalBuildingAgentTurn, getComponentDetail, getComponentsBehindSurface, getUpstream, queryBuildingAgent, resolveQueryVisualDirective, resolveTargetEntity, traceSystem, validateBuildingDataset } from "../lib/building-intelligence/index.ts";
 
 test("1602 building intelligence data is referentially and engineering plausible", () => {
   const report = validateBuildingDataset(building1602Dataset);
@@ -20,6 +20,9 @@ test("synthetic engineering records are explicitly classified", () => {
   const synthetic = building1602Dataset.components.filter((item) => item.provenance.sourceClass === "SYNTHETIC_ENGINEERING_RECORD");
   assert.ok(synthetic.length > 8);
   assert.ok(synthetic.every((item) => item.provenance.synthetic && /合成/.test(item.provenance.note)));
+  const memoryRecords = building1602Dataset.records.filter((item) => item.provenance.sourceId === "SRC-SYNTHETIC-MEMORY-1602");
+  assert.ok(memoryRecords.length >= 8);
+  assert.ok(memoryRecords.every((item) => item.provenance.synthetic && item.provenance.sourceClass === "SYNTHETIC_ENGINEERING_RECORD"));
 });
 
 test("conduit is physical routing and never an electrical functional connection", () => {
@@ -112,4 +115,22 @@ test("visual intent resolver preserves XRAY and SYSTEM_TRACE over later detail c
   assert.equal(traceVisual?.mode, "SYSTEM_TRACE");
   assert.ok(traceVisual?.revealBusinessIds.includes("METER-1602-FLOW-01"));
   assert.ok(traceVisual?.revealBusinessIds.includes("FIXTURE-1602-BASIN-01"));
+});
+
+test("diagnostic query automatically pulls this system's construction and inspection memory", async () => {
+  const offlineFetcher = (async () => { throw new Error("offline"); }) as typeof fetch;
+  const turn = await queryBuildingAgent("卫生间有臭味可能是什么原因？", null, offlineFetcher);
+  assert.equal(turn.mode, "LOCAL_READ_ONLY");
+  assert.ok(turn.toolTrace.some((item) => item.tool === "get_construction_history" && item.arguments.businessId === "SYS-1602-DRAIN"));
+  assert.ok(turn.toolTrace.some((item) => item.tool === "get_inspection_history" && item.arguments.businessId === "SYS-1602-DRAIN"));
+  assert.ok(turn.facts.some((fact) => fact.factId === "REC-CONST-DRAIN-OFFSET-01"));
+  assert.ok(turn.facts.some((fact) => fact.factId === "REC-CONST-WC-REWORK-01"));
+  assert.ok(turn.sources.some((source) => source.sourceId === "SRC-SYNTHETIC-MEMORY-1602"));
+  assert.equal(turn.visualDirective?.mode, "CONSTRUCTION_MEMORY");
+});
+
+test("ordinary fact query does not auto-attach diagnostic history", async () => {
+  const offlineFetcher = (async () => { throw new Error("offline"); }) as typeof fetch;
+  const turn = await queryBuildingAgent("北墙后面有哪些构件？", null, offlineFetcher);
+  assert.equal(turn.toolTrace.some((item) => item.tool === "get_construction_history" && item.arguments.businessId === "SYS-1602-DRAIN"), false);
 });

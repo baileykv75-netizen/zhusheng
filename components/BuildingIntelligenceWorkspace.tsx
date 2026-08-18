@@ -27,7 +27,7 @@ export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onRe
 
   if (!result) return <section className="building-ai building-ai-empty" aria-label="筑生建筑智能查询">
     <header><div><Sparkles size={16} /><span>筑生 AI</span></div><GatewayBadge health={health} /></header>
-    <div className="building-ai-intro"><i><Bot size={22} /></i><p>QUERYABLE BUILDING INTELLIGENCE</p><h2>问这栋房子<br />任何问题</h2><span>事实来自建筑数据；原因类问题会把“已确认事实”和“工程假设”分开，不把推测冒充成这栋房子的已知事实。</span></div>
+    <div className="building-ai-intro"><i><Bot size={22} /></i><p>QUERYABLE BUILDING INTELLIGENCE</p><h2>问这栋房子<br />任何问题</h2><span>事实来自建筑数据；原因类问题会优先回看这栋房子的施工偏差、返工和验收空白，再给出排查顺序。</span></div>
     {selected ? <button className="selected-context" type="button" onClick={() => setQuestion(`请说明${selected.displayName}的已记录信息`)}><LocateFixed size={14} /><span>已选中 {selected.displayName}</span><strong>问筑生这个构件</strong></button> : null}
     <div className="building-ai-examples">{examples.map((item) => <button key={item} type="button" onClick={() => setQuestion(item)}>{item}<ArrowUp size={13} /></button>)}</div>
     <QuestionForm question={question} busy={busy} setQuestion={setQuestion} ask={ask} />
@@ -35,7 +35,7 @@ export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onRe
   </section>;
 
   const synthetic = result.sources.some((source) => source.synthetic);
-  const answerTitle = result.mode === "LIVE_AI_CLARIFICATION" ? "需要澄清" : reasoning ? "分析结论" : "查询结论";
+  const answerTitle = result.mode === "LIVE_AI_CLARIFICATION" ? "需要澄清" : reasoning?.memoryBased ? "本楼诊断结论" : reasoning ? "分析结论" : "查询结论";
   const answerText = result.mode === "LIVE_AI_CLARIFICATION" ? result.clarificationQuestion : reasoning?.summary ?? result.answer;
 
   return <section className="building-ai building-ai-result" aria-label="筑生建筑智能查询结果" data-agent-mode={result.mode}>
@@ -48,17 +48,26 @@ export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onRe
         <section className={styles.confirmedCard}>
           <div className={styles.sectionLabel}><CheckCircle2 size={14} />已确认的建筑事实</div>
           <strong>{reasoning.confirmedSummary}</strong>
-          <p className={styles.knownFactLine}>{result.answer}</p>
+          <p>{reasoning.memoryBased ? "系统已把本次问题与 1602 的排水施工、返工和验收记录交叉匹配；下面的优先级来自这栋房子的历史，而不是通用故障清单。" : "当前没有足够的本楼施工记忆用于排序，因此只能退回一般工程机理。"}</p>
         </section>
 
         <section className={styles.hypothesisBlock}>
-          <div className={styles.hypothesisHeader}><span><CircleHelp size={14} />工程推理</span><em>待验证假设</em></div>
-          <div className={styles.hypothesisGrid}>{reasoning.hypotheses.map((item) => <article className={styles.hypothesisCard} key={item.id}><strong>{item.title}</strong><p>{item.mechanism}</p><small>怎么验证：{item.verification}</small></article>)}</div>
+          <div className={styles.hypothesisHeader}>
+            <span><CircleHelp size={14} />{reasoning.memoryBased ? "基于本楼记忆的诊断候选" : "工程推理"}</span>
+            <em>{reasoning.memoryBased ? "建筑记忆优先" : "待验证假设"}</em>
+          </div>
+          <div className={styles.hypothesisGrid}>{reasoning.hypotheses.map((item) => <article className={styles.hypothesisCard} key={item.id}>
+            <div className={styles.memoryMeta}><span>优先级 {item.priority}</span>{item.sourceRecordId ? <code>{item.sourceRecordId}</code> : <code>GENERAL</code>}</div>
+            <strong>{item.title}</strong>
+            <p>{item.mechanism}</p>
+            {item.evidence ? <p className={styles.evidenceLine}>施工记忆依据：{item.evidence}</p> : null}
+            <small>怎么验证：{item.verification}</small>
+          </article>)}</div>
         </section>
 
         <section className={styles.nextStepCard}>
           <div className={styles.sectionLabel}><Wrench size={14} />建议下一步</div>
-          <strong>先做最小成本排查</strong>
+          <strong>{reasoning.memoryBased ? "按这栋房子的历史顺序排查" : "先做最小成本排查"}</strong>
           <p>{reasoning.nextStep}</p>
         </section>
 
@@ -68,7 +77,7 @@ export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onRe
         </section>
       </div> : null}
 
-      {synthetic ? <div className={styles.demoNote}><TriangleAlert size={13} /><span>DEMO DATA</span><p>部分工程记录为合成数据；事实来源与工程假设仍分开显示。</p></div> : null}
+      {synthetic ? <div className={styles.demoNote}><TriangleAlert size={13} /><span>DEMO DATA</span><p>部分工程记录为合成数据；用于演示“建筑历史如何改变诊断顺序”，不冒充真实竣工档案。</p></div> : null}
 
       {result.visualDirective ? <div className="ai-visual-state"><Box size={14} /><span>3D 已响应</span><strong>{result.visualDirective.mode}</strong><small>{result.visualDirective.targetBusinessIds.length} 个空间对象</small></div> : null}
       {result.proposedAction ? <div className="ai-proposed-action"><ShieldCheck size={15} /><p><strong>只提出下一步：{result.proposedAction.type}</strong>需要独立人工授权；本次查询没有执行任何设备动作或事件状态变更。</p></div> : null}

@@ -47,6 +47,34 @@ function invoke(tool: BuildingQueryToolName, args: Record<string, string>): Invo
   }
 }
 
+function diagnosticSystemForQuestion(question: string) {
+  if (/(臭味|异味|返味|反味|臭气|下水道味|排水不畅|地漏)/u.test(question)) return "SYS-1602-DRAIN";
+  if (/(镜前灯|顶灯|照明|灯具|不亮|闪烁|跳闸)/u.test(question)) return "SYS-1602-EL-LIGHT";
+  if (/(冷水|微流量|冷水管|冷水接头)/u.test(question) && /(漏|渗|潮|异常|原因|为什么|排查)/u.test(question)) return "SYS-1602-CW";
+  if (/(热水|热水管)/u.test(question) && /(漏|渗|潮|异常|原因|为什么|排查)/u.test(question)) return "SYS-1602-HW";
+  return null;
+}
+
+function diagnosticMemoryInvocations(question: string): Invocation[] {
+  const systemId = diagnosticSystemForQuestion(question);
+  if (!systemId) return [];
+  if (!/(为什么|原因|可能|异常|故障|排查|解决|怎么处理|怎么修|臭味|异味|返味|反味|漏|渗|潮|不亮|闪烁|跳闸)/u.test(question)) return [];
+  return [
+    invoke("get_construction_history", { businessId: systemId }),
+    invoke("get_inspection_history", { businessId: systemId })
+  ];
+}
+
+function mergeInvocations(primary: Invocation[], extras: Invocation[]) {
+  const seen = new Set(primary.map((item) => `${item.tool}:${JSON.stringify(item.arguments)}`));
+  return [...primary, ...extras.filter((item) => {
+    const key = `${item.tool}:${JSON.stringify(item.arguments)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  })];
+}
+
 export function planLocalBuildingQuery(question: string, selectedBusinessId?: string | null): Invocation[] {
   const componentId = resolveComponent(question, selectedBusinessId);
   const systemId = resolveSystem(question);
@@ -128,6 +156,30 @@ export function resolveQueryVisualDirective(invocations: Invocation[]): QueryVis
   return null;
 }
 
+function sourcesForInvocations(invocations: Invocation[]) {
+  const sourceIds = new Set(invocations.flatMap((item) => item.result.sourceIds));
+  return building1602Dataset.sources.filter((source) => sourceIds.has(source.sourceId));
+}
+
+export function augmentDiagnosticMemory(result: BuildingAgentTurnResult): BuildingAgentTurnResult {
+  const extras = diagnosticMemoryInvocations(result.question);
+  if (!extras.length) return result;
+  const existing = new Set(result.toolTrace.map((item) => `${item.tool}:${JSON.stringify(item.arguments)}`));
+  const accepted = extras.filter((item) => !existing.has(`${item.tool}:${JSON.stringify(item.arguments)}`));
+  if (!accepted.length) return result;
+  const facts = [...new Map([...result.facts, ...accepted.flatMap((item) => item.result.facts)].map((fact) => [fact.factId, fact])).values()];
+  const sourceIds = new Set([...result.sources.map((source) => source.sourceId), ...accepted.flatMap((item) => item.result.sourceIds)]);
+  const memoryVisual = resolveQueryVisualDirective(accepted);
+  const preserveExisting = result.visualDirective && ["XRAY", "SYSTEM_TRACE"].includes(result.visualDirective.mode);
+  return {
+    ...result,
+    facts,
+    sources: building1602Dataset.sources.filter((source) => sourceIds.has(source.sourceId)),
+    toolTrace: [...result.toolTrace, ...accepted.map((item) => ({ tool: item.tool, arguments: item.arguments, status: item.result.status }))],
+    visualDirective: preserveExisting ? result.visualDirective : (memoryVisual ?? result.visualDirective)
+  };
+}
+
 export function createLocalBuildingAgentTurn(question: string, selectedBusinessId?: string | null, mode: BuildingAgentTurnResult["mode"] = "LOCAL_READ_ONLY"): BuildingAgentTurnResult {
   const targetEntityResolution = resolveTargetEntity(question, selectedBusinessId);
   if (targetEntityResolution?.status !== undefined && targetEntityResolution.status !== "RESOLVED") {
@@ -137,10 +189,9 @@ export function createLocalBuildingAgentTurn(question: string, selectedBusinessI
       : `当前 1602 建筑数据中没有找到“${targetEntityResolution.mention}”这一独立构件，请确认名称或选择已记录构件。`;
     return { mode: "LIVE_AI_CLARIFICATION", question, answer: "", clarificationQuestion, toolTrace: [], facts: [], sources: [], visualDirective: null, selectedBusinessId, targetEntityResolution };
   }
-  const invocations = planLocalBuildingQuery(question, selectedBusinessId);
+  const invocations = mergeInvocations(planLocalBuildingQuery(question, selectedBusinessId), diagnosticMemoryInvocations(question));
   const facts = [...new Map(invocations.flatMap((item) => item.result.facts).map((fact) => [fact.factId, fact])).values()];
-  const sourceIds = new Set(invocations.flatMap((item) => item.result.sourceIds));
-  const sources = building1602Dataset.sources.filter((source) => sourceIds.has(source.sourceId));
+  const sources = sourcesForInvocations(invocations);
   const asksClose = /关.*阀|阀.*关|关水/.test(question);
   const asksOpen = /开阀|恢复供水/.test(question);
   const asksInspection = /创建|新建|安排/.test(question) && /检查|任务|工单/.test(question);
@@ -169,8 +220,8 @@ export async function queryBuildingAgent(question: string, selectedBusinessId?: 
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const body = await response.json() as { ok: true; result: BuildingAgentTurnResult };
     if (body.ok !== true || !Array.isArray(body.result?.facts)) throw new Error("invalid result");
-    return body.result;
+    return augmentDiagnosticMemory(body.result);
   } catch {
-    return createLocalBuildingAgentTurn(question, selectedBusinessId, "LOCAL_READ_ONLY");
+    return augmentDiagnosticMemory(createLocalBuildingAgentTurn(question, selectedBusinessId, "LOCAL_READ_ONLY"));
   }
 }

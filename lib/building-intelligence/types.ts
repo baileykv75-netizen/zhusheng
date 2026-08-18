@@ -68,6 +68,28 @@ export type SpatialRelation = {
   provenance: Provenance;
 };
 
+export type BuildingRecordMemory = {
+  phase?: string;
+  issueType?: string;
+  originalDesign?: string;
+  actualCondition?: string;
+  reason?: string;
+  fieldDecision?: string;
+  verification?: {
+    method: string;
+    result: string;
+    checkedItems: string[];
+    uncheckedItems: string[];
+  };
+  residualRisk?: string;
+  workerStatement?: string;
+  diagnosticPriority?: number;
+  diagnosticTags?: string[];
+  diagnosticTitle?: string;
+  diagnosticReason?: string;
+  recommendedCheck?: string;
+};
+
 export type BuildingRecord = {
   recordId: string;
   recordType: "CONSTRUCTION" | "INSPECTION" | "MAINTENANCE" | "OBSERVATION";
@@ -77,6 +99,7 @@ export type BuildingRecord = {
   summary: string;
   status: string;
   provenance: Provenance;
+  memory?: BuildingRecordMemory;
 };
 
 export type VisualBinding = {
