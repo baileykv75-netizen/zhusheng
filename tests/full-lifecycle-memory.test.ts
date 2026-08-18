@@ -45,6 +45,19 @@ test("normal records provide negative evidence instead of making every location 
   assert.ok(ceilingLight.facts.some((fact) => String(fact.value).includes("正常点亮")));
 });
 
+test("high-value history facts expose field decisions, worker memory and inspection boundaries to grounded AI", () => {
+  const drain = getConstructionHistory("DRAIN-1602-FLOOR-01");
+  const offsetFact = drain.facts.find((fact) => fact.factId === "REC-CONST-DRAIN-OFFSET-01");
+  assert.ok(offsetFact);
+  const text = String(offsetFact.value);
+  assert.match(text, /形成原因:/);
+  assert.match(text, /现场处理:/);
+  assert.match(text, /工友留痕:/);
+  assert.match(text, /已检查:/);
+  assert.match(text, /未检查:/);
+  assert.match(text, /事实边界:/);
+});
+
 test("high-value memories preserve what was checked and what remained outside inspection scope", () => {
   const drainOffset = records.find((record) => record.recordId === "REC-CONST-DRAIN-OFFSET-01");
   const drainInspect = records.find((record) => record.recordId === "REC-INSPECT-DRAIN-OFFSET-01");
