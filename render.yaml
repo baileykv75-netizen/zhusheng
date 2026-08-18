@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: zhusheng-building-agent-gateway
+    runtime: node
+    plan: free
+    region: singapore
+    repo: https://github.com/baileykv75-netizen/zhusheng
+    branch: gpt/step4-guarded-lifecycle
+    buildCommand: corepack enable && pnpm install --frozen-lockfile
+    startCommand: pnpm agent:gateway
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEEPSEEK_MODEL
+        value: deepseek-v4-flash
+      - key: BUILDING_AGENT_PUBLIC_MODE
+        value: "true"
+      - key: BUILDING_AGENT_GATEWAY_HOST
+        value: 0.0.0.0
+      - key: BUILDING_AGENT_ALLOWED_ORIGINS
+        value: https://baileykv75-netizen.github.io
+      - key: BUILDING_AGENT_REQUEST_TIMEOUT_MS
+        value: "12000"
+      - key: BUILDING_AGENT_MAX_INPUT_CHARS
+        value: "4000"
+      - key: BUILDING_AGENT_MAX_OUTPUT_TOKENS
+        value: "1200"
