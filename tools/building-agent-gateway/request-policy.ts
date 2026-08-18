@@ -25,9 +25,13 @@ export function applySecurityHeaders(response: ServerResponse, origin?: string) 
   }
 }
 
-export function verifyOrigin(request: IncomingMessage, config: GatewayConfig) {
+export function verifyOrigin(request: IncomingMessage, config: GatewayConfig, required = false) {
   const origin = request.headers.origin;
-  if (origin && !config.allowedOrigins.includes(origin)) throw new GatewayRequestError(403, "ORIGIN_REJECTED", "请求Origin不在允许列表");
+  if (!origin) {
+    if (required) throw new GatewayRequestError(403, "ORIGIN_REQUIRED", "公网网关仅接受来自允许网页Origin的请求");
+    return undefined;
+  }
+  if (!config.allowedOrigins.includes(origin)) throw new GatewayRequestError(403, "ORIGIN_REJECTED", "请求Origin不在允许列表");
   return origin;
 }
 
