@@ -1,3 +1,4 @@
+import { getBuildingAgentGatewayUrl } from "../building-agent/providers/deepseek-gateway.ts";
 import { building1602Dataset, entityById } from "./catalog.ts";
 import {
   findComponent,
@@ -161,7 +162,7 @@ export function createLocalBuildingAgentTurn(question: string, selectedBusinessI
 
 export async function queryBuildingAgent(question: string, selectedBusinessId?: string | null, fetcher: typeof fetch = fetch): Promise<BuildingAgentTurnResult> {
   try {
-    const response = await fetcher("http://127.0.0.1:4180/v1/agent/query", {
+    const response = await fetcher(`${getBuildingAgentGatewayUrl()}/v1/agent/query`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question, selectedBusinessId: selectedBusinessId ?? null })
     });
