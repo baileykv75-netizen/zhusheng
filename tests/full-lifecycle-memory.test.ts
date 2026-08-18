@@ -43,7 +43,10 @@ test("normal records provide negative evidence instead of making every location 
   const basinCold = getConstructionHistory("PIPE-1602-CW-BASIN-01");
   assert.equal(basinCold.status, "OK");
   assert.ok(basinCold.facts.some((fact) => String(fact.value).includes("台盆冷水支管安装")));
-  assert.ok(!basinCold.facts.some((fact) => String(fact.value).includes("返工")));
+  assert.ok(
+    basinCold.data.every((record) => !["REWORK", "FIELD_CHANGE"].includes(record.memory?.memoryClass ?? "")),
+    "the basin cold-water branch should remain a normal-history location even when a record explicitly says no rework was recorded"
+  );
 
   const ceilingLight = getInspectionHistory("LIGHT-1602-CEILING-01");
   assert.equal(ceilingLight.status, "OK");
