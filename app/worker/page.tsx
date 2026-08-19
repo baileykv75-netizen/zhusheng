@@ -53,7 +53,7 @@ export default function WorkerPage() {
   return (
     <SceneStage view="worker" scene="bathroomConstruction" preload={["bathroomMoisture"]} focus="pipe-joint" activeFlow={recording && !paused} cues={[{ id: "component", label: "W-1602-B7", detail: "PPR DN20支管接头", x: 30, y: 45, tone: stage >= 4 ? "safe" : "water" }]}>
       <header className="stage-heading compact worker-stage-heading">
-        <span className="stage-kicker">工友现场记录 · 1602</span>
+        <span className="stage-kicker">BUILDING MEMORY / 建造阶段</span>
         <h1>冷热水支管<br />接头复核</h1>
         <div className="context-line"><span>1602卫生间</span><i /><span>MIC-BATH-1602</span><i /><span>今日工序 03 / 06</span></div>
       </header>
@@ -110,11 +110,11 @@ export default function WorkerPage() {
           </div>
         ) : (
           <div className="memory-seal compact-success">
-            <span className="seal-mark"><CheckCircle2 size={30} /></span><small>品质核验通过</small><h2>关键事实已写入<br />建筑生命记忆</h2><p>{latest?.id || "EV-2848"} 已成为1602卫生间入住后诊断的可信依据。</p>
+            <span className="seal-mark"><CheckCircle2 size={30} /></span><small>BUILDING MEMORY · 已写入</small><h2>这次施工经历<br />不会在封板后消失</h2><p>{latest?.id || "EV-2848"} 已作为1602卫生间的施工证据留在同一建筑数据链中，后续可被定位查询、事件诊断与经验治理引用。</p>
             <EvidenceStrip ids={["joint", "pressure"]} label="EV-2848建筑记忆证据" />
             <dl className="memory-object"><div><dt>空间</dt><dd>1602卫生间</dd></div><div><dt>构件</dt><dd>W-1602-B7</dd></div><div><dt>班组</dt><dd>安装班组（脱敏）</dd></div><div><dt>验收阶段</dt><dd>隐蔽工程复核</dd></div></dl>
-            <div className="contribution-line"><span>工友品质贡献</span><strong>关键隐蔽工序形成可信记录</strong></div>
-          <div className="success-links"><button className="stage-decision" onClick={enterResidentTask}>进入住户服务</button><Link href="/">返回筑生总智能体</Link></div>
+            <div className="contribution-line"><span>后续用途</span><strong>隐蔽查询 · 维修定位 · 异常诊断 · 经验治理</strong></div>
+            <div className="success-links"><button className="stage-decision" onClick={enterResidentTask}>进入住户服务</button><Link href="/memory">在建筑记忆中查看1602</Link><Link href="/">返回建筑总览</Link></div>
           </div>
         )}
       </section>
