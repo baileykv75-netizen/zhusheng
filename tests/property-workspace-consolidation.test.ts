@@ -39,6 +39,9 @@ test("detailed property work cannot present template inputs as facts or one-clic
 
   assert.match(source, /没有事件级湿度观测/);
   assert.match(source, /模板或高级验证中的数值草稿不能冒充当前事实/);
+  assert.match(source, /initialObservationConfirmed/);
+  assert.match(source, /住户提交不会自动触发诊断/);
+  assert.match(source, /运行第一次确定性评估/);
   assert.match(source, /isolationObservationConfirmed/);
   assert.match(source, /repairRecordConfirmed/);
   assert.match(source, /postRepairObservationConfirmed/);
