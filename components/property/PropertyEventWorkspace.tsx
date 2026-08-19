@@ -173,8 +173,8 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
 
     <div className={styles.detailsStrip}>
       <div>
-        <strong>专业处理细节按需展开</strong>
-        <p>住户原始证据、物业复核、授权、阀门执行、维修与复验仍使用原确定性生命周期能力，但不再和第一屏争夺注意力。</p>
+        <strong>完整处理记录</strong>
+        <p>住户原始证据、物业复核、授权、阀门执行、维修与复验按当前事件阶段展开，所有操作继续受同一事件状态约束。</p>
       </div>
       <div className={styles.detailsActions}>
         <Link className={styles.secondaryButton} href="/events">返回事件中心</Link>
