@@ -1,0 +1,98 @@
+/* Route-level refinements that sit above legacy page CSS without changing domain logic. */
+
+/* The 1602 case now has four time stages; legacy two-column navigation must not survive. */
+.product-shell[data-product-mode="cinematic"] .case-workspace > nav {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.product-shell[data-product-mode="cinematic"] .case-workspace > nav button {
+  min-width: 0;
+  padding-inline: 8px;
+  white-space: nowrap;
+}
+
+.product-shell[data-product-mode="cinematic"] .case-current-card h2 {
+  max-width: 680px;
+  font-size: clamp(30px, 3.8vw, 52px);
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+
+.product-shell[data-product-mode="cinematic"] .case-current-card > div:not([class]) {
+  border-color: rgba(255, 255, 255, .09);
+}
+
+/* Building situation owns its page width; old rail compensation would shift it off-center. */
+.product-shell[data-product-mode="work"] .event-center {
+  padding-left: 0;
+}
+
+/* The governance introduction already establishes page context, so task mode should start immediately after it. */
+.product-shell[data-product-mode="work"] .group-workspace-shell .group-learning-workbench.task-mode {
+  min-height: 0;
+  padding-top: 30px;
+}
+
+.product-shell[data-product-mode="work"] .group-learning-workbench.task-mode .group-learning-grid {
+  gap: 34px;
+}
+
+.product-shell[data-product-mode="work"] .group-learning-workbench.task-mode .group-learning-header {
+  margin-bottom: 8px;
+}
+
+.product-shell[data-product-mode="work"] .group-learning-workbench.task-mode .source-proof-metrics {
+  border-bottom: 1px solid var(--zs-line-soft);
+}
+
+.product-shell[data-product-mode="work"] .group-learning-workbench.task-mode .known-unknown-grid {
+  margin-block: 4px 22px;
+}
+
+/* Product pages share the same top offset under the persistent work bar. */
+.product-shell[data-product-mode="work"] .resident-service > main {
+  padding-top: max(104px, env(safe-area-inset-top));
+}
+
+.product-shell[data-product-mode="work"] .resident-service-header {
+  top: 90px;
+}
+
+/* Secondary proof and example media should never compete with the active task. */
+.product-shell[data-product-mode="work"] .resident-photo-guide,
+.product-shell[data-product-mode="work"] .resident-meter-example,
+.product-shell[data-product-mode="work"] .evidence-vault,
+.product-shell[data-product-mode="work"] .reference-vault {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 980px) {
+  .product-shell[data-product-mode="work"] .event-center {
+    padding-left: 0;
+  }
+
+  .product-shell[data-product-mode="work"] .group-learning-workbench.task-mode .group-learning-grid {
+    gap: 22px;
+  }
+}
+
+@media (max-width: 700px) {
+  .product-shell[data-product-mode="cinematic"] .case-workspace > nav {
+    grid-template-columns: repeat(4, minmax(62px, 1fr));
+    overflow-x: auto;
+  }
+
+  .product-shell[data-product-mode="cinematic"] .case-workspace > nav button {
+    min-height: 44px;
+    font-size: 9px;
+  }
+
+  .product-shell[data-product-mode="work"] .resident-service > main {
+    padding-top: 84px;
+  }
+
+  .product-shell[data-product-mode="work"] .resident-service-header {
+    top: 70px;
+  }
+}
