@@ -25,6 +25,13 @@ test("1602 showcase uses four inspectable time stages instead of five feature-de
   assert.match(source, /工作流后续阶段/);
 });
 
+test("past-stage showcase opens the same building-memory record used by operations", async () => {
+  const source = await readFile(sourceUrl, "utf8");
+
+  assert.match(source, /打开完整建筑记忆/);
+  assert.match(source, /\/memory\?record=REC-CONST-CW-J03-REWORK-01/);
+});
+
 test("evidence timeline remains available as proof without dominating the default case narrative", async () => {
   const source = await readFile(sourceUrl, "utf8");
 
