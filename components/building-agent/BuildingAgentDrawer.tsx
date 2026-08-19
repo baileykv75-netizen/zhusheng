@@ -24,7 +24,7 @@ export function BuildingAgentDrawer({ open, onClose }: { open: boolean; onClose:
         <div>
           <span>ASK THE BUILDING</span>
           <h2>问这栋房子</h2>
-          <p>直接查询 1602 的施工、验收、交付与运行记忆；原因类问题优先使用这栋房子的历史，而不是通用故障清单。</p>
+          <p>从1602已经留下的施工、验收、交付与运行记忆开始回答，而不是先给一份通用故障清单。</p>
         </div>
         <div className="agent-header-actions">
           <em className="agent-mode">{building1602Dataset.records.length} 条记忆 · {memoryTradeCount} 类专业/阶段</em>
@@ -34,7 +34,7 @@ export function BuildingAgentDrawer({ open, onClose }: { open: boolean; onClose:
 
       <div className="agent-boundary">
         <ShieldCheck size={15} />
-        <span>建筑事实、工程假设和确认诊断严格分层。这里可以查询和推理，但不会替你授权、执行阀门动作、写入维修结果或改变事件状态。</span>
+        <span>它可以查询、解释和提出验证建议；授权、设备动作和维修结果仍由对应的人与受控流程完成。</span>
       </div>
 
       <div className="agent-body">
@@ -50,8 +50,8 @@ export function BuildingAgentDrawer({ open, onClose }: { open: boolean; onClose:
       <footer className="agent-drawer-footer">
         <span><Database size={13} />{building1602Dataset.records.length} 条生命周期记忆</span>
         <span><LocateFixed size={13} />16F / 1602 / 卫生间</span>
-        <span><Sparkles size={13} />LIVE AI + 确定性建筑工具</span>
-        <Link href="/property" onClick={onClose}>进入受控事件处理<ArrowRight size={13} /></Link>
+        <span><Sparkles size={13} />本楼事实优先</span>
+        <Link href="/property" onClick={onClose}>进入物业事件处理<ArrowRight size={13} /></Link>
       </footer>
     </aside>
   </div>, document.body);
