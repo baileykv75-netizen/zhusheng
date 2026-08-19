@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArrowRight, Bot, Clock3, Database, LocateFixed, ShieldCheck, Wrench } from "lucide-react";
+import { ArrowRight, Clock3, Database, ShieldCheck, Wrench } from "lucide-react";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { useBuildingProductContext } from "@/components/product/BuildingContextProvider";
 import { BathroomTwinViewport } from "@/components/life-event/BathroomTwinViewport";
@@ -166,8 +166,8 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
         <p>住户原始证据、物业复核、授权、阀门执行、维修与复验仍使用原确定性生命周期能力，但不再和第一屏争夺注意力。</p>
       </div>
       <div className={styles.detailsActions}>
+        <Link className={styles.secondaryButton} href="/events">返回事件中心</Link>
         <button className={styles.secondaryButton} type="button" onClick={() => setTaskOpen((value) => !value)}>{taskOpen ? "收起处理任务" : "展开处理任务"}</button>
-        <button className={styles.secondaryButton} type="button" onClick={() => product.setAgentResult(product.agentResult)}><Bot size={14} /> AI结果跨页面保留</button>
       </div>
     </div>
 
