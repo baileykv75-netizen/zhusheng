@@ -27,13 +27,14 @@ test("shared product visual layers load after legacy CSS", async () => {
 });
 
 test("work mode uses one product topbar instead of exposing the legacy admin rail", async () => {
-  const [shell, polish] = await Promise.all([readFile(shellUrl, "utf8"), readFile(polishUrl, "utf8")]);
+  const [shell, polish, finishing] = await Promise.all([readFile(shellUrl, "utf8"), readFile(polishUrl, "utf8"), readFile(finishingUrl, "utf8")]);
 
   assert.match(shell, /className="floating-project-bar journey-project-bar product-topbar"/);
   assert.match(shell, /className="work-brand"/);
   assert.match(shell, /className="topbar-agent"/);
   assert.match(polish, /\.compact-brand-rail \{\s*display: none !important;/);
   assert.match(polish, /\.app-shell,[\s\S]*padding-left: 0;/);
+  assert.match(finishing, /--rail: 0px;/);
 });
 
 test("visual system defines restrained colors spacing type and reduced-motion behavior", async () => {
