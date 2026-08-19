@@ -23,7 +23,7 @@ import styles from "./BuildingMemoryWorkspace.module.css";
 
 const defaultDirective: VisualDirective = {
   view: "VIEW_CONSTRUCTION_MEMORY",
-  highlightBusinessIds: ["J-1602-CW-03"],
+  highlightBusinessIds: [],
   moistureState: "DRY",
   valvePosition: "OPEN",
   evidenceAnchorIds: [],
@@ -132,7 +132,9 @@ export function BuildingMemoryWorkspace() {
       <div className={styles.heroCopy}>
         <span className={styles.eyebrow}>BUILDING MEMORY · 16F / 1602</span>
         <h1>这栋房子记得自己经历过什么</h1>
-        <p>施工、现场调整、检查、交付与运行记录按同一个空间和构件身份连续保存。今天处理 EVT-1602 时，相关历史会参与排查优先级，但不会被自动升级为故障结论。</p>
+        <p>{model.hasActiveEvent
+          ? `当前处理 ${model.eventId} 时，相关历史会参与排查优先级，但不会被自动升级为故障结论。`
+          : "当前没有活动事件。这里先作为建筑生命周期档案浏览；返工、现场调整或检查边界都只是历史事实，不代表今天存在对应故障。"}</p>
       </div>
       <div className={styles.metrics} aria-label="建筑记忆摘要">
         <div><strong>{model.totalRecords}</strong><span>生命周期记忆</span></div>
@@ -241,7 +243,7 @@ export function BuildingMemoryWorkspace() {
               <div className={styles.relationHeadline}><strong>{relevanceLabel[selected.eventRelation.relevance]}</strong><span>{signalLabel[selected.eventRelation.historicalSignal]}</span></div>
               <div className={styles.reasonList}>{selected.eventRelation.reasons.map((reason) => <span key={`${reason.code}-${reason.detail ?? ""}`}>{reason.label}{reason.detail ? ` · ${reason.detail}` : ""}</span>)}</div>
               <p>{selected.eventRelation.historicalBoundary}</p>
-            </section> : <section className={styles.eventRelation}><div className={styles.sectionTitle}><ShieldCheck size={14} /><strong>当前事件关系</strong></div><p>这条记录目前只作为建筑生命周期背景保存，没有被当前事件相关性规则提升优先级。</p></section>}
+            </section> : <section className={styles.eventRelation}><div className={styles.sectionTitle}><ShieldCheck size={14} /><strong>{model.hasActiveEvent ? "当前事件关系" : "生命周期背景"}</strong></div><p>{model.hasActiveEvent ? "这条记录目前只作为建筑生命周期背景保存，没有被当前事件相关性规则提升优先级。" : "当前没有活动事件，这条记录只按原始时间、空间和构件身份保存，不参与任何诊断排序。"}</p></section>}
 
             <div className={styles.businessIds}>
               <span>关联构件 / 系统</span>
