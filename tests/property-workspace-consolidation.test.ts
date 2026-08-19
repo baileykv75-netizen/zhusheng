@@ -22,6 +22,7 @@ test("legacy detailed property work remains available only behind the secondary 
   assert.match(source, /这栋房子记得什么/);
   assert.match(source, /当前还缺什么/);
   assert.match(source, /UNIQUE NEXT ACTION/);
+  assert.match(source, /href="\/memory"/);
 });
 
 test("existing focus deep links still open the detailed domain task when required", async () => {
