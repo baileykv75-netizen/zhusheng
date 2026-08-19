@@ -124,6 +124,19 @@
   background: var(--zs-accent-hover);
 }
 
+/* Resident no longer carries the legacy left-rail offset or a second header beneath the shared product bar. */
+.product-shell[data-product-mode="work"] .resident-service {
+  padding-left: 0;
+}
+
+.product-shell[data-product-mode="work"] .resident-service-header {
+  display: none;
+}
+
+.product-shell[data-product-mode="work"] .resident-service > main {
+  padding-top: 116px;
+}
+
 /* 3D response should communicate continuity rather than flashy motion. */
 .twin-viewport,
 .case-model,
@@ -138,6 +151,10 @@
   .product-shell[data-product-mode="work"]:has(.event-center) .mobile-task-nav,
   .product-shell[data-product-mode="work"]:has(.group-workspace-shell) .mobile-task-nav {
     display: grid;
+  }
+
+  .product-shell[data-product-mode="work"] .resident-service > main {
+    padding-top: 86px;
   }
 }
 
