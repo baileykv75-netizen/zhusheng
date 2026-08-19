@@ -7,6 +7,7 @@ const shellUrl = new URL("../components/shell.tsx", import.meta.url);
 const tokensUrl = new URL("../app/product-tokens.css", import.meta.url);
 const polishUrl = new URL("../app/product-polish.css", import.meta.url);
 const routePolishUrl = new URL("../app/product-route-polish.css", import.meta.url);
+const finishingUrl = new URL("../app/product-finishing.css", import.meta.url);
 const buildingAiCssUrl = new URL("../components/BuildingIntelligenceWorkspace.module.css", import.meta.url);
 
 test("shared product visual layers load after legacy CSS", async () => {
@@ -15,10 +16,12 @@ test("shared product visual layers load after legacy CSS", async () => {
   const tokens = source.indexOf('import "./product-tokens.css"');
   const polish = source.indexOf('import "./product-polish.css"');
   const routePolish = source.indexOf('import "./product-route-polish.css"');
+  const finishing = source.indexOf('import "./product-finishing.css"');
 
   assert.ok(legacy >= 0 && tokens > legacy);
   assert.ok(polish > tokens);
   assert.ok(routePolish > polish);
+  assert.ok(finishing > routePolish);
 });
 
 test("work mode uses one product topbar instead of exposing the legacy admin rail", async () => {
@@ -73,4 +76,13 @@ test("Building AI reasoning reads as one evidence flow rather than a grid of hyp
   assert.match(source, /\.hypothesisGrid \{\s*display: grid;\s*grid-template-columns: 1fr;/);
   assert.match(source, /\.hypothesisCard \{[\s\S]*border-radius: 0;[\s\S]*background: transparent;/);
   assert.match(source, /\.reasoningStack \{[\s\S]*border-top:/);
+});
+
+test("Ask Building uses the same restrained product interaction language as work mode", async () => {
+  const source = await readFile(finishingUrl, "utf8");
+
+  assert.match(source, /\.building-agent-drawer \{[\s\S]*background: var\(--zs-paper\)/);
+  assert.match(source, /\.agent-drawer-header \{[\s\S]*background: var\(--zs-charcoal\)/);
+  assert.match(source, /\.building-agent-shell :focus-visible/);
+  assert.match(source, /\.building-ai-form button \{\s*background: var\(--zs-accent\)/);
 });
