@@ -43,6 +43,9 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
   const result = session.result;
   const [repairPhotoReady, setRepairPhotoReady] = useState(false);
   const [postRepairPhotoReady, setPostRepairPhotoReady] = useState(false);
+  const [isolationObservationConfirmed, setIsolationObservationConfirmed] = useState(false);
+  const [repairRecordConfirmed, setRepairRecordConfirmed] = useState(false);
+  const [postRepairObservationConfirmed, setPostRepairObservationConfirmed] = useState(false);
   const [reviewerId, setReviewerId] = useState("PROPERTY-DEMO-01");
   const [reviewDecision, setReviewDecision] = useState<"CONSISTENT" | "NEEDS_SITE_CHECK" | "INCONCLUSIVE">("NEEDS_SITE_CHECK");
   const [reviewNote, setReviewNote] = useState("已核对住户原始描述与照片来源，建议结合现场传感器观察继续判断。");
@@ -62,8 +65,15 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
   }, [result?.state]);
 
   useEffect(() => {
-    if (result?.state === "REPAIR_PENDING") setRepairPhotoReady(false);
-    if (result?.state === "POST_REPAIR_VERIFYING") setPostRepairPhotoReady(false);
+    if (result?.state === "VERIFYING") setIsolationObservationConfirmed(false);
+    if (result?.state === "REPAIR_PENDING") {
+      setRepairPhotoReady(false);
+      setRepairRecordConfirmed(false);
+    }
+    if (result?.state === "POST_REPAIR_VERIFYING") {
+      setPostRepairPhotoReady(false);
+      setPostRepairObservationConfirmed(false);
+    }
   }, [result?.state]);
 
   function patch<K extends keyof LabSession>(key: K, value: LabSession[K]) {
@@ -202,24 +212,28 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
 
         {result?.state === "VERIFYING" ? <section className="active-task" data-focus="isolation" tabIndex={-1}>
           <div className="task-section-heading"><Gauge size={18} /><div><strong>提交关阀后的新观察</strong><small>自动关联本次关阀审计sequence</small></div></div>
+          <p className="task-control-note">下面的数值是脱敏演示草稿，不代表系统已经观测到恢复。请调整为本轮实际/演示读数，并人工确认后再提交。</p>
           <div className="task-field-grid">
-            <TaskNumber label="微流量" value={session.isolation.microFlow} unit="L/min" min={0} max={0.2} step={0.01} onChange={(microFlow) => patch("isolation", { ...session.isolation, microFlow })} />
-            <TaskNumber label="湿度" value={session.isolation.humidity} unit="%" min={0} max={100} onChange={(humidity) => patch("isolation", { ...session.isolation, humidity })} />
-            <TaskNumber label="持续时间" value={session.isolation.durationMinutes} unit="min" min={0} max={120} step={5} onChange={(durationMinutes) => patch("isolation", { ...session.isolation, durationMinutes })} />
+            <TaskNumber label="微流量" value={session.isolation.microFlow} unit="L/min" min={0} max={0.2} step={0.01} onChange={(microFlow) => { patch("isolation", { ...session.isolation, microFlow }); setIsolationObservationConfirmed(false); }} />
+            <TaskNumber label="湿度" value={session.isolation.humidity} unit="%" min={0} max={100} onChange={(humidity) => { patch("isolation", { ...session.isolation, humidity }); setIsolationObservationConfirmed(false); }} />
+            <TaskNumber label="持续时间" value={session.isolation.durationMinutes} unit="min" min={0} max={120} step={5} onChange={(durationMinutes) => { patch("isolation", { ...session.isolation, durationMinutes }); setIsolationObservationConfirmed(false); }} />
           </div>
-          <button className="task-primary" disabled={busy} onClick={submitIsolation}><Gauge size={16} />提交隔离后观察</button>
+          <label className="task-control-note"><input type="checkbox" checked={isolationObservationConfirmed} onChange={(event) => setIsolationObservationConfirmed(event.target.checked)} /> 我确认这些是本次隔离后的观测值，而不是直接采用示例结果</label>
+          <button className="task-primary" disabled={busy || !isolationObservationConfirmed} onClick={submitIsolation}><Gauge size={16} />提交隔离后观察</button>
         </section> : null}
 
         {result?.state === "REPAIR_PENDING" ? <section className="active-task" data-focus="repair" tabIndex={-1}>
           <div className="task-section-heading"><Wrench size={18} /><div><strong>填写人工维修记录</strong><small>事件已临时控制，尚未完成维修</small></div></div>
           {repairTask ? <div className="repair-task-brief"><span>精准维修目标</span><strong>{repairTask.target.displayName}</strong><code>{repairTask.target.businessId}</code><p>{repairTask.recommendedScope.join("；")}</p></div> : null}
+          <p className="task-control-note">维修方式和说明带有脱敏演示草稿，只用于降低演示录入成本；它们不是已经发生的维修事实。</p>
           <div className="task-form-stack">
-            <label><span>维修方式</span><select value={session.repairDraft.method} onChange={(event) => patch("repairDraft", { ...session.repairDraft, method: event.target.value as typeof session.repairDraft.method })}><option value="JOINT_RETIGHTEN">接头复紧</option><option value="SEAL_REPLACEMENT">密封件更换</option><option value="JOINT_REPLACEMENT">接头更换</option><option value="LOCAL_PIPE_REPLACEMENT">局部管段更换</option><option value="INSPECTION_ONLY">仅检查、未维修</option></select></label>
-            <label><span>维修人员 / 班组</span><input value={session.repairDraft.crewId} onChange={(event) => patch("repairDraft", { ...session.repairDraft, crewId: event.target.value })} /></label>
-            <label><span>维修说明</span><textarea value={session.repairDraft.description} onChange={(event) => patch("repairDraft", { ...session.repairDraft, description: event.target.value })} /></label>
+            <label><span>维修方式</span><select value={session.repairDraft.method} onChange={(event) => { patch("repairDraft", { ...session.repairDraft, method: event.target.value as typeof session.repairDraft.method }); setRepairRecordConfirmed(false); }}><option value="JOINT_RETIGHTEN">接头复紧</option><option value="SEAL_REPLACEMENT">密封件更换</option><option value="JOINT_REPLACEMENT">接头更换</option><option value="LOCAL_PIPE_REPLACEMENT">局部管段更换</option><option value="INSPECTION_ONLY">仅检查、未维修</option></select></label>
+            <label><span>维修人员 / 班组</span><input value={session.repairDraft.crewId} onChange={(event) => { patch("repairDraft", { ...session.repairDraft, crewId: event.target.value }); setRepairRecordConfirmed(false); }} /></label>
+            <label><span>维修说明</span><textarea value={session.repairDraft.description} onChange={(event) => { patch("repairDraft", { ...session.repairDraft, description: event.target.value }); setRepairRecordConfirmed(false); }} /></label>
           </div>
-          <LocalEvidenceUpload label="选择维修现场照片" help="关联1602卫生间与当前维修构件" syntheticExample="/assets/demo-evidence/1602-repair-open-wall.webp" onReadyChange={setRepairPhotoReady} />
-          <button className="task-primary" disabled={busy || !session.repairDraft.crewId || !session.repairDraft.description || !repairPhotoReady} onClick={submitRepair}><ClipboardCheck size={16} />提交不可变维修记录</button>
+          <LocalEvidenceUpload label="选择维修现场照片" help="关联1602卫生间与当前维修构件" syntheticExample="/assets/demo-evidence/1602-repair-open-wall.webp" onReadyChange={(ready) => { setRepairPhotoReady(ready); if (!ready) setRepairRecordConfirmed(false); }} />
+          <label className="task-control-note"><input type="checkbox" checked={repairRecordConfirmed} onChange={(event) => setRepairRecordConfirmed(event.target.checked)} /> 我确认维修方式、人员、说明与照片代表本次提交记录</label>
+          <button className="task-primary" disabled={busy || !session.repairDraft.crewId || !session.repairDraft.description || !repairPhotoReady || !repairRecordConfirmed} onClick={submitRepair}><ClipboardCheck size={16} />提交不可变维修记录</button>
         </section> : null}
 
         {result?.state === "REPAIR_RECORDED" ? <section className="active-task safety" data-focus="authorization" tabIndex={-1}>
@@ -230,13 +244,15 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
 
         {result?.state === "POST_REPAIR_VERIFYING" ? <section className="active-task" data-focus="post-repair" tabIndex={-1}>
           <div className="task-section-heading"><Gauge size={18} /><div><strong>维修后复验</strong><small>只接受恢复供水后的新观察</small></div></div>
+          <p className="task-control-note">默认读数和示例照片只是脱敏演示草稿，不代表维修已经成功。必须确认恢复供水后的新观测后，事件引擎才会判断 RESOLVED 或 REOPENED。</p>
           <div className="task-field-grid">
-            <TaskNumber label="微流量" value={session.postRepair.microFlow} unit="L/min" min={0} max={0.2} step={0.01} onChange={(microFlow) => patch("postRepair", { ...session.postRepair, microFlow })} />
-            <TaskNumber label="湿度" value={session.postRepair.humidity} unit="%" min={0} max={100} onChange={(humidity) => patch("postRepair", { ...session.postRepair, humidity })} />
-            <TaskNumber label="持续时间" value={session.postRepair.durationMinutes} unit="min" min={0} max={120} step={5} onChange={(durationMinutes) => patch("postRepair", { ...session.postRepair, durationMinutes })} />
+            <TaskNumber label="微流量" value={session.postRepair.microFlow} unit="L/min" min={0} max={0.2} step={0.01} onChange={(microFlow) => { patch("postRepair", { ...session.postRepair, microFlow }); setPostRepairObservationConfirmed(false); }} />
+            <TaskNumber label="湿度" value={session.postRepair.humidity} unit="%" min={0} max={100} onChange={(humidity) => { patch("postRepair", { ...session.postRepair, humidity }); setPostRepairObservationConfirmed(false); }} />
+            <TaskNumber label="持续时间" value={session.postRepair.durationMinutes} unit="min" min={0} max={120} step={5} onChange={(durationMinutes) => { patch("postRepair", { ...session.postRepair, durationMinutes }); setPostRepairObservationConfirmed(false); }} />
           </div>
-          <LocalEvidenceUpload label="选择维修后现场照片" help="必须是恢复供水后的新观察" syntheticExample="/assets/demo-evidence/1602-post-repair-wall.webp" onReadyChange={setPostRepairPhotoReady} />
-          <button className="task-primary" disabled={busy || !postRepairPhotoReady} onClick={submitPostRepair}><Gauge size={16} />提交维修后复验</button>
+          <LocalEvidenceUpload label="选择维修后现场照片" help="必须是恢复供水后的新观察" syntheticExample="/assets/demo-evidence/1602-post-repair-wall.webp" onReadyChange={(ready) => { setPostRepairPhotoReady(ready); if (!ready) setPostRepairObservationConfirmed(false); }} />
+          <label className="task-control-note"><input type="checkbox" checked={postRepairObservationConfirmed} onChange={(event) => setPostRepairObservationConfirmed(event.target.checked)} /> 我确认这些是恢复供水后的新观测，不是直接采用示例结果</label>
+          <button className="task-primary" disabled={busy || !postRepairPhotoReady || !postRepairObservationConfirmed} onClick={submitPostRepair}><Gauge size={16} />提交维修后复验</button>
         </section> : null}
 
         {result?.state === "RESOLVED" ? <section className="active-task final resolved">
