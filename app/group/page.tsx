@@ -26,7 +26,7 @@ export default function GroupPage() {
 
     {mode === "task" ? <section className={styles.intro}>
       <span className={styles.eyebrow}>EXPERIENCE GOVERNANCE · FROM ONE VERIFIED EVENT</span>
-      <h1>一件被验证的经历<br />先成为可以继续验证的经验</h1>
+      <h1>一件被验证的经历先成为可以继续验证的经验</h1>
       <p>单个案例不会被直接包装成集团规律。这里依次回答：经验从哪个事件来、形成了什么候选、证据覆盖到哪里，以及最终由谁决定是否进入试点。</p>
       <div className={styles.flow} aria-label="经验治理链">
         <div><span>01 / SOURCE EVENT</span><strong>EVT-1602</strong><small>来源事件必须先通过完整闭环与成果包验证。</small></div>
