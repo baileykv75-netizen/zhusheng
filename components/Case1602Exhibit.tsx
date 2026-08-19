@@ -69,8 +69,8 @@ export function Case1602Exhibit() {
         title: "墙封起来以后 施工经历没有消失",
         fact: "1602的施工、现场调整、返工和验收边界仍然按构件与系统留在 Building Memory 中。",
         why: "这些历史会改变今天的排查顺序，但历史相关性不等于当前故障结论。",
-        action: "查看施工记录如何留下",
-        href: "/worker?from=case",
+        action: "打开完整建筑记忆",
+        href: "/memory?record=REC-CONST-CW-J03-REWORK-01",
         view: "VIEW_CONSTRUCTION_MEMORY"
       },
       present: {
