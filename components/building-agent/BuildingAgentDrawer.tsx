@@ -1,20 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { ArrowRight, Database, LocateFixed, ShieldCheck, Sparkles, X } from "lucide-react";
 import { BuildingIntelligenceWorkspace } from "@/components/BuildingIntelligenceWorkspace";
-import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { building1602Dataset } from "@/lib/building-intelligence/catalog.ts";
-import type { BuildingAgentTurnResult } from "@/lib/building-intelligence/types.ts";
+import { useBuildingProductContext } from "@/components/product/BuildingContextProvider";
 
 const memoryTradeCount = new Set(building1602Dataset.records.map((record) => record.memory?.trade).filter(Boolean)).size;
 
 export function BuildingAgentDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
-  const [result, setResult] = useState<BuildingAgentTurnResult | null>(null);
-  const { session } = useLifecycleJourney();
+  const product = useBuildingProductContext();
 
   useEffect(() => { if (open) closeRef.current?.focus(); }, [open]);
 
@@ -41,11 +39,11 @@ export function BuildingAgentDrawer({ open, onClose }: { open: boolean; onClose:
 
       <div className="agent-body">
         <BuildingIntelligenceWorkspace
-          idPrefix="homepage-building-agent"
-          selectedBusinessId={session.selectedBusinessId}
-          result={result}
-          onResult={setResult}
-          showVisualState={false}
+          idPrefix="global-building-agent"
+          selectedBusinessId={product.selectedBusinessId}
+          result={product.agentResult}
+          onResult={product.setAgentResult}
+          showVisualState={Boolean(product.queryVisual)}
         />
       </div>
 
