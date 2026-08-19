@@ -153,7 +153,7 @@ export function deriveGuardedLifecycleProjection(
         ...base,
         phase: "EVIDENCE",
         headline: source?.state === "REOPENED" ? "事件已重新打开，先补充新的现场事实" : "先让现场事实进入事件链",
-        summary: "物业不能代替住户填写原始证据。先补齐描述、照片观察与水表观察，再由同一事件引擎评估。",
+        summary: "物业不能代替住户填写原始证据。先提交住户实际看到的描述与现场观察；后续只追加当前事实真正需要的补证，再由同一事件引擎评估。",
         nextAction: {
           id: "COLLECT_RESIDENT_EVIDENCE",
           label: "通知住户补充原始证据",
