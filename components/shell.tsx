@@ -49,25 +49,26 @@ export function Shell({ children }: { children: React.ReactNode }) {
   </ProductShellFrame><BuildingAgentDrawer open={agentOpen} onClose={() => setAgentOpen(false)} /></>;
 
   return <><ProductShellFrame mode={product.presentationMode} area={product.area}>
-    <aside className="brand-rail compact-brand-rail">
-      <Link href="/" className="brand-signature" aria-label="返回筑生总智能体">
+    <aside className="brand-rail compact-brand-rail" aria-hidden="true">
+      <Link href="/" className="brand-signature" tabIndex={-1}>
         <span>筑</span><strong>筑生</strong>
       </Link>
       <div className="brand-life-mark"><i /><small>ONE BUILDING<br />ONE AGENT</small></div>
     </aside>
 
-    <header className="floating-project-bar journey-project-bar">
+    <header className="floating-project-bar journey-project-bar product-topbar">
+      <Link href="/" className="work-brand" aria-label="返回筑生建筑总览"><span>筑</span><strong>筑生</strong></Link>
       <Link href="/" className="project-identity" aria-label="筑生建筑总览">
         <span className="project-pulse" />
         <div><small>BUILDING LIFE / 02</small><strong>{product.buildingLabel}</strong></div>
       </Link>
       <div className="workspace-context"><span>{product.workspaceLabel}</span><em>{locationContext || journey.stateLabel}</em></div>
       <div className="project-meta"><span>{product.buildingId}</span><span className="runtime-mode"><i />脱敏演示数据</span></div>
-      <Link className="return-agent" href={product.currentPath === "/events" ? "/" : "/case-1602"}><Building2 size={15} />{product.currentPath === "/events" ? "返回建筑总览" : "返回1602事件"}</Link>
+      <button className="topbar-agent" type="button" onClick={() => setAgentOpen(true)}><Sparkles size={15} /><span>问这栋房子</span></button>
       <details className="workspace-menu">
         <summary aria-label="打开筑生产品导航"><Menu size={17} /><span>产品导航</span><ChevronDown size={13} /></summary>
         <nav aria-label="筑生产品导航">
-          <button type="button" onClick={() => setAgentOpen(true)}><Sparkles size={15} /><span>问这栋房子</span></button>
+          <Link href="/"><Building2 size={15} /><span>建筑总览</span></Link>
           {workspaceLinks.map(({ href, label, group, english }) => {
             const Icon = iconByHref[href as keyof typeof iconByHref] ?? Building2;
             const displayLabel = group === label ? label : `${group} · ${label}`;
