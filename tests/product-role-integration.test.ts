@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 
 const workerUrl = new URL("../app/worker/page.tsx", import.meta.url);
 const residentUrl = new URL("../components/ResidentService.tsx", import.meta.url);
+const journeyUrl = new URL("../components/lifecycle-journey-provider.tsx", import.meta.url);
 const eventsUrl = new URL("../components/BuildingEventCenter.tsx", import.meta.url);
 const eventModelUrl = new URL("../lib/product/building-life-events.ts", import.meta.url);
 const groupUrl = new URL("../app/group/page.tsx", import.meta.url);
@@ -18,13 +19,16 @@ test("worker completion explicitly continues into Building Memory instead of end
   assert.match(source, /查看这条建筑记忆/);
 });
 
-test("resident evidence is framed as immutable source evidence inside EVT-1602", async () => {
-  const source = await readFile(residentUrl, "utf8");
+test("resident evidence is immutable source evidence and does not auto-run diagnosis", async () => {
+  const [resident, journey] = await Promise.all([readFile(residentUrl, "utf8"), readFile(journeyUrl, "utf8")]);
 
-  assert.match(source, /你的现场观察进入同一事件/);
-  assert.match(source, /提交后会形成 EVT-1602 的住户原始证据/);
-  assert.match(source, /物业只能追加独立复核，不能覆盖你的原始提交/);
-  assert.match(source, /数据与隐私说明/);
+  assert.match(resident, /你的现场观察进入同一事件/);
+  assert.match(resident, /提交后先形成住户原始证据，不会立刻产生故障判断/);
+  assert.match(resident, /物业只能追加独立复核，不能覆盖你的原始提交/);
+  assert.match(resident, /等待物业确认本轮系统观测/);
+  assert.match(resident, /数据与隐私说明/);
+  assert.match(journey, /尚未运行故障判断。下一步由物业确认本轮系统观测/);
+  assert.match(journey, /const eventId = session\.result\?\.eventId \?\? pendingEventId\(session\.eventCounter\)/);
 });
 
 test("resident evidence collection does not expose water-meter questioning as a preset first-screen step", async () => {
