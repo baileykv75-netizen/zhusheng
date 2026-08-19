@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import type { LabSession } from "../lib/life-event-lab/types.ts";
-import { derivePropertyEventViewModel } from "../lib/product/property-event-view-model.ts";
+import { derive1602MemoryRelevanceInput, derivePropertyEventViewModel } from "../lib/product/property-event-view-model.ts";
 
 function sessionWithoutEvent(): LabSession {
   return {
@@ -51,8 +51,10 @@ function sessionWithoutEvent(): LabSession {
   };
 }
 
-test("property first screen derives one event story from lifecycle truth and building memory", () => {
-  const model = derivePropertyEventViewModel(sessionWithoutEvent());
+test("property first screen waits for event facts instead of presenting template controls as observations", () => {
+  const session = sessionWithoutEvent();
+  const model = derivePropertyEventViewModel(session);
+  const relevance = derive1602MemoryRelevanceInput(session);
 
   assert.equal(model.eventId, "EVT-1602");
   assert.equal(model.spaceLabel, "1602卫生间");
@@ -60,8 +62,10 @@ test("property first screen derives one event story from lifecycle truth and bui
   assert.equal(model.projection.nextAction.id, "COLLECT_RESIDENT_EVIDENCE");
   assert.equal(model.residentEvidenceReady, false);
   assert.equal(model.evidenceGaps[0]?.actor, "住户");
-  assert.equal(model.relevantMemories[0]?.recordId, "REC-CONST-CW-J03-REWORK-01");
-  assert.equal(model.relevantMemories[0]?.historicalSignal, "ELEVATED_HISTORY");
+  assert.deepEqual(model.observations, []);
+  assert.deepEqual(relevance.activeSystemIds, []);
+  assert.deepEqual(relevance.observationTags, []);
+  assert.equal(relevance.selectedBusinessId, null);
 });
 
 test("property view model keeps historical relevance separate from confirmed diagnosis", () => {
@@ -72,4 +76,13 @@ test("property view model keeps historical relevance separate from confirmed dia
   assert.equal(normal.historicalSignal, "BACKGROUND");
   assert.match(normal.historicalBoundary, /不能.*当前|不代表当前|不能据此排除|不应.*当前/u);
   assert.equal(model.assessment.confidence, "尚未评估");
+});
+
+test("browsing a component cannot change event-level memory relevance before assessment", () => {
+  const session = sessionWithoutEvent();
+  session.selectedBusinessId = "J-1602-CW-03";
+
+  const relevance = derive1602MemoryRelevanceInput(session);
+  assert.equal(relevance.selectedBusinessId, null);
+  assert.deepEqual(relevance.topologyBusinessIds, []);
 });
