@@ -1,6 +1,7 @@
 import { building1602Dataset } from "../building-intelligence/catalog.ts";
 import { resolveBuildingMemoryRelevance, type RelevantBuildingMemory } from "../building-intelligence/memory-relevance.ts";
 import type { BuildingMemoryClass, BuildingMemoryTrade, BuildingRecord, BuildingRecordMemory } from "../building-intelligence/types.ts";
+import type { EvidenceRecord } from "../demo-engine.ts";
 import type { LabSession } from "../life-event-lab/types.ts";
 import { derive1602MemoryRelevanceInput } from "./property-event-view-model.ts";
 
@@ -125,6 +126,42 @@ function isSpecial(record: BuildingRecord) {
   return ["REWORK", "FIELD_CHANGE", "INSPECTION_LIMIT"].includes(record.memory?.memoryClass ?? "");
 }
 
+function workerEvidenceEntries(evidence: EvidenceRecord[]) {
+  return evidence
+    .filter((item) => item.id === "EV-2848" && item.status === "verified")
+    .map((item): BuildingMemoryEntry => ({
+      recordId: item.id,
+      title: `工友现场复核 · ${item.type}`,
+      summary: item.note,
+      occurredAt: item.capturedAt,
+      recordType: "CONSTRUCTION",
+      subjectBusinessIds: [...item.refs],
+      visualTargetBusinessId: null,
+      memory: {
+        trade: "COLD_WATER",
+        memoryClass: "NORMAL",
+        phase: "现场口述 / 品质核验",
+        originalDesign: "1602卫生间冷热水支管按既定施工与复核流程形成现场证据。",
+        actualCondition: item.note,
+        reason: "工友现场口述与照片用于保留封板前的实际施工状态。",
+        fieldDecision: "AI仅整理口述字段；经人工确认和品质核验后作为施工证据写入建筑记忆视图。",
+        verification: {
+          method: "品质核验",
+          result: "空间、构件、工序与现场影像已核对",
+          checkedItems: ["空间", "构件", "工序", "保压结果", "现场影像"],
+          uncheckedItems: ["长期运行状态", "入住后的实际渗漏表现"]
+        },
+        residualRisk: "施工期核验通过不代表后续运行期永远无异常。",
+        workerStatement: item.source
+      },
+      memoryClass: "NORMAL",
+      trade: "COLD_WATER",
+      stage: "INSTALLATION",
+      special: false,
+      eventRelation: null
+    }));
+}
+
 function recordMatchesFilter(entry: BuildingMemoryEntry, filter: MemoryFilterId) {
   if (filter === "ALL") return true;
   if (filter === "WATER_SUPPLY") return entry.trade === "COLD_WATER" || entry.trade === "HOT_WATER";
@@ -150,7 +187,7 @@ export function groupBuildingMemoryEntries(entries: BuildingMemoryEntry[]) {
   })).filter((stage) => stage.entries.length > 0);
 }
 
-export function deriveBuildingMemoryViewModel(session: LabSession): BuildingMemoryViewModel {
+export function deriveBuildingMemoryViewModel(session: LabSession, workerEvidence: EvidenceRecord[] = []): BuildingMemoryViewModel {
   const relationInput = derive1602MemoryRelevanceInput(session);
   const relations = resolveBuildingMemoryRelevance({
     ...relationInput,
@@ -159,7 +196,7 @@ export function deriveBuildingMemoryViewModel(session: LabSession): BuildingMemo
     selectedBusinessId: null
   });
   const relationById = new Map(relations.map((item) => [item.recordId, item]));
-  const entries = building1602Dataset.records
+  const structuredEntries = building1602Dataset.records
     .filter((record): record is BuildingRecord & { memory: BuildingRecordMemory } => Boolean(record.memory))
     .map((record): BuildingMemoryEntry => ({
       recordId: record.recordId,
@@ -175,7 +212,9 @@ export function deriveBuildingMemoryViewModel(session: LabSession): BuildingMemo
       stage: memoryLifecycleStage(record),
       special: isSpecial(record),
       eventRelation: relationById.get(record.recordId) ?? null
-    }))
+    }));
+  const structuredIds = new Set(structuredEntries.map((entry) => entry.recordId));
+  const entries = [...structuredEntries, ...workerEvidenceEntries(workerEvidence).filter((entry) => !structuredIds.has(entry.recordId))]
     .sort((a, b) => a.occurredAt.localeCompare(b.occurredAt) || a.recordId.localeCompare(b.recordId));
 
   const firstHighSpecial = entries.find((entry) => entry.special && entry.eventRelation?.relevance === "HIGH");
