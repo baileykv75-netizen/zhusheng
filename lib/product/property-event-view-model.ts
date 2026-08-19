@@ -1,6 +1,6 @@
 import { resolveBuildingMemoryRelevance, type MemoryRelevanceInput, type RelevantBuildingMemory } from "../building-intelligence/memory-relevance.ts";
 import { deriveGuardedLifecycleProjection, type GuardedLifecycleProjection } from "../life-event-engine/guarded-lifecycle.ts";
-import type { Hypothesis, LifeEventResult, MissingEvidence } from "../life-event-engine/types.ts";
+import type { Hypothesis, LifeEventResult, MissingEvidence, SensorObservation } from "../life-event-engine/types.ts";
 import type { LabSession } from "../life-event-lab/types.ts";
 import { hasFreshEvidenceAfterReopen } from "../life-event-lab/reopened-cycle.ts";
 
@@ -62,18 +62,33 @@ function actorLabel(actor: MissingEvidence["requestedFrom"]): PropertyEvidenceGa
   return "物业";
 }
 
+function latestObservation(result: LifeEventResult, metric: SensorObservation["metric"]) {
+  return result.input.observations
+    .filter((item) => item.metric === metric)
+    .sort((a, b) => a.observedAt.localeCompare(b.observedAt))
+    .at(-1);
+}
+
 function activeSystemsFor(result: LifeEventResult | null) {
-  const hypothesis = result?.rankedHypotheses[0]?.hypothesis;
-  if (hypothesis === "COLD_WATER_JOINT_LEAK") return ["SYS-1602-CW"];
-  if (hypothesis === "WATERPROOFING_FAILURE") return [];
-  return ["SYS-1602-CW"];
+  if (result?.rankedHypotheses[0]?.hypothesis === "COLD_WATER_JOINT_LEAK") return ["SYS-1602-CW"];
+  return [];
 }
 
 function phenomenonTags(result: LifeEventResult | null) {
-  const tags = ["DAMPNESS"];
-  const micro = result?.input.observations.find((item) => item.metric === "MICRO_FLOW");
-  if (!micro || micro.value > (micro.baseline ?? 0)) tags.push("MICROFLOW", "COLD_WATER_LEAK");
-  if (result?.rankedHypotheses[0]?.hypothesis === "WATERPROOFING_FAILURE") tags.push("LEAKAGE");
+  if (!result) return [];
+  const tags: string[] = [];
+  const humidity = latestObservation(result, "RELATIVE_HUMIDITY");
+  const micro = latestObservation(result, "MICRO_FLOW");
+  const photoShowsMoisture = result.input.evidence.some((item) =>
+    item.type === "RESIDENT_WALL_PHOTO"
+    && item.status === "PRESENT"
+    && String(item.observedValue ?? "").toUpperCase() === "MOISTURE_VISIBLE"
+  );
+
+  if (photoShowsMoisture || (humidity?.baseline !== undefined && humidity.value > humidity.baseline)) tags.push("DAMPNESS");
+  if (micro?.baseline !== undefined && micro.value > micro.baseline) tags.push("MICROFLOW");
+  if (result.rankedHypotheses[0]?.hypothesis === "COLD_WATER_JOINT_LEAK" && tags.includes("MICROFLOW")) tags.push("COLD_WATER_LEAK");
+  if (result.rankedHypotheses[0]?.hypothesis === "WATERPROOFING_FAILURE") tags.push("LEAKAGE");
   return tags;
 }
 
@@ -82,7 +97,8 @@ export function derive1602MemoryRelevanceInput(session: LabSession): MemoryRelev
   const leader = result?.rankedHypotheses[0] ?? null;
   return {
     spaceId: "SPACE-1602-BATHROOM",
-    selectedBusinessId: session.selectedBusinessId,
+    // Event relevance must not change merely because a user clicked a component in 3D.
+    selectedBusinessId: null,
     activeSystemIds: activeSystemsFor(result),
     observationTags: phenomenonTags(result),
     topologyBusinessIds: leader?.candidateBusinessIds ?? []
@@ -112,6 +128,30 @@ function assessmentFor(result: LifeEventResult | null, projection: GuardedLifecy
   };
 }
 
+function observationsFor(result: LifeEventResult | null): PropertyObservation[] {
+  if (!result) return [];
+  const observations: PropertyObservation[] = [];
+  const humidity = latestObservation(result, "RELATIVE_HUMIDITY");
+  const micro = latestObservation(result, "MICRO_FLOW");
+  if (humidity) {
+    observations.push({
+      id: "HUMIDITY",
+      label: "湿度观察",
+      value: `${humidity.value}% · ${humidity.durationMinutes ?? 0} min`,
+      status: "OBSERVED"
+    });
+  }
+  if (micro) {
+    observations.push({
+      id: "MICROFLOW",
+      label: "微流量观察",
+      value: `${micro.value} L/min · ${micro.durationMinutes ?? 0} min`,
+      status: "OBSERVED"
+    });
+  }
+  return observations;
+}
+
 export function derivePropertyEventViewModel(session: LabSession): PropertyEventViewModel {
   const result = session.result;
   const submissionTimes = (session.residentSubmissions ?? []).map((item) => item.submittedAt);
@@ -135,8 +175,8 @@ export function derivePropertyEventViewModel(session: LabSession): PropertyEvent
       label: result?.state === "REOPENED" ? "重新打开后的住户新证据" : "住户原始现场证据",
       actor: "住户",
       reason: result?.state === "REOPENED"
-        ? "重新打开后的事件不能复用上一轮住户证据，需要新的描述、照片观察和水表观察。"
-        : "物业不能代替住户填写原始描述、照片观察与水表观察。"
+        ? "重新打开后的事件不能复用上一轮住户证据，需要新的现场描述与观察；后续补证项由本轮事实重新决定。"
+        : "物业不能代替住户填写原始描述与现场观察；后续是否需要水表等补证，由当前事实决定。"
     });
   }
 
@@ -145,20 +185,7 @@ export function derivePropertyEventViewModel(session: LabSession): PropertyEvent
     spaceLabel: "1602卫生间",
     projection,
     assessment: assessmentFor(result, projection),
-    observations: [
-      {
-        id: "HUMIDITY",
-        label: "持续湿度",
-        value: `${session.controls.humidity.value}% · ${session.controls.humidity.durationMinutes} min`,
-        status: "OBSERVED"
-      },
-      {
-        id: "MICROFLOW",
-        label: "无人用水微流量",
-        value: `${session.controls.microFlow.value} L/min · ${session.controls.microFlow.durationMinutes} min`,
-        status: "OBSERVED"
-      }
-    ],
+    observations: observationsFor(result),
     relevantMemories,
     evidenceGaps,
     residentEvidenceReady,
