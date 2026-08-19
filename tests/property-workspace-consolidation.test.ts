@@ -23,3 +23,11 @@ test("legacy detailed property work remains available only behind the secondary 
   assert.match(source, /当前还缺什么/);
   assert.match(source, /UNIQUE NEXT ACTION/);
 });
+
+test("existing focus deep links still open the detailed domain task when required", async () => {
+  const source = await readFile(propertyWorkspace, "utf8");
+
+  assert.match(source, /URLSearchParams\(window\.location\.search\)\.get\("focus"\)/);
+  assert.match(source, /setTaskOpen\(true\)/);
+  assert.match(source, /\[data-focus=/);
+});
