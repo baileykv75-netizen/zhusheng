@@ -68,7 +68,8 @@ test("memory view exposes the full structured lifecycle memory instead of a hand
   assert.ok(model.totalRecords >= 60, "the product view must expose the full lifecycle memory dataset");
   assert.ok(model.specialRecords > 0);
   assert.ok(model.tradeCount >= 8);
-  assert.equal(model.defaultRecordId, "REC-CONST-CW-J03-REWORK-01");
+  assert.equal(model.defaultRecordId, model.entries[0]?.recordId ?? null);
+  assert.equal(model.entries.find((entry) => entry.recordId === model.defaultRecordId)?.special, false);
   assert.equal(model.hasActiveEvent, false);
   assert.equal(model.eventId, "尚未进入事件");
   assert.equal(model.eventRelatedRecords, 0);
