@@ -1,4 +1,4 @@
-import type { LifeEventState } from "@/lib/life-event-engine/types";
+import type { LifeEventResult, LifeEventState } from "@/lib/life-event-engine/types";
 
 export type BuildingEventDataClass = "DEMO_SYNTHETIC" | "REAL";
 export type BuildingEventOwnerRole = "住户" | "物业值班" | "物业维修" | "集团质量";
@@ -40,8 +40,19 @@ const displayState: Record<LifeEventState, Pick<BuildingLifeEventSummary, "displ
   REOPENED: { displayStatus: "维修后仍有异常", ownerRole: "物业值班", nextAction: "重新收集新一轮现场事实" }
 };
 
-export function buildingLifeEvents(state?: LifeEventState): BuildingLifeEventSummary[] {
+const BUILDING_MEMORY_EVIDENCE = new Set(["PIPE_INSTALLATION_RECORD", "WATERPROOFING_RECORD", "CLOSED_WATER_TEST"]);
+
+export function buildingLifeEvents(source?: LifeEventResult | LifeEventState | null): BuildingLifeEventSummary[] {
+  const deepResult = source && typeof source === "object" ? source : null;
+  const state = typeof source === "string" ? source : deepResult?.state;
   const current = state ? displayState[state] : displayState.DETECTED;
+  const evidenceCount = deepResult
+    ? deepResult.input.evidence.length + deepResult.input.observations.length
+    : 0;
+  const memoryReferenceCount = deepResult
+    ? deepResult.input.evidence.filter((item) => BUILDING_MEMORY_EVIDENCE.has(item.type)).length
+    : 0;
+
   return [
     {
       id: "EVT-1602",
@@ -54,8 +65,8 @@ export function buildingLifeEvents(state?: LifeEventState): BuildingLifeEventSum
       ...current,
       ...(state ? { technicalState: state } : {}),
       updatedAt: "刚刚",
-      evidenceCount: state ? 6 : 0,
-      memoryReferenceCount: 4,
+      evidenceCount,
+      memoryReferenceCount,
       isDeepDemo: true,
       dataClass: "DEMO_SYNTHETIC"
     },
