@@ -49,7 +49,8 @@ export default function WorkerPage() {
   }
 
   function enterResidentTask() {
-    next();
+    // Switching roles must not advance the legacy scripted demo or seed a
+    // pre-baked life-event result. The resident starts from their own facts.
     router.push("/resident");
   }
 
