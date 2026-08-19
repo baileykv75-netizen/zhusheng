@@ -1,0 +1,151 @@
+/* Last-mile interaction polish. No domain-state behavior lives here. */
+
+.product-shell[data-product-mode="work"] {
+  color-scheme: light;
+}
+
+.product-shell[data-product-mode="work"] ::selection,
+.building-agent-shell ::selection {
+  color: #f8f5ed;
+  background: var(--zs-accent);
+}
+
+.product-shell[data-product-mode="work"] :focus-visible,
+.building-agent-shell :focus-visible {
+  outline: 1px solid rgba(155, 63, 52, .72);
+  outline-offset: 3px;
+}
+
+/* Ask Building should feel like a product layer, not an engineering console. */
+.building-agent-scrim {
+  background: rgba(8, 10, 9, .58);
+  backdrop-filter: blur(4px);
+}
+
+.building-agent-drawer {
+  width: min(760px, calc(100vw - 56px));
+  color: var(--zs-ink);
+  background: var(--zs-paper);
+  box-shadow: -28px 0 80px rgba(0, 0, 0, .22);
+}
+
+.agent-drawer-header {
+  min-height: 104px;
+  padding: 20px 26px;
+  border-bottom-color: rgba(243, 240, 232, .12);
+  color: #f3f0e8;
+  background: var(--zs-charcoal);
+}
+
+.agent-drawer-header span {
+  color: #b29b84;
+  font-family: "Zhusheng Sans", sans-serif;
+  font-size: 9px;
+  letter-spacing: .13em;
+}
+
+.agent-drawer-header h2 {
+  margin-top: 5px;
+  font-size: 25px;
+  letter-spacing: -.025em;
+  font-weight: 600;
+}
+
+.agent-drawer-header p {
+  max-width: 520px;
+  margin-top: 7px;
+  color: #9da19d;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.agent-mode {
+  border-color: rgba(243, 240, 232, .15);
+  color: #979d98;
+  background: rgba(243, 240, 232, .035);
+}
+
+.agent-header-actions > button {
+  border-color: rgba(243, 240, 232, .16);
+  background: transparent;
+}
+
+.agent-boundary {
+  min-height: 44px;
+  padding-inline: 26px;
+  border-bottom-color: var(--zs-line);
+  color: #646b67;
+  background: rgba(235, 231, 222, .66);
+}
+
+.agent-boundary svg {
+  color: #6d8379;
+}
+
+.agent-body {
+  padding: 20px 26px 34px;
+}
+
+.agent-drawer-footer {
+  border-top-color: var(--zs-line);
+  background: rgba(248, 246, 240, .92);
+}
+
+/* Neutralize legacy cyan accents in the primary Building AI experience. Technical states keep their own status colors. */
+.building-agent-drawer .building-ai-intro > i {
+  color: #d9cdbf;
+  background: var(--zs-charcoal);
+}
+
+.building-agent-drawer .building-ai-intro p {
+  color: #98624e;
+}
+
+.building-agent-drawer .building-ai-intro h2 {
+  color: var(--zs-ink);
+}
+
+.building-agent-drawer .selected-context {
+  border-color: var(--zs-line);
+  background: rgba(255, 255, 255, .46);
+}
+
+.building-agent-drawer .building-ai-examples button:hover {
+  border-color: rgba(155, 63, 52, .28);
+  color: #7d3b31;
+}
+
+.building-agent-drawer .building-ai-form button {
+  background: var(--zs-accent);
+}
+
+.building-agent-drawer .building-ai-form button:hover:not(:disabled) {
+  background: var(--zs-accent-hover);
+}
+
+/* 3D response should communicate continuity rather than flashy motion. */
+.twin-viewport,
+.case-model,
+[class*="sceneViewport"],
+[class*="twinViewport"] {
+  transition: background-color var(--zs-motion) var(--zs-ease), border-color var(--zs-motion) var(--zs-ease);
+}
+
+@media (max-width: 780px) {
+  .building-agent-drawer {
+    width: 100vw;
+  }
+
+  .agent-drawer-header {
+    min-height: 82px;
+    padding: 14px 16px;
+  }
+
+  .agent-boundary {
+    padding-inline: 16px;
+  }
+
+  .agent-body {
+    padding: 12px 12px 76px;
+  }
+}
