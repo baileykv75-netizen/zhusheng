@@ -14,7 +14,7 @@ import "./product-finishing.css";
 
 export const metadata: Metadata = {
   title: "筑生：一栋房子一生的AI智能体",
-  description: "从开工第一天，到入住每一天。建筑全生命周期智能体交互样机。"
+  description: "从开工第一天，到入住每一天。让建筑拥有连续记忆、可追溯事件与可验证的AI判断。"
 };
 
 export const viewport: Viewport = {
