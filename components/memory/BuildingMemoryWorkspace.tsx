@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, CheckCircle2, Database, Focus, Search, ShieldCheck, TriangleAlert } from "lucide-react";
 import { BathroomTwinViewport } from "@/components/life-event/BathroomTwinViewport";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
+import { useDemo } from "@/components/demo-provider";
 import { useBuildingProductContext } from "@/components/product/BuildingContextProvider";
 import type { BuildingQueryToolName, QueryVisualDirective } from "@/lib/building-intelligence/types.ts";
 import type { VisualDirective } from "@/lib/life-event-engine/types.ts";
@@ -84,8 +85,9 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
 
 export function BuildingMemoryWorkspace() {
   const { session, setSession, assets, assetError } = useLifecycleJourney();
+  const { state: demoState } = useDemo();
   const product = useBuildingProductContext();
-  const model = useMemo(() => deriveBuildingMemoryViewModel(session), [session]);
+  const model = useMemo(() => deriveBuildingMemoryViewModel(session, demoState.evidence), [demoState.evidence, session]);
   const [filter, setFilter] = useState<MemoryFilterId>("ALL");
   const [search, setSearch] = useState("");
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(model.defaultRecordId);
