@@ -234,6 +234,8 @@ export function deriveBuildingMemoryViewModel(session: LabSession, workerEvidenc
       : 0,
     tradeCount: new Set(entries.map((entry) => entry.trade).filter(Boolean)).size,
     entries,
-    defaultRecordId: firstHighSpecial?.recordId ?? firstSpecial?.recordId ?? entries[0]?.recordId ?? null
+    defaultRecordId: hasActiveEvent
+      ? firstHighSpecial?.recordId ?? firstSpecial?.recordId ?? entries[0]?.recordId ?? null
+      : entries[0]?.recordId ?? null
   };
 }
