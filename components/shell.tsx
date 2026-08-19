@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, BriefcaseBusiness, Building2, ChevronDown, ClipboardPenLine, House, ListTree, Menu, Sparkles, UsersRound } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, Building2, ChevronDown, ClipboardPenLine, Database, House, ListTree, Menu, Sparkles, UsersRound } from "lucide-react";
 import { deriveJourneyView } from "@/lib/journey/index.ts";
 import { productNavigation } from "@/lib/product/product-navigation";
 import { useDemo } from "./demo-provider";
@@ -13,6 +13,7 @@ import { ProductShellFrame } from "./product/ProductShellFrame";
 
 const iconByHref = {
   "/events": ListTree,
+  "/memory": Database,
   "/worker": ClipboardPenLine,
   "/resident": House,
   "/property": BriefcaseBusiness,
@@ -20,7 +21,7 @@ const iconByHref = {
 } as const;
 
 const workspaceLinks = productNavigation.flatMap((item) => {
-  if (!item.available || item.id === "OVERVIEW" || item.id === "MEMORY") return [];
+  if (!item.available || item.id === "OVERVIEW") return [];
   if (item.children) return item.children.map((child) => ({ ...child, group: item.label, english: item.english }));
   if (!item.href) return [];
   return [{ href: item.href, label: item.label, group: item.label, english: item.english }];
