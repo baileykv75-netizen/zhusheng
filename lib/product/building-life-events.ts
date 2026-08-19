@@ -23,25 +23,25 @@ export type BuildingLifeEventSummary = {
 };
 
 const displayState: Record<LifeEventState, Pick<BuildingLifeEventSummary, "displayStatus" | "ownerRole" | "nextAction">> = {
-  DETECTED: { displayStatus: "等待补充现场信息", ownerRole: "住户", nextAction: "补拍北侧墙角" },
-  COLLECTING_EVIDENCE: { displayStatus: "等待补充现场信息", ownerRole: "住户", nextAction: "确认水表观察" },
-  INCONCLUSIVE: { displayStatus: "证据不足，暂不操作", ownerRole: "住户", nextAction: "补充照片或水表观察" },
-  ASSESSED: { displayStatus: "已形成初步判断", ownerRole: "物业值班", nextAction: "查看建筑记忆" },
-  ACTION_PROPOSED: { displayStatus: "等待物业提出处置", ownerRole: "物业值班", nextAction: "发起局部隔离申请" },
-  AUTHORIZATION_PENDING: { displayStatus: "等待人工授权", ownerRole: "住户", nextAction: "确认是否允许临时关阀" },
-  AUTHORIZED: { displayStatus: "已授权，尚未执行", ownerRole: "物业值班", nextAction: "执行模拟阀门动作" },
-  SIMULATED_ACTION_APPLIED: { displayStatus: "正在隔离验证", ownerRole: "物业值班", nextAction: "记录隔离后观察" },
-  VERIFYING: { displayStatus: "正在隔离验证", ownerRole: "物业值班", nextAction: "提交新的湿度与微流量" },
-  ISOLATION_CONFIRMED: { displayStatus: "隔离结果已确认", ownerRole: "物业维修", nextAction: "创建精准维修任务" },
-  REPAIR_PENDING: { displayStatus: "等待维修", ownerRole: "物业维修", nextAction: "检查冷水支管接头" },
+  DETECTED: { displayStatus: "等待住户描述现场", ownerRole: "住户", nextAction: "描述实际现象并补充现场照片" },
+  COLLECTING_EVIDENCE: { displayStatus: "现场事实补充中", ownerRole: "住户", nextAction: "按当前事实补充下一项必要证据" },
+  INCONCLUSIVE: { displayStatus: "证据不足，暂不操作", ownerRole: "物业值班", nextAction: "核对缺口后决定由谁继续补证" },
+  ASSESSED: { displayStatus: "已形成初步判断", ownerRole: "物业值班", nextAction: "查看候选、建筑记忆与证据边界" },
+  ACTION_PROPOSED: { displayStatus: "等待物业提出处置", ownerRole: "物业值班", nextAction: "核对处置条件并发起必要申请" },
+  AUTHORIZATION_PENDING: { displayStatus: "等待人工授权", ownerRole: "住户", nextAction: "确认是否允许当前受控操作" },
+  AUTHORIZED: { displayStatus: "已授权，尚未执行", ownerRole: "物业值班", nextAction: "执行已授权的模拟设备动作" },
+  SIMULATED_ACTION_APPLIED: { displayStatus: "正在隔离验证", ownerRole: "物业值班", nextAction: "记录动作后的新观察" },
+  VERIFYING: { displayStatus: "正在隔离验证", ownerRole: "物业值班", nextAction: "提交动作后的新湿度与微流量观察" },
+  ISOLATION_CONFIRMED: { displayStatus: "隔离结果已确认", ownerRole: "物业维修", nextAction: "根据已验证候选创建维修任务" },
+  REPAIR_PENDING: { displayStatus: "等待维修", ownerRole: "物业维修", nextAction: "按当前维修任务检查目标构件" },
   REPAIR_RECORDED: { displayStatus: "维修已记录，等待恢复", ownerRole: "住户", nextAction: "完成独立恢复供水授权" },
   POST_REPAIR_VERIFYING: { displayStatus: "正在维修后复验", ownerRole: "物业值班", nextAction: "提交恢复供水后的新观察" },
   RESOLVED: { displayStatus: "已验证解决", ownerRole: "集团质量", nextAction: "审阅单事件经验" },
-  REOPENED: { displayStatus: "维修后仍有异常", ownerRole: "物业值班", nextAction: "重新检查1602卫生间" }
+  REOPENED: { displayStatus: "维修后仍有异常", ownerRole: "物业值班", nextAction: "重新收集新一轮现场事实" }
 };
 
 export function buildingLifeEvents(state?: LifeEventState): BuildingLifeEventSummary[] {
-  const current = state ? displayState[state] : displayState.COLLECTING_EVIDENCE;
+  const current = state ? displayState[state] : displayState.DETECTED;
   return [
     {
       id: "EVT-1602",
@@ -54,7 +54,7 @@ export function buildingLifeEvents(state?: LifeEventState): BuildingLifeEventSum
       ...current,
       ...(state ? { technicalState: state } : {}),
       updatedAt: "刚刚",
-      evidenceCount: state ? 6 : 3,
+      evidenceCount: state ? 6 : 0,
       memoryReferenceCount: 4,
       isDeepDemo: true,
       dataClass: "DEMO_SYNTHETIC"
