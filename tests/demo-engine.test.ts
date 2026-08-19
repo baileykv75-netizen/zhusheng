@@ -22,6 +22,29 @@ test("seven-step lifecycle closes only after authorization and verification", ()
   assert.ok(state.agentTrace.some((item) => item.refs.includes("EV-2845")));
 });
 
+test("worker-confirmed AI fields become the actual EV-2848 evidence instead of being discarded", () => {
+  let state = DemoEngine.start();
+  state = DemoEngine.next(state);
+  assert.equal(state.workerSubstep, 2);
+
+  state = DemoEngine.confirmWorkerEvidence(state, {
+    transcript: "现场复核完成，保压稳定。",
+    room: "1602卫生间",
+    component: "W-1602-B7-CUSTOM",
+    process: "冷热水支管二次复核",
+    pressure: "30分钟无掉压"
+  });
+  const draft = state.evidence.find((item) => item.id === "EV-2848");
+  assert.equal(state.workerSubstep, 3);
+  assert.equal(draft?.type, "冷热水支管二次复核");
+  assert.ok(draft?.refs.includes("W-1602-B7-CUSTOM"));
+  assert.match(draft?.note ?? "", /30分钟无掉压/);
+  assert.match(draft?.note ?? "", /现场复核完成/);
+
+  state = DemoEngine.next(state);
+  assert.equal(state.evidence.find((item) => item.id === "EV-2848")?.status, "verified");
+});
+
 test("previous step replays a deterministic isolated snapshot", () => {
   let state = DemoEngine.start();
   while (state.currentStep < 5) state = DemoEngine.next(state);
