@@ -36,9 +36,11 @@ const routes = [
   { path: "/events/", name: "events", root: ".app-shell" },
   { path: "/memory/", name: "memory", root: ".app-shell" },
   { path: "/property/", name: "property", root: ".app-shell" },
+  { path: "/property/?mode=lab", name: "property-lab", root: ".app-shell" },
   { path: "/worker/", name: "worker", root: ".app-shell" },
   { path: "/resident/", name: "resident", root: ".app-shell" },
-  { path: "/group/", name: "group", root: ".app-shell" }
+  { path: "/group/", name: "group", root: ".app-shell" },
+  { path: "/group/?mode=advanced", name: "group-advanced", root: ".app-shell" }
 ];
 const viewports = [
   { name: "desktop", width: 1440, height: 900 },
@@ -85,7 +87,12 @@ try {
         const rootStyle = getComputedStyle(document.documentElement);
         const bodyStyle = getComputedStyle(document.body);
         const workShell = document.querySelector('.product-shell[data-product-mode="work"]');
+        const productTopbar = document.querySelector(".product-topbar");
         const mobileNav = document.querySelector(".mobile-task-nav");
+        const visibleHeading = [...document.querySelectorAll("main h1, main h2")]
+          .map((element) => element.getBoundingClientRect())
+          .find((rect) => rect.width > 0 && rect.height > 0);
+        const topbarRect = productTopbar?.getBoundingClientRect();
         return {
           graphite: rootStyle.getPropertyValue("--graphite").trim(),
           bodyBackground: bodyStyle.backgroundColor,
@@ -95,6 +102,9 @@ try {
           htmlWidth: document.documentElement.scrollWidth,
           bodyWidth: document.body.scrollWidth,
           workRail: workShell ? getComputedStyle(workShell).getPropertyValue("--rail").trim() : null,
+          topbarPosition: productTopbar ? getComputedStyle(productTopbar).position : null,
+          topbarBottom: topbarRect?.bottom ?? null,
+          firstHeadingTop: visibleHeading?.top ?? null,
           mobileNavDisplay: mobileNav ? getComputedStyle(mobileNav).display : null
         };
       });
@@ -105,7 +115,13 @@ try {
       assert.ok(styleState.stylesheets.length > 0, `${route.path} has no stylesheet link`);
       assert.ok(styleState.htmlWidth <= styleState.viewportWidth + 1, `${route.path} html overflows at ${viewport.name}`);
       assert.ok(styleState.bodyWidth <= styleState.viewportWidth + 1, `${route.path} body overflows at ${viewport.name}`);
-      if (route.root === ".app-shell") assert.equal(styleState.workRail, "0px", `${route.path} still inherits the legacy rail width`);
+      if (route.root === ".app-shell") {
+        assert.equal(styleState.workRail, "0px", `${route.path} still inherits the legacy rail width`);
+        assert.equal(styleState.topbarPosition, "fixed", `${route.path} product bar is no longer persistent`);
+        if (styleState.firstHeadingTop !== null && styleState.topbarBottom !== null) {
+          assert.ok(styleState.firstHeadingTop >= styleState.topbarBottom - 1, `${route.path} primary heading is hidden under the product bar at ${viewport.name}`);
+        }
+      }
       if (viewport.width <= 820 && route.root === ".app-shell") assert.equal(styleState.mobileNavDisplay, "grid", `${route.path} lost the shared mobile product navigation`);
 
       for (const stylesheet of styleState.stylesheets) {
@@ -128,4 +144,4 @@ try {
   await browser.close();
 }
 
-console.log("Product regression QA passed: eight routes at 1440/1024/768/390 widths, stylesheet delivery, rail reset, navigation and overflow checks.");
+console.log("Product regression QA passed: ten route/mode surfaces at 1440/1024/768/390 widths, fixed-bar clearance, stylesheet delivery, rail reset, navigation and overflow checks.");
