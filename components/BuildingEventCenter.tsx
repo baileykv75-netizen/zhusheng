@@ -9,7 +9,7 @@ import styles from "./BuildingEventCenter.module.css";
 
 export function BuildingEventCenter() {
   const { session } = useLifecycleJourney();
-  const events = buildingLifeEvents(session.result?.state);
+  const events = buildingLifeEvents(session.result);
   const tasks = buildingTasks(events, session.result);
   const residentOwned = events.filter((event) => event.ownerRole === "住户").length;
   const propertyOwned = events.filter((event) => event.ownerRole.startsWith("物业")).length;
