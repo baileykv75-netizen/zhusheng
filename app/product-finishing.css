@@ -5,6 +5,27 @@
   color-scheme: light;
 }
 
+/* Fully leave the legacy rail/grid shell behind in work mode. Page-level spacing now owns the top offset. */
+.product-shell[data-product-mode="work"].journey-shell {
+  display: block;
+  grid-template-columns: none;
+  grid-template-rows: none;
+  padding: 0;
+  overflow-x: clip;
+}
+
+.product-shell[data-product-mode="work"].journey-shell > main {
+  display: block;
+  min-width: 0;
+  min-height: 100svh;
+}
+
+.product-shell[data-product-mode="work"] .product-topbar {
+  position: fixed;
+  width: auto;
+  z-index: 150;
+}
+
 .product-shell[data-product-mode="work"] ::selection,
 .building-agent-shell ::selection {
   color: #f8f5ed;
@@ -146,6 +167,10 @@
 }
 
 @media (max-width: 820px) {
+  .product-shell[data-product-mode="work"].journey-shell {
+    padding-bottom: 58px;
+  }
+
   /* Legacy pages used to hide the shared mobile nav; the product shell now keeps it consistent. */
   .product-shell[data-product-mode="work"]:has(.resident-service) .mobile-task-nav,
   .product-shell[data-product-mode="work"]:has(.event-center) .mobile-task-nav,
