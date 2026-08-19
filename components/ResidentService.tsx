@@ -27,7 +27,7 @@ type IntakeStage = "OBSERVATION" | "FOLLOW_UP";
 export function ResidentService() {
   const { session, setSession, assets, busy, submitResidentEvidence, decideAuthorization } = useLifecycleJourney();
   const result = session.result;
-  const [description, setDescription] = useState("我家卫生间北侧墙角最近一直很潮。 ");
+  const [description, setDescription] = useState("");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [photoMetadata, setPhotoMetadata] = useState<{ fileName: string; mediaType: string; size: number } | null>(null);
   const [photoFinding, setPhotoFinding] = useState<ResidentPhotoFinding>("UNCONFIRMED");
@@ -114,7 +114,7 @@ export function ResidentService() {
   }
 
   function submitEvidence() {
-    if (photoFinding === "UNCONFIRMED" || !meterFinding || (!previewUrl && !syntheticPhoto)) return;
+    if (!followUp || photoFinding === "UNCONFIRMED" || !meterFinding || (!previewUrl && !syntheticPhoto)) return;
     submitResidentEvidence({
       description,
       photo: syntheticPhoto
@@ -150,12 +150,14 @@ export function ResidentService() {
   }
 
   const intakeTitle = intakeStage === "FOLLOW_UP"
-    ? "筑生还需要你确认一件事"
+    ? followUp ? "筑生还需要你确认一件事" : "当前信息不支持继续套用漏水补证"
     : result?.state === "REOPENED"
       ? "维修后仍有异常，请重新描述现场"
       : "先告诉筑生你看到了什么";
   const intakeSubtitle = intakeStage === "FOLLOW_UP"
-    ? "筑生先读取你刚才提交的现象，再只补问当前排查最需要的一项事实。"
+    ? followUp
+      ? "筑生先读取你刚才提交的现象，再只补问当前排查最需要的一项事实。"
+      : "你刚才提交的现象没有进入本次1602潮湿事件的验证路径，系统不会因此强行要求水表或关阀操作。"
     : "先描述现象和现场画面。原因尚未收敛前，筑生不会让你按预设故障流程操作。";
 
   return <div className="resident-service">
@@ -169,7 +171,7 @@ export function ResidentService() {
         {result?.state === "REOPENED" ? <p className="resident-boundary"><Camera size={14} />这次需要重新提交维修后的新观察；第一次维修、授权和复验记录仍保留在原事件中。</p> : null}
 
         {intakeStage === "OBSERVATION" ? <>
-          <article><div className="resident-step"><span>01</span><div><strong>发生了什么</strong><small>不用判断原因，只描述你实际看到的现象。</small></div></div><textarea value={description} onChange={(event) => { setDescription(event.target.value); setMeterFinding(null); }} aria-label="问题描述" /></article>
+          <article><div className="resident-step"><span>01</span><div><strong>发生了什么</strong><small>不用判断原因，只描述你实际看到的现象。</small></div></div><textarea value={description} placeholder="例如：卫生间墙角最近总是发潮，摸起来比周边湿。" onChange={(event) => { setDescription(event.target.value); setMeterFinding(null); }} aria-label="问题描述" /></article>
           <article><div className="resident-step"><span>02</span><div><strong>补一张现场照片</strong><small>照片用于确认位置和表面现象，不会自动被当成故障结论。</small></div></div>
             <input ref={fileInput} hidden type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => choosePhoto(event.target.files?.[0])} />
             {previewUrl ? <div className="resident-photo-preview"><img src={previewUrl} alt="住户选择的卫生间现场照片预览" /><button onClick={() => fileInput.current?.click()}><Camera size={15} />重新选择</button></div> : <button className="resident-upload" onClick={() => fileInput.current?.click()}><Upload size={19} /><span><strong>选择现场照片</strong><small>JPG / JPEG / PNG / WEBP</small></span></button>}
@@ -179,7 +181,7 @@ export function ResidentService() {
               <button type="button" className={photoFinding === "NO_VISIBLE_MOISTURE" ? "active" : ""} onClick={() => confirmPhotoFinding("NO_VISIBLE_MOISTURE")}>未见潮湿</button>
               <button type="button" className={photoFinding === "UNREADABLE" ? "active" : ""} onClick={() => confirmPhotoFinding("UNREADABLE")}>无法判断</button>
             </div></div> : null}
-            <details className="resident-photo-guide"><summary>查看拍摄位置</summary><div><figure><img src={publicAssetPath("/assets/v6/model/north-wall-locator.webp")} alt="BIM模型中的1602卫生间北侧墙角定位" /><figcaption>BIM / GLB · MODEL_LOCATOR</figcaption></figure><section><strong>请拍摄北侧墙角</strong><p>建议画面同时包含墙面、墙地交界和相邻区域。</p><figure><img src={publicAssetPath("/assets/demo-evidence/1602-resident-damp-wall.webp")} alt="AI生成的北侧墙角脱敏合成演示照片" /><figcaption>AI生成 · 脱敏合成演示</figcaption></figure><button type="button" onClick={useSyntheticEvidence}>使用这张脱敏图继续演示</button></section></div></details>
+            <details className="resident-photo-guide"><summary>查看拍摄建议</summary><div><figure><img src={publicAssetPath("/assets/v6/model/north-wall-locator.webp")} alt="1602卫生间脱敏演示空间定位" /><figcaption>当前脱敏示例位置 · MODEL_LOCATOR</figcaption></figure><section><strong>优先拍你实际发现异常的位置</strong><p>把异常区域和周边关系同时拍进画面。当前脱敏示例使用北侧墙角，只用于演示，不代表筑生已经判断问题就在这里。</p><figure><img src={publicAssetPath("/assets/demo-evidence/1602-resident-damp-wall.webp")} alt="AI生成的北侧墙角脱敏合成演示照片" /><figcaption>AI生成 · 脱敏合成演示</figcaption></figure><button type="button" onClick={useSyntheticEvidence}>使用这张脱敏图继续演示</button></section></div></details>
           </article>
           <button className="resident-primary" disabled={!description.trim() || (!previewUrl && !syntheticPhoto) || photoFinding === "UNCONFIRMED"} onClick={beginFollowUp}>提交初步情况，让筑生决定还缺什么 <ArrowRight size={17} /></button>
           <p className="resident-boundary"><ShieldCheck size={14} />这一步只整理你看到的事实，不判断故障原因，也不会触发阀门或维修动作。</p>
@@ -200,16 +202,16 @@ export function ResidentService() {
               <button type="button" className={meterFinding === "UNREADABLE" ? "active" : ""} onClick={() => setMeterFinding("UNREADABLE")}>看不清</button>
             </div>
             <details className="resident-meter-example"><summary>查看水表观察示例</summary><figure><img src={publicAssetPath("/assets/demo-evidence/1602-water-meter-observation.webp")} alt="AI生成的住宅水表脱敏合成演示照片" /><figcaption>AI生成 · 脱敏合成演示</figcaption></figure></details>
-          </article> : null}
+          </article> : <article className="resident-followup-question"><div className="resident-step"><span>停止</span><div><strong>不继续要求水表观察</strong><small>当前描述和照片没有支持潮湿或水迹路径。</small></div></div><div className="resident-followup-reason"><ShieldCheck size={15} /><div><strong>为什么停在这里</strong><p>本次1602闭环只验证卫生间潮湿事件。对其他现象继续追问水表，会把未知问题硬塞进漏水流程。</p><small>请返回补充更准确的现场情况，或从事件中心进入其他问题的后续处理。</small></div></div></article>}
 
           <div className="resident-followup-actions">
             <button className="resident-secondary" type="button" onClick={resetFollowUp}>返回修改现场情况</button>
-            <button className="resident-primary" disabled={busy || !assets || !meterFinding} onClick={submitEvidence}>{busy ? "正在提交…" : result?.state === "REOPENED" ? "提交新的现场证据" : "提交这项补充并进入事件"}<ArrowRight size={17} /></button>
+            {followUp ? <button className="resident-primary" disabled={busy || !assets || !meterFinding} onClick={submitEvidence}>{busy ? "正在提交…" : result?.state === "REOPENED" ? "提交新的现场证据" : "提交这项补充并进入事件"}<ArrowRight size={17} /></button> : <Link className="resident-secondary" href="/events">返回事件中心</Link>}
           </div>
-          <p className="resident-boundary"><ShieldCheck size={14} />提交后会形成 EVT-1602 的住户原始证据；物业只能追加独立复核，不能覆盖你的原始提交。</p>
+          {followUp ? <p className="resident-boundary"><ShieldCheck size={14} />提交后会形成 EVT-1602 的住户原始证据；物业只能追加独立复核，不能覆盖你的原始提交。</p> : null}
         </>}
 
-        <details className="resident-data-details"><summary>数据与隐私说明</summary><p>本演示中的本地照片只在浏览器预览，不上传服务器；脱敏示例图会明确标注。照片结论和水表观察都由你手工确认，系统不会把“上传图片”自动当成“发现潮湿”。提交证据不会自动操作阀门。</p></details>
+        <details className="resident-data-details"><summary>数据与隐私说明</summary><p>本演示中的本地照片只在浏览器预览，不上传服务器；脱敏示例图会明确标注。照片结论与后续补证都由你手工确认，系统不会把“上传图片”自动当成“发现潮湿”，也不会因为处于卫生间就自动假定为漏水。提交证据不会自动操作阀门。</p></details>
       </section> : null}
 
       {authorization ? <section className="resident-authorization" data-focus="authorization" tabIndex={-1}>
