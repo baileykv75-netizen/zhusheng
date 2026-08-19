@@ -131,6 +131,15 @@
   transition: background-color var(--zs-motion) var(--zs-ease), border-color var(--zs-motion) var(--zs-ease);
 }
 
+@media (max-width: 820px) {
+  /* Legacy pages used to hide the shared mobile nav; the product shell now keeps it consistent. */
+  .product-shell[data-product-mode="work"]:has(.resident-service) .mobile-task-nav,
+  .product-shell[data-product-mode="work"]:has(.event-center) .mobile-task-nav,
+  .product-shell[data-product-mode="work"]:has(.group-workspace-shell) .mobile-task-nav {
+    display: grid;
+  }
+}
+
 @media (max-width: 780px) {
   .building-agent-drawer {
     width: 100vw;
