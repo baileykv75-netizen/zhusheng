@@ -6,6 +6,11 @@ export const productInformationHierarchy = {
     SECONDARY: ["resident-evidence", "property-review", "observations", "repair", "verification"],
     PROOF: ["tool-trace", "facts", "provenance", "audit", "proposal-gate"]
   },
+  memory: {
+    PRIMARY: ["lifecycle-timeline", "record", "space-context", "event-relation"],
+    SECONDARY: ["verification-scope", "business-ids", "3d-location", "filters"],
+    PROOF: ["provenance", "source-class", "synthetic-disclosure"]
+  },
   resident: {
     PRIMARY: ["task", "description", "photo", "photo-confirmation", "meter-confirmation", "authorization"],
     SECONDARY: ["event-progress", "result"],
