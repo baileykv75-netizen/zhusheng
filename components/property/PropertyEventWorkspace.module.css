@@ -74,7 +74,7 @@
 .secondaryButton {
   padding: 9px 12px;
   border: 1px solid rgba(18, 22, 22, .14);
-  border-radius: 8px;
+  border-radius: 3px;
   background: transparent;
   color: inherit;
   text-decoration: none;
@@ -116,7 +116,7 @@
 .sceneViewport {
   min-height: 540px;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 4px;
   background: #e8e6df;
 }
 
@@ -301,7 +301,7 @@
   width: 100%;
   margin-top: 14px;
   padding: 13px 16px;
-  border-radius: 8px;
+  border-radius: 3px;
   background: #171a1a;
   color: #f5f2e9;
   text-decoration: none;
@@ -325,6 +325,7 @@
 
 .detailsActions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -395,6 +396,11 @@
 }
 
 @media (max-width: 640px) {
+  .workspace {
+    width: min(100% - 20px, 620px);
+    margin-top: 82px;
+  }
+
   .eventHeader {
     align-items: flex-start;
     flex-direction: column;
@@ -407,7 +413,7 @@
 
   .advancedButton,
   .secondaryButton {
-    flex: 1;
+    flex: 1 1 auto;
     text-align: center;
   }
 
@@ -416,7 +422,7 @@
   }
 
   .sceneViewport {
-    min-height: 420px;
+    min-height: 340px;
   }
 
   .observations {
