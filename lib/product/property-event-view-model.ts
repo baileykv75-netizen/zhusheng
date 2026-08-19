@@ -1,8 +1,8 @@
-import { resolveBuildingMemoryRelevance, type RelevantBuildingMemory } from "@/lib/building-intelligence/memory-relevance.ts";
-import { deriveGuardedLifecycleProjection, type GuardedLifecycleProjection } from "@/lib/life-event-engine/guarded-lifecycle.ts";
-import type { Hypothesis, LifeEventResult, MissingEvidence } from "@/lib/life-event-engine/types.ts";
-import type { LabSession } from "@/lib/life-event-lab/types.ts";
-import { hasFreshEvidenceAfterReopen } from "@/lib/life-event-lab/reopened-cycle.ts";
+import { resolveBuildingMemoryRelevance, type RelevantBuildingMemory } from "../building-intelligence/memory-relevance.ts";
+import { deriveGuardedLifecycleProjection, type GuardedLifecycleProjection } from "../life-event-engine/guarded-lifecycle.ts";
+import type { Hypothesis, LifeEventResult, MissingEvidence } from "../life-event-engine/types.ts";
+import type { LabSession } from "../life-event-lab/types.ts";
+import { hasFreshEvidenceAfterReopen } from "../life-event-lab/reopened-cycle.ts";
 
 const HYPOTHESIS_LABELS: Record<Hypothesis, string> = {
   COLD_WATER_JOINT_LEAK: "冷水系统局部渗漏",
