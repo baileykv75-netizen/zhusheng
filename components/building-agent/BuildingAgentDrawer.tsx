@@ -43,7 +43,7 @@ export function BuildingAgentDrawer({ open, onClose }: { open: boolean; onClose:
           selectedBusinessId={product.selectedBusinessId}
           result={product.agentResult}
           onResult={product.setAgentResult}
-          showVisualState={Boolean(product.queryVisual)}
+          showVisualState={product.currentPath === "/property" && Boolean(product.queryVisual)}
         />
       </div>
 
