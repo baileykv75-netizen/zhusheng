@@ -145,6 +145,40 @@
   background: var(--zs-accent-hover);
 }
 
+/* Work routes that previously lived in grid row 2 must now reserve space below the fixed product bar themselves. */
+.product-shell[data-product-mode="work"] .advanced-workspace-shell,
+.product-shell[data-product-mode="work"] .group-workspace-shell {
+  min-height: 100svh;
+  padding-top: 96px;
+}
+
+.product-shell[data-product-mode="work"] .group-workspace-shell > .workspace-inline-mode + section {
+  padding-top: 34px;
+}
+
+/* Worker keeps its immersive scene, but task controls must not sit underneath the product bar. */
+.product-shell[data-product-mode="work"] .view-worker .stage-content {
+  min-height: 100svh;
+  padding-top: 96px;
+}
+
+.product-shell[data-product-mode="work"] .view-worker .field-recorder,
+.product-shell[data-product-mode="work"] .view-worker .field-recorder.compact {
+  height: calc(100svh - 96px);
+}
+
+.product-shell[data-product-mode="work"] .view-worker .worker-stage-heading {
+  top: 126px;
+}
+
+.product-shell[data-product-mode="work"] .view-worker .stage-progress {
+  top: 344px;
+}
+
+.product-shell[data-product-mode="work"] .view-worker .scene-grid {
+  top: 104px;
+}
+
 /* Resident no longer carries the legacy left-rail offset or a second header beneath the shared product bar. */
 .product-shell[data-product-mode="work"] .resident-service {
   padding-left: 0;
@@ -164,6 +198,36 @@
 [class*="sceneViewport"],
 [class*="twinViewport"] {
   transition: background-color var(--zs-motion) var(--zs-ease), border-color var(--zs-motion) var(--zs-ease);
+}
+
+@media (max-width: 899px) {
+  .product-shell[data-product-mode="work"] .advanced-workspace-shell,
+  .product-shell[data-product-mode="work"] .group-workspace-shell {
+    padding-top: 74px;
+  }
+
+  .product-shell[data-product-mode="work"] .group-workspace-shell > .workspace-inline-mode + section {
+    padding-top: 28px;
+  }
+
+  .product-shell[data-product-mode="work"] .view-worker .stage-content {
+    min-height: calc(100svh - 58px);
+    padding-top: 42svh;
+  }
+
+  .product-shell[data-product-mode="work"] .view-worker .field-recorder,
+  .product-shell[data-product-mode="work"] .view-worker .field-recorder.compact {
+    height: auto;
+  }
+
+  .product-shell[data-product-mode="work"] .view-worker .worker-stage-heading {
+    top: 88px;
+  }
+
+  .product-shell[data-product-mode="work"] .view-worker .scene-grid {
+    top: 74px;
+    height: calc(42svh - 90px);
+  }
 }
 
 @media (max-width: 820px) {
