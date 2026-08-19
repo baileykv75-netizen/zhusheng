@@ -36,12 +36,13 @@ export function ResidentService() {
   const [intakeStage, setIntakeStage] = useState<IntakeStage>("OBSERVATION");
   const fileInput = useRef<HTMLInputElement>(null);
   const latestSubmission = session.residentSubmissions?.at(-1) ?? null;
+  const awaitingPropertyAssessment = Boolean(latestSubmission && !result);
   const freshReopenEvidence = result?.state === "REOPENED"
     ? hasFreshEvidenceAfterReopen(result, (session.residentSubmissions ?? []).map((item) => item.submittedAt))
     : false;
-  const sameCycleIntake = !result
-    || ["DETECTED", "COLLECTING_EVIDENCE"].includes(result.state)
-    || (result.state === "INCONCLUSIVE" && !latestSubmission);
+  const sameCycleIntake = (!result && !latestSubmission)
+    || (Boolean(result) && ["DETECTED", "COLLECTING_EVIDENCE"].includes(result!.state))
+    || (result?.state === "INCONCLUSIVE" && !latestSubmission);
   const intake = sameCycleIntake || (result?.state === "REOPENED" && !freshReopenEvidence);
   const authorization = result?.state === "AUTHORIZATION_PENDING" ? result.authorizationRequirement : null;
   const reopening = authorization?.action === "SIMULATE_REOPEN_VALVE";
@@ -159,7 +160,7 @@ export function ResidentService() {
   return <div className="resident-service">
     <header className="resident-service-header"><Link href="/case-1602">EVT-1602</Link><span>住户任务</span><small>你的现场观察进入同一事件</small></header>
     <main>
-      <section className="resident-service-title"><p>1602 / 卫生间</p><h1>{authorization ? reopening ? "维修完成后，是否允许恢复供水？" : "物业申请临时关闭局部进水阀" : result?.state === "RESOLVED" ? "这件事已经完成维修复验" : result?.state === "REOPENED" && freshReopenEvidence ? "新的现场情况已提交" : intake ? intakeTitle : "物业正在继续处理"}</h1><span>{intake ? intakeSubtitle : "你只需要关注自己的现场观察和需要你本人作出的授权决定。"}</span></section>
+      <section className="resident-service-title"><p>1602 / 卫生间</p><h1>{authorization ? reopening ? "维修完成后，是否允许恢复供水？" : "物业申请临时关闭局部进水阀" : result?.state === "RESOLVED" ? "这件事已经完成维修复验" : result?.state === "REOPENED" && freshReopenEvidence ? "新的现场情况已提交" : awaitingPropertyAssessment ? "你的现场事实已经提交" : intake ? intakeTitle : "物业正在继续处理"}</h1><span>{awaitingPropertyAssessment ? "筑生还没有据此判断原因。下一步由物业确认本轮系统观测，再进入确定性评估。" : intake ? intakeSubtitle : "你只需要关注自己的现场观察和需要你本人作出的授权决定。"}</span></section>
 
       {session.notice ? <div className="resident-message" role="status"><span>{session.notice}</span><button onClick={() => setSession((current) => ({ ...current, notice: null }))} aria-label="关闭提示"><X size={14} /></button></div> : null}
 
@@ -202,13 +203,15 @@ export function ResidentService() {
 
           <div className="resident-followup-actions">
             <button className="resident-secondary" type="button" onClick={resetFollowUp}>返回修改现场情况</button>
-            {followUp ? <button className="resident-primary" disabled={busy || !assets || !meterFinding} onClick={submitEvidence}>{busy ? "正在提交…" : result?.state === "REOPENED" ? "提交新的现场证据" : "提交这项补充并进入事件"}<ArrowRight size={17} /></button> : <Link className="resident-secondary" href="/events">返回事件中心</Link>}
+            {followUp ? <button className="resident-primary" disabled={busy || !assets || !meterFinding} onClick={submitEvidence}>{busy ? "正在提交…" : result?.state === "REOPENED" ? "提交新的现场证据" : "提交这项补充并交给物业核对"}<ArrowRight size={17} /></button> : <Link className="resident-secondary" href="/events">返回事件中心</Link>}
           </div>
-          {followUp ? <p className="resident-boundary"><ShieldCheck size={14} />提交后会形成 EVT-1602 的住户原始证据；物业只能追加独立复核，不能覆盖你的原始提交。</p> : null}
+          {followUp ? <p className="resident-boundary"><ShieldCheck size={14} />提交后先形成住户原始证据，不会立刻产生故障判断；物业只能追加独立复核，不能覆盖你的原始提交。</p> : null}
         </>}
 
-        <details className="resident-data-details"><summary>数据与隐私说明</summary><p>本演示中的本地照片只在浏览器预览，不上传服务器；脱敏示例图会明确标注。照片结论与后续补证都由你手工确认，系统不会把“上传图片”自动当成“发现潮湿”，也不会因为处于卫生间就自动假定为漏水。提交证据不会自动操作阀门。</p></details>
+        <details className="resident-data-details"><summary>数据与隐私说明</summary><p>本演示中的本地照片只在浏览器预览，不上传服务器；脱敏示例图会明确标注。照片结论与后续补证都由你手工确认，系统不会把“上传图片”自动当成“发现潮湿”，也不会因为处于卫生间就自动假定为漏水。提交住户证据不会自动运行诊断，也不会自动操作阀门。</p></details>
       </section> : null}
+
+      {awaitingPropertyAssessment ? <section className="resident-progress"><House size={23} /><p>住户原始证据 {latestSubmission?.submissionId}</p><h2>等待物业确认本轮系统观测</h2><span>你的描述、照片观察和本轮补充已经保存，但还没有被系统包装成故障结论。物业确认湿度、微流量等当前观测后，才会运行第一次确定性评估。</span><Link href="/case-1602">查看事件入口 <ArrowRight size={15} /></Link></section> : null}
 
       {authorization ? <section className="resident-authorization" data-focus="authorization" tabIndex={-1}>
         <div className="resident-authorization-mark"><LockKeyhole size={23} /></div><p>需要你的决定</p><h2>{reopening ? "模拟恢复1602卫生间局部供水" : "模拟关闭1602卫生间局部进水阀"}</h2>
