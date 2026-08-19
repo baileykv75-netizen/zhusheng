@@ -41,6 +41,7 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
     executeValveAction, submitIsolation, submitRepair, submitPostRepair, submitPropertyReview
   } = useLifecycleJourney();
   const result = session.result;
+  const [initialObservationConfirmed, setInitialObservationConfirmed] = useState(false);
   const [repairPhotoReady, setRepairPhotoReady] = useState(false);
   const [postRepairPhotoReady, setPostRepairPhotoReady] = useState(false);
   const [isolationObservationConfirmed, setIsolationObservationConfirmed] = useState(false);
@@ -65,6 +66,7 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
   }, [result?.state]);
 
   useEffect(() => {
+    setInitialObservationConfirmed(false);
     if (result?.state === "VERIFYING") setIsolationObservationConfirmed(false);
     if (result?.state === "REPAIR_PENDING") {
       setRepairPhotoReady(false);
@@ -74,7 +76,7 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
       setPostRepairPhotoReady(false);
       setPostRepairObservationConfirmed(false);
     }
-  }, [result?.state]);
+  }, [result?.state, session.residentSubmissions?.length]);
 
   function patch<K extends keyof LabSession>(key: K, value: LabSession[K]) {
     setSession((current) => ({ ...current, [key]: value, notice: null }));
@@ -84,6 +86,7 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
   const reopening = result?.authorizationRequirement?.action === "SIMULATE_REOPEN_VALVE" || result?.authorizedActions.some((item) => item.action === "SIMULATE_REOPEN_VALVE");
   const isFactCheck = !result || ["DETECTED", "COLLECTING_EVIDENCE", "INCONCLUSIVE", "REOPENED"].includes(result.state);
   const latestSubmission = session.residentSubmissions?.at(-1) ?? null;
+  const pendingAssessment = Boolean(latestSubmission && !result);
   const submissionEvidence = latestSubmission
     ? (session.productEvidenceTimeline ?? []).filter((item) => latestSubmission.evidenceIds.includes(item.id))
     : [];
@@ -100,7 +103,7 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
     .sort((a, b) => a.observedAt.localeCompare(b.observedAt))
     .at(-1);
   const missingTypes = new Set(result?.missingEvidence.map((item) => item.evidenceType) ?? []);
-  const eventQueue = buildingLifeEvents(result?.state);
+  const eventQueue = buildingLifeEvents(result);
   const taskQueue = buildingTasks(eventQueue, result);
   const currentTask = taskQueue.find((task) => task.eventId === "EVT-1602");
 
@@ -109,7 +112,7 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
       <div className="professional-scene-heading">
         <small>筑生样板楼A座 / 16层 / 1602户</small>
         <h1>1602卫生间</h1>
-        <p>{result ? `事件 ${result.eventId}` : "等待现场观察进入真实事件引擎"}</p>
+        <p>{result ? `事件 ${result.eventId}` : pendingAssessment ? `住户证据 ${latestSubmission?.submissionId} 已提交，等待物业确认系统观测` : "等待现场观察进入真实事件引擎"}</p>
       </div>
       <BathroomTwinViewport
         assets={assets}
@@ -137,11 +140,11 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
           })}</div>
         </details>
         <small>物业运行席 / 1602 / {isFactCheck ? "事件接入" : journey.stateLabel}</small>
-        <h2>{isFactCheck ? result ? "1602事件正在补充现场事实" : "等待1602现场事实进入事件" : journey.headline}</h2>
-        <p>{isFactCheck ? "先确认住户原始观察和已经存在的系统事实，再由事件引擎决定需要补什么、是否进入诊断或动作阶段。" : journey.summary}</p>
+        <h2>{pendingAssessment ? "住户原始事实已到，先确认系统观测" : isFactCheck ? result ? "1602事件正在补充现场事实" : "等待1602现场事实进入事件" : journey.headline}</h2>
+        <p>{pendingAssessment ? "住户提交不会自动触发诊断。物业需要核对本轮湿度与微流量等系统观测，明确确认后，确定性事件引擎才开始第一次评估。" : isFactCheck ? "先确认住户原始观察和已经存在的系统事实，再由事件引擎决定需要补什么、是否进入诊断或动作阶段。" : journey.summary}</p>
       </header>
 
-      {session.notice ? <div className="task-notice" role="status"><AlertTriangle size={15} /><span>{session.notice}</span><button aria-label="关闭提示" onClick={() => setSession((current) => ({ ...current, notice: null }))}>×</button></div> : null}
+      {session.notice ? <div className="task-notice" role="status"><AlertTriangle size={15} /><span>{session.notice}</span><button onClick={() => setSession((current) => ({ ...current, notice: null }))} aria-label="关闭提示">×</button></div> : null}
       {assetError ? <div className="task-notice error"><AlertTriangle size={15} />三维资产降级：{assetError}</div> : null}
 
       <div className="task-pane-body">
@@ -176,20 +179,21 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
             {latestHumidity ? <article className="resident-fact known"><span>事件观测</span><strong>湿度观察已进入事件</strong><p>湿度 {latestHumidity.value}%（基线 {latestHumidity.baseline ?? "—"}%），持续 {latestHumidity.durationMinutes ?? 0} 分钟。</p></article> : <article className="resident-fact gap"><span>尚未形成</span><strong>没有事件级湿度观测</strong><p>模板或高级验证中的数值草稿不能冒充当前事实。</p></article>}
             {latestMicroFlow ? <article className="resident-fact known"><span>事件观测</span><strong>微流量观察已进入事件</strong><p>{latestMicroFlow.value} L/min，持续 {latestMicroFlow.durationMinutes ?? 0} 分钟。</p></article> : <article className="resident-fact gap"><span>尚未形成</span><strong>没有事件级微流量观测</strong><p>只有明确记录到事件中的观测才会出现在这里。</p></article>}
             <article className="resident-fact memory"><span>建筑背景</span><strong>建造期记录可供检索</strong><p>施工、闭水、防水和现场调整记录保持各自来源；只有事件事实形成后才计算诊断相关性。</p></article>
-            <article className="resident-fact gap"><span>{latestSubmission ? "住户已提交" : "等待住户"}</span><strong>{latestSubmission ? "按事件缺口继续补证" : "先收集住户原始现场事实"}</strong><p>{latestSubmission
-              ? `${photoConfirmed ? "照片观察已确认。" : missingTypes.has("RESIDENT_WALL_PHOTO") ? "事件仍需要有效照片观察。" : "照片当前未形成确定性结论。"}${meterConfirmed ? " 水表观察已确认。" : missingTypes.has("METER_READING") ? " 当前事件规则要求补充水表观察。" : " 不预设水表为必填项。"}`
+            <article className="resident-fact gap"><span>{latestSubmission ? "住户已提交" : "等待住户"}</span><strong>{latestSubmission ? "等待物业确认本轮系统观测" : "先收集住户原始现场事实"}</strong><p>{latestSubmission
+              ? `${photoConfirmed ? "照片观察已确认。" : "照片当前未形成确定性结论。"}${meterConfirmed ? " 水表观察已确认。" : " 水表当前未形成确定性结论。"} 住户证据本身不会自动触发故障判断。`
               : "先由住户描述实际看到的现象并提交现场观察；系统随后只请求当前路径真正需要的补证。"}</p></article>
           </div>
-          <details className="resident-fact-controls">
+          <details className="resident-fact-controls" open={pendingAssessment}>
             <summary>录入物业 / 系统观测草稿 <ChevronDown size={15} /></summary>
-            <p className="task-control-note">以下是待人工确认的演示输入控件。未运行确定性评估前，它们不是“当前已发现事实”。</p>
+            <p className="task-control-note">以下是待人工确认的演示输入控件。它们不会因为住户提交而自动变成“当前事实”，也不会在未经物业确认时触发诊断。</p>
             <div className="task-field-grid">
-              <TaskNumber label="湿度观测" value={session.controls.humidity.value} unit="%" min={0} max={100} onChange={(value) => setSession((current) => ({ ...current, controls: { ...current.controls, humidity: { ...current.controls.humidity, value } } }))} />
-              <TaskNumber label="微流量观测" value={session.controls.microFlow.value} unit="L/min" min={0} max={0.2} step={0.01} onChange={(value) => setSession((current) => ({ ...current, controls: { ...current.controls, microFlow: { ...current.controls.microFlow, value } } }))} />
+              <TaskNumber label="湿度观测" value={session.controls.humidity.value} unit="%" min={0} max={100} onChange={(value) => { setSession((current) => ({ ...current, controls: { ...current.controls, humidity: { ...current.controls.humidity, value } } })); setInitialObservationConfirmed(false); }} />
+              <TaskNumber label="微流量观测" value={session.controls.microFlow.value} unit="L/min" min={0} max={0.2} step={0.01} onChange={(value) => { setSession((current) => ({ ...current, controls: { ...current.controls, microFlow: { ...current.controls.microFlow, value } } })); setInitialObservationConfirmed(false); }} />
             </div>
           </details>
+          {latestSubmission ? <label className="task-control-note"><input type="checkbox" checked={initialObservationConfirmed} onChange={(event) => setInitialObservationConfirmed(event.target.checked)} /> 我确认湿度与微流量是本轮需要进入事件的系统 / 现场观测，不是直接采用预置演示答案</label> : null}
           {result?.contradictions.length ? <p className="task-blocked"><AlertTriangle size={13} />{result.contradictions[0].explanation}</p> : null}
-          <button className="task-primary" disabled={busy || !assets || !latestSubmission} onClick={evaluate}><FileSearch size={16} />{busy ? "正在核对建筑记忆…" : latestSubmission ? "核对已提交事实，给出下一步" : "等待住户提交原始证据"}</button>
+          <button className="task-primary" disabled={busy || !assets || !latestSubmission || !initialObservationConfirmed} onClick={evaluate}><FileSearch size={16} />{busy ? "正在核对建筑记忆…" : latestSubmission ? initialObservationConfirmed ? "运行第一次确定性评估" : "确认系统观测后再评估" : "等待住户提交原始证据"}</button>
         </section> : null}
 
         {result && !["DETECTED", "COLLECTING_EVIDENCE", "INCONCLUSIVE", "REOPENED"].includes(result.state) ? <section className="task-decision-summary" data-focus="diagnosis" tabIndex={-1}>
@@ -266,6 +270,5 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
         </details>
       </div>
     </aside>
-
   </div>;
 }
