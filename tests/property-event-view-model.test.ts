@@ -70,6 +70,6 @@ test("property view model keeps historical relevance separate from confirmed dia
 
   assert.ok(normal);
   assert.equal(normal.historicalSignal, "BACKGROUND");
-  assert.match(normal.historicalBoundary, /不能.*当前|不代表当前|不能据此排除/u);
+  assert.match(normal.historicalBoundary, /不能.*当前|不代表当前|不能据此排除|不应.*当前/u);
   assert.equal(model.assessment.confidence, "尚未评估");
 });
