@@ -37,7 +37,7 @@ import {
   type ResidentEvidenceDraft,
   type VerifiedProductEvidenceBundle
 } from "@/lib/product/evidence.ts";
-import { residentDomainEvidenceRefs, residentEvidenceToDomainControls } from "@/lib/product/evidence-adapter.ts";
+import { residentEvidenceToDomainControls } from "@/lib/product/evidence-adapter.ts";
 import { useDemo } from "./demo-provider";
 
 export const LIFE_EVENT_PACKAGE_KEY = "zhusheng.life-event-package.v1";
@@ -95,6 +95,10 @@ function controlsFromDraft(fields: DraftFields): LabControls {
   };
 }
 
+function pendingEventId(eventCounter: number) {
+  return `EVT-1602-LAB-${String(eventCounter + 1).padStart(3, "0")}`;
+}
+
 function loadStoredSession(): { session: LabSession; found: boolean } {
   try {
     const value = JSON.parse(sessionStorage.getItem(LAB_SESSION_KEY) ?? "null") as LabSession | null;
@@ -136,7 +140,6 @@ type LifecycleJourneyValue = {
   submitRepair(): void;
   submitPostRepair(): void;
   seedFromAgent(fields: DraftFields, result: LifeEventResult): void;
-  markWorkerEvidenceReady(): void;
   resetLab(): void;
   buildVerifiedPackage(): VerifiedLifeEventPackage;
   buildProductEvidenceBundle(): VerifiedProductEvidenceBundle<VerifiedLifeEventPackage>;
@@ -272,7 +275,7 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
         (session.residentSubmissions ?? []).map((item) => item.submittedAt)
       );
       if (!freshResidentEvidence) {
-        setSession((current) => ({ ...current, notice: "事件已重新打开。必须先由住户追加新的现场描述、照片观察和水表观察；历史证据不能直接触发下一轮判断。" }));
+        setSession((current) => ({ ...current, notice: "事件已重新打开。必须先由住户追加新的现场事实；历史证据不能直接触发下一轮判断。" }));
         return;
       }
       setBusy(true);
@@ -286,7 +289,7 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
           selectedBusinessId: result.visualDirective.highlightBusinessIds[0] ?? null,
           repairDraft: defaultRepairDraft(),
           postRepair: structuredClone(DEFAULT_POST_REPAIR_CONTROLS),
-          notice: "物业已明确确认本轮湿度与微流量观测；新传感器观察和住户新证据已追加到原事件后重新评估。"
+          notice: "物业已明确确认本轮系统观测；新的系统观察和住户新证据已追加到原事件后重新评估。"
         }));
       } catch (reason) {
         setSession((current) => ({ ...current, notice: reason instanceof Error ? reason.message : "重新检查评估失败" }));
@@ -309,7 +312,7 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
         selectedBusinessId: result.visualDirective.highlightBusinessIds[0] ?? null,
         repairDraft: defaultRepairDraft(),
         postRepair: structuredClone(DEFAULT_POST_REPAIR_CONTROLS),
-        notice: null
+        notice: "物业已确认本轮系统观测并运行确定性评估。"
       }));
     } catch (reason) {
       setSession((current) => ({ ...current, notice: reason instanceof Error ? reason.message : "输入校验失败" }));
@@ -324,7 +327,6 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
       return;
     }
     const reopeningCycle = session.result?.state === "REOPENED";
-    const counter = session.eventCounter + (reopeningCycle ? 0 : 1);
     const nowMs = Date.now();
     const controls = residentEvidenceToDomainControls(session.controls, draft);
     const submissionSequence = (session.residentSubmissions?.length ?? 0) + 1;
@@ -343,35 +345,26 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
           residentSubmissions: [...(current.residentSubmissions ?? []), product.submission],
           productEvidenceTimeline: [...(current.productEvidenceTimeline ?? []), ...product.evidence],
           photoObservationConfirmation: draft.photo.finding,
-          notice: "住户已追加重新打开后的新描述、照片观察和水表观察。事件仍保持 REOPENED；下一步由物业明确录入并确认本轮湿度与微流量后，再运行确定性评估。"
+          notice: "住户已追加重新打开后的新现场事实。事件仍保持 REOPENED；下一步由物业明确录入并确认本轮系统观测后，再运行确定性评估。"
         }));
         return;
       }
 
-      const result = evaluateControls(engine, controls, counter, nowMs);
-      const refs = residentDomainEvidenceRefs(result);
+      const eventId = session.result?.eventId ?? pendingEventId(session.eventCounter);
       const product = createResidentEvidenceSubmission({
         draft,
-        eventId: result.eventId,
+        eventId,
         submittedAt: new Date(nowMs).toISOString(),
-        domainPhotoEvidenceId: refs.photoEvidenceId,
-        domainMeterEvidenceId: refs.meterEvidenceId,
         submissionSequence
       });
       setSession((current) => ({
         ...current,
         controls,
-        eventCounter: counter,
-        result,
         residentSubmissions: [...(current.residentSubmissions ?? []), product.submission],
         productEvidenceTimeline: [...(current.productEvidenceTimeline ?? []), ...product.evidence],
         photoObservationConfirmation: draft.photo.finding,
-        activeTab: result.state === "INCONCLUSIVE" ? "input" : "diagnosis",
-        selectedView: result.visualDirective.view,
-        selectedBusinessId: result.visualDirective.highlightBusinessIds[0] ?? null,
-        repairDraft: defaultRepairDraft(),
-        postRepair: structuredClone(DEFAULT_POST_REPAIR_CONTROLS),
-        notice: "住户原始描述与人工观察已形成不可变产品证据；只有确认后的照片和水表观察进入确定性判断。"
+        activeTab: "input",
+        notice: "住户原始描述与人工观察已形成不可变产品证据；尚未运行故障判断。下一步由物业确认本轮系统观测，再启动确定性评估。"
       }));
     } catch (reason) {
       setSession((current) => ({ ...current, notice: reason instanceof Error ? reason.message : "住户证据提交失败" }));
@@ -447,19 +440,6 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
     }));
   }, []);
 
-  const markWorkerEvidenceReady = useCallback(() => {
-    setSession((current) => ({
-      ...current,
-      controls: {
-        ...current.controls,
-        pipeInstallation: "PRESENT",
-        waterproofing: "PRESENT",
-        closedWaterTest: "PRESENT"
-      },
-      notice: "工友核验记录已作为本次事件的建造阶段证据输入。"
-    }));
-  }, []);
-
   const buildVerifiedPackage = useCallback(() => {
     if (!assets || !session.result) throw new Error("事件资产或结果尚未就绪");
     const sourceAssetHashes = Object.fromEntries(Object.entries(assets.integrity.files).map(([name, item]) => [name, item.sha256]));
@@ -528,11 +508,10 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
     submitRepair,
     submitPostRepair,
     seedFromAgent,
-    markWorkerEvidenceReady,
     resetLab,
     buildVerifiedPackage,
     buildProductEvidenceBundle
-  }), [applyTemplate, assetError, assets, attemptUnauthorized, buildProductEvidenceBundle, buildVerifiedPackage, busy, currentPackage, decide, engine, evaluate, executeValveAction, hydrated, markWorkerEvidenceReady, patchControls, resetLab, seedFromAgent, session, submitIsolation, submitPostRepair, submitPropertyReview, submitRepair, submitResidentEvidence]);
+  }), [applyTemplate, assetError, assets, attemptUnauthorized, buildProductEvidenceBundle, buildVerifiedPackage, busy, currentPackage, decide, engine, evaluate, executeValveAction, hydrated, patchControls, resetLab, seedFromAgent, session, submitIsolation, submitPostRepair, submitPropertyReview, submitRepair, submitResidentEvidence]);
 
   return <LifecycleJourneyContext.Provider value={value}>{children}</LifecycleJourneyContext.Provider>;
 }
