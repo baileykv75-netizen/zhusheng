@@ -20,7 +20,7 @@ export function BuildingEventCenter() {
       <div className={styles.heroCopy}>
         <span className={styles.eyebrow}>BUILDING SITUATION · 华章新筑 2号楼</span>
         <h1>这栋楼今天需要处理什么</h1>
-        <p>事件中心只展示正在发生的建筑生命事件、责任人和下一项工作。1602保留完整深度闭环，其余事件只提供建筑尺度上的概览，不伪造尚未实现的专业流程。</p>
+        <p>把正在发生的建筑生命事件放回楼层、空间和责任链中查看。每件事都保留当前状态、负责人和下一项工作，1602可继续进入完整处置闭环。</p>
       </div>
       <div className={styles.metrics} aria-label="建筑事件摘要">
         <div><strong>{events.length}</strong><span>当前事件</span></div>
@@ -31,15 +31,15 @@ export function BuildingEventCenter() {
     </header>
 
     <div className={styles.context}>
-      <div><Building2 size={15} /><strong>18层 MiC 住宅</strong><span>只显示有事件的位置</span></div>
-      <div><span>完整深度事件</span><strong>EVT-1602</strong><span>其余为概览事件</span></div>
+      <div><Building2 size={15} /><strong>18层 MiC 住宅</strong><span>当前有事件的空间</span></div>
+      <div><span>完整深度事件</span><strong>EVT-1602</strong><span>其余为建筑态势概览</span></div>
     </div>
 
     <main className={styles.layout}>
       <section className={`event-floor-map ${styles.buildingMap}`} aria-label="建筑事件空间分布">
         <header className={styles.mapHeader}>
           <div><span className={styles.sectionLabel}>BUILDING MAP</span><strong>事件分布</strong></div>
-          <small>不再铺满18个空楼层，只保留真正存在事件的位置。</small>
+          <small>只显示当前有事件的楼层与空间。</small>
         </header>
         <div className={`event-floor-stack ${styles.floorStack}`}>
           {events.slice().sort((a, b) => b.floor - a.floor).map((event) => <div key={event.id} className={`${styles.floor} ${event.isDeepDemo ? styles.deepFloor : ""}`}>
@@ -74,12 +74,12 @@ export function BuildingEventCenter() {
           </div>
           {event.isDeepDemo
             ? <Link className={styles.deepAction} href="/case-1602">进入1602完整事件 <ArrowRight size={14} /></Link>
-            : <p className={styles.overviewOnly}>当前仅保留空间、状态、责任人与下一步概览；没有伪造完整领域闭环。</p>}
+            : <p className={styles.overviewOnly}>当前提供空间、状态、责任人与下一步概览；专业处置在对应深度事件中展开。</p>}
         </article>)}
 
         <details className={styles.boundary}>
           <summary>数据与事件深度说明</summary>
-          <p>当前五个事件均为脱敏演示数据。只有1602已经实现从住户证据、Building Memory、确定性判断、人工授权、维修到复验的完整闭环；其他四个事件只用于验证建筑级事件组织方式。</p>
+          <p>当前五个事件均为脱敏演示数据。只有1602已经实现从住户证据、Building Memory、确定性判断、人工授权、维修到复验的完整闭环；其他四个事件用于验证建筑级事件组织方式。</p>
         </details>
       </section>
     </main>
