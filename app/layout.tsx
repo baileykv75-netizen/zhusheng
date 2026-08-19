@@ -7,6 +7,8 @@ import { Shell } from "@/components/shell";
 import "./globals.css";
 import "./v6.css";
 import "./display-headlines.css";
+import "./product-tokens.css";
+import "./product-polish.css";
 
 export const metadata: Metadata = {
   title: "筑生：一栋房子一生的AI智能体",
