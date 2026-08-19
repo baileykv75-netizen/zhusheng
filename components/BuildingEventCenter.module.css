@@ -271,7 +271,7 @@
 .eventCard {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(245px, .46fr);
-  gap: 28px;
+  gap: 14px 28px;
   padding: 23px 0;
   border-bottom: 1px solid var(--line);
 }
@@ -359,6 +359,7 @@
 }
 
 .deepAction {
+  grid-column: 2;
   display: inline-flex;
   width: fit-content;
   align-items: center;
@@ -370,6 +371,7 @@
 }
 
 .overviewOnly {
+  grid-column: 2;
   margin: 0;
   color: var(--muted);
   font-size: 11px;
@@ -412,5 +414,6 @@
   .mapHeader { flex-direction: column; }
   .mapHeader small { text-align: left; }
   .eventCard { grid-template-columns: 1fr; gap: 16px; }
+  .deepAction, .overviewOnly { grid-column: 1; }
   .listHeader { align-items: flex-start; flex-direction: column; }
 }
