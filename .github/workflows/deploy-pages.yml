@@ -1,9 +1,9 @@
 name: Deploy GitHub Pages
 
-# Stable and product-shell branches can publish the current GitHub Pages site.
+# GitHub Pages environment protection allows the stable lifecycle branch to publish.
 on:
   push:
-    branches: [main, gpt/step4-guarded-lifecycle, gpt/product-shell-consolidation]
+    branches: [main, gpt/step4-guarded-lifecycle]
   workflow_dispatch:
 
 permissions:
