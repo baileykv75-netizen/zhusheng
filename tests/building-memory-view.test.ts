@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { building1602Dataset } from "../lib/building-intelligence/catalog.ts";
+import type { EvidenceRecord } from "../lib/demo-engine.ts";
 import type { LabSession } from "../lib/life-event-lab/types.ts";
 import {
   deriveBuildingMemoryViewModel,
@@ -68,6 +69,43 @@ test("memory view exposes the full structured lifecycle memory instead of a hand
   assert.ok(model.specialRecords > 0);
   assert.ok(model.tradeCount >= 8);
   assert.equal(model.defaultRecordId, "REC-CONST-CW-J03-REWORK-01");
+});
+
+test("verified worker evidence is projected into the same Building Memory timeline", () => {
+  const workerEvidence: EvidenceRecord[] = [{
+    id: "EV-2848",
+    type: "管线接头复核",
+    source: "安装班组口述 + 现场照片",
+    status: "verified",
+    note: "1602卫生间北侧墙冷热水接头已完成，照片与房间码已同步。",
+    capturedAt: "2025-03-18 14:26",
+    refs: ["1602卫生间", "MIC-BATH-1602", "W-1602-B7"]
+  }];
+  const model = deriveBuildingMemoryViewModel(baseSession(), workerEvidence);
+  const record = model.entries.find((entry) => entry.recordId === "EV-2848");
+
+  assert.ok(record);
+  assert.equal(record?.stage, "INSTALLATION");
+  assert.equal(record?.trade, "COLD_WATER");
+  assert.equal(record?.memory.workerStatement, "安装班组口述 + 现场照片");
+  assert.ok(record?.memory.verification?.checkedItems.includes("现场影像"));
+  assert.match(workspaceSource, /useDemo/);
+  assert.match(workspaceSource, /demoState\.evidence/);
+});
+
+test("unverified worker draft evidence does not enter Building Memory", () => {
+  const workerEvidence: EvidenceRecord[] = [{
+    id: "EV-2848",
+    type: "管线接头复核",
+    source: "安装班组口述 + 现场照片",
+    status: "needs_review",
+    note: "尚待品质核验。",
+    capturedAt: "2025-03-18 14:26",
+    refs: ["1602卫生间", "MIC-BATH-1602", "W-1602-B7"]
+  }];
+  const model = deriveBuildingMemoryViewModel(baseSession(), workerEvidence);
+
+  assert.equal(model.entries.some((entry) => entry.recordId === "EV-2848"), false);
 });
 
 test("browsing a component does not artificially inflate its current-event memory relevance", () => {
