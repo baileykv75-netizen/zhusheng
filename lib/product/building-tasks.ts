@@ -43,14 +43,14 @@ export function buildingTasks(events: BuildingLifeEventSummary[], deepResult?: L
       createdAt: event.updatedAt,
       dueAt: noPendingWork ? "已完成" : "当前事件阶段内",
       requiredEvidence: type === "COLLECT_EVIDENCE"
-        ? ["现场照片", "人工观察"]
+        ? ["现场描述", "现场照片或人工观察"]
         : type === "REPAIR" ? ["维修记录", "维修照片"]
           : type === "POST_REPAIR_REVIEW" ? ["恢复供水后的新观察"]
-            : type === "REINSPECTION" ? ["新的现场照片", "新的水表观察", "第一次维修记录", "第一次复验结果"]
+            : type === "REINSPECTION" ? ["新的现场描述", "新的现场观察", "第一次维修记录", "第一次复验结果"]
             : [],
       blockingReason: type === "REINSPECTION" ? "维修后仍观察到异常，原事件不得关闭" : /等待/.test(event.displayStatus) ? event.displayStatus : null,
       nextStateHint: type === "REINSPECTION"
-        ? "保留第一次维修与复验记录，由1602确定性事件引擎创建第二次检查链"
+        ? "保留第一次维修与复验记录，先收集新的现场事实，再由1602确定性事件引擎决定本轮补证与检查路径"
         : event.isDeepDemo ? "由1602确定性事件引擎校验后推进" : "仅展示产品任务，不创建完整领域状态",
       historyRefs: event.isDeepDemo && type === "REINSPECTION" && deepResult
         ? [...new Set([...deepResult.repairRecords.map((record) => record.repairRecordId), ...deepResult.auditLog.flatMap((entry) => [...entry.repairRecordIds, ...entry.evidenceRefs])])]
