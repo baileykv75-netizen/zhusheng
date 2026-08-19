@@ -123,7 +123,7 @@ export function Case1602Exhibit() {
 
   return <div className="case-exhibit">
     <section className="case-intro">
-      <div><p className="concept-kicker">筑生 / 1602建筑生命事件</p><h1 className="display-headline"><span className="display-headline-line">一件潮湿异常</span><span className="display-headline-line">唤醒一栋房子的记忆</span></h1><p>这里不再展示五个彼此独立的功能模块，而是沿着同一栋房子的事实、记忆、人工动作与验证结果查看一件真实可操作的生命事件。</p></div>
+      <div><p className="concept-kicker">筑生 / 1602建筑生命事件</p><h1 className="display-headline"><span className="display-headline-line">一件潮湿异常</span><span className="display-headline-line">唤醒一栋房子的记忆</span></h1><p>从建造时留下的现场经历，到入住后的异常、判断、人工动作与最终验证，一件事始终沿着同一栋房子的生命线向前推进。</p></div>
       <aside><span>当前真实阶段</span><strong>{stages[currentLifecycleStage].label}</strong><p>{result ? `事件：${result.eventId} · ${model.projection.stateLabel}` : "尚未开启1602事件；先查看它在建造期留下了什么"}</p><Link href={actionHref(model.projection.nextAction.destination)}>继续当前任务 <ArrowRight size={15} /></Link></aside>
     </section>
 
