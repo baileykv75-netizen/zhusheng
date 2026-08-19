@@ -38,6 +38,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
     ? deriveJourneyView({ source: "LIFE_EVENT", state: lifecycleSession.result.state })
     : deriveJourneyView({ source: "DEMO", snapshot: state });
   const locationContext = [product.floorId, product.unitId, product.spaceLabel].filter(Boolean).join(" / ");
+  const mobilePrimaryHref = product.eventId ? "/case-1602" : "/";
+  const mobilePrimaryLabel = product.eventId ? "1602生命事件" : "建筑总览";
 
   if (isCinematic) return <><ProductShellFrame mode={product.presentationMode} area={product.area}>
     <header className="exhibit-header">
@@ -81,7 +83,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <main data-journey-stage={journey.stage}>{children}</main>
 
     <nav className="mobile-task-nav" aria-label="移动端产品导航">
-      <Link href="/case-1602"><Building2 size={17} /><span>{product.eventId ? "1602生命事件" : "建筑总览"}</span></Link>
+      <Link href={mobilePrimaryHref}><Building2 size={17} /><span>{mobilePrimaryLabel}</span></Link>
       <details><summary><Menu size={17} /><span>{product.workspaceLabel}</span></summary><div><button type="button" onClick={() => setAgentOpen(true)}><Sparkles size={15} />问这栋房子</button>{workspaceLinks.map(({ href, label, group }) => { const Icon = iconByHref[href as keyof typeof iconByHref] ?? Building2; return <Link key={href} href={href}><Icon size={15} />{group === label ? label : `${group} · ${label}`}</Link>; })}</div></details>
     </nav>
   </ProductShellFrame><BuildingAgentDrawer open={agentOpen} onClose={() => setAgentOpen(false)} /></>;
