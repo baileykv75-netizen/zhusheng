@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   BUILDING_PRODUCT_ID,
@@ -8,6 +8,7 @@ import {
   deriveBuildingRouteContext,
   type BuildingRouteContext
 } from "@/lib/product/building-context";
+import type { BuildingAgentTurnResult, QueryVisualDirective } from "@/lib/building-intelligence/types.ts";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 
 type BuildingProductContextValue = BuildingRouteContext & {
@@ -15,7 +16,10 @@ type BuildingProductContextValue = BuildingRouteContext & {
   buildingLabel: typeof BUILDING_PRODUCT_LABEL;
   eventId: string | null;
   selectedBusinessId: string | null;
+  agentResult: BuildingAgentTurnResult | null;
+  queryVisual: QueryVisualDirective | null;
   setSelectedBusinessId(value: string | null): void;
+  setAgentResult(value: BuildingAgentTurnResult | null): void;
 };
 
 const BuildingProductContext = createContext<BuildingProductContextValue | null>(null);
@@ -23,6 +27,7 @@ const BuildingProductContext = createContext<BuildingProductContextValue | null>
 export function BuildingContextProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { session, setSession } = useLifecycleJourney();
+  const [agentResult, setAgentResultState] = useState<BuildingAgentTurnResult | null>(null);
   const route = useMemo(() => deriveBuildingRouteContext(pathname), [pathname]);
   const eventId = session.result?.eventId ?? route.canonicalEventId;
 
@@ -32,10 +37,24 @@ export function BuildingContextProvider({ children }: { children: React.ReactNod
     buildingLabel: BUILDING_PRODUCT_LABEL,
     eventId,
     selectedBusinessId: session.selectedBusinessId,
+    agentResult,
+    queryVisual: agentResult?.visualDirective ?? null,
     setSelectedBusinessId(value) {
       setSession((current) => ({ ...current, selectedBusinessId: value }));
+    },
+    setAgentResult(value) {
+      setAgentResultState(value);
+      if (!value) return;
+      const visual = value.visualDirective;
+      const target = visual?.targetBusinessIds[0]
+        ?? visual?.revealBusinessIds[0]
+        ?? value.selectedBusinessId
+        ?? null;
+      if (target) {
+        setSession((current) => ({ ...current, selectedBusinessId: target }));
+      }
     }
-  }), [eventId, route, session.selectedBusinessId, setSession]);
+  }), [agentResult, eventId, route, session.selectedBusinessId, setSession]);
 
   return <BuildingProductContext.Provider value={value}>{children}</BuildingProductContext.Provider>;
 }
