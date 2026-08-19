@@ -73,7 +73,7 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
       <div>
         <span className={styles.eyebrow}>PROPERTY OPERATIONS · {model.eventId}</span>
         <h1>{model.spaceLabel}</h1>
-        <p>{product.buildingLabel} / 16F / 1602 · 同一事件真相、同一建筑记忆、同一人工门禁</p>
+        <p>{product.buildingLabel} / 16F / 1602 · 当前事件与建筑记忆连续可追溯</p>
       </div>
       <div className={styles.headerActions}>
         <span className={styles.stateBadge}><i />{model.projection.stateLabel}</span>
@@ -86,9 +86,9 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
         <div className={styles.sceneHead}>
           <div>
             <span className={styles.sectionLabel}>BUILDING CONTEXT</span>
-            <strong>空间、系统与历史在同一视图里定位</strong>
+            <strong>定位当前空间、系统与隐蔽历史</strong>
           </div>
-          <small>{product.queryVisual ? `Ask Building 已返回 ${product.queryVisual.mode} 视觉指令；查询结果只影响定位与显示，不改事件状态。` : "点击建筑记忆会切到施工记忆视图；当前事件状态仍由确定性引擎控制。"}</small>
+          <small>{product.queryVisual ? `已按最近一次建筑查询定位 ${product.queryVisual.mode} 视图` : "点击建筑记忆可回到对应施工阶段"}</small>
         </div>
         <div className={styles.sceneViewport}>
           <BathroomTwinViewport
@@ -111,7 +111,7 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
           <p>{model.assessment.explanation}</p>
           <div className={styles.confidence}>
             <ShieldCheck size={14} />
-            <span>确定性判断置信度：{model.assessment.confidence}</span>
+            <span>当前判断置信度：{model.assessment.confidence}</span>
             {model.assessment.targetBusinessIds[0] ? <span>· {model.assessment.targetBusinessIds[0]}</span> : null}
           </div>
         </section>
@@ -126,7 +126,7 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
         <section className={styles.memorySection} aria-label="当前相关建筑记忆">
           <div className={styles.sectionHead}>
             <strong><Database size={14} /> 这栋房子记得什么</strong>
-            <small>确定性相关性排序</small>
+            <small>按当前事件相关性排序</small>
           </div>
           <div className={styles.memoryList}>
             {model.relevantMemories.slice(0, 3).map((memory) => <button
@@ -156,7 +156,7 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
               <strong>{gap.label}</strong>
               <p>{gap.reason}</p>
             </div>)}
-            {!model.evidenceGaps.length ? <div className={styles.gapItem}><strong>当前阶段没有新增证据缺口</strong><p>继续按事件引擎给出的唯一下一步推进。</p></div> : null}
+            {!model.evidenceGaps.length ? <div className={styles.gapItem}><strong>当前阶段没有新增证据缺口</strong><p>继续按当前下一步推进。</p></div> : null}
           </div>
         </section>
 
@@ -174,7 +174,7 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
     <div className={styles.detailsStrip}>
       <div>
         <strong>完整处理记录</strong>
-        <p>住户原始证据、物业复核、授权、阀门执行、维修与复验按当前事件阶段展开，所有操作继续受同一事件状态约束。</p>
+        <p>住户原始证据、物业复核、授权、阀门执行、维修与复验按当前事件阶段展开。</p>
       </div>
       <div className={styles.detailsActions}>
         <Link className={styles.secondaryButton} href="/memory">查看完整建筑记忆</Link>
