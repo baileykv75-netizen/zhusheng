@@ -37,6 +37,14 @@ test("work mode uses one product topbar instead of exposing the legacy admin rai
   assert.match(finishing, /--rail: 0px;/);
 });
 
+test("resident route does not retain its pre-refactor rail offset or duplicate page header", async () => {
+  const source = await readFile(finishingUrl, "utf8");
+
+  assert.match(source, /\.resident-service \{\s*padding-left: 0;/);
+  assert.match(source, /\.resident-service-header \{\s*display: none;/);
+  assert.match(source, /\.resident-service > main \{\s*padding-top: 116px;/);
+});
+
 test("visual system defines restrained colors spacing type and reduced-motion behavior", async () => {
   const source = await readFile(tokensUrl, "utf8");
 
