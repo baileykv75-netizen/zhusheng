@@ -34,6 +34,30 @@ jobs:
         run: pnpm run typecheck
       - name: Test
         run: pnpm test
+      - name: Prepare product browser QA
+        run: |
+          pnpm add -w --save-dev --lockfile=false playwright@1.55.0
+          pnpm exec playwright install --with-deps chromium
+      - name: Start product QA server
+        run: |
+          pnpm dev > /tmp/zhusheng-product-qa.log 2>&1 &
+          echo $! > /tmp/zhusheng-product-qa.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --show-error http://127.0.0.1:4174/property >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/zhusheng-product-qa.log
+          exit 1
+      - name: Browser regression QA
+        run: pnpm run test:css-delivery
+      - name: Stop product QA server
+        if: always()
+        run: |
+          if [ -f /tmp/zhusheng-product-qa.pid ]; then
+            kill "$(cat /tmp/zhusheng-product-qa.pid)" || true
+          fi
       - name: Build static product
         run: |
           pnpm run build:next
