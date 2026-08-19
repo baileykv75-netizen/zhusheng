@@ -7,6 +7,7 @@ const shellUrl = new URL("../components/shell.tsx", import.meta.url);
 const tokensUrl = new URL("../app/product-tokens.css", import.meta.url);
 const polishUrl = new URL("../app/product-polish.css", import.meta.url);
 const routePolishUrl = new URL("../app/product-route-polish.css", import.meta.url);
+const buildingAiCssUrl = new URL("../components/BuildingIntelligenceWorkspace.module.css", import.meta.url);
 
 test("shared product visual layers load after legacy CSS", async () => {
   const source = await readFile(layoutUrl, "utf8");
@@ -64,4 +65,12 @@ test("group task mode removes repeated dashboard-card treatment while preserving
 
   assert.match(source, /\.group-learning-workbench\.task-mode \.source-proof,[\s\S]*border: 0;/);
   assert.match(source, /\.group-learning-workbench\.task-mode \.group-governance \{[\s\S]*border: 1px solid/);
+});
+
+test("Building AI reasoning reads as one evidence flow rather than a grid of hypothesis cards", async () => {
+  const source = await readFile(buildingAiCssUrl, "utf8");
+
+  assert.match(source, /\.hypothesisGrid \{\s*display: grid;\s*grid-template-columns: 1fr;/);
+  assert.match(source, /\.hypothesisCard \{[\s\S]*border-radius: 0;[\s\S]*background: transparent;/);
+  assert.match(source, /\.reasoningStack \{[\s\S]*border-top:/);
 });
