@@ -1,6 +1,7 @@
 /* Last-mile interaction polish. No domain-state behavior lives here. */
 
 .product-shell[data-product-mode="work"] {
+  --rail: 0px;
   color-scheme: light;
 }
 
