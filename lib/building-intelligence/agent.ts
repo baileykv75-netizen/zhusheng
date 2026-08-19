@@ -18,11 +18,17 @@ import { resolveTargetEntity } from "./entity-resolution.ts";
 
 export type Invocation = { tool: BuildingQueryToolName; arguments: Record<string, string>; result: BuildingQueryResult };
 
+const SELECTION_REFERENCE = /它|这个|该构件|这个构件|选中/;
+
+export function selectedContextForQuestion(question: string, selectedBusinessId?: string | null) {
+  return selectedBusinessId && SELECTION_REFERENCE.test(question) ? selectedBusinessId : null;
+}
+
 function resolveComponent(question: string, selectedBusinessId?: string | null) {
-  const target = resolveTargetEntity(question, selectedBusinessId);
+  const selectedContext = selectedContextForQuestion(question, selectedBusinessId);
+  const target = resolveTargetEntity(question, selectedContext);
   if (target?.status === "RESOLVED" && building1602Dataset.components.some((item) => item.businessId === target.businessIds[0])) return target.businessIds[0];
-  if (selectedBusinessId && /它|这个|该构件|这个构件|选中/.test(question)) return selectedBusinessId;
-  return null;
+  return selectedContext;
 }
 
 function resolveSystem(question: string) {
@@ -82,8 +88,8 @@ export function planLocalBuildingQuery(question: string, selectedBusinessId?: st
   const systemId = resolveSystem(question);
   const surface = building1602Dataset.components.find((item) => item.entityType === "SURFACE" && [item.displayName, ...(item.aliases ?? [])].some((value) => question.includes(value)));
   if (/后面|背后|墙内|墙后/.test(question) && surface) return [invoke("get_components_behind_surface", { surfaceBusinessId: surface.businessId })];
-  if (/施工|建造|留痕|安装|照片|热熔/.test(question)) return [invoke("get_construction_history", { businessId: componentId ?? "J-1602-CW-03" })];
-  if (/检查|检验|保压/.test(question)) return [invoke("get_inspection_history", { businessId: componentId ?? systemId ?? "J-1602-CW-03" })];
+  if (/施工|建造|留痕|安装|照片|热熔/.test(question)) return [invoke("get_construction_history", { businessId: componentId ?? systemId ?? "SPACE-1602-BATHROOM" })];
+  if (/检查|检验|保压/.test(question)) return [invoke("get_inspection_history", { businessId: componentId ?? systemId ?? "SPACE-1602-BATHROOM" })];
   if (/维修|修过|维护/.test(question)) return [invoke("get_maintenance_history", { businessId: componentId ?? "SPACE-1602-BATHROOM" })];
   if (/观察|湿度|现在|当前/.test(question) && !systemId) return [invoke("get_current_observations", { businessId: componentId ?? "SPACE-1602-BATHROOM" })];
   if (/上游|从哪来|前面/.test(question) && componentId) return [invoke("get_upstream", { businessId: componentId })];
@@ -183,15 +189,16 @@ export function augmentDiagnosticMemory(result: BuildingAgentTurnResult): Buildi
 }
 
 export function createLocalBuildingAgentTurn(question: string, selectedBusinessId?: string | null, mode: BuildingAgentTurnResult["mode"] = "LOCAL_READ_ONLY"): BuildingAgentTurnResult {
-  const targetEntityResolution = resolveTargetEntity(question, selectedBusinessId);
+  const selectedContext = selectedContextForQuestion(question, selectedBusinessId);
+  const targetEntityResolution = resolveTargetEntity(question, selectedContext);
   if (targetEntityResolution?.status !== undefined && targetEntityResolution.status !== "RESOLVED") {
     const alternatives = targetEntityResolution.candidates.map((item) => item.displayName).join("、");
     const clarificationQuestion = targetEntityResolution.status === "AMBIGUOUS"
       ? `“${targetEntityResolution.mention}”对应多个已记录对象（${alternatives}），请指定一个。`
       : `当前 1602 建筑数据中没有找到“${targetEntityResolution.mention}”这一独立构件，请确认名称或选择已记录构件。`;
-    return { mode: "LIVE_AI_CLARIFICATION", question, answer: "", clarificationQuestion, toolTrace: [], facts: [], sources: [], visualDirective: null, selectedBusinessId, targetEntityResolution };
+    return { mode: "LIVE_AI_CLARIFICATION", question, answer: "", clarificationQuestion, toolTrace: [], facts: [], sources: [], visualDirective: null, selectedBusinessId: selectedContext, targetEntityResolution };
   }
-  const invocations = mergeInvocations(planLocalBuildingQuery(question, selectedBusinessId), diagnosticMemoryInvocations(question));
+  const invocations = mergeInvocations(planLocalBuildingQuery(question, selectedContext), diagnosticMemoryInvocations(question));
   const facts = [...new Map(invocations.flatMap((item) => item.result.facts).map((fact) => [fact.factId, fact])).values()];
   const sources = sourcesForInvocations(invocations);
   const asksClose = /关.*阀|阀.*关|关水/.test(question);
@@ -208,22 +215,23 @@ export function createLocalBuildingAgentTurn(question: string, selectedBusinessI
     ...(asksClose ? { proposedAction: { type: "CLOSE_VALVE" as const, authorizationRequired: true as const } }
       : asksOpen ? { proposedAction: { type: "OPEN_VALVE" as const, authorizationRequired: true as const } }
         : asksInspection ? { proposedAction: { type: "CREATE_INSPECTION_TASK" as const, authorizationRequired: true as const } } : {}),
-    selectedBusinessId,
+    selectedBusinessId: selectedContext,
     targetEntityResolution
   };
 }
 
 export async function queryBuildingAgent(question: string, selectedBusinessId?: string | null, fetcher: typeof fetch = fetch): Promise<BuildingAgentTurnResult> {
+  const selectedContext = selectedContextForQuestion(question, selectedBusinessId);
   try {
     const response = await fetcher(`${getBuildingAgentGatewayUrl()}/v1/agent/query`, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, selectedBusinessId: selectedBusinessId ?? null })
+      body: JSON.stringify({ question, selectedBusinessId: selectedContext })
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const body = await response.json() as { ok: true; result: BuildingAgentTurnResult };
     if (body.ok !== true || !Array.isArray(body.result?.facts)) throw new Error("invalid result");
     return augmentDiagnosticMemory(body.result);
   } catch {
-    return augmentDiagnosticMemory(createLocalBuildingAgentTurn(question, selectedBusinessId, "LOCAL_READ_ONLY"));
+    return augmentDiagnosticMemory(createLocalBuildingAgentTurn(question, selectedContext, "LOCAL_READ_ONLY"));
   }
 }
