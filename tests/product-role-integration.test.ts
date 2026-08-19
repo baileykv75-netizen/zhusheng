@@ -13,7 +13,8 @@ test("worker completion explicitly continues into Building Memory instead of end
   assert.match(source, /BUILDING MEMORY \/ 建造阶段/);
   assert.match(source, /后续用途/);
   assert.match(source, /隐蔽查询 · 维修定位 · 异常诊断 · 经验治理/);
-  assert.match(source, /href="\/memory"/);
+  assert.match(source, /href="\/memory\?record=EV-2848"/);
+  assert.match(source, /查看这条建筑记忆/);
 });
 
 test("resident evidence is framed as immutable source evidence inside EVT-1602", async () => {
