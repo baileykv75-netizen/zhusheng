@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 
 const propertyPage = new URL("../app/property/page.tsx", import.meta.url);
 const propertyWorkspace = new URL("../components/property/PropertyEventWorkspace.tsx", import.meta.url);
+const detailedWorkbench = new URL("../components/life-event/ResidentTaskWorkbench.tsx", import.meta.url);
 
 test("property task mode renders one consolidated event workspace", async () => {
   const source = await readFile(propertyPage, "utf8");
@@ -31,4 +32,17 @@ test("existing focus deep links still open the detailed domain task when require
   assert.match(source, /URLSearchParams\(window\.location\.search\)\.get\("focus"\)/);
   assert.match(source, /setTaskOpen\(true\)/);
   assert.match(source, /\[data-focus=/);
+});
+
+test("detailed property work cannot present template inputs as facts or one-click a prewritten success", async () => {
+  const source = await readFile(detailedWorkbench, "utf8");
+
+  assert.match(source, /没有事件级湿度观测/);
+  assert.match(source, /模板或高级验证中的数值草稿不能冒充当前事实/);
+  assert.match(source, /isolationObservationConfirmed/);
+  assert.match(source, /repairRecordConfirmed/);
+  assert.match(source, /postRepairObservationConfirmed/);
+  assert.match(source, /不代表系统已经观测到恢复/);
+  assert.match(source, /不是已经发生的维修事实/);
+  assert.match(source, /不代表维修已经成功/);
 });
