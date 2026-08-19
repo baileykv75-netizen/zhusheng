@@ -13,7 +13,9 @@ test("resident sees observed-fact intake before any water-meter follow-up", asyn
   assert.match(source, /intakeStage === "OBSERVATION"/);
   assert.match(source, /intakeStage === "FOLLOW_UP"/);
   assert.match(source, /为什么现在问这个/);
-  assert.match(source, /不是预设故障答案/);
+  assert.match(source, /不代表筑生已经判断为管道漏水/);
+  assert.match(source, /useState\(""\)/);
+  assert.match(source, /不继续要求水表观察/);
 });
 
 test("1602 follow-up explains why meter evidence is discriminating rather than diagnostic", () => {
@@ -22,19 +24,29 @@ test("1602 follow-up explains why meter evidence is discriminating rather than d
     photoFinding: "MOISTURE_VISIBLE"
   });
 
+  assert.ok(request);
   assert.equal(request.id, "METER_READING");
   assert.match(request.reason, /区分供水侧持续微流量与防水、冷凝等其他方向/);
   assert.match(request.boundary, /不代表筑生已经判断为管道漏水/);
   assert.deepEqual(request.triggeredBy, ["SPACE_CONTEXT", "DESCRIPTION", "PHOTO"]);
 });
 
-test("an unreadable photo does not become a pipe-leak diagnosis", () => {
+test("photo-confirmed moisture can trigger meter follow-up even when resident wording is vague", () => {
   const request = derive1602ResidentFollowUp({
     description: "这里看起来不太对，但我说不清是什么",
+    photoFinding: "MOISTURE_VISIBLE"
+  });
+
+  assert.ok(request);
+  assert.equal(request.id, "METER_READING");
+  assert.deepEqual(request.triggeredBy, ["SPACE_CONTEXT", "PHOTO"]);
+});
+
+test("non-moisture resident symptoms never get forced into the water-meter leak workflow", () => {
+  const request = derive1602ResidentFollowUp({
+    description: "卫生间镜前灯一直闪烁",
     photoFinding: "UNREADABLE"
   });
 
-  assert.equal(request.id, "METER_READING");
-  assert.match(request.reason, /先确认是否存在持续用水侧信号/);
-  assert.deepEqual(request.triggeredBy, ["SPACE_CONTEXT"]);
+  assert.equal(request, null);
 });
