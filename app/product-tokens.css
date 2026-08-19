@@ -1,0 +1,50 @@
+:root {
+  --zs-charcoal: #111413;
+  --zs-charcoal-soft: #1a1e1c;
+  --zs-paper: #f3f0e8;
+  --zs-paper-elevated: #f8f6f0;
+  --zs-paper-muted: #ebe7de;
+  --zs-ink: #171a19;
+  --zs-ink-secondary: #555c58;
+  --zs-ink-tertiary: #7b817d;
+  --zs-line: rgba(23, 26, 25, .13);
+  --zs-line-soft: rgba(23, 26, 25, .075);
+  --zs-line-dark: rgba(243, 240, 232, .14);
+  --zs-accent: #9b3f34;
+  --zs-accent-hover: #83362d;
+  --zs-success: #5d7f72;
+  --zs-warning: #9a7137;
+  --zs-danger: #a13d34;
+
+  --zs-space-1: 4px;
+  --zs-space-2: 8px;
+  --zs-space-3: 12px;
+  --zs-space-4: 16px;
+  --zs-space-5: 24px;
+  --zs-space-6: 32px;
+  --zs-space-7: 48px;
+  --zs-space-8: 72px;
+
+  --zs-radius-sm: 2px;
+  --zs-radius-md: 6px;
+  --zs-radius-lg: 12px;
+
+  --zs-type-display: clamp(48px, 5vw, 64px);
+  --zs-type-page: clamp(30px, 3.2vw, 36px);
+  --zs-type-section: clamp(18px, 1.7vw, 22px);
+  --zs-type-body: 14px;
+
+  --zs-content-max: 1540px;
+  --zs-ease: cubic-bezier(.22, 1, .36, 1);
+  --zs-motion-fast: 180ms;
+  --zs-motion: 320ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
