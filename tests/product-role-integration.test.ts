@@ -26,6 +26,16 @@ test("resident evidence is framed as immutable source evidence inside EVT-1602",
   assert.match(source, /数据与隐私说明/);
 });
 
+test("resident evidence collection does not expose water-meter questioning as a preset first-screen step", async () => {
+  const source = await readFile(residentUrl, "utf8");
+
+  assert.match(source, /提交初步情况，让筑生决定还缺什么/);
+  assert.match(source, /intakeStage === "OBSERVATION"/);
+  assert.match(source, /intakeStage === "FOLLOW_UP"/);
+  assert.match(source, /derive1602ResidentFollowUp/);
+  assert.match(source, /这只是为了缩小排查范围|不代表筑生已经判断为管道漏水/);
+});
+
 test("event center shows only actual event locations instead of eighteen mostly empty floors", async () => {
   const source = await readFile(eventsUrl, "utf8");
 
