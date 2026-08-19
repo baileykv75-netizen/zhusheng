@@ -1,32 +1,56 @@
 import assert from "node:assert/strict";
 import { mkdir } from "node:fs/promises";
 import { createRequire } from "node:module";
+import path from "node:path";
 
 const require = createRequire(import.meta.url);
-const { chromium } = require(
-  "C:/Users/Admin/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright"
-);
 
+function loadPlaywright() {
+  try {
+    return require("playwright");
+  } catch {
+    const fallback = process.env.CODEX_PLAYWRIGHT_MODULE
+      || "C:/Users/Admin/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright";
+    return require(fallback);
+  }
+}
+
+function browserExecutable(chromium) {
+  if (process.env.CHROME_EXECUTABLE) return process.env.CHROME_EXECUTABLE;
+  const candidates = process.platform === "win32"
+    ? [
+        "C:/Program Files/Google/Chrome/Application/chrome.exe",
+        "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+      ]
+    : ["/usr/bin/google-chrome", "/usr/bin/chromium", "/usr/bin/chromium-browser"];
+  return candidates[0] || chromium.executablePath();
+}
+
+const { chromium } = loadPlaywright();
 const baseUrl = (process.env.QA_BASE_URL || "http://127.0.0.1:4174").replace(/\/$/, "");
-const output = "D:/Admin/Desktop/Project/zhusheng-agent/artifacts/css-recovery";
+const output = process.env.QA_OUTPUT || path.resolve(process.cwd(), "artifacts/product-regression");
 const routes = [
   { path: "/", name: "concept", root: ".exhibit-shell" },
   { path: "/case-1602/", name: "case-1602", root: ".exhibit-shell" },
+  { path: "/events/", name: "events", root: ".app-shell" },
+  { path: "/memory/", name: "memory", root: ".app-shell" },
+  { path: "/property/", name: "property", root: ".app-shell" },
   { path: "/worker/", name: "worker", root: ".app-shell" },
   { path: "/resident/", name: "resident", root: ".app-shell" },
   { path: "/group/", name: "group", root: ".app-shell" }
 ];
 const viewports = [
   { name: "desktop", width: 1440, height: 900 },
+  { name: "tablet", width: 1024, height: 820 },
   { name: "mobile", width: 390, height: 844 }
 ];
 
 await mkdir(output, { recursive: true });
 
-const browser = await chromium.launch({
-  headless: true,
-  executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe"
-});
+const launchOptions = { headless: true };
+const executablePath = browserExecutable(chromium);
+if (executablePath) launchOptions.executablePath = executablePath;
+const browser = await chromium.launch(launchOptions);
 
 try {
   for (const viewport of viewports) {
@@ -58,6 +82,8 @@ try {
       const styleState = await page.evaluate(() => {
         const rootStyle = getComputedStyle(document.documentElement);
         const bodyStyle = getComputedStyle(document.body);
+        const workShell = document.querySelector('.product-shell[data-product-mode="work"]');
+        const mobileNav = document.querySelector(".mobile-task-nav");
         return {
           graphite: rootStyle.getPropertyValue("--graphite").trim(),
           bodyBackground: bodyStyle.backgroundColor,
@@ -65,7 +91,9 @@ try {
           stylesheets: [...document.querySelectorAll('link[rel="stylesheet"]')].map((link) => link.href),
           viewportWidth: window.innerWidth,
           htmlWidth: document.documentElement.scrollWidth,
-          bodyWidth: document.body.scrollWidth
+          bodyWidth: document.body.scrollWidth,
+          workRail: workShell ? getComputedStyle(workShell).getPropertyValue("--rail").trim() : null,
+          mobileNavDisplay: mobileNav ? getComputedStyle(mobileNav).display : null
         };
       });
 
@@ -75,6 +103,8 @@ try {
       assert.ok(styleState.stylesheets.length > 0, `${route.path} has no stylesheet link`);
       assert.ok(styleState.htmlWidth <= styleState.viewportWidth + 1, `${route.path} html overflows at ${viewport.name}`);
       assert.ok(styleState.bodyWidth <= styleState.viewportWidth + 1, `${route.path} body overflows at ${viewport.name}`);
+      if (route.root === ".app-shell") assert.equal(styleState.workRail, "0px", `${route.path} still inherits the legacy rail width`);
+      if (viewport.width <= 820 && route.root === ".app-shell") assert.equal(styleState.mobileNavDisplay, "grid", `${route.path} lost the shared mobile product navigation`);
 
       for (const stylesheet of styleState.stylesheets) {
         const response = await context.request.get(stylesheet);
@@ -86,7 +116,7 @@ try {
       }
 
       assert.deepEqual(failedAssets, [], `${route.path} failed static assets: ${failedAssets.join(", ")}`);
-      await page.screenshot({ path: `${output}/${route.name}-${viewport.name}.png`, fullPage: true });
+      await page.screenshot({ path: path.join(output, `${route.name}-${viewport.name}.png`), fullPage: true });
       await page.close();
     }
 
@@ -96,4 +126,4 @@ try {
   await browser.close();
 }
 
-console.log("CSS delivery QA passed: five routes, desktop/mobile, stylesheet HTTP and computed styles.");
+console.log("Product regression QA passed: eight routes, desktop/tablet/mobile, stylesheet delivery, rail reset, navigation and overflow checks.");
