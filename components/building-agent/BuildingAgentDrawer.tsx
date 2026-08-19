@@ -13,6 +13,7 @@ const memoryTradeCount = new Set(building1602Dataset.records.map((record) => rec
 export function BuildingAgentDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const product = useBuildingProductContext();
+  const hasSharedVisualScene = ["/case-1602", "/property"].includes(product.currentPath) && Boolean(product.queryVisual);
 
   useEffect(() => { if (open) closeRef.current?.focus(); }, [open]);
 
@@ -43,7 +44,7 @@ export function BuildingAgentDrawer({ open, onClose }: { open: boolean; onClose:
           selectedBusinessId={product.selectedBusinessId}
           result={product.agentResult}
           onResult={product.setAgentResult}
-          showVisualState={product.currentPath === "/property" && Boolean(product.queryVisual)}
+          showVisualState={hasSharedVisualScene}
         />
       </div>
 
