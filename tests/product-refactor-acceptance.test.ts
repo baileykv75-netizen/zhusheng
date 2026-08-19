@@ -65,10 +65,11 @@ test("proof and operational safety remain present but secondary to the primary w
   assert.match(resident, /数据与隐私说明/);
 });
 
-test("product refactor branch deploys through Pages while keeping independent regression QA", async () => {
+test("product refactor validates independently while protected stable branch owns Pages deployment", async () => {
   const [deploy, check] = await Promise.all([readFile(deployUrl, "utf8"), readFile(refactorCheckUrl, "utf8")]);
 
-  assert.match(deploy, /branches: \[main, gpt\/step4-guarded-lifecycle, gpt\/product-shell-consolidation\]/);
+  assert.match(deploy, /branches: \[main, gpt\/step4-guarded-lifecycle\]/);
+  assert.doesNotMatch(deploy, /branches: \[[^\]]*gpt\/product-shell-consolidation/);
   assert.match(deploy, /NEXT_PUBLIC_BUILDING_AGENT_GATEWAY_URL/);
   assert.match(check, /gpt\/product-shell-consolidation/);
   assert.match(check, /pnpm run test:css-delivery/);
