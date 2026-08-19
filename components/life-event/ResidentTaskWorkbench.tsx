@@ -81,6 +81,15 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
   const residentPhotoEvidence = submissionEvidence.find((item) => item.type === "RESIDENT_PHOTO_OBSERVATION");
   const photoConfirmed = Boolean(latestSubmission && latestSubmission.photoFinding !== "UNREADABLE");
   const meterConfirmed = Boolean(latestSubmission && latestSubmission.meterFinding !== "UNREADABLE");
+  const latestHumidity = result?.input.observations
+    .filter((item) => item.metric === "RELATIVE_HUMIDITY")
+    .sort((a, b) => a.observedAt.localeCompare(b.observedAt))
+    .at(-1);
+  const latestMicroFlow = result?.input.observations
+    .filter((item) => item.metric === "MICRO_FLOW")
+    .sort((a, b) => a.observedAt.localeCompare(b.observedAt))
+    .at(-1);
+  const missingTypes = new Set(result?.missingEvidence.map((item) => item.evidenceType) ?? []);
   const eventQueue = buildingLifeEvents(result?.state);
   const taskQueue = buildingTasks(eventQueue, result);
   const currentTask = taskQueue.find((task) => task.eventId === "EVT-1602");
@@ -118,8 +127,8 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
           })}</div>
         </details>
         <small>物业运行席 / 1602 / {isFactCheck ? "事件接入" : journey.stateLabel}</small>
-        <h2>{isFactCheck ? "1602卫生间出现潮湿" : journey.headline}</h2>
-        <p>{isFactCheck ? "先把现场事实与建造记忆放在一起核对，再决定是否需要隔离验证。" : journey.summary}</p>
+        <h2>{isFactCheck ? result ? "1602事件正在补充现场事实" : "等待1602现场事实进入事件" : journey.headline}</h2>
+        <p>{isFactCheck ? "先确认住户原始观察和已经存在的系统事实，再由事件引擎决定需要补什么、是否进入诊断或动作阶段。" : journey.summary}</p>
       </header>
 
       {session.notice ? <div className="task-notice" role="status"><AlertTriangle size={15} /><span>{session.notice}</span><button aria-label="关闭提示" onClick={() => setSession((current) => ({ ...current, notice: null }))}>×</button></div> : null}
@@ -147,27 +156,30 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
               <button className="task-primary" type="button" disabled={!reviewerId.trim() || !reviewNote.trim()} onClick={() => submitPropertyReview({ residentSubmissionId: latestSubmission.submissionId, reviewedBy: reviewerId, decision: reviewDecision, note: reviewNote })}><ClipboardCheck size={15} />追加物业复核记录</button>
             </details>
             {session.propertyReviews?.length ? <ol className="property-review-history">{session.propertyReviews.map((review) => <li key={review.reviewId}><span>{review.decision}</span><strong>{review.note}</strong><small>{review.reviewedBy} · {new Date(review.reviewedAt).toLocaleString("zh-CN", { hour12: false })}</small></li>)}</ol> : null}
-          </> : <p>请先由住户提交描述、照片观察和水表观察。物业不能代替住户填写原始证据。</p>}
+          </> : <p>请先由住户提交实际描述和现场观察。后续是否需要水表或其他补证，由当前事实和事件规则决定；物业不能替住户填写原始证据。</p>}
         </section>
 
         {isFactCheck ? <section className="active-task resident-guided-task" data-focus="evidence" tabIndex={-1}>
           <div className="task-section-heading"><Gauge size={18} /><div><strong>此刻只需要核对现场事实</strong><small>系统会调用同一份建筑记忆；不会替人操作阀门。</small></div></div>
           <div className="resident-fact-groups">
-            {result?.state === "REOPENED" ? <article className="resident-fact gap reopened-history"><span>历史保留</span><strong>第一次维修与复验仍在事件链</strong><p>{currentTask?.historyRefs.length ? currentTask.historyRefs.join(" · ") : "原维修记录、复验观察与审计顺序保持不变。"}</p><small>新任务：重新检查1602卫生间；不会覆盖第一次处置。</small></article> : null}
-            <article className="resident-fact known"><span>已发现</span><strong>卫生间持续潮湿</strong><p>湿度 {session.controls.humidity.value}%（基线 {session.controls.humidity.baseline ?? "—"}%），持续 {session.controls.humidity.durationMinutes} 分钟。</p></article>
-            <article className="resident-fact known"><span>已发现</span><strong>无人用水仍有微流量</strong><p>{session.controls.microFlow.value} L/min，已持续 {session.controls.microFlow.durationMinutes} 分钟。</p></article>
-            <article className="resident-fact memory"><span>已调取</span><strong>建造期管线与闭水记录</strong><p>施工接头、闭水试验和防水记录已关联至1602卫生间。</p></article>
-            <article className="resident-fact gap"><span>{photoConfirmed && meterConfirmed ? "已核对" : "还需确认"}</span><strong>{photoConfirmed && meterConfirmed ? "住户照片与水表复核已齐全" : "补齐现场人工证据"}</strong><p>{photoConfirmed ? "墙面照片已判读。" : "需要住户确认墙面是否可见潮湿。"}{meterConfirmed ? " 水表观察已确认。" : " 需要确认停用水后水表是否仍变化。"}</p></article>
+            {result?.state === "REOPENED" ? <article className="resident-fact gap reopened-history"><span>历史保留</span><strong>第一次维修与复验仍在事件链</strong><p>{currentTask?.historyRefs.length ? currentTask.historyRefs.join(" · ") : "原维修记录、复验观察与审计顺序保持不变。"}</p><small>新任务：先收集新的现场事实，再决定本轮补证路径；不会覆盖第一次处置。</small></article> : null}
+            {latestHumidity ? <article className="resident-fact known"><span>事件观测</span><strong>湿度观察已进入事件</strong><p>湿度 {latestHumidity.value}%（基线 {latestHumidity.baseline ?? "—"}%），持续 {latestHumidity.durationMinutes ?? 0} 分钟。</p></article> : <article className="resident-fact gap"><span>尚未形成</span><strong>没有事件级湿度观测</strong><p>模板或高级验证中的数值草稿不能冒充当前事实。</p></article>}
+            {latestMicroFlow ? <article className="resident-fact known"><span>事件观测</span><strong>微流量观察已进入事件</strong><p>{latestMicroFlow.value} L/min，持续 {latestMicroFlow.durationMinutes ?? 0} 分钟。</p></article> : <article className="resident-fact gap"><span>尚未形成</span><strong>没有事件级微流量观测</strong><p>只有明确记录到事件中的观测才会出现在这里。</p></article>}
+            <article className="resident-fact memory"><span>建筑背景</span><strong>建造期记录可供检索</strong><p>施工、闭水、防水和现场调整记录保持各自来源；只有事件事实形成后才计算诊断相关性。</p></article>
+            <article className="resident-fact gap"><span>{latestSubmission ? "住户已提交" : "等待住户"}</span><strong>{latestSubmission ? "按事件缺口继续补证" : "先收集住户原始现场事实"}</strong><p>{latestSubmission
+              ? `${photoConfirmed ? "照片观察已确认。" : missingTypes.has("RESIDENT_WALL_PHOTO") ? "事件仍需要有效照片观察。" : "照片当前未形成确定性结论。"}${meterConfirmed ? " 水表观察已确认。" : missingTypes.has("METER_READING") ? " 当前事件规则要求补充水表观察。" : " 不预设水表为必填项。"}`
+              : "先由住户描述实际看到的现象并提交现场观察；系统随后只请求当前路径真正需要的补证。"}</p></article>
           </div>
           <details className="resident-fact-controls">
-            <summary>补充物业现场观测 <ChevronDown size={15} /></summary>
+            <summary>录入物业 / 系统观测草稿 <ChevronDown size={15} /></summary>
+            <p className="task-control-note">以下是待人工确认的演示输入控件。未运行确定性评估前，它们不是“当前已发现事实”。</p>
             <div className="task-field-grid">
-              <TaskNumber label="当前湿度" value={session.controls.humidity.value} unit="%" min={0} max={100} onChange={(value) => setSession((current) => ({ ...current, controls: { ...current.controls, humidity: { ...current.controls.humidity, value } } }))} />
-              <TaskNumber label="无人用水微流量" value={session.controls.microFlow.value} unit="L/min" min={0} max={0.2} step={0.01} onChange={(value) => setSession((current) => ({ ...current, controls: { ...current.controls, microFlow: { ...current.controls.microFlow, value } } }))} />
+              <TaskNumber label="湿度观测" value={session.controls.humidity.value} unit="%" min={0} max={100} onChange={(value) => setSession((current) => ({ ...current, controls: { ...current.controls, humidity: { ...current.controls.humidity, value } } }))} />
+              <TaskNumber label="微流量观测" value={session.controls.microFlow.value} unit="L/min" min={0} max={0.2} step={0.01} onChange={(value) => setSession((current) => ({ ...current, controls: { ...current.controls, microFlow: { ...current.controls.microFlow, value } } }))} />
             </div>
           </details>
           {result?.contradictions.length ? <p className="task-blocked"><AlertTriangle size={13} />{result.contradictions[0].explanation}</p> : null}
-          <button className="task-primary" disabled={busy || !assets || !latestSubmission} onClick={evaluate}><FileSearch size={16} />{busy ? "正在核对建筑记忆…" : latestSubmission ? "核对现场事实，给出下一步" : "等待住户提交原始证据"}</button>
+          <button className="task-primary" disabled={busy || !assets || !latestSubmission} onClick={evaluate}><FileSearch size={16} />{busy ? "正在核对建筑记忆…" : latestSubmission ? "核对已提交事实，给出下一步" : "等待住户提交原始证据"}</button>
         </section> : null}
 
         {result && !["DETECTED", "COLLECTING_EVIDENCE", "INCONCLUSIVE", "REOPENED"].includes(result.state) ? <section className="task-decision-summary" data-focus="diagnosis" tabIndex={-1}>
