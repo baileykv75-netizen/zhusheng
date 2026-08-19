@@ -71,10 +71,10 @@ export function BuildingEventCenter() {
               <div><dt>当前责任</dt><dd>{event.ownerRole}</dd></div>
               <div><dt>唯一下一步</dt><dd>{tasks[eventIndex]?.title ?? event.nextAction}</dd></div>
             </dl>
-            {event.isDeepDemo
-              ? <Link className={styles.deepAction} href="/case-1602">进入1602完整事件 <ArrowRight size={14} /></Link>
-              : <p className={styles.overviewOnly}>当前仅保留空间、状态、责任人与下一步概览；没有伪造完整领域闭环。</p>}
           </div>
+          {event.isDeepDemo
+            ? <Link className={styles.deepAction} href="/case-1602">进入1602完整事件 <ArrowRight size={14} /></Link>
+            : <p className={styles.overviewOnly}>当前仅保留空间、状态、责任人与下一步概览；没有伪造完整领域闭环。</p>}
         </article>)}
 
         <details className={styles.boundary}>
