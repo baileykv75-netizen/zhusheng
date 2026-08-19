@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
@@ -23,7 +24,7 @@ function browserExecutable(chromium) {
         "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
       ]
     : ["/usr/bin/google-chrome", "/usr/bin/chromium", "/usr/bin/chromium-browser"];
-  return candidates[0] || chromium.executablePath();
+  return candidates.find((candidate) => existsSync(candidate)) || chromium.executablePath();
 }
 
 const { chromium } = loadPlaywright();
