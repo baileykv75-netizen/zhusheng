@@ -1,5 +1,6 @@
 import type { BuildingFact, BuildingRecord } from "./types.ts";
 import { building1602Dataset } from "./catalog.ts";
+import { resolveBuildingMemoryRelevance } from "./memory-relevance.ts";
 
 export type EngineeringHypothesis = {
   id: string;
@@ -49,18 +50,20 @@ function hasAnyTag(record: BuildingRecord, tags: string[]) {
 
 function memoryCandidates(tags: string[], facts: BuildingFact[]) {
   const queried = queriedRecordIds(facts);
-  return building1602Dataset.records
+  const recordById = new Map(building1602Dataset.records.map((record) => [record.recordId, record]));
+  return resolveBuildingMemoryRelevance({
+    spaceId: "SPACE-1602-BATHROOM",
+    queryTags: tags
+  })
+    .filter((match) => queried.has(match.recordId))
+    .map((match) => recordById.get(match.recordId))
+    .filter((record): record is BuildingRecord => Boolean(record))
     .filter((record) =>
       record.recordType === "CONSTRUCTION"
-      && queried.has(record.recordId)
       && hasAnyTag(record, tags)
-      && record.memory?.diagnosticTitle
-      && record.memory?.diagnosticReason
-      && record.memory?.recommendedCheck
-    )
-    .sort((a, b) =>
-      (a.memory?.diagnosticPriority ?? 99) - (b.memory?.diagnosticPriority ?? 99)
-      || a.occurredAt.localeCompare(b.occurredAt)
+      && Boolean(record.memory?.diagnosticTitle)
+      && Boolean(record.memory?.diagnosticReason)
+      && Boolean(record.memory?.recommendedCheck)
     );
 }
 
