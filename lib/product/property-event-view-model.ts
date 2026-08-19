@@ -152,15 +152,24 @@ function observationsFor(result: LifeEventResult | null): PropertyObservation[] 
   return observations;
 }
 
+function memoriesFor(session: LabSession, result: LifeEventResult | null) {
+  const memories = resolveBuildingMemoryRelevance({
+    ...derive1602MemoryRelevanceInput(session)
+  });
+  if (result) return memories.slice(0, 5);
+  // Before an event exists, this is an archive view: do not let same-space rework
+  // scores masquerade as diagnostic priority. Keep a plain chronological sample.
+  return [...memories]
+    .sort((a, b) => a.occurredAt.localeCompare(b.occurredAt) || a.recordId.localeCompare(b.recordId))
+    .slice(0, 5);
+}
+
 export function derivePropertyEventViewModel(session: LabSession): PropertyEventViewModel {
   const result = session.result;
   const submissionTimes = (session.residentSubmissions ?? []).map((item) => item.submittedAt);
   const residentEvidenceReady = hasFreshEvidenceAfterReopen(result, submissionTimes);
   const projection = deriveGuardedLifecycleProjection(result, { hasResidentEvidence: residentEvidenceReady });
-  const relevantMemories = resolveBuildingMemoryRelevance({
-    ...derive1602MemoryRelevanceInput(session),
-    limit: 5
-  });
+  const relevantMemories = memoriesFor(session, result);
 
   const evidenceGaps: PropertyEvidenceGap[] = (result?.missingEvidence ?? []).map((item, index) => ({
     id: `${item.evidenceType}-${index}`,
