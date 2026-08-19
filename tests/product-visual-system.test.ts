@@ -9,6 +9,8 @@ const polishUrl = new URL("../app/product-polish.css", import.meta.url);
 const routePolishUrl = new URL("../app/product-route-polish.css", import.meta.url);
 const finishingUrl = new URL("../app/product-finishing.css", import.meta.url);
 const buildingAiCssUrl = new URL("../components/BuildingIntelligenceWorkspace.module.css", import.meta.url);
+const workerUrl = new URL("../app/worker/page.tsx", import.meta.url);
+const groupUrl = new URL("../app/group/page.tsx", import.meta.url);
 
 test("shared product visual layers load after legacy CSS", async () => {
   const source = await readFile(layoutUrl, "utf8");
@@ -56,6 +58,14 @@ test("work headings prevent Chinese orphan wrapping without forcing every page i
   assert.match(source, /\.group-learning-workbench\.task-mode/);
 });
 
+test("work page primary headings no longer depend on hard-coded line breaks", async () => {
+  const [worker, group] = await Promise.all([readFile(workerUrl, "utf8"), readFile(groupUrl, "utf8")]);
+
+  assert.doesNotMatch(worker, /<h1>[^<]*<br\s*\/>/);
+  assert.doesNotMatch(worker, /<h2>[^<]*<br\s*\/>/);
+  assert.doesNotMatch(group, /<h1>[^<]*<br\s*\/>/);
+});
+
 test("case uses four time-stage columns and legacy event rail compensation is neutralized", async () => {
   const source = await readFile(routePolishUrl, "utf8");
 
@@ -85,4 +95,13 @@ test("Ask Building uses the same restrained product interaction language as work
   assert.match(source, /\.agent-drawer-header \{[\s\S]*background: var\(--zs-charcoal\)/);
   assert.match(source, /\.building-agent-shell :focus-visible/);
   assert.match(source, /\.building-ai-form button \{\s*background: var\(--zs-accent\)/);
+});
+
+test("shared mobile navigation remains available on resident events and group work routes", async () => {
+  const source = await readFile(finishingUrl, "utf8");
+
+  assert.match(source, /:has\(\.resident-service\) \.mobile-task-nav/);
+  assert.match(source, /:has\(\.event-center\) \.mobile-task-nav/);
+  assert.match(source, /:has\(\.group-workspace-shell\) \.mobile-task-nav/);
+  assert.match(source, /display: grid;/);
 });
