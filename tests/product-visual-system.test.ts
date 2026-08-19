@@ -47,6 +47,15 @@ test("resident route does not retain its pre-refactor rail offset or duplicate p
   assert.match(source, /\.resident-service > main \{\s*padding-top: 116px;/);
 });
 
+test("advanced property group and worker controls reserve space below the fixed product bar", async () => {
+  const source = await readFile(finishingUrl, "utf8");
+
+  assert.match(source, /\.advanced-workspace-shell,[\s\S]*\.group-workspace-shell \{[\s\S]*padding-top: 96px;/);
+  assert.match(source, /\.view-worker \.stage-content \{[\s\S]*padding-top: 96px;/);
+  assert.match(source, /\.view-worker \.field-recorder,[\s\S]*height: calc\(100svh - 96px\)/);
+  assert.match(source, /@media \(max-width: 899px\)[\s\S]*\.view-worker \.stage-content \{[\s\S]*padding-top: 42svh;/);
+});
+
 test("visual system defines restrained colors spacing type and reduced-motion behavior", async () => {
   const source = await readFile(tokensUrl, "utf8");
 
