@@ -16,7 +16,7 @@ test("property task mode renders one consolidated event workspace", async () => 
 test("legacy detailed property work remains available only behind the secondary task layer", async () => {
   const source = await readFile(propertyWorkspace, "utf8");
 
-  assert.match(source, /专业处理细节按需展开/);
+  assert.match(source, /完整处理记录/);
   assert.match(source, /taskOpen \? <PropertyWorkbench/);
   assert.match(source, /当前判断|CURRENT ASSESSMENT/);
   assert.match(source, /这栋房子记得什么/);
