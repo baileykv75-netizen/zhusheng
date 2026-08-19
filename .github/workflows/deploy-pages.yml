@@ -1,9 +1,9 @@
 name: Deploy GitHub Pages
 
-# STEP 4 preview deployments are allowed from the dedicated preview branch.
+# Stable and product-shell branches can publish the current GitHub Pages site.
 on:
   push:
-    branches: [main, gpt/step4-guarded-lifecycle]
+    branches: [main, gpt/step4-guarded-lifecycle, gpt/product-shell-consolidation]
   workflow_dispatch:
 
 permissions:
