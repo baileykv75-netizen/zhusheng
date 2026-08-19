@@ -1,0 +1,67 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const layoutUrl = new URL("../app/layout.tsx", import.meta.url);
+const shellUrl = new URL("../components/shell.tsx", import.meta.url);
+const tokensUrl = new URL("../app/product-tokens.css", import.meta.url);
+const polishUrl = new URL("../app/product-polish.css", import.meta.url);
+const routePolishUrl = new URL("../app/product-route-polish.css", import.meta.url);
+
+test("shared product visual layers load after legacy CSS", async () => {
+  const source = await readFile(layoutUrl, "utf8");
+  const legacy = source.indexOf('import "./v6.css"');
+  const tokens = source.indexOf('import "./product-tokens.css"');
+  const polish = source.indexOf('import "./product-polish.css"');
+  const routePolish = source.indexOf('import "./product-route-polish.css"');
+
+  assert.ok(legacy >= 0 && tokens > legacy);
+  assert.ok(polish > tokens);
+  assert.ok(routePolish > polish);
+});
+
+test("work mode uses one product topbar instead of exposing the legacy admin rail", async () => {
+  const [shell, polish] = await Promise.all([readFile(shellUrl, "utf8"), readFile(polishUrl, "utf8")]);
+
+  assert.match(shell, /className="floating-project-bar journey-project-bar product-topbar"/);
+  assert.match(shell, /className="work-brand"/);
+  assert.match(shell, /className="topbar-agent"/);
+  assert.match(polish, /\.compact-brand-rail \{\s*display: none !important;/);
+  assert.match(polish, /\.app-shell,[\s\S]*padding-left: 0;/);
+});
+
+test("visual system defines restrained colors spacing type and reduced-motion behavior", async () => {
+  const source = await readFile(tokensUrl, "utf8");
+
+  assert.match(source, /--zs-charcoal:/);
+  assert.match(source, /--zs-paper:/);
+  assert.match(source, /--zs-accent:/);
+  assert.match(source, /--zs-type-display:/);
+  assert.match(source, /--zs-type-page:/);
+  assert.match(source, /prefers-reduced-motion/);
+});
+
+test("work headings prevent Chinese orphan wrapping without forcing every page into one layout", async () => {
+  const source = await readFile(polishUrl, "utf8");
+
+  assert.match(source, /word-break: keep-all/);
+  assert.match(source, /line-break: strict/);
+  assert.match(source, /text-wrap: balance/);
+  assert.match(source, /\.resident-service-title h1/);
+  assert.match(source, /\.worker-stage-heading h1/);
+  assert.match(source, /\.group-learning-workbench\.task-mode/);
+});
+
+test("case uses four time-stage columns and legacy event rail compensation is neutralized", async () => {
+  const source = await readFile(routePolishUrl, "utf8");
+
+  assert.match(source, /\.case-workspace > nav \{\s*grid-template-columns: repeat\(4, minmax\(0, 1fr\)\)/);
+  assert.match(source, /\.event-center \{\s*padding-left: 0;/);
+});
+
+test("group task mode removes repeated dashboard-card treatment while preserving governance as a decision panel", async () => {
+  const source = await readFile(polishUrl, "utf8");
+
+  assert.match(source, /\.group-learning-workbench\.task-mode \.source-proof,[\s\S]*border: 0;/);
+  assert.match(source, /\.group-learning-workbench\.task-mode \.group-governance \{[\s\S]*border: 1px solid/);
+});
