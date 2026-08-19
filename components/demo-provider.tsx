@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { createInitialSnapshot, DemoEngine, DemoSnapshot, demoSteps, RuntimeMode } from "@/lib/demo-engine";
+import { createInitialSnapshot, DemoEngine, DemoSnapshot, demoSteps, RuntimeMode, type WorkerEvidenceDraft } from "@/lib/demo-engine";
 
 const STORAGE_KEY = "zhusheng.demo.v3";
 
@@ -11,6 +11,7 @@ type DemoContextValue = {
   hydrated: boolean;
   start: () => void;
   next: () => void;
+  confirmWorkerEvidence: (draft: WorkerEvidenceDraft) => void;
   previous: () => void;
   reset: () => void;
   exit: () => void;
@@ -77,6 +78,12 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     navigate(snapshot);
   }, [navigate, state]);
 
+  const confirmWorkerEvidence = useCallback((draft: WorkerEvidenceDraft) => {
+    const snapshot = DemoEngine.confirmWorkerEvidence(state, draft);
+    setState(snapshot);
+    navigate(snapshot);
+  }, [navigate, state]);
+
   const previous = useCallback(() => {
     const snapshot = DemoEngine.previous(state);
     setState(snapshot);
@@ -109,8 +116,8 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   }, [navigate, state]);
 
   const value = useMemo(
-    () => ({ state, hydrated, start, next, previous, reset, exit, approve, goToChapter }),
-    [approve, exit, goToChapter, hydrated, next, previous, reset, start, state]
+    () => ({ state, hydrated, start, next, confirmWorkerEvidence, previous, reset, exit, approve, goToChapter }),
+    [approve, confirmWorkerEvidence, exit, goToChapter, hydrated, next, previous, reset, start, state]
   );
 
   return <DemoContext.Provider value={value}>{children}</DemoContext.Provider>;
