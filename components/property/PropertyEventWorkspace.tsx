@@ -177,6 +177,7 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
         <p>住户原始证据、物业复核、授权、阀门执行、维修与复验按当前事件阶段展开，所有操作继续受同一事件状态约束。</p>
       </div>
       <div className={styles.detailsActions}>
+        <Link className={styles.secondaryButton} href="/memory">查看完整建筑记忆</Link>
         <Link className={styles.secondaryButton} href="/events">返回事件中心</Link>
         <button className={styles.secondaryButton} type="button" onClick={() => setTaskOpen((value) => !value)}>{taskOpen ? "收起处理任务" : "展开处理任务"}</button>
       </div>
