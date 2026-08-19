@@ -11,7 +11,7 @@ import { derivePropertyEventViewModel } from "@/lib/product/property-event-view-
 import type { LifeEventState, VisualDirective } from "@/lib/life-event-engine/types";
 import styles from "./Case1602Exhibit.module.css";
 
-const emptyDirective: VisualDirective = { view: "VIEW_CONSTRUCTION_MEMORY", highlightBusinessIds: ["J-1602-CW-03"], moistureState: "DRY", valvePosition: "OPEN", evidenceAnchorIds: ["EVIDENCE-ANCHOR-PIPE-INSTALL"], allowedActions: [], authorizationRequired: false };
+const emptyDirective: VisualDirective = { view: "VIEW_CONSTRUCTION_MEMORY", highlightBusinessIds: [], moistureState: "DRY", valvePosition: "OPEN", evidenceAnchorIds: [], allowedActions: [], authorizationRequired: false };
 
 type StoryStageId = "past" | "present" | "action" | "result";
 type StoryStage = {
@@ -58,7 +58,9 @@ export function Case1602Exhibit() {
   }, [presentView, result?.state]);
 
   const stages = useMemo<Record<StoryStageId, StoryStage>>(() => {
-    const observationText = model.observations.map((item) => `${item.label} ${item.value}`).join("；");
+    const observationText = model.observations.length
+      ? model.observations.map((item) => `${item.label} ${item.value}`).join("；")
+      : "当前还没有形成可用于事件判断的观测；先收集住户实际看到的现场事实。";
     const next = model.projection.nextAction;
     const resolved = result?.state === "RESOLVED";
     return {
@@ -115,6 +117,8 @@ export function Case1602Exhibit() {
 
   const current = stages[storyStage];
   const currentIndex = stageOrder.indexOf(currentLifecycleStage);
+  const selectedSceneBusinessId = product.selectedBusinessId
+    ?? (result ? directive.highlightBusinessIds[0] ?? null : null);
 
   function selectStoryStage(id: StoryStageId) {
     setStoryStage(id);
@@ -138,7 +142,7 @@ export function Case1602Exhibit() {
           externalError={assetError}
           directive={directive}
           view={view}
-          selectedBusinessId={product.selectedBusinessId ?? directive.highlightBusinessIds[0] ?? null}
+          selectedBusinessId={selectedSceneBusinessId}
           onViewChange={setView}
           onSelect={product.setSelectedBusinessId}
           queryVisual={product.queryVisual}
