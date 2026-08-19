@@ -1,4 +1,4 @@
-import { resolveBuildingMemoryRelevance, type RelevantBuildingMemory } from "../building-intelligence/memory-relevance.ts";
+import { resolveBuildingMemoryRelevance, type MemoryRelevanceInput, type RelevantBuildingMemory } from "../building-intelligence/memory-relevance.ts";
 import { deriveGuardedLifecycleProjection, type GuardedLifecycleProjection } from "../life-event-engine/guarded-lifecycle.ts";
 import type { Hypothesis, LifeEventResult, MissingEvidence } from "../life-event-engine/types.ts";
 import type { LabSession } from "../life-event-lab/types.ts";
@@ -77,6 +77,18 @@ function phenomenonTags(result: LifeEventResult | null) {
   return tags;
 }
 
+export function derive1602MemoryRelevanceInput(session: LabSession): MemoryRelevanceInput {
+  const result = session.result;
+  const leader = result?.rankedHypotheses[0] ?? null;
+  return {
+    spaceId: "SPACE-1602-BATHROOM",
+    selectedBusinessId: session.selectedBusinessId,
+    activeSystemIds: activeSystemsFor(result),
+    observationTags: phenomenonTags(result),
+    topologyBusinessIds: leader?.candidateBusinessIds ?? []
+  };
+}
+
 function assessmentFor(result: LifeEventResult | null, projection: GuardedLifecycleProjection): PropertyAssessment {
   const leader = result?.rankedHypotheses[0];
   if (!leader) {
@@ -105,14 +117,8 @@ export function derivePropertyEventViewModel(session: LabSession): PropertyEvent
   const submissionTimes = (session.residentSubmissions ?? []).map((item) => item.submittedAt);
   const residentEvidenceReady = hasFreshEvidenceAfterReopen(result, submissionTimes);
   const projection = deriveGuardedLifecycleProjection(result, { hasResidentEvidence: residentEvidenceReady });
-  const leader = result?.rankedHypotheses[0] ?? null;
-  const topologyBusinessIds = leader?.candidateBusinessIds ?? [];
   const relevantMemories = resolveBuildingMemoryRelevance({
-    spaceId: "SPACE-1602-BATHROOM",
-    selectedBusinessId: session.selectedBusinessId,
-    activeSystemIds: activeSystemsFor(result),
-    observationTags: phenomenonTags(result),
-    topologyBusinessIds,
+    ...derive1602MemoryRelevanceInput(session),
     limit: 5
   });
 
