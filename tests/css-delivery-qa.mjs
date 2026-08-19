@@ -43,6 +43,7 @@ const routes = [
 const viewports = [
   { name: "desktop", width: 1440, height: 900 },
   { name: "tablet", width: 1024, height: 820 },
+  { name: "tablet-small", width: 768, height: 1024 },
   { name: "mobile", width: 390, height: 844 }
 ];
 
@@ -127,4 +128,4 @@ try {
   await browser.close();
 }
 
-console.log("Product regression QA passed: eight routes, desktop/tablet/mobile, stylesheet delivery, rail reset, navigation and overflow checks.");
+console.log("Product regression QA passed: eight routes at 1440/1024/768/390 widths, stylesheet delivery, rail reset, navigation and overflow checks.");
