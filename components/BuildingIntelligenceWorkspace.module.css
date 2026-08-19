@@ -4,16 +4,15 @@
   flex-wrap: wrap;
   gap: 7px;
   margin: -6px 0 18px;
-  padding: 10px 12px;
-  border: 1px solid rgba(12, 13, 14, 0.08);
-  border-radius: 6px;
-  background: rgba(12, 13, 14, 0.025);
-  color: #6d7477;
+  padding: 10px 0;
+  border-top: 1px solid rgba(12, 13, 14, .09);
+  border-bottom: 1px solid rgba(12, 13, 14, .09);
+  color: #737974;
   font: 10px/1.4 Consolas, monospace;
 }
 
 .memoryScope strong {
-  color: #183f46;
+  color: #303632;
   font-size: 13px;
 }
 
@@ -21,28 +20,24 @@
   width: 1px;
   height: 12px;
   margin: 0 3px;
-  background: rgba(12, 13, 14, 0.12);
+  background: rgba(12, 13, 14, .12);
 }
 
 .reasoningStack {
   display: grid;
-  gap: 14px;
-  margin: 18px 0 6px;
-}
-
-.confirmedCard,
-.hypothesisCard,
-.nextStepCard,
-.boundaryCard {
-  border: 1px solid rgba(12, 13, 14, 0.12);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.42);
+  gap: 0;
+  margin: 20px 0 6px;
+  border-top: 1px solid rgba(12, 13, 14, .12);
 }
 
 .confirmedCard,
 .nextStepCard,
 .boundaryCard {
-  padding: 16px 18px;
+  padding: 17px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(12, 13, 14, .1);
+  border-radius: 0;
+  background: transparent;
 }
 
 .sectionLabel {
@@ -50,9 +45,9 @@
   align-items: center;
   gap: 7px;
   margin-bottom: 8px;
-  color: #6e7477;
+  color: #767c78;
   font: 700 10px/1.3 Consolas, monospace;
-  letter-spacing: 0.06em;
+  letter-spacing: .06em;
   text-transform: uppercase;
 }
 
@@ -60,22 +55,31 @@
 .nextStepCard p,
 .boundaryCard p {
   margin: 0;
-  color: #202426;
+  color: #343a36;
   font-size: 13px;
   line-height: 1.72;
 }
 
 .confirmedCard strong {
   display: block;
+  max-width: 760px;
   margin-bottom: 8px;
-  color: #111415;
-  font-size: 15px;
-  font-weight: 680;
+  color: #111513;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.confirmedCard p {
+  max-width: 760px;
+  color: #676e69;
+  font-size: 11px;
 }
 
 .hypothesisBlock {
   display: grid;
-  gap: 9px;
+  gap: 0;
+  padding-top: 18px;
+  border-bottom: 1px solid rgba(12, 13, 14, .1);
 }
 
 .hypothesisHeader {
@@ -83,55 +87,69 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  padding-bottom: 8px;
 }
 
 .hypothesisHeader > span {
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #6e7477;
+  color: #747a76;
   font: 700 10px/1.3 Consolas, monospace;
-  letter-spacing: 0.06em;
+  letter-spacing: .06em;
   text-transform: uppercase;
 }
 
 .hypothesisHeader em {
-  padding: 4px 7px;
-  border: 1px solid rgba(212, 33, 33, 0.22);
-  border-radius: 999px;
-  color: #a51d1d;
-  background: rgba(212, 33, 33, 0.05);
+  color: #8f493d;
   font: 700 9px/1 Consolas, monospace;
   font-style: normal;
 }
 
 .hypothesisGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 9px;
+  grid-template-columns: 1fr;
+  gap: 0;
 }
 
 .hypothesisCard {
-  padding: 14px 15px;
+  position: relative;
+  padding: 16px 0 17px 28px;
+  border: 0;
+  border-top: 1px solid rgba(12, 13, 14, .075);
+  border-radius: 0;
+  background: transparent;
+}
+
+.hypothesisCard::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 21px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #9b3f34;
+  box-shadow: 0 0 0 4px rgba(155, 63, 52, .08);
 }
 
 .memoryMeta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .memoryMeta span {
-  color: #9d351f;
+  color: #8f493d;
   font: 700 9px/1.2 Consolas, monospace;
 }
 
 .memoryMeta code {
   overflow: hidden;
-  max-width: 70%;
-  color: #737a7d;
+  max-width: 72%;
+  color: #8b918d;
   font: 9px/1.2 Consolas, monospace;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -140,54 +158,55 @@
 .hypothesisCard strong {
   display: block;
   margin-bottom: 6px;
-  color: #151819;
-  font-size: 13px;
+  color: #151918;
+  font-size: 14px;
+  font-weight: 620;
 }
 
 .hypothesisCard p {
+  max-width: 760px;
   margin: 0;
-  color: #555d60;
+  color: #5f6661;
   font-size: 11px;
-  line-height: 1.65;
+  line-height: 1.68;
 }
 
 .evidenceLine {
-  margin-top: 10px !important;
-  padding: 9px 10px;
-  border-left: 2px solid rgba(82, 200, 215, 0.55);
-  color: #31494e !important;
-  background: rgba(82, 200, 215, 0.055);
+  margin-top: 9px !important;
+  padding-left: 10px;
+  border-left: 1px solid rgba(155, 63, 52, .38);
+  color: #5d514b !important;
   font-size: 10px !important;
 }
 
 .hypothesisCard small {
   display: block;
-  margin-top: 10px;
-  padding-top: 9px;
-  border-top: 1px solid rgba(12, 13, 14, 0.08);
-  color: #2c555c;
+  max-width: 760px;
+  margin-top: 8px;
+  color: #59645f;
   font-size: 10px;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 .nextStepCard {
-  border-color: rgba(82, 200, 215, 0.3);
-  background: rgba(82, 200, 215, 0.07);
+  padding: 20px 18px;
+  border-bottom-color: rgba(155, 63, 52, .18);
+  background: rgba(155, 63, 52, .045);
 }
 
 .nextStepCard strong {
   display: block;
   margin-bottom: 7px;
-  color: #0d5e68;
-  font-size: 14px;
+  color: #78392f;
+  font-size: 15px;
 }
 
 .boundaryCard {
-  background: rgba(12, 13, 14, 0.035);
+  padding-block: 14px;
 }
 
 .boundaryCard p {
-  color: #73797b;
+  color: #7a807c;
   font-size: 10px;
 }
 
@@ -203,7 +222,7 @@
 .demoNote > span {
   flex: 0 0 auto;
   padding: 3px 6px;
-  border: 1px solid rgba(124, 104, 67, 0.26);
+  border: 1px solid rgba(124, 104, 67, .26);
   border-radius: 999px;
   font: 700 9px/1 Consolas, monospace;
 }
@@ -215,7 +234,7 @@
 
 .technicalDetails {
   margin-top: 18px;
-  border-top: 1px solid rgba(12, 13, 14, 0.12);
+  border-top: 1px solid rgba(12, 13, 14, .12);
 }
 
 .technicalDetails > summary {
@@ -224,7 +243,7 @@
   align-items: center;
   gap: 8px;
   list-style: none;
-  color: #656d70;
+  color: #6b726e;
   cursor: pointer;
   font-size: 11px;
 }
@@ -235,7 +254,7 @@
 
 .technicalDetails > summary b {
   margin-left: auto;
-  color: #232728;
+  color: #4a504c;
   font: 700 10px/1 Consolas, monospace;
 }
 
@@ -250,11 +269,11 @@
 }
 
 @media (max-width: 760px) {
-  .hypothesisGrid {
-    grid-template-columns: 1fr;
-  }
-
   .memoryScope {
     align-items: flex-start;
+  }
+
+  .hypothesisCard {
+    padding-left: 23px;
   }
 }
