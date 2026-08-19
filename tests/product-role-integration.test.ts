@@ -30,9 +30,9 @@ test("event center shows only actual event locations instead of eighteen mostly 
 
   assert.doesNotMatch(source, /Array\.from\(\{ length: 18 \}/);
   assert.doesNotMatch(source, /暂无事件/);
-  assert.match(source, /只显示有事件的位置/);
+  assert.match(source, /当前有事件的空间|只显示当前有事件的楼层与空间/);
   assert.match(source, /完整深度事件/);
-  assert.match(source, /没有伪造完整领域闭环/);
+  assert.match(source, /专业处置在对应深度事件中展开/);
 });
 
 test("group governance no longer uses fabricated scale counters as the primary story", async () => {
