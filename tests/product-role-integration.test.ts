@@ -33,7 +33,7 @@ test("resident evidence collection does not expose water-meter questioning as a 
   assert.match(source, /intakeStage === "OBSERVATION"/);
   assert.match(source, /intakeStage === "FOLLOW_UP"/);
   assert.match(source, /derive1602ResidentFollowUp/);
-  assert.match(source, /这只是为了缩小排查范围|不代表筑生已经判断为管道漏水/);
+  assert.match(source, /不是预设故障答案/);
 });
 
 test("event center shows only actual event locations instead of eighteen mostly empty floors", async () => {
