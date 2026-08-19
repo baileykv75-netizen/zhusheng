@@ -1,15 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GuardedLifecycleAgentPanel } from "@/components/life-event/GuardedLifecycleAgentPanel";
-import { PropertyWorkbench } from "@/components/life-event/ResidentTaskWorkbench";
+import { PropertyEventWorkspace } from "@/components/property/PropertyEventWorkspace";
 import { ResidentFreeLab } from "@/components/life-event/ResidentFreeLab";
-import type { QueryVisualDirective } from "@/lib/building-intelligence/types.ts";
 import { publicAssetPath } from "@/lib/site-path";
 
 export default function PropertyPage() {
   const [mode, setMode] = useState<"task" | "lab">("task");
-  const [queryVisual, setQueryVisual] = useState<QueryVisualDirective | null>(null);
 
   useEffect(() => {
     setMode(new URLSearchParams(window.location.search).get("mode") === "lab" ? "lab" : "task");
@@ -21,6 +18,6 @@ export default function PropertyPage() {
   }
 
   return mode === "task"
-    ? <><GuardedLifecycleAgentPanel onQueryVisualChange={setQueryVisual} /><PropertyWorkbench queryVisual={queryVisual} onOpenAdvanced={() => selectMode("lab")} /></>
+    ? <PropertyEventWorkspace onOpenAdvanced={() => selectMode("lab")} />
     : <div className="advanced-workspace-shell"><div className="advanced-mode-bar"><button onClick={() => selectMode("task")}>返回物业任务</button><span><strong>高级验证</strong><small>规则贡献、参数重放和审计只在这里出现，不占用物业主任务。</small></span></div><ResidentFreeLab /></div>;
 }
