@@ -145,10 +145,6 @@ export function ResidentService() {
     });
   }
 
-  function recordResidentResult(message: string) {
-    setSession((current) => ({ ...current, notice: message }));
-  }
-
   const intakeTitle = intakeStage === "FOLLOW_UP"
     ? followUp ? "筑生还需要你确认一件事" : "当前信息不支持继续套用漏水补证"
     : result?.state === "REOPENED"
@@ -225,7 +221,7 @@ export function ResidentService() {
         <House size={23} /><p>事件 {result.eventId}</p><h2>{progressLabels[result.state] ?? "物业正在继续处理"}</h2><span>{latestSubmission ? `你的提交 ${latestSubmission.submissionId} 已进入同一事件，当前由物业继续处理。` : "下一项需要你决定的任务会在这里出现。"}</span><Link href="/case-1602">查看事件生命线 <ArrowRight size={15} /></Link>
       </section> : null}
 
-      {result?.state === "RESOLVED" ? <section className="resident-result"><Check size={25} /><p>维修与复验完成</p><h2>恢复供水后未再次观察到异常</h2><span>本次维修、新观察与住户反馈继续保留在同一栋房子的事件和建筑记忆中。</span><div><button onClick={() => recordResidentResult("住户反馈：现在已经恢复正常。该反馈已记录，但不会绕过事件引擎改写状态。")}>现在已经正常</button><button onClick={() => recordResidentResult("住户反馈：仍有问题。已通知物业创建后续检查任务，原维修与复验记录保留。")}>仍有问题</button></div></section> : null}
+      {result?.state === "RESOLVED" ? <section className="resident-result"><Check size={25} /><p>维修与复验完成</p><h2>恢复供水后未再次观察到异常</h2><span>本次维修、授权、恢复供水后的新观察与最终复验结果继续保留在同一事件和建筑记忆中。</span><p className="resident-boundary"><ShieldCheck size={14} />如果以后再次发现异常，需要从新的现场事实发起复查；当前 RESOLVED 不会因为一个反馈按钮被直接改写，也不会假装已经创建并不存在的任务。</p><div><Link href="/case-1602">查看完整事件</Link><Link href="/events">返回事件中心</Link></div></section> : null}
     </main>
   </div>;
 }
