@@ -5,6 +5,7 @@ import { readFile } from "node:fs/promises";
 const workerUrl = new URL("../app/worker/page.tsx", import.meta.url);
 const residentUrl = new URL("../components/ResidentService.tsx", import.meta.url);
 const eventsUrl = new URL("../components/BuildingEventCenter.tsx", import.meta.url);
+const eventModelUrl = new URL("../lib/product/building-life-events.ts", import.meta.url);
 const groupUrl = new URL("../app/group/page.tsx", import.meta.url);
 
 test("worker completion explicitly continues into Building Memory instead of ending as an isolated demo", async () => {
@@ -34,6 +35,8 @@ test("resident evidence collection does not expose water-meter questioning as a 
   assert.match(source, /intakeStage === "FOLLOW_UP"/);
   assert.match(source, /derive1602ResidentFollowUp/);
   assert.match(source, /不是预设故障答案/);
+  assert.match(source, /不继续要求水表观察/);
+  assert.match(source, /不会因为处于卫生间就自动假定为漏水/);
 });
 
 test("event center shows only actual event locations instead of eighteen mostly empty floors", async () => {
@@ -46,6 +49,16 @@ test("event center shows only actual event locations instead of eighteen mostly 
   assert.match(source, /专业处置在对应深度事件中展开/);
 });
 
+test("1602 event summary never preselects meter or a component before evidence supports it", async () => {
+  const source = await readFile(eventModelUrl, "utf8");
+
+  assert.match(source, /DETECTED: \{ displayStatus: "等待住户描述现场"/);
+  assert.match(source, /按当前事实补充下一项必要证据/);
+  assert.match(source, /const current = state \? displayState\[state\] : displayState\.DETECTED/);
+  assert.doesNotMatch(source, /DETECTED: \{[^\n]*北侧墙角/);
+  assert.doesNotMatch(source, /COLLECTING_EVIDENCE: \{[^\n]*确认水表观察/);
+});
+
 test("group governance no longer uses fabricated scale counters as the primary story", async () => {
   const source = await readFile(groupUrl, "utf8");
 
@@ -53,9 +66,18 @@ test("group governance no longer uses fabricated scale counters as the primary s
   assert.doesNotMatch(source, /相似演示事件/);
   assert.doesNotMatch(source, /演示项目/);
   assert.doesNotMatch(source, /演示建筑/);
-  assert.match(source, /EVT-1602/);
   assert.match(source, /单事件经验候选/);
   assert.match(source, /证据覆盖与缺口/);
   assert.match(source, /PILOT_ONLY 或退回/);
   assert.match(source, /单事件 ≠ 企业标准/);
+});
+
+test("group task mode cannot manufacture a resolved source when the current event is unfinished", async () => {
+  const source = await readFile(groupUrl, "utf8");
+
+  assert.match(source, /currentResolved = currentPackage\?\.finalState === "RESOLVED"/);
+  assert.match(source, /当前事件还没有资格进入经验治理/);
+  assert.match(source, /这里不会用预制结果替代真实闭环/);
+  assert.match(source, /mode === "task" && !currentResolved \? null : <GroupLearningWorkbench/);
+  assert.match(source, /示例 ≠ 当前事件/);
 });
