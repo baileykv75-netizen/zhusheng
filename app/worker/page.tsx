@@ -11,7 +11,7 @@ import { LocalEvidenceUpload } from "@/components/LocalEvidenceUpload";
 
 export default function WorkerPage() {
   const router = useRouter();
-  const { state, next } = useDemo();
+  const { state, next, confirmWorkerEvidence } = useDemo();
   const [recording, setRecording] = useState(false);
   const [paused, setPaused] = useState(false);
   const [recorded, setRecorded] = useState(false);
@@ -20,6 +20,7 @@ export default function WorkerPage() {
   const [fields, setFields] = useState({ room: "1602卫生间", component: "W-1602-B7", process: "冷热水支管接头复核", pressure: "无掉压" });
   const latest = state.evidence.find((item) => item.id === "EV-2848");
   const stage = state.currentStep >= 2 ? 4 : state.workerSubstep || 1;
+  const workerDraftReady = Boolean(transcript.trim() && fields.room.trim() && fields.component.trim() && fields.process.trim() && fields.pressure.trim());
 
   useEffect(() => {
     if (!recording || paused) return;
@@ -40,6 +41,11 @@ export default function WorkerPage() {
     setRecording(false);
     setPaused(false);
     setRecorded(true);
+  }
+
+  function submitWorkerDraft() {
+    if (!workerDraftReady) return;
+    confirmWorkerEvidence({ transcript, ...fields });
   }
 
   function enterResidentTask() {
@@ -86,7 +92,7 @@ export default function WorkerPage() {
           </div>
         ) : stage === 2 ? (
           <div className="structured-record">
-            <div className="record-lead"><small>AI已整理 · 请人工确认</small><h2>已识别关键施工事实</h2><p>带“AI提取”的字段来自原始口述，可修改；系统不会补写不存在的证据。</p></div>
+            <div className="record-lead"><small>AI已整理 · 请人工确认</small><h2>已识别关键施工事实</h2><p>带“AI提取”的字段来自原始口述，可修改；你确认后的字段会真实写入 EV-2848，而不是被示例默认值覆盖。</p></div>
             <div className="record-fields editable">
               <label><span>空间 <em>扫码识别</em></span><input value={fields.room} onChange={(e) => setFields({ ...fields, room: e.target.value })} /></label>
               <label><span>构件 <em>扫码识别</em></span><input value={fields.component} onChange={(e) => setFields({ ...fields, component: e.target.value })} /></label>
@@ -95,21 +101,21 @@ export default function WorkerPage() {
             </div>
             <details className="evidence-vault"><summary>原始口述与整理依据 <ChevronDown size={15} /></summary><p>{transcript}</p></details>
             <EvidenceStrip ids={["joint", "pressure"]} label="AI整理关联的现场证据" />
-            <div className="evidence-row"><span><FileImage size={15} />现场照片 <strong>2张</strong></span><span><ShieldCheck size={15} />字段完整 <strong>4/4</strong></span></div>
-            <button className="stage-decision" onClick={next}>提交品质核验</button>
+            <div className="evidence-row"><span><FileImage size={15} />现场照片 <strong>2张</strong></span><span><ShieldCheck size={15} />字段完整 <strong>{workerDraftReady ? "4/4" : "待补齐"}</strong></span></div>
+            <button className="stage-decision" disabled={!workerDraftReady} onClick={submitWorkerDraft}>确认字段并提交品质核验</button>
           </div>
         ) : stage === 3 ? (
           <div className="quality-submitted">
-            <span className="seal-mark"><ShieldCheck size={28} /></span><small>品质核验已提交</small><h2>记录 EV-2848 等待写入建筑记忆</h2><p>品质智能体已核对空间、构件、工序与现场影像。当前工友记录只证明本次管线工序，不替防水或闭水试验记录背书。</p>
+            <span className="seal-mark"><ShieldCheck size={28} /></span><small>品质核验已提交</small><h2>记录 EV-2848 等待写入建筑记忆</h2><p>品质智能体已核对你确认后的空间、构件、工序与现场影像。当前工友记录只证明本次管线工序，不替防水或闭水试验记录背书。</p>
             <EvidenceStrip ids={["joint", "pressure"]} label="品质核验现场证据" />
             <dl><div><dt>当前状态</dt><dd>证据完整</dd></div><div><dt>下一步</dt><dd>写入建筑生命记忆</dd></div></dl>
             <button className="stage-decision" onClick={next}>写入建筑记忆</button>
           </div>
         ) : (
           <div className="memory-seal compact-success">
-            <span className="seal-mark"><CheckCircle2 size={30} /></span><small>BUILDING MEMORY · 已写入</small><h2>这次施工经历不会在封板后消失</h2><p>{latest?.id || "EV-2848"} 已作为1602卫生间的管线施工证据留在同一建筑数据链中；防水、闭水等其他记录继续保持各自来源。</p>
+            <span className="seal-mark"><CheckCircle2 size={30} /></span><small>BUILDING MEMORY · 已写入</small><h2>这次施工经历不会在封板后消失</h2><p>{latest?.id || "EV-2848"} 已作为当前确认的管线施工证据留在同一建筑数据链中；防水、闭水等其他记录继续保持各自来源。</p>
             <EvidenceStrip ids={["joint", "pressure"]} label="EV-2848建筑记忆证据" />
-            <dl className="memory-object"><div><dt>空间</dt><dd>1602卫生间</dd></div><div><dt>构件</dt><dd>W-1602-B7</dd></div><div><dt>班组</dt><dd>安装班组（脱敏）</dd></div><div><dt>验收阶段</dt><dd>隐蔽工程复核</dd></div></dl>
+            <dl className="memory-object"><div><dt>空间</dt><dd>{fields.room}</dd></div><div><dt>构件</dt><dd>{fields.component}</dd></div><div><dt>工序</dt><dd>{fields.process}</dd></div><div><dt>保压结果</dt><dd>{fields.pressure}</dd></div></dl>
             <div className="contribution-line"><span>后续用途</span><strong>隐蔽查询 · 维修定位 · 异常诊断 · 经验治理</strong></div>
             <div className="success-links"><button className="stage-decision" onClick={enterResidentTask}>进入住户服务</button><Link href="/memory?record=EV-2848">查看这条建筑记忆</Link><Link href="/">返回建筑总览</Link></div>
           </div>
