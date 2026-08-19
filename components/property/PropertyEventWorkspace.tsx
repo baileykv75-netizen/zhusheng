@@ -117,16 +117,16 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
         </section>
 
         <div className={styles.observations}>
-          {model.observations.map((item) => <div className={styles.observation} key={item.id}>
+          {model.observations.length ? model.observations.map((item) => <div className={styles.observation} key={item.id}>
             <span>{item.label}</span>
             <strong>{item.value}</strong>
-          </div>)}
+          </div>) : <div className={styles.observation}><span>当前观测</span><strong>尚未形成事件观测</strong></div>}
         </div>
 
         <section className={styles.memorySection} aria-label="当前相关建筑记忆">
           <div className={styles.sectionHead}>
             <strong><Database size={14} /> 这栋房子记得什么</strong>
-            <small>按当前事件相关性排序</small>
+            <small>{model.result ? "按当前事件事实相关性排序" : "仅按当前空间浏览，不代表诊断优先级"}</small>
           </div>
           <div className={styles.memoryList}>
             {model.relevantMemories.slice(0, 3).map((memory) => <button
