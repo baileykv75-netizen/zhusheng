@@ -10,7 +10,7 @@ import {
 
 test("product routes share one stable building identity", () => {
   assert.equal(BUILDING_PRODUCT_ID, "BLD-HZZ-02");
-  for (const pathname of ["/case-1602", "/events", "/worker", "/resident", "/property", "/group"]) {
+  for (const pathname of ["/case-1602", "/events", "/memory", "/worker", "/resident", "/property", "/group"]) {
     const context = deriveBuildingRouteContext(pathname);
     assert.equal(context.currentPath, pathname);
   }
@@ -31,6 +31,7 @@ test("presentation mode changes without creating a second product identity", () 
   assert.equal(deriveBuildingRouteContext("/case-1602").presentationMode, "CINEMATIC");
   assert.equal(deriveBuildingRouteContext("/events").presentationMode, "WORK");
   assert.equal(deriveBuildingRouteContext("/property").presentationMode, "WORK");
+  assert.equal(deriveBuildingRouteContext("/memory").presentationMode, "WORK");
 });
 
 test("worker remains a building-memory collaboration route rather than inheriting a fake event id", () => {
