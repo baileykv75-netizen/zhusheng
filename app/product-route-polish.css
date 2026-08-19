@@ -49,15 +49,7 @@
   margin-block: 4px 22px;
 }
 
-/* Resident has a local task header, so the whole page begins below the persistent product bar. */
-.product-shell[data-product-mode="work"] .resident-service {
-  padding-top: 88px;
-  padding-left: 0;
-}
-
-.product-shell[data-product-mode="work"] .resident-service > main {
-  padding-top: 54px;
-}
+/* Resident positioning is owned by product-finishing.css after the legacy shell is fully removed. */
 
 /* Secondary proof and example media should never compete with the active task. */
 .product-shell[data-product-mode="work"] .resident-photo-guide,
@@ -87,13 +79,5 @@
   .product-shell[data-product-mode="cinematic"] .case-workspace > nav button {
     min-height: 44px;
     font-size: 9px;
-  }
-
-  .product-shell[data-product-mode="work"] .resident-service {
-    padding-top: 72px;
-  }
-
-  .product-shell[data-product-mode="work"] .resident-service > main {
-    padding-top: 44px;
   }
 }
