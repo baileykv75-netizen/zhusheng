@@ -192,6 +192,109 @@
   padding-top: 116px;
 }
 
+/* Resident evidence is progressive: observed facts first, targeted follow-up second. */
+.product-shell[data-product-mode="work"] .resident-intake-stage.is-follow-up {
+  padding-top: 4px;
+}
+
+.product-shell[data-product-mode="work"] .resident-triage-summary {
+  display: grid;
+  gap: 8px;
+  padding: 18px 0 20px;
+  border-top: 1px solid rgba(21, 25, 24, .14);
+  border-bottom: 1px solid rgba(21, 25, 24, .14);
+}
+
+.product-shell[data-product-mode="work"] .resident-triage-summary > span {
+  color: #9b3f34;
+  font-size: 9px;
+  font-weight: 780;
+  letter-spacing: .12em;
+}
+
+.product-shell[data-product-mode="work"] .resident-triage-summary > strong {
+  color: #202422;
+  font-size: 18px;
+  font-weight: 620;
+}
+
+.product-shell[data-product-mode="work"] .resident-triage-summary > p {
+  margin: 2px 0 0;
+  color: #4f5753;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.product-shell[data-product-mode="work"] .resident-triage-summary > small {
+  color: #747a76;
+  font-size: 10px;
+}
+
+.product-shell[data-product-mode="work"] .resident-followup-question {
+  margin-top: 0;
+}
+
+.product-shell[data-product-mode="work"] .resident-followup-reason {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 11px;
+  margin: 16px 0 18px;
+  padding: 14px 16px;
+  border-left: 2px solid #9b3f34;
+  background: rgba(155, 63, 52, .055);
+}
+
+.product-shell[data-product-mode="work"] .resident-followup-reason > svg {
+  margin-top: 2px;
+  color: #9b3f34;
+}
+
+.product-shell[data-product-mode="work"] .resident-followup-reason strong {
+  display: block;
+  color: #272c29;
+  font-size: 11px;
+}
+
+.product-shell[data-product-mode="work"] .resident-followup-reason p {
+  margin: 5px 0 0;
+  color: #515954;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.product-shell[data-product-mode="work"] .resident-followup-reason small {
+  display: block;
+  margin-top: 7px;
+  color: #777d79;
+  font-size: 9px;
+  line-height: 1.65;
+}
+
+.product-shell[data-product-mode="work"] .resident-followup-actions {
+  display: grid;
+  grid-template-columns: minmax(160px, .42fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
+  margin-top: 18px;
+}
+
+.product-shell[data-product-mode="work"] .resident-followup-actions .resident-primary {
+  margin-top: 0;
+}
+
+.product-shell[data-product-mode="work"] .resident-secondary {
+  min-height: 44px;
+  border: 1px solid rgba(21, 25, 24, .2);
+  color: #4e5651;
+  background: transparent;
+  font-size: 11px;
+}
+
+.product-shell[data-product-mode="work"] .resident-secondary:hover {
+  border-color: rgba(155, 63, 52, .4);
+  color: #7d3b31;
+}
+
 /* 3D response should communicate continuity rather than flashy motion. */
 .twin-viewport,
 .case-model,
@@ -244,6 +347,10 @@
 
   .product-shell[data-product-mode="work"] .resident-service > main {
     padding-top: 86px;
+  }
+
+  .product-shell[data-product-mode="work"] .resident-followup-actions {
+    grid-template-columns: 1fr;
   }
 }
 
