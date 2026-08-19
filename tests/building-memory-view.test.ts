@@ -69,6 +69,10 @@ test("memory view exposes the full structured lifecycle memory instead of a hand
   assert.ok(model.specialRecords > 0);
   assert.ok(model.tradeCount >= 8);
   assert.equal(model.defaultRecordId, "REC-CONST-CW-J03-REWORK-01");
+  assert.equal(model.hasActiveEvent, false);
+  assert.equal(model.eventId, "尚未进入事件");
+  assert.equal(model.eventRelatedRecords, 0);
+  assert.equal(model.entries.some((entry) => entry.eventRelation !== null), false);
 });
 
 test("verified worker evidence is projected into the same Building Memory timeline", () => {
@@ -143,6 +147,7 @@ test("memory UI exposes verification scope and current-event relation without ca
   assert.match(workspaceSource, /当时检查了/);
   assert.match(workspaceSource, /当时没有单独覆盖/);
   assert.match(workspaceSource, /与 \{model\.eventId\} 的当前关系/);
-  assert.match(workspaceSource, /historicalBoundary/);
+  assert.match(workspaceSource, /当前没有活动事件/);
+  assert.match(workspaceSource, /不参与任何诊断排序/);
   assert.doesNotMatch(workspaceSource, /排除证据|确认故障点/);
 });
