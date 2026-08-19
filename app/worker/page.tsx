@@ -114,7 +114,7 @@ export default function WorkerPage() {
             <EvidenceStrip ids={["joint", "pressure"]} label="EV-2848建筑记忆证据" />
             <dl className="memory-object"><div><dt>空间</dt><dd>1602卫生间</dd></div><div><dt>构件</dt><dd>W-1602-B7</dd></div><div><dt>班组</dt><dd>安装班组（脱敏）</dd></div><div><dt>验收阶段</dt><dd>隐蔽工程复核</dd></div></dl>
             <div className="contribution-line"><span>后续用途</span><strong>隐蔽查询 · 维修定位 · 异常诊断 · 经验治理</strong></div>
-            <div className="success-links"><button className="stage-decision" onClick={enterResidentTask}>进入住户服务</button><Link href="/memory">在建筑记忆中查看1602</Link><Link href="/">返回建筑总览</Link></div>
+            <div className="success-links"><button className="stage-decision" onClick={enterResidentTask}>进入住户服务</button><Link href="/memory?record=EV-2848">查看这条建筑记忆</Link><Link href="/">返回建筑总览</Link></div>
           </div>
         )}
       </section>
