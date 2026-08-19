@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
+const layoutUrl = new URL("../app/layout.tsx", import.meta.url);
 const shellUrl = new URL("../components/shell.tsx", import.meta.url);
 const memoryPageUrl = new URL("../app/memory/page.tsx", import.meta.url);
 const propertyUrl = new URL("../components/property/PropertyEventWorkspace.tsx", import.meta.url);
@@ -27,6 +28,13 @@ test("core work routes read as one building product instead of independent demo 
   assert.match(property, /这栋房子记得什么/);
   assert.match(resident, /EVT-1602/);
   assert.match(worker, /BUILDING MEMORY/);
+});
+
+test("primary product metadata no longer presents the experience as a prototype", async () => {
+  const layout = await readFile(layoutUrl, "utf8");
+
+  assert.match(layout, /连续记忆、可追溯事件与可验证的AI判断/);
+  assert.doesNotMatch(layout, /交互样机|原型系统/);
 });
 
 test("mobile primary navigation never labels a link as building overview while sending it to the 1602 case", async () => {
