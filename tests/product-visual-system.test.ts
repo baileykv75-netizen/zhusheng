@@ -26,7 +26,7 @@ test("shared product visual layers load after legacy CSS", async () => {
   assert.ok(finishing > routePolish);
 });
 
-test("work mode uses one product topbar instead of exposing the legacy admin rail", async () => {
+test("work mode fully exits the legacy rail-grid shell and owns one fixed product topbar", async () => {
   const [shell, polish, finishing] = await Promise.all([readFile(shellUrl, "utf8"), readFile(polishUrl, "utf8"), readFile(finishingUrl, "utf8")]);
 
   assert.match(shell, /className="floating-project-bar journey-project-bar product-topbar"/);
@@ -35,6 +35,8 @@ test("work mode uses one product topbar instead of exposing the legacy admin rai
   assert.match(polish, /\.compact-brand-rail \{\s*display: none !important;/);
   assert.match(polish, /\.app-shell,[\s\S]*padding-left: 0;/);
   assert.match(finishing, /--rail: 0px;/);
+  assert.match(finishing, /\.journey-shell \{\s*display: block;[\s\S]*grid-template-columns: none;[\s\S]*grid-template-rows: none;/);
+  assert.match(finishing, /\.product-topbar \{\s*position: fixed;\s*width: auto;/);
 });
 
 test("resident route does not retain its pre-refactor rail offset or duplicate page header", async () => {
@@ -113,4 +115,5 @@ test("shared mobile navigation remains available on resident events and group wo
   assert.match(source, /:has\(\.event-center\) \.mobile-task-nav/);
   assert.match(source, /:has\(\.group-workspace-shell\) \.mobile-task-nav/);
   assert.match(source, /display: grid;/);
+  assert.match(source, /padding-bottom: 58px;/);
 });
