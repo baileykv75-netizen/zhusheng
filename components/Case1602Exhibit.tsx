@@ -156,18 +156,17 @@ export function Case1602Exhibit() {
           <div><span>这一阶段发生什么</span><strong>{current.fact}</strong></div>
           <div><span>为什么重要</span><strong>{current.why}</strong></div>
           <div className={styles.storyMeta}>
-            <div><span>事件真相</span><strong>{model.projection.stateLabel}</strong></div>
+            <div><span>事件状态</span><strong>{model.projection.stateLabel}</strong></div>
             <div><span>当前下一步</span><strong>{model.projection.nextAction.label}</strong></div>
-            <div><span>Ask Building</span><strong>{product.agentResult ? "已保留最近一次建筑查询，可从顶部继续追问" : "可从顶部“问这栋房子”发起只读建筑查询"}</strong></div>
           </div>
           <Link href={current.href} className="case-primary">{current.action} <ArrowRight size={17} /></Link>
-          <details><summary>查看事实边界 <ChevronDown size={15} /></summary><p>空间与构件来自1602数字样间；建筑记忆由确定性相关性规则参与排序；事件状态、授权、阀门与维修结果仍由原有确定性领域引擎维护。</p></details>
+          <details><summary>查看事实边界 <ChevronDown size={15} /></summary><p>空间与构件来自1602数字样间；建筑记忆只改变排查优先级。事件状态、人工授权、阀门动作和维修结果仍沿受控流程独立记录。</p></details>
         </article>
       </div>
     </section>
 
     <details className={styles.evidenceDetails}>
-      <summary><span>展开证据时间链</span><small>住户观察、系统事实与事件证据仍完整保留，但不占据默认主叙事</small></summary>
+      <summary><span>展开证据时间链</span><small>住户观察、系统事实与事件证据完整保留，按需查看</small></summary>
       <EvidenceTimeChain />
     </details>
 
