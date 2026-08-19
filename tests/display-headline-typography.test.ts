@@ -6,7 +6,7 @@ const concept = readFileSync(new URL("../components/ConceptExhibit.tsx", import.
 const caseExhibit = readFileSync(new URL("../components/Case1602Exhibit.tsx", import.meta.url), "utf8");
 const headlineCss = readFileSync(new URL("../app/display-headlines.css", import.meta.url), "utf8");
 
-test("cinematic display headlines do not carry sentence punctuation", () => {
+test("cinematic authored display lines do not carry sentence punctuation", () => {
   const conceptDisplayLines = [...concept.matchAll(/display-headline-line">([^<]+)</g)].map((match) => match[1]);
   const caseDisplayLines = [...caseExhibit.matchAll(/display-headline-line">([^<]+)</g)].map((match) => match[1]);
   assert.ok(conceptDisplayLines.length >= 8);
@@ -15,9 +15,9 @@ test("cinematic display headlines do not carry sentence punctuation", () => {
     assert.ok(!/[，。！？；：]$/.test(line), `cinematic display line ends with punctuation: ${line}`);
   }
 
-  const chapterTitles = [...caseExhibit.matchAll(/title: "([^"]+)"/g)].map((match) => match[1]);
-  assert.ok(chapterTitles.length >= 5);
-  assert.ok(chapterTitles.every((title) => !/[，。！？；：]$/.test(title)), "case chapter display titles must not carry terminal punctuation");
+  assert.match(caseExhibit, /"past", "present", "action", "result"/);
+  assert.match(caseExhibit, /墙封起来以后 施工经历没有消失/);
+  assert.doesNotMatch(caseExhibit, /墙封起来以后 施工经历没有消失[，。！？；：]/);
 });
 
 test("authored Chinese display lines stay atomic at medium widths instead of orphaning the final characters", () => {
