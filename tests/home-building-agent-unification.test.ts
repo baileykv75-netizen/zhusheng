@@ -10,9 +10,10 @@ test("Ask the Building uses the same Building Intelligence workspace and shared 
   assert.match(drawer, /idPrefix="global-building-agent"/);
   assert.match(drawer, /result=\{product\.agentResult\}/);
   assert.match(drawer, /onResult=\{product\.setAgentResult\}/);
-  assert.match(drawer, /showVisualState=\{product\.currentPath === "\/property" && Boolean\(product\.queryVisual\)\}/);
+  assert.match(drawer, /const hasSharedVisualScene = \["\/case-1602", "\/property"\]\.includes\(product\.currentPath\) && Boolean\(product\.queryVisual\)/);
+  assert.match(drawer, /showVisualState=\{hasSharedVisualScene\}/);
   assert.match(drawer, /building1602Dataset\.records\.length/);
-  assert.match(drawer, /进入受控事件处理/);
+  assert.match(drawer, /进入物业事件处理/);
 });
 
 test("legacy draft-to-event drawer flow is no longer the Ask Building experience", () => {
