@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFileSync } from "node:fs";
 import { productInformationHierarchy } from "../lib/product/information-hierarchy.ts";
 import { productNavigation } from "../lib/product/product-navigation.ts";
+
+const memoryPage = readFileSync(new URL("../app/memory/page.tsx", import.meta.url), "utf8");
 
 test("primary navigation is organized by building capabilities rather than role apps", () => {
   assert.deepEqual(productNavigation.map((item) => item.label), ["建筑总览", "生命事件", "建筑记忆", "协同处理", "经验治理"]);
@@ -10,10 +13,11 @@ test("primary navigation is organized by building capabilities rather than role 
   assert.deepEqual(collaboration.children.map((item) => item.label), ["物业运行", "住户任务", "施工记录"]);
 });
 
-test("memory navigation remains hidden until the dedicated memory view exists", () => {
+test("memory navigation is enabled only after the dedicated building-memory view exists", () => {
   const memory = productNavigation.find((item) => item.id === "MEMORY");
   assert.equal(memory?.href, "/memory");
-  assert.equal(memory?.available, false);
+  assert.equal(memory?.available, true);
+  assert.match(memoryPage, /BuildingMemoryWorkspace/);
 });
 
 test("technical proof is never part of the property primary information tier", () => {
