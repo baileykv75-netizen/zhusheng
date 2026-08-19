@@ -12,7 +12,7 @@ export type ProductNavigationItem = {
 export const productNavigation: ProductNavigationItem[] = [
   { id: "OVERVIEW", label: "建筑总览", english: "BUILDING", href: "/", available: true },
   { id: "EVENTS", label: "生命事件", english: "EVENTS", href: "/events", available: true },
-  { id: "MEMORY", label: "建筑记忆", english: "MEMORY", href: "/memory", available: false },
+  { id: "MEMORY", label: "建筑记忆", english: "MEMORY", href: "/memory", available: true },
   {
     id: "COLLABORATION",
     label: "协同处理",
