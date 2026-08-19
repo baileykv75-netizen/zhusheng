@@ -91,6 +91,7 @@ export type BuildingMemoryEntry = {
 
 export type BuildingMemoryViewModel = {
   eventId: string;
+  hasActiveEvent: boolean;
   totalRecords: number;
   specialRecords: number;
   eventRelatedRecords: number;
@@ -188,13 +189,16 @@ export function groupBuildingMemoryEntries(entries: BuildingMemoryEntry[]) {
 }
 
 export function deriveBuildingMemoryViewModel(session: LabSession, workerEvidence: EvidenceRecord[] = []): BuildingMemoryViewModel {
+  const hasActiveEvent = Boolean(session.result);
   const relationInput = derive1602MemoryRelevanceInput(session);
-  const relations = resolveBuildingMemoryRelevance({
-    ...relationInput,
-    // Browsing a memory record changes selectedBusinessId. Do not let that UI selection
-    // inflate the record's event relevance; event relation must remain stable.
-    selectedBusinessId: null
-  });
+  const relations = hasActiveEvent
+    ? resolveBuildingMemoryRelevance({
+        ...relationInput,
+        // Browsing a memory record changes selectedBusinessId. Do not let that UI selection
+        // inflate the record's event relevance; event relation must remain stable.
+        selectedBusinessId: null
+      })
+    : [];
   const relationById = new Map(relations.map((item) => [item.recordId, item]));
   const structuredEntries = building1602Dataset.records
     .filter((record): record is BuildingRecord & { memory: BuildingRecordMemory } => Boolean(record.memory))
@@ -221,10 +225,13 @@ export function deriveBuildingMemoryViewModel(session: LabSession, workerEvidenc
   const firstSpecial = entries.find((entry) => entry.special);
 
   return {
-    eventId: session.result?.eventId ?? "EVT-1602",
+    eventId: session.result?.eventId ?? "尚未进入事件",
+    hasActiveEvent,
     totalRecords: entries.length,
     specialRecords: entries.filter((entry) => entry.special).length,
-    eventRelatedRecords: entries.filter((entry) => entry.eventRelation && ["HIGH", "MEDIUM"].includes(entry.eventRelation.relevance)).length,
+    eventRelatedRecords: hasActiveEvent
+      ? entries.filter((entry) => entry.eventRelation && ["HIGH", "MEDIUM"].includes(entry.eventRelation.relevance)).length
+      : 0,
     tradeCount: new Set(entries.map((entry) => entry.trade).filter(Boolean)).size,
     entries,
     defaultRecordId: firstHighSpecial?.recordId ?? firstSpecial?.recordId ?? entries[0]?.recordId ?? null
