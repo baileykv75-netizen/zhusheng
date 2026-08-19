@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Clock3, Database, ShieldCheck, Wrench } from "lucide-react";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { useBuildingProductContext } from "@/components/product/BuildingContextProvider";
@@ -35,6 +35,17 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
   const model = useMemo(() => derivePropertyEventViewModel(session), [session]);
   const directive = session.result?.visualDirective ?? defaultDirective;
   const next = model.projection.nextAction;
+
+  useEffect(() => {
+    const focus = new URLSearchParams(window.location.search).get("focus");
+    if (!focus) return;
+    setTaskOpen(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const target = document.querySelector<HTMLElement>(`[data-focus="${focus}"]`);
+      target?.scrollIntoView({ behavior: "smooth", block: "center" });
+      target?.focus({ preventScroll: true });
+    }));
+  }, []);
 
   function openTask(focus?: string) {
     setTaskOpen(true);
