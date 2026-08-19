@@ -29,6 +29,15 @@ test("core work routes read as one building product instead of independent demo 
   assert.match(worker, /BUILDING MEMORY/);
 });
 
+test("mobile primary navigation never labels a link as building overview while sending it to the 1602 case", async () => {
+  const shell = await readFile(shellUrl, "utf8");
+
+  assert.match(shell, /const mobilePrimaryHref = product\.eventId \? "\/case-1602" : "\/"/);
+  assert.match(shell, /const mobilePrimaryLabel = product\.eventId \? "1602生命事件" : "建筑总览"/);
+  assert.match(shell, /<Link href=\{mobilePrimaryHref\}>/);
+  assert.doesNotMatch(shell, /<Link href="\/case-1602"><Building2[^>]*><span>\{product\.eventId \? "1602生命事件" : "建筑总览"\}/);
+});
+
 test("the product keeps one deep event without manufacturing building or enterprise scale", async () => {
   const [events, group] = await Promise.all([readFile(eventsUrl, "utf8"), readFile(groupUrl, "utf8")]);
 
@@ -48,11 +57,12 @@ test("proof and operational safety remain present but secondary to the primary w
   assert.match(resident, /数据与隐私说明/);
 });
 
-test("refactor branch can never replace tomorrow's production site through a normal push", async () => {
+test("refactor branch can never replace production through a normal push and must run browser regression QA", async () => {
   const [deploy, check] = await Promise.all([readFile(deployUrl, "utf8"), readFile(refactorCheckUrl, "utf8")]);
 
   assert.match(deploy, /branches: \[main, gpt\/step4-guarded-lifecycle\]/);
   assert.doesNotMatch(deploy, /branches: \[[^\]]*product-shell-consolidation/);
   assert.match(check, /gpt\/product-shell-consolidation/);
+  assert.match(check, /pnpm run test:css-delivery/);
   assert.doesNotMatch(check, /deploy-pages|upload-pages-artifact/);
 });
