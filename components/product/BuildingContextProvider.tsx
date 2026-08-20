@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   BUILDING_PRODUCT_ID,
@@ -10,6 +10,7 @@ import {
 } from "@/lib/product/building-context";
 import type { BuildingAgentTurnResult, QueryVisualDirective } from "@/lib/building-intelligence/types.ts";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
+import { residentEvidenceNeedsAssessment } from "@/lib/product/resident-assessment";
 
 type BuildingProductContextValue = BuildingRouteContext & {
   buildingId: typeof BUILDING_PRODUCT_ID;
@@ -30,8 +31,25 @@ export function BuildingContextProvider({ children }: { children: React.ReactNod
   const { session, setSession } = useLifecycleJourney();
   const [agentResult, setAgentResultState] = useState<BuildingAgentTurnResult | null>(null);
   const route = useMemo(() => deriveBuildingRouteContext(pathname), [pathname]);
+  const pendingResidentAssessment = residentEvidenceNeedsAssessment(session.result, session.residentSubmissions);
   const eventId = session.result?.eventId
     ?? (route.currentPath === "/case-1602" ? route.canonicalEventId : null);
+
+  useEffect(() => {
+    if (!pendingResidentAssessment) return;
+    // A new resident evidence cycle invalidates only the previous visual/query focus,
+    // not the lifecycle result or audit history. This prevents "这个构件" follow-ups
+    // from silently inheriting the previous cycle's candidate before reassessment.
+    setAgentResultState(null);
+    setSession((current) => {
+      if (current.selectedBusinessId === null && current.selectedView === "VIEW_RESIDENT") return current;
+      return {
+        ...current,
+        selectedBusinessId: null,
+        selectedView: "VIEW_RESIDENT"
+      };
+    });
+  }, [pendingResidentAssessment, setSession]);
 
   const value = useMemo<BuildingProductContextValue>(() => ({
     ...route,
