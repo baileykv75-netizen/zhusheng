@@ -38,7 +38,7 @@ export function buildingTasks(events: BuildingLifeEventSummary[], deepResult?: L
     const type = taskType(event);
     const pendingSameEvent = isPendingSameEventAssessment(event);
     const noPendingWork = event.nextAction === "无待办";
-    const reopenedHistory = event.isDeepDemo && event.technicalState === "REOPENED" && deepResult;
+    const reopenedHistory = event.isDeepDemo && event.technicalState === "REOPENED" && Boolean(deepResult);
     return {
       id: `TASK-${event.id}-${type}`,
       eventId: event.id,
@@ -68,7 +68,7 @@ export function buildingTasks(events: BuildingLifeEventSummary[], deepResult?: L
           ? "保留第一次维修与复验记录，先收集新的现场事实，再由1602确定性事件引擎决定本轮补证与检查路径"
           : event.isDeepDemo ? "由1602确定性事件引擎校验后推进" : "仅展示产品任务，不创建完整领域状态",
       historyRefs: reopenedHistory
-        ? [...new Set([...deepResult.repairRecords.map((record) => record.repairRecordId), ...deepResult.auditLog.flatMap((entry) => [...entry.repairRecordIds, ...entry.evidenceRefs])])]
+        ? [...new Set([...deepResult!.repairRecords.map((record) => record.repairRecordId), ...deepResult!.auditLog.flatMap((entry) => [...entry.repairRecordIds, ...entry.evidenceRefs])])]
         : []
     };
   });
