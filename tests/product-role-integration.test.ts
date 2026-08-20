@@ -9,12 +9,16 @@ const eventsUrl = new URL("../components/BuildingEventCenter.tsx", import.meta.u
 const eventModelUrl = new URL("../lib/product/building-life-events.ts", import.meta.url);
 const groupUrl = new URL("../app/group/page.tsx", import.meta.url);
 
-test("worker completion explicitly continues into Building Memory instead of ending as an isolated demo", async () => {
+test("worker completion writes a bounded Building Memory record instead of overclaiming downstream automation", async () => {
   const source = await readFile(workerUrl, "utf8");
 
   assert.match(source, /BUILDING MEMORY \/ 建造阶段/);
-  assert.match(source, /后续用途/);
-  assert.match(source, /隐蔽查询 · 维修定位 · 异常诊断 · 经验治理/);
+  assert.match(source, /SPACE-1602-BATHROOM/);
+  assert.match(source, /J-1602-CW-03/);
+  assert.match(source, /扫码\/BIM绑定/);
+  assert.match(source, /本轮影像/);
+  assert.match(source, /建筑记忆检索 · 构件身份追溯 · 3D定位/);
+  assert.doesNotMatch(source, /隐蔽查询 · 维修定位 · 异常诊断 · 经验治理/);
   assert.match(source, /href="\/memory\?record=EV-2848"/);
   assert.match(source, /查看这条建筑记忆/);
 });
