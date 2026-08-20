@@ -7,12 +7,12 @@ import type { QueryVisualDirective } from "@/lib/building-intelligence/types.ts"
 import { deriveJourneyView } from "@/lib/journey/index.ts";
 import type { LabSession } from "@/lib/life-event-lab/types.ts";
 import { repairTaskForResult } from "@/lib/life-event-lab/model.ts";
-import { hasFreshEvidenceAfterReopen } from "@/lib/life-event-lab/reopened-cycle.ts";
 import type { VisualDirective } from "@/lib/life-event-engine/types.ts";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { LocalEvidenceUpload } from "@/components/LocalEvidenceUpload";
 import { buildingLifeEvents } from "@/lib/product/building-life-events";
 import { buildingTasks } from "@/lib/product/building-tasks";
+import { latestResidentSubmission, residentEvidenceNeedsAssessment } from "@/lib/product/resident-assessment";
 import { BathroomTwinViewport } from "./BathroomTwinViewport";
 
 const defaultDirective: VisualDirective = {
@@ -86,25 +86,8 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
   const leader = result?.rankedHypotheses[0];
   const reopening = result?.authorizationRequirement?.action === "SIMULATE_REOPEN_VALVE" || result?.authorizedActions.some((item) => item.action === "SIMULATE_REOPEN_VALVE");
   const isFactCheck = !result || ["DETECTED", "COLLECTING_EVIDENCE", "INCONCLUSIVE", "REOPENED"].includes(result.state);
-  const latestSubmission = session.residentSubmissions?.at(-1) ?? null;
-  const latestSubmissionAfterEvaluation = Boolean(
-    result
-    && latestSubmission
-    && Date.parse(latestSubmission.submittedAt) > Date.parse(result.input.evaluatedAt)
-  );
-  const freshReopenSubmission = Boolean(
-    result?.state === "REOPENED"
-    && latestSubmission
-    && hasFreshEvidenceAfterReopen(result, [latestSubmission.submittedAt])
-  );
-  const pendingAssessment = Boolean(
-    latestSubmission
-    && (
-      !result
-      || (result.state === "INCONCLUSIVE" && latestSubmissionAfterEvaluation)
-      || freshReopenSubmission
-    )
-  );
+  const latestSubmission = latestResidentSubmission(session.residentSubmissions);
+  const pendingAssessment = residentEvidenceNeedsAssessment(result, session.residentSubmissions);
   const submissionEvidence = latestSubmission
     ? (session.productEvidenceTimeline ?? []).filter((item) => latestSubmission.evidenceIds.includes(item.id))
     : [];
@@ -120,7 +103,6 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
     .filter((item) => item.metric === "MICRO_FLOW")
     .sort((a, b) => a.observedAt.localeCompare(b.observedAt))
     .at(-1);
-  const missingTypes = new Set(result?.missingEvidence.map((item) => item.evidenceType) ?? []);
   const eventQueue = buildingLifeEvents(result, pendingAssessment);
   const taskQueue = buildingTasks(eventQueue, result);
   const activeQueueId = result?.eventId ?? (pendingAssessment ? "INTAKE-1602" : null);
