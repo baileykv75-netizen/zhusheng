@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createLocalBuildingAgentTurn } from "../lib/building-intelligence/agent.ts";
 import { building1602Dataset } from "../lib/building-intelligence/catalog.ts";
+import { deriveEngineeringReasoning } from "../lib/building-intelligence/engineering-reasoning.ts";
 import { getCurrentObservations } from "../lib/building-intelligence/queries.ts";
 
 test("static lifecycle memory contains historical observations but no live observation source", () => {
@@ -24,4 +25,10 @@ test("Ask Building cannot answer a current humidity question from historical obs
   assert.match(turn.answer, /历史观察记录.*不能当作当前读数/);
   assert.ok(turn.facts.some((fact) => fact.predicate === "NO_LIVE_OBSERVATION_SOURCE"));
   assert.equal(turn.facts.some((fact) => fact.factId === "REC-OBS-HUM-BASELINE-01"), false);
+});
+
+test("diagnostic presentation cannot override an authoritative no-live-observation boundary", () => {
+  const turn = createLocalBuildingAgentTurn("1602卫生间当前微流量多少？");
+  assert.ok(turn.facts.some((fact) => fact.predicate === "NO_LIVE_OBSERVATION_SOURCE"));
+  assert.equal(deriveEngineeringReasoning(turn.question, turn.facts), null);
 });
