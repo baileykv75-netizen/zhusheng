@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import { derive1602ResidentFollowUp } from "../lib/product/resident-intake.ts";
 
 const residentUrl = new URL("../components/ResidentService.tsx", import.meta.url);
+const lifecycleProviderUrl = new URL("../components/lifecycle-journey-provider.tsx", import.meta.url);
 const propertyUrl = new URL("../lib/product/property-event-view-model.ts", import.meta.url);
 const propertyWorkbenchUrl = new URL("../components/life-event/ResidentTaskWorkbench.tsx", import.meta.url);
 const caseUrl = new URL("../components/Case1602Exhibit.tsx", import.meta.url);
@@ -39,6 +40,18 @@ test("resident intake is not labelled as a formed event before property assessme
   assert.match(source, /先提交你实际看到的现场事实/);
   assert.match(source, /result \? "你的现场观察进入同一事件"/);
   assert.doesNotMatch(source, /<Link href="\/case-1602">EVT-1602<\/Link><span>住户任务<\/span><small>你的现场观察进入同一事件<\/small>/);
+});
+
+test("resident evidence intake persists without requiring event-engine assets", async () => {
+  const [resident, provider] = await Promise.all([
+    readFile(residentUrl, "utf8"),
+    readFile(lifecycleProviderUrl, "utf8")
+  ]);
+
+  assert.doesNotMatch(resident, /disabled=\{busy \|\| !assets \|\| !meterFinding\}/);
+  assert.match(resident, /disabled=\{busy \|\| !meterFinding\}/);
+  assert.match(provider, /const submitResidentEvidence = useCallback\(\(draft: ResidentEvidenceDraft\) => \{\s*const reopeningCycle/);
+  assert.doesNotMatch(provider, /const submitResidentEvidence = useCallback\(\(draft: ResidentEvidenceDraft\) => \{\s*if \(!engine\)/);
 });
 
 test("property surfaces only event observations and requires human confirmation of every demo draft", async () => {
@@ -81,12 +94,14 @@ test("evidence timeline renders only records that actually exist in the current 
   assert.match(source, /result\?\.input\.observations/);
   assert.match(source, /result\?\.repairRecords/);
   assert.match(source, /建造期历史，不代表当前故障/);
+  assert.match(source, /result \? "事件" : "受理关联"/);
+  assert.match(source, /预分配关联 ID，用于后续确定性评估对齐；此刻不代表已经形成 Life Event/);
   assert.doesNotMatch(source, /syntheticEvidenceTimelineIds/);
   assert.doesNotMatch(source, /局部接头维修记录/);
   assert.doesNotMatch(source, /恢复供水后的新观察/);
 });
 
-test("building situation does not create EVT-1602 before evidence and uses actual event counts after assessment", async () => {
+test("building situation keeps intake separate from EVT-1602 and uses actual event counts after assessment", async () => {
   const [model, center] = await Promise.all([
     readFile(eventsUrl, "utf8"),
     readFile(eventCenterUrl, "utf8")
@@ -94,6 +109,8 @@ test("building situation does not create EVT-1602 before evidence and uses actua
 
   assert.match(model, /deepResult\.input\.evidence\.length \+ deepResult\.input\.observations\.length/);
   assert.match(model, /pending1602Evidence = false/);
+  assert.match(model, /id: "INTAKE-1602"/);
+  assert.match(model, /id: "EVT-1602"/);
   assert.match(model, /1602卫生间现场事实待评估/);
   assert.match(model, /return deepEvent \? \[deepEvent\] : \[\]/);
   assert.match(model, /buildingLifeEventExamples/);
@@ -139,13 +156,20 @@ test("worker confirmation becomes the actual evidence and no longer certifies un
   assert.match(engine, /record\.refs = \[room, "MIC-BATH-1602", component\]/);
 });
 
-test("stale scripted demo storage cannot silently become current lifecycle truth", async () => {
-  const source = await readFile(demoProviderUrl, "utf8");
+test("scripted demo state cannot seed the formal lifecycle", async () => {
+  const [demo, provider] = await Promise.all([
+    readFile(demoProviderUrl, "utf8"),
+    readFile(lifecycleProviderUrl, "utf8")
+  ]);
 
-  assert.match(source, /LEGACY_STORAGE_KEY = "zhusheng\.demo\.v3"/);
-  assert.match(source, /STORAGE_KEY = "zhusheng\.demo\.v4"/);
-  assert.match(source, /sessionStorage\.removeItem\(LEGACY_STORAGE_KEY\)/);
-  assert.match(source, /search\.get\("demo"\) === "1"/);
+  assert.match(demo, /LEGACY_STORAGE_KEY = "zhusheng\.demo\.v3"/);
+  assert.match(demo, /STORAGE_KEY = "zhusheng\.demo\.v4"/);
+  assert.match(demo, /sessionStorage\.removeItem\(LEGACY_STORAGE_KEY\)/);
+  assert.match(demo, /search\.get\("demo"\) === "1"/);
+  assert.doesNotMatch(provider, /useDemo/);
+  assert.doesNotMatch(provider, /seedFromAgent/);
+  assert.doesNotMatch(provider, /demoState\.currentStep/);
+  assert.doesNotMatch(provider, /旧演示已安全迁移到待维修状态/);
 });
 
 test("route membership and active event truth are separate product concepts", async () => {
