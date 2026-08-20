@@ -22,6 +22,11 @@
 
 `tests/evidence-correctness-qa.mjs` 与 `tests/v6-lifecycle-qa.mjs` 是稳定入口，实际分别加载当前 v2 脚本；`tests/spatial-drilldown-qa.mjs` 直接验证当前空间连续性。
 
+当前浏览器 QA 必须可在开发机与 GitHub Actions/Linux headless Chromium 中一致运行：
+- URL 断言必须兼容 `next.config.ts` 的 `trailingSlash: true`，不能把 `/case-1602/` 误判为失败。
+- Playwright 优先使用项目运行时依赖；Codex 本地环境允许通过 `CODEX_PLAYWRIGHT_MODULE` 或既有 runtime fallback 加载，不要求把 Playwright 永久写入产品依赖。
+- Spatial QA 在无硬件 GPU 的 CI runner 上允许使用 SwiftShader 软件 WebGL；这只是浏览器测试运行方式，不降低“必须加载真实 `hero-glb`”的产品验收要求。
+
 ## 2. 当前产品的不可回退语义
 
 以下规则优先于任何历史视觉脚本：
