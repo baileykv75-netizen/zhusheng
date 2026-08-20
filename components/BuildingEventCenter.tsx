@@ -15,7 +15,6 @@ export function BuildingEventCenter() {
   const residentOwned = events.filter((event) => event.ownerRole === "住户").length;
   const propertyOwned = events.filter((event) => event.ownerRole.startsWith("物业")).length;
   const resolved = events.filter((event) => event.displayStatus.includes("解决")).length;
-  const deepEventVisible = events.some((event) => event.id === "EVT-1602");
 
   return <div className={`event-center ${styles.center}`}>
     <header className={styles.hero}>
@@ -34,7 +33,7 @@ export function BuildingEventCenter() {
 
     <div className={styles.context}>
       <div><Building2 size={15} /><strong>18层 MiC 住宅</strong><span>当前会话真实事项</span></div>
-      <div><span>1602深度链</span><strong>{deepEventVisible ? "EVT-1602" : "尚未进入事件"}</strong><span>{deepEventVisible ? "住户事实 / 事件状态按当前会话展示" : "案例结构可查看，但不冒充当前事件"}</span></div>
+      <div><span>1602深度链</span><strong>{session.result?.eventId ?? "尚未进入事件"}</strong><span>{session.result ? "事件实例 ID 直接来自确定性引擎" : pending1602Evidence ? "住户事实已受理，仍处于 INTAKE-1602" : "案例结构可查看，但不冒充当前事件"}</span></div>
     </div>
 
     <main className={styles.layout}>
@@ -57,13 +56,13 @@ export function BuildingEventCenter() {
 
       <section className={`event-list ${styles.list}`} aria-label="建筑生命事件列表">
         <header className={styles.listHeader}>
-          <div><span className={styles.sectionLabel}>ACTIVE LIFE EVENTS</span><h2>当前真正存在的事</h2></div>
+          <div><span className={styles.sectionLabel}>CURRENT BUILDING ITEMS</span><h2>当前真正存在的事</h2></div>
           <span>不含结构示例</span>
         </header>
 
         {events.length ? events.map((event, eventIndex) => <article key={event.id} className={`${event.isDeepDemo ? "deep" : ""} ${styles.eventCard}`}>
           <div className={styles.eventCardMain}>
-            <div className={styles.eventTop}><span>{event.id}</span><em>{event.category}</em><b>{session.result ? "完整深度事件" : "待接入深度事件"}</b></div>
+            <div className={styles.eventTop}><span>{event.id}</span><em>{event.category}</em><b>{session.result ? "完整深度事件" : "待接入现场受理"}</b></div>
             <h3>{event.title}</h3>
             <div className={styles.meta}><span><MapPin size={13} />{event.floor}层 · {event.unitId} · {event.space}</span><span><Clock3 size={13} />{event.updatedAt}</span></div>
           </div>
