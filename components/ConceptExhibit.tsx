@@ -55,10 +55,10 @@ export function ConceptExhibit() {
       </div>
 
       <aside className="v6-building-pulse">
-        <span>BUILDING PULSE / 此刻</span>
+        <span>FEATURED LIFE EVENT / 1602案例</span>
         <strong>16层 · 1602卫生间</strong>
-        <p>住户发现持续潮湿，建筑智能体正在重新调用这个空间的建造记忆。</p>
-        <button type="button" onClick={enterBuilding}>走进这件事 <CornerDownRight size={15} /></button>
+        <p>这个脱敏案例从住户现场潮湿观察开始，随后回看同一空间的建造记忆；是否形成事件与最终判断仍由当前会话事实决定。</p>
+        <button type="button" onClick={enterBuilding}>查看这件事如何推进 <CornerDownRight size={15} /></button>
       </aside>
 
       <div className="v6-hero-meta"><span>126 SPACES</span><span>750 OBJECTS</span><span><i />MEMORY ONLINE</span></div>
@@ -74,7 +74,7 @@ export function ConceptExhibit() {
 
       <section className="v6-story-chapter event" id="event">
         <div className="v6-chapter-index"><span>02</span><small>THE EVENT</small></div>
-        <div className="v6-chapter-copy"><p>居住，有回应</p><h2 className="display-headline"><span className="display-headline-line">今天 16层的身体里</span><span className="display-headline-line">发生了一件事</span></h2><Link href="/case-1602">进入1602建筑生命事件 <ArrowRight size={17} /></Link></div>
+        <div className="v6-chapter-copy"><p>居住，有回应</p><h2 className="display-headline"><span className="display-headline-line">当一件事发生在16层</span><span className="display-headline-line">它会沿同一条生命线推进</span></h2><Link href="/case-1602">进入1602建筑生命事件 <ArrowRight size={17} /></Link></div>
         <div className="v6-human-boundary"><small>AI 建议</small><i /><small>人类授权</small><i /><small>物业执行</small><i /><small>维修复验</small></div>
       </section>
 
