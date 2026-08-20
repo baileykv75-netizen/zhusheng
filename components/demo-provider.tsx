@@ -4,7 +4,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { createInitialSnapshot, DemoEngine, DemoSnapshot, demoSteps, RuntimeMode, type WorkerEvidenceDraft } from "@/lib/demo-engine";
 
-const STORAGE_KEY = "zhusheng.demo.v3";
+const LEGACY_STORAGE_KEY = "zhusheng.demo.v3";
+const STORAGE_KEY = "zhusheng.demo.v4";
 
 type DemoContextValue = {
   state: DemoSnapshot;
@@ -30,6 +31,9 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [entryPath, setEntryPath] = useState("/");
 
   useEffect(() => {
+    // v3 belonged to the former scripted cross-role demo. Never reinterpret a
+    // stale v3 browser snapshot as the current product's live-event truth.
+    sessionStorage.removeItem(LEGACY_STORAGE_KEY);
     const saved = sessionStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
@@ -53,6 +57,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   }, [hydrated, state]);
 
   useEffect(() => {
+    // Scripted demo behavior remains available only through an explicit URL.
     if (hydrated && search.get("demo") === "1" && state.currentStep === 0) {
       const started = DemoEngine.start(state.runtimeMode);
       setState(started);
