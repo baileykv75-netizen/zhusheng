@@ -43,13 +43,16 @@ test("resident evidence collection does not expose water-meter questioning as a 
   assert.match(source, /不会因为处于卫生间就自动假定为漏水/);
 });
 
-test("event center shows only actual event locations instead of eighteen mostly empty floors", async () => {
+test("event center shows only current-session event locations and keeps examples out of active metrics", async () => {
   const source = await readFile(eventsUrl, "utf8");
 
   assert.doesNotMatch(source, /Array\.from\(\{ length: 18 \}/);
   assert.doesNotMatch(source, /暂无事件/);
-  assert.match(source, /只显示当前有事件或待接入事实的楼层与空间/);
-  assert.match(source, /专业处置在对应深度事件中展开/);
+  assert.match(source, /只显示当前会话已经存在的事件或待接入事实/);
+  assert.match(source, /不含结构示例/);
+  assert.match(source, /没有活动事件时，这里保持为空/);
+  assert.match(source, /buildingLifeEventExamples/);
+  assert.match(source, /不参与上方任何统计或任务队列/);
   assert.match(source, /pending1602Evidence/);
 });
 
@@ -59,7 +62,9 @@ test("1602 is not manufactured as an active event before resident evidence exist
   assert.match(source, /pending1602Evidence = false/);
   assert.match(source, /: pending1602Evidence/);
   assert.match(source, /1602卫生间现场事实待评估/);
-  assert.match(source, /: null;/);
+  assert.match(source, /return deepEvent \? \[deepEvent\] : \[\]/);
+  assert.match(source, /buildingLifeEventExamples/);
+  assert.match(source, /ID 统一使用 EXAMPLE|EXAMPLE-1203/);
   assert.match(source, /按当前事实补充下一项必要证据/);
   assert.doesNotMatch(source, /state \? displayState\[state\] : displayState\.DETECTED/);
   assert.doesNotMatch(source, /DETECTED: \{[^\n]*北侧墙角/);
