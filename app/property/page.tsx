@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { PropertyEventWorkspace } from "@/components/property/PropertyEventWorkspace";
 import { ResidentFreeLab } from "@/components/life-event/ResidentFreeLab";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
-import type { LabSession } from "@/lib/life-event-lab/types.ts";
+import { LAB_SESSION_KEY, type LabSession } from "@/lib/life-event-lab/types.ts";
 import { publicAssetPath } from "@/lib/site-path";
 
 const LAB_SNAPSHOT_KEY = "zhusheng.property.advanced.snapshot.v1";
@@ -16,6 +16,10 @@ function readLabSnapshot(): LabSession | null {
     sessionStorage.removeItem(LAB_SNAPSHOT_KEY);
     return null;
   }
+}
+
+function persistTaskTruth(snapshot: LabSession) {
+  sessionStorage.setItem(LAB_SESSION_KEY, JSON.stringify(snapshot));
 }
 
 export default function PropertyPage() {
@@ -38,7 +42,11 @@ export default function PropertyPage() {
 
   function restoreTaskTruth() {
     const snapshot = labSnapshotRef.current ?? readLabSnapshot();
-    if (snapshot) setSession(structuredClone(snapshot));
+    if (snapshot) {
+      const restored = structuredClone(snapshot);
+      persistTaskTruth(restored);
+      setSession(restored);
+    }
     labSnapshotRef.current = null;
     sessionStorage.removeItem(LAB_SNAPSHOT_KEY);
   }
@@ -57,7 +65,13 @@ export default function PropertyPage() {
   useEffect(() => () => {
     if (modeRef.current !== "lab") return;
     const snapshot = labSnapshotRef.current ?? readLabSnapshot();
-    if (snapshot) setSession(structuredClone(snapshot));
+    if (snapshot) {
+      const restored = structuredClone(snapshot);
+      // Persist synchronously as well as restoring React state so refresh/hard
+      // navigation cannot leave sandbox mutations as the next product session.
+      persistTaskTruth(restored);
+      setSession(restored);
+    }
     sessionStorage.removeItem(LAB_SNAPSHOT_KEY);
   }, [setSession]);
 
@@ -75,5 +89,5 @@ export default function PropertyPage() {
 
   return mode === "task"
     ? <PropertyEventWorkspace onOpenAdvanced={() => selectMode("lab")} />
-    : <div className="advanced-workspace-shell"><div className="advanced-mode-bar"><button onClick={() => selectMode("task")}>退出沙盒并恢复物业任务</button><span><strong>高级验证沙盒</strong><small>规则贡献、参数重放和审计只在隔离沙盒中运行；退出后恢复进入前的物业会话，不写回任务真相。</small></span></div><ResidentFreeLab /></div>;
+    : <div className="advanced-workspace-shell"><div className="advanced-mode-bar"><button onClick={() => selectMode("task")}>退出沙盒并恢复物业任务</button><span><strong>高级验证沙盒</strong><small>规则贡献、参数重放和审计只在隔离沙盒中运行；退出、刷新或离开页面后都恢复进入前的物业会话，不写回任务真相。</small></span></div><ResidentFreeLab /></div>;
 }
