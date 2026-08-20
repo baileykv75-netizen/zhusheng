@@ -2,7 +2,7 @@ import { resolveBuildingMemoryRelevance, type MemoryRelevanceInput, type Relevan
 import { deriveGuardedLifecycleProjection, type GuardedLifecycleProjection } from "../life-event-engine/guarded-lifecycle.ts";
 import type { Hypothesis, LifeEventResult, MissingEvidence, SensorObservation } from "../life-event-engine/types.ts";
 import type { LabSession } from "../life-event-lab/types.ts";
-import { hasFreshEvidenceAfterReopen } from "../life-event-lab/reopened-cycle.ts";
+import { latestResidentSubmission, residentEvidenceNeedsAssessment } from "./resident-assessment.ts";
 
 const HYPOTHESIS_LABELS: Record<Hypothesis, string> = {
   COLD_WATER_JOINT_LEAK: "冷水系统局部渗漏",
@@ -50,6 +50,8 @@ export type PropertyEventViewModel = {
   observations: PropertyObservation[];
   relevantMemories: RelevantBuildingMemory[];
   evidenceGaps: PropertyEvidenceGap[];
+  pendingResidentAssessment: boolean;
+  /** Current-cycle compatibility alias; do not interpret as historical evidence existence. */
   residentEvidenceReady: boolean;
   latestResidentSubmissionId: string | null;
   selectedBusinessId: string | null;
@@ -92,8 +94,10 @@ function phenomenonTags(result: LifeEventResult | null) {
   return tags;
 }
 
-export function derive1602MemoryRelevanceInput(session: LabSession): MemoryRelevanceInput {
-  const result = session.result;
+export function derive1602MemoryRelevanceInput(
+  session: LabSession,
+  result: LifeEventResult | null = session.result
+): MemoryRelevanceInput {
   const leader = result?.rankedHypotheses[0] ?? null;
   return {
     spaceId: "SPACE-1602-BATHROOM",
@@ -105,7 +109,22 @@ export function derive1602MemoryRelevanceInput(session: LabSession): MemoryRelev
   };
 }
 
-function assessmentFor(result: LifeEventResult | null, projection: GuardedLifecycleProjection): PropertyAssessment {
+function assessmentFor(
+  result: LifeEventResult | null,
+  projection: GuardedLifecycleProjection,
+  pendingResidentAssessment: boolean
+): PropertyAssessment {
+  if (pendingResidentAssessment) {
+    return {
+      title: result ? "新现场事实已到，上一轮判断暂不更新" : "住户现场事实已到，等待第一次确定性评估",
+      confidence: result ? "待本轮评估" : "尚未评估",
+      targetBusinessIds: [],
+      explanation: result
+        ? `事件 ${result.eventId} 的上一轮状态仍为“${projection.stateLabel}”，但新住户证据尚未进入本轮系统观测与确定性评估，因此不沿用上一轮候选作为当前判断。`
+        : "住户原始事实已经受理，但还没有形成正式 Life Event；物业确认本轮系统观测后才进行第一次确定性评估。"
+    };
+  }
+
   const leader = result?.rankedHypotheses[0];
   if (!leader) {
     return {
@@ -128,37 +147,40 @@ function assessmentFor(result: LifeEventResult | null, projection: GuardedLifecy
   };
 }
 
-function observationsFor(result: LifeEventResult | null): PropertyObservation[] {
+function observationsFor(result: LifeEventResult | null, pendingResidentAssessment: boolean): PropertyObservation[] {
   if (!result) return [];
   const observations: PropertyObservation[] = [];
   const humidity = latestObservation(result, "RELATIVE_HUMIDITY");
   const micro = latestObservation(result, "MICRO_FLOW");
+  const prefix = pendingResidentAssessment ? "上一轮" : "";
+  const status: PropertyObservation["status"] = pendingResidentAssessment ? "BASELINE" : "OBSERVED";
   if (humidity) {
     observations.push({
       id: "HUMIDITY",
-      label: "湿度观察",
+      label: `${prefix}湿度观察`,
       value: `${humidity.value}% · ${humidity.durationMinutes ?? 0} min`,
-      status: "OBSERVED"
+      status
     });
   }
   if (micro) {
     observations.push({
       id: "MICROFLOW",
-      label: "微流量观察",
+      label: `${prefix}微流量观察`,
       value: `${micro.value} L/min · ${micro.durationMinutes ?? 0} min`,
-      status: "OBSERVED"
+      status
     });
   }
   return observations;
 }
 
-function memoriesFor(session: LabSession, result: LifeEventResult | null) {
+function memoriesFor(session: LabSession, relevanceResult: LifeEventResult | null) {
   const memories = resolveBuildingMemoryRelevance({
-    ...derive1602MemoryRelevanceInput(session)
+    ...derive1602MemoryRelevanceInput(session, relevanceResult)
   });
-  if (result) return memories.slice(0, 5);
-  // Before an event exists, this is an archive view: do not let same-space rework
-  // scores masquerade as diagnostic priority. Keep a plain chronological sample.
+  if (relevanceResult) return memories.slice(0, 5);
+  // Before an event exists or while a new resident cycle is waiting for
+  // assessment, this is an archive view: do not carry the previous diagnostic
+  // ranking forward as if it already explained the new facts.
   return [...memories]
     .sort((a, b) => a.occurredAt.localeCompare(b.occurredAt) || a.recordId.localeCompare(b.recordId))
     .slice(0, 5);
@@ -166,39 +188,54 @@ function memoriesFor(session: LabSession, result: LifeEventResult | null) {
 
 export function derivePropertyEventViewModel(session: LabSession): PropertyEventViewModel {
   const result = session.result;
-  const submissionTimes = (session.residentSubmissions ?? []).map((item) => item.submittedAt);
-  const residentEvidenceReady = hasFreshEvidenceAfterReopen(result, submissionTimes);
-  const projection = deriveGuardedLifecycleProjection(result, { hasResidentEvidence: residentEvidenceReady });
-  const relevantMemories = memoriesFor(session, result);
+  const latestSubmission = latestResidentSubmission(session.residentSubmissions);
+  const pendingResidentAssessment = residentEvidenceNeedsAssessment(result, session.residentSubmissions);
+  const projection = deriveGuardedLifecycleProjection(result, { hasResidentEvidence: pendingResidentAssessment });
+  const relevantMemories = memoriesFor(session, pendingResidentAssessment ? null : result);
 
-  const evidenceGaps: PropertyEvidenceGap[] = (result?.missingEvidence ?? []).map((item, index) => ({
-    id: `${item.evidenceType}-${index}`,
-    label: EVIDENCE_LABELS[item.evidenceType],
-    actor: actorLabel(item.requestedFrom),
-    reason: item.reason
-  }));
+  const evidenceGaps: PropertyEvidenceGap[] = pendingResidentAssessment
+    ? [{
+        id: "property-system-observation-confirmation",
+        label: "本轮系统观测确认",
+        actor: "物业",
+        reason: result
+          ? "新住户证据已经存在，但尚未进入本轮确定性评估；物业需要明确确认本轮湿度、微流量等系统/现场观测，不能复用上一轮值。"
+          : "住户原始证据已经受理；物业需要明确确认本轮湿度、微流量等系统/现场观测，才能形成第一次确定性评估。"
+      }]
+    : (result?.missingEvidence ?? []).map((item, index) => ({
+        id: `${item.evidenceType}-${index}`,
+        label: EVIDENCE_LABELS[item.evidenceType],
+        actor: actorLabel(item.requestedFrom),
+        reason: item.reason
+      }));
 
-  if (!residentEvidenceReady && !evidenceGaps.some((item) => item.actor === "住户")) {
-    evidenceGaps.unshift({
-      id: "resident-origin-evidence",
-      label: result?.state === "REOPENED" ? "重新打开后的住户新证据" : "住户原始现场证据",
-      actor: "住户",
-      reason: result?.state === "REOPENED"
-        ? "重新打开后的事件不能复用上一轮住户证据，需要新的现场描述与观察；后续补证项由本轮事实重新决定。"
-        : "物业不能代替住户填写原始描述与现场观察；后续是否需要水表等补证，由当前事实决定。"
-    });
+  if (!pendingResidentAssessment && !evidenceGaps.some((item) => item.actor === "住户")) {
+    const needsNewResidentCycle = result?.state === "REOPENED" || result?.state === "INCONCLUSIVE";
+    if (!result || needsNewResidentCycle) {
+      evidenceGaps.unshift({
+        id: "resident-origin-evidence",
+        label: needsNewResidentCycle ? "本轮新的住户现场证据" : "住户原始现场证据",
+        actor: "住户",
+        reason: result?.state === "REOPENED"
+          ? "重新打开后的事件不能复用上一轮住户证据，需要新的现场描述与观察；后续补证项由本轮事实重新决定。"
+          : result?.state === "INCONCLUSIVE"
+            ? "上一轮证据仍不足以收敛；需要住户提交晚于上一轮评估的新现场事实，再在原事件 ID 上继续评估。"
+            : "物业不能代替住户填写原始描述与现场观察；后续是否需要水表等补证，由当前事实决定。"
+      });
+    }
   }
 
   return {
-    eventId: result?.eventId ?? "EVT-1602",
+    eventId: result?.eventId ?? (pendingResidentAssessment ? "INTAKE-1602" : "尚未形成事件"),
     spaceLabel: "1602卫生间",
     projection,
-    assessment: assessmentFor(result, projection),
-    observations: observationsFor(result),
+    assessment: assessmentFor(result, projection, pendingResidentAssessment),
+    observations: observationsFor(result, pendingResidentAssessment),
     relevantMemories,
     evidenceGaps,
-    residentEvidenceReady,
-    latestResidentSubmissionId: session.residentSubmissions?.at(-1)?.submissionId ?? null,
+    pendingResidentAssessment,
+    residentEvidenceReady: pendingResidentAssessment,
+    latestResidentSubmissionId: latestSubmission?.submissionId ?? null,
     selectedBusinessId: session.selectedBusinessId,
     result
   };
