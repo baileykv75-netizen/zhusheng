@@ -15,7 +15,7 @@ import { residentEvidenceNeedsAssessment } from "@/lib/product/resident-assessme
 type BuildingProductContextValue = BuildingRouteContext & {
   buildingId: typeof BUILDING_PRODUCT_ID;
   buildingLabel: typeof BUILDING_PRODUCT_LABEL;
-  /** Actual active lifecycle event. The case route may still carry canonicalEventId separately. */
+  /** Actual active lifecycle event only. Route identity remains canonicalEventId. */
   eventId: string | null;
   selectedBusinessId: string | null;
   agentResult: BuildingAgentTurnResult | null;
@@ -32,8 +32,7 @@ export function BuildingContextProvider({ children }: { children: React.ReactNod
   const [agentResult, setAgentResultState] = useState<BuildingAgentTurnResult | null>(null);
   const route = useMemo(() => deriveBuildingRouteContext(pathname), [pathname]);
   const pendingResidentAssessment = residentEvidenceNeedsAssessment(session.result, session.residentSubmissions);
-  const eventId = session.result?.eventId
-    ?? (route.currentPath === "/case-1602" ? route.canonicalEventId : null);
+  const eventId = session.result?.eventId ?? null;
 
   useEffect(() => {
     if (!pendingResidentAssessment) return;
