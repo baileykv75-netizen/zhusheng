@@ -28,29 +28,45 @@ function approve(engine: ReturnType<typeof createDefaultLifeEventEngine>, result
 }
 
 function driveToReopened() {
-  const engine = createDefaultLifeEventEngine();
+  let auditNow = start;
+  const engine = createDefaultLifeEventEngine({
+    clock: { now: () => new Date(auditNow).toISOString() }
+  });
+  const setAuditTime = (value: number) => { auditNow = value; };
+
+  setAuditTime(start);
   let result = evaluateControls(engine, controlsFromTemplate("joint-supported"), 1, start);
   assert.equal(result.state, "AUTHORIZATION_PENDING");
 
+  setAuditTime(start + 2 * 60_000);
   result = approve(engine, result, start + 2 * 60_000);
   assert.equal(result.state, "AUTHORIZED");
+
+  setAuditTime(start + 3 * 60_000);
   result = executeAuthorizedClose(engine, result, start + 3 * 60_000);
   assert.equal(result.state, "VERIFYING");
+
+  setAuditTime(start + 5 * 60_000);
   result = submitIsolationObservation(engine, result, DEFAULT_ISOLATION_CONTROLS, start + 5 * 60_000);
   assert.equal(result.state, "REPAIR_PENDING");
 
   const repairNow = start + 30 * 60_000;
   const repairDraft = defaultRepairDraft(repairNow);
   repairDraft.targetBusinessId = result.rankedHypotheses[0]!.candidateBusinessIds[0]!;
+  setAuditTime(repairNow);
   result = submitRepairRecord(engine, result, repairDraft, repairNow);
   assert.equal(result.state, "AUTHORIZATION_PENDING");
   assert.equal(result.authorizationRequirement?.action, "SIMULATE_REOPEN_VALVE");
 
+  setAuditTime(start + 32 * 60_000);
   result = approve(engine, result, start + 32 * 60_000);
   assert.equal(result.state, "AUTHORIZED");
+
+  setAuditTime(start + 33 * 60_000);
   result = executeAuthorizedReopen(engine, result, start + 33 * 60_000);
   assert.equal(result.state, "POST_REPAIR_VERIFYING");
 
+  setAuditTime(start + 40 * 60_000);
   result = submitPostRepairObservation(engine, result, {
     humidity: 82,
     humidityBaseline: 55,
@@ -62,7 +78,7 @@ function driveToReopened() {
     observationNote: "维修后仍有潮湿与微流量。"
   }, start + 40 * 60_000);
   assert.equal(result.state, "REOPENED");
-  return { engine, reopened: result };
+  return { engine, reopened: result, setAuditTime };
 }
 
 function reopenedResidentTime() {
@@ -70,7 +86,7 @@ function reopenedResidentTime() {
 }
 
 test("reopened second assessment keeps one event and uses the newest sensor cycle", () => {
-  const { engine, reopened } = driveToReopened();
+  const { engine, reopened, setAuditTime } = driveToReopened();
   const previousAuditCount = reopened.auditLog.length;
   const previousObservationIds = new Set(reopened.input.observations.map((item) => item.id));
 
@@ -83,6 +99,7 @@ test("reopened second assessment keeps one event and uses the newest sensor cycl
   recheck.meterFinding = "NO_CHANGE";
 
   const submittedAt = reopenedResidentTime();
+  setAuditTime(start + 45 * 60_000);
   const second = resumeReopenedAssessment(engine, reopened, recheck, submittedAt, start + 45 * 60_000);
   assert.equal(second.eventId, reopened.eventId);
   assert.ok(second.auditLog.length > previousAuditCount);
@@ -117,8 +134,9 @@ test("reopened second assessment keeps one event and uses the newest sensor cycl
 });
 
 test("reopened assessment with a genuinely new abnormal cycle can diagnose again", () => {
-  const { engine, reopened } = driveToReopened();
+  const { engine, reopened, setAuditTime } = driveToReopened();
   const recheck = controlsFromTemplate("joint-supported");
+  setAuditTime(start + 45 * 60_000);
   const second = resumeReopenedAssessment(engine, reopened, recheck, reopenedResidentTime(), start + 45 * 60_000);
   const evidence = evaluateEvidence(second.input, engine.memory);
 
@@ -130,8 +148,9 @@ test("reopened assessment with a genuinely new abnormal cycle can diagnose again
 });
 
 test("reopened assessment rejects stale resident evidence from before reopen", () => {
-  const { engine, reopened } = driveToReopened();
+  const { engine, reopened, setAuditTime } = driveToReopened();
   const stale = new Date(start + 39 * 60_000).toISOString();
+  setAuditTime(start + 45 * 60_000);
   assert.throws(
     () => resumeReopenedAssessment(engine, reopened, controlsFromTemplate("joint-supported"), stale, start + 45 * 60_000),
     /晚于事件重新打开时间|晚于上一轮事件评估/
