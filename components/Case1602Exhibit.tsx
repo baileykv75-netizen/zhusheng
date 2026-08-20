@@ -40,27 +40,51 @@ function actionHref(destination: ReturnType<typeof derivePropertyEventViewModel>
   return `/property?mode=task&focus=${destination.focus}`;
 }
 
+function hasCompletedActionHistory(result: ReturnType<typeof derivePropertyEventViewModel>["result"]) {
+  if (!result) return false;
+  return result.auditLog.some((entry) => [
+    "SIMULATED_VALVE_CLOSED",
+    "ISOLATION_CONFIRMED",
+    "REPAIR_RESULT_RECORDED",
+    "SIMULATED_VALVE_REOPENED",
+    "POST_REPAIR_VERIFICATION_FAILED"
+  ].includes(entry.actionType));
+}
+
 export function Case1602Exhibit() {
   const { session, assets, assetError } = useLifecycleJourney();
   const product = useBuildingProductContext();
   const model = useMemo(() => derivePropertyEventViewModel(session), [session]);
   const result = session.result;
-  const directive = result?.visualDirective ?? emptyDirective;
+  const sourceDirective = result?.visualDirective ?? emptyDirective;
+  const directive: VisualDirective = model.pendingResidentAssessment && result
+    ? {
+        ...sourceDirective,
+        view: "VIEW_RESIDENT",
+        highlightBusinessIds: [],
+        evidenceAnchorIds: [],
+        allowedActions: [],
+        authorizationRequired: false
+      }
+    : sourceDirective;
   const presentView = directive.view === "VIEW_CONSTRUCTION_MEMORY" ? "VIEW_RESIDENT" : directive.view;
-  const currentLifecycleStage = lifecycleStage(result?.state);
+  const currentLifecycleStage = model.pendingResidentAssessment ? "present" : lifecycleStage(result?.state);
+  const previousActionCompleted = hasCompletedActionHistory(result);
   const [storyStage, setStoryStage] = useState<StoryStageId>(currentLifecycleStage);
   const [view, setView] = useState<VisualDirective["view"]>(directive.view);
 
   useEffect(() => {
-    const nextStage = lifecycleStage(result?.state);
+    const nextStage = model.pendingResidentAssessment ? "present" : lifecycleStage(result?.state);
     setStoryStage(nextStage);
-    setView(result?.state ? presentView : "VIEW_CONSTRUCTION_MEMORY");
-  }, [presentView, result?.state]);
+    setView(result?.state || model.pendingResidentAssessment ? presentView : "VIEW_CONSTRUCTION_MEMORY");
+  }, [model.pendingResidentAssessment, presentView, result?.state]);
 
   const stages = useMemo<Record<StoryStageId, StoryStage>>(() => {
     const observationText = model.observations.length
       ? model.observations.map((item) => `${item.label} ${item.value}`).join("；")
-      : "当前还没有形成可用于事件判断的观测；先收集住户实际看到的现场事实。";
+      : model.pendingResidentAssessment
+        ? "新的住户现场事实已经受理；本轮系统观测尚未由物业确认，因此不展示上一轮候选作为当前判断。"
+        : "当前还没有形成可用于事件判断的观测；先收集住户实际看到的现场事实。";
     const next = model.projection.nextAction;
     const resolved = result?.state === "RESOLVED";
     return {
@@ -82,7 +106,7 @@ export function Case1602Exhibit() {
         title: model.assessment.title,
         fact: observationText,
         why: model.assessment.explanation,
-        action: "进入物业当前判断",
+        action: model.pendingResidentAssessment ? "进入物业确认本轮观测" : "进入物业当前判断",
         href: "/property?mode=task",
         view: presentView
       },
@@ -90,11 +114,11 @@ export function Case1602Exhibit() {
         id: "action",
         label: "处置 / 人工门禁",
         shortLabel: "处置",
-        title: next.label,
-        fact: model.projection.summary,
+        title: model.pendingResidentAssessment && previousActionCompleted ? "上一轮处置完整保留，本轮尚未重新进入动作阶段" : next.label,
+        fact: model.pendingResidentAssessment && previousActionCompleted ? "上一轮授权、阀门动作、维修与复验仍在原事件审计链中；新的住户事实不会覆盖这些历史，也不会自动复用上一轮动作。" : model.projection.summary,
         why: model.projection.safetyBoundary,
-        action: next.label,
-        href: actionHref(next.destination),
+        action: model.pendingResidentAssessment ? "先完成本轮重新评估" : next.label,
+        href: model.pendingResidentAssessment ? "/property?mode=task" : actionHref(next.destination),
         view: directive.view === "VIEW_CONSTRUCTION_MEMORY" ? "VIEW_DIAGNOSTIC" : directive.view
       },
       result: {
@@ -103,8 +127,10 @@ export function Case1602Exhibit() {
         shortLabel: "结果",
         title: resolved ? "事件已经闭环 经历继续留下" : "结果不会被提前写好",
         fact: resolved
-          ? `EVT-1602 已通过确定性复验闭环，当前事件链保留 ${result.auditLog.length} 条审计记录与 ${result.repairRecords.length} 条维修记录。`
-          : `当前仍处于“${model.projection.stateLabel}”；维修记录、授权或单次动作都不能提前替代最终复验。`,
+          ? `${result.eventId} 已通过确定性复验闭环，当前事件链保留 ${result.auditLog.length} 条审计记录与 ${result.repairRecords.length} 条维修记录。`
+          : model.pendingResidentAssessment
+            ? `当前正式事件仍是 ${result?.eventId ?? "未形成"}；新住户事实正在等待本轮评估，上一轮结果不会被当作本轮结论。`
+            : `当前仍处于“${model.projection.stateLabel}”；维修记录、授权或单次动作都不能提前替代最终复验。`,
         why: resolved
           ? "事件经历可以进入企业经验候选，但单个案例仍不能自动升级成企业标准。"
           : "只有维修后的新观察满足验证条件，事件才能进入 RESOLVED；否则继续保持未完成或重新打开。",
@@ -113,12 +139,13 @@ export function Case1602Exhibit() {
         view: "VIEW_MAINTENANCE"
       }
     };
-  }, [directive.view, model, presentView, result]);
+  }, [directive.view, model, presentView, previousActionCompleted, result]);
 
   const current = stages[storyStage];
   const currentIndex = stageOrder.indexOf(currentLifecycleStage);
-  const selectedSceneBusinessId = product.selectedBusinessId
-    ?? (result ? directive.highlightBusinessIds[0] ?? null : null);
+  const selectedSceneBusinessId = model.pendingResidentAssessment
+    ? null
+    : product.selectedBusinessId ?? (result ? directive.highlightBusinessIds[0] ?? null : null);
 
   function selectStoryStage(id: StoryStageId) {
     setStoryStage(id);
@@ -128,7 +155,9 @@ export function Case1602Exhibit() {
   return <div className="case-exhibit">
     <section className="case-intro">
       <div><p className="concept-kicker">筑生 / 1602建筑生命事件</p><h1 className="display-headline"><span className="display-headline-line">一件潮湿异常</span><span className="display-headline-line">唤醒一栋房子的记忆</span></h1><p>从建造时留下的现场经历，到入住后的异常、判断、人工动作与最终验证，一件事始终沿着同一栋房子的生命线向前推进。</p></div>
-      <aside><span>当前真实阶段</span><strong>{stages[currentLifecycleStage].label}</strong><p>{result ? `事件：${result.eventId} · ${model.projection.stateLabel}` : "尚未开启1602事件；先查看它在建造期留下了什么"}</p><Link href={actionHref(model.projection.nextAction.destination)}>继续当前任务 <ArrowRight size={15} /></Link></aside>
+      <aside><span>当前真实阶段</span><strong>{stages[currentLifecycleStage].label}</strong><p>{model.pendingResidentAssessment
+        ? result ? `事件：${result.eventId} · 新住户事实待本轮评估` : "INTAKE-1602 · 住户现场事实已受理，正式事件尚未形成"
+        : result ? `事件：${result.eventId} · ${model.projection.stateLabel}` : "尚未开启1602事件；先查看它在建造期留下了什么"}</p><Link href={actionHref(model.projection.nextAction.destination)}>继续当前任务 <ArrowRight size={15} /></Link></aside>
     </section>
 
     <section className="case-stage" aria-label="1602卫生间数字样间">
@@ -178,8 +207,9 @@ export function Case1602Exhibit() {
       {stageOrder.map((id, stageIndex) => {
         const stage = stages[id];
         const isCurrent = id === currentLifecycleStage;
-        const completed = stageIndex < currentIndex || result?.state === "RESOLVED";
-        const status = isCurrent ? "当前真实阶段" : completed ? "事件已经过" : "工作流后续阶段";
+        const previousCycleAction = model.pendingResidentAssessment && id === "action" && previousActionCompleted;
+        const completed = stageIndex < currentIndex || result?.state === "RESOLVED" || previousCycleAction;
+        const status = isCurrent ? "当前真实阶段" : previousCycleAction ? "上一轮已经过 · 本轮待重新评估" : completed ? "事件已经过" : "工作流后续阶段";
         return <article key={id} className={isCurrent ? "active" : completed ? "done" : ""} aria-current={isCurrent ? "step" : undefined}>
           <i>{completed ? <CheckCircle2 size={16} /> : isCurrent ? <CircleDot size={15} /> : <LockKeyhole size={14} />}</i>
           <span>{stage.label}</span>
