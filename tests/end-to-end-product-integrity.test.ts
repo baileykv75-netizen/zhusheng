@@ -7,6 +7,7 @@ const residentUrl = new URL("../components/ResidentService.tsx", import.meta.url
 const propertyUrl = new URL("../lib/product/property-event-view-model.ts", import.meta.url);
 const propertyWorkbenchUrl = new URL("../components/life-event/ResidentTaskWorkbench.tsx", import.meta.url);
 const caseUrl = new URL("../components/Case1602Exhibit.tsx", import.meta.url);
+const evidenceTimelineUrl = new URL("../components/EvidenceTimeChain.tsx", import.meta.url);
 const memoryUrl = new URL("../lib/product/building-memory-view-model.ts", import.meta.url);
 const eventsUrl = new URL("../lib/product/building-life-events.ts", import.meta.url);
 const eventCenterUrl = new URL("../components/BuildingEventCenter.tsx", import.meta.url);
@@ -28,6 +29,16 @@ test("resident journey starts from observed facts and does not force unrelated s
   assert.match(source, /不会因为处于卫生间就自动假定为漏水/);
   assert.doesNotMatch(source, /已通知物业创建后续检查任务/);
   assert.match(source, /当前 RESOLVED 不会因为一个反馈按钮被直接改写/);
+});
+
+test("resident intake is not labelled as a formed event before property assessment", async () => {
+  const source = await readFile(residentUrl, "utf8");
+
+  assert.match(source, /const residentHeaderId = result\?\.eventId \?\? "1602现场受理"/);
+  assert.match(source, /住户事实已保存 · 等待物业接入/);
+  assert.match(source, /先提交你实际看到的现场事实/);
+  assert.match(source, /result \? "你的现场观察进入同一事件"/);
+  assert.doesNotMatch(source, /<Link href="\/case-1602">EVT-1602<\/Link><span>住户任务<\/span><small>你的现场观察进入同一事件<\/small>/);
 });
 
 test("property surfaces only event observations and requires human confirmation of every demo draft", async () => {
@@ -61,6 +72,20 @@ test("case and memory stay visually neutral before an event produces a candidate
   assert.match(memorySource, /: entries\[0\]\?\.recordId \?\? null/);
 });
 
+test("evidence timeline renders only records that actually exist in the current lifecycle", async () => {
+  const source = await readFile(evidenceTimelineUrl, "utf8");
+
+  assert.match(source, /只显示已经发生的记录/);
+  assert.match(source, /session\.productEvidenceTimeline/);
+  assert.match(source, /result\.input\.evidence/);
+  assert.match(source, /result\?\.input\.observations/);
+  assert.match(source, /result\?\.repairRecords/);
+  assert.match(source, /建造期历史，不代表当前故障/);
+  assert.doesNotMatch(source, /syntheticEvidenceTimelineIds/);
+  assert.doesNotMatch(source, /局部接头维修记录/);
+  assert.doesNotMatch(source, /恢复供水后的新观察/);
+});
+
 test("building situation does not create EVT-1602 before evidence and uses actual event counts after assessment", async () => {
   const [model, center] = await Promise.all([
     readFile(eventsUrl, "utf8"),
@@ -70,13 +95,16 @@ test("building situation does not create EVT-1602 before evidence and uses actua
   assert.match(model, /deepResult\.input\.evidence\.length \+ deepResult\.input\.observations\.length/);
   assert.match(model, /pending1602Evidence = false/);
   assert.match(model, /1602卫生间现场事实待评估/);
-  assert.match(model, /: null;/);
+  assert.match(model, /return deepEvent \? \[deepEvent\] : \[\]/);
+  assert.match(model, /buildingLifeEventExamples/);
+  assert.match(model, /EXAMPLE-1203/);
   assert.match(model, /按当前事实补充下一项必要证据/);
   assert.doesNotMatch(model, /evidenceCount: 6/);
   assert.doesNotMatch(model, /COLLECTING_EVIDENCE: \{[^\n]*确认水表观察/);
   assert.match(center, /const pending1602Evidence = !session\.result && Boolean\(session\.residentSubmissions\?\.length\)/);
   assert.match(center, /buildingLifeEvents\(session\.result, pending1602Evidence\)/);
-  assert.match(center, /尚未进入事件/);
+  assert.match(center, /没有活动事件时，这里保持为空/);
+  assert.match(center, /不参与上方任何统计或任务队列/);
 });
 
 test("homepage presents 1602 as a featured case instead of pretending an event is live", async () => {
