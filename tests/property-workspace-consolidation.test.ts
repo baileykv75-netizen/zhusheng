@@ -14,6 +14,18 @@ test("property task mode renders one consolidated event workspace", async () => 
   assert.doesNotMatch(source, /<PropertyWorkbench/);
 });
 
+test("advanced verification is a transaction-like sandbox and restores task truth on exit", async () => {
+  const source = await readFile(propertyPage, "utf8");
+
+  assert.match(source, /LAB_SNAPSHOT_KEY/);
+  assert.match(source, /rememberTaskTruth/);
+  assert.match(source, /restoreTaskTruth/);
+  assert.match(source, /structuredClone\(session\)/);
+  assert.match(source, /if \(modeRef\.current !== "lab"\) return/);
+  assert.match(source, /退出沙盒并恢复物业任务/);
+  assert.match(source, /退出后恢复进入前的物业会话，不写回任务真相/);
+});
+
 test("legacy detailed property work remains available only behind the secondary task layer", async () => {
   const source = await readFile(propertyWorkspace, "utf8");
 
