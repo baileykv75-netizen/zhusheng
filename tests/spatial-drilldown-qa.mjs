@@ -1,8 +1,33 @@
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
+import { createRequire } from "node:module";
 import path from "node:path";
-import { chromium } from "playwright";
 
+const require = createRequire(import.meta.url);
+
+function loadPlaywright() {
+  try {
+    return require("playwright");
+  } catch {
+    const fallback = process.env.CODEX_PLAYWRIGHT_MODULE
+      || "C:/Users/Admin/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright";
+    return require(fallback);
+  }
+}
+
+function browserExecutable(chromium) {
+  if (process.env.CHROME_EXECUTABLE) return process.env.CHROME_EXECUTABLE;
+  const candidates = process.platform === "win32"
+    ? [
+        "C:/Program Files/Google/Chrome/Application/chrome.exe",
+        "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+      ]
+    : ["/usr/bin/google-chrome", "/usr/bin/chromium", "/usr/bin/chromium-browser"];
+  return candidates.find((candidate) => existsSync(candidate)) || chromium.executablePath();
+}
+
+const { chromium } = loadPlaywright();
 const baseUrl = (process.env.QA_BASE_URL || "http://127.0.0.1:4174").replace(/\/$/, "");
 const output = process.env.QA_OUTPUT || path.resolve(process.cwd(), "artifacts/spatial-drilldown");
 await mkdir(output, { recursive: true });
@@ -36,8 +61,14 @@ async function assertPhase(page, phase, currentLabel) {
   assert.equal((await current.innerText()).trim(), currentLabel, `${phase}: breadcrumb current location mismatch`);
 }
 
+function normalizePathname(pathname) {
+  // next.config.ts uses trailingSlash: true; dev/static URLs must share one assertion.
+  return pathname.replace(/\/+$/, "") || "/";
+}
+
 function isCaseUrl(url) {
-  return url.pathname.endsWith("/case-1602") && url.searchParams.get("entry") === "building";
+  return normalizePathname(url.pathname).endsWith("/case-1602")
+    && url.searchParams.get("entry") === "building";
 }
 
 async function openFreshHome(page) {
@@ -47,7 +78,16 @@ async function openFreshHome(page) {
   await assertPhase(page, "building", "华章新筑 · 2号楼");
 }
 
-const browser = await chromium.launch({ headless: true });
+const launchOptions = {
+  headless: true,
+  // CI runners may not expose a hardware GPU. Software WebGL is acceptable for
+  // verifying the published GLB + anchor behavior and avoids a false product fallback.
+  args: ["--enable-unsafe-swiftshader"]
+};
+const executablePath = browserExecutable(chromium);
+if (executablePath) launchOptions.executablePath = executablePath;
+
+const browser = await chromium.launch(launchOptions);
 try {
   const desktop = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
   const page = await desktop.newPage();
@@ -124,7 +164,7 @@ try {
   assert.deepEqual(mobileErrors, [], `mobile spatial runtime errors: ${mobileErrors.join(" | ")}`);
   await mobile.close();
 
-  console.log("Spatial drilldown QA passed: published hero GLB, explicit four-step navigation, back/breadcrumb control, no autoplay, Case handoff and 390px continuity.");
+  console.log("Spatial drilldown QA passed: published hero GLB, explicit four-step navigation, back/breadcrumb control, no autoplay, trailing-slash-safe Case handoff and 390px continuity.");
 } finally {
   await browser.close();
 }
