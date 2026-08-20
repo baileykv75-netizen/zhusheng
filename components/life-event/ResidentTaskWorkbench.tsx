@@ -7,6 +7,7 @@ import type { QueryVisualDirective } from "@/lib/building-intelligence/types.ts"
 import { deriveJourneyView } from "@/lib/journey/index.ts";
 import type { LabSession } from "@/lib/life-event-lab/types.ts";
 import { repairTaskForResult } from "@/lib/life-event-lab/model.ts";
+import { hasFreshEvidenceAfterReopen } from "@/lib/life-event-lab/reopened-cycle.ts";
 import type { VisualDirective } from "@/lib/life-event-engine/types.ts";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { LocalEvidenceUpload } from "@/components/LocalEvidenceUpload";
@@ -86,7 +87,24 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
   const reopening = result?.authorizationRequirement?.action === "SIMULATE_REOPEN_VALVE" || result?.authorizedActions.some((item) => item.action === "SIMULATE_REOPEN_VALVE");
   const isFactCheck = !result || ["DETECTED", "COLLECTING_EVIDENCE", "INCONCLUSIVE", "REOPENED"].includes(result.state);
   const latestSubmission = session.residentSubmissions?.at(-1) ?? null;
-  const pendingAssessment = Boolean(latestSubmission && !result);
+  const latestSubmissionAfterEvaluation = Boolean(
+    result
+    && latestSubmission
+    && Date.parse(latestSubmission.submittedAt) > Date.parse(result.input.evaluatedAt)
+  );
+  const freshReopenSubmission = Boolean(
+    result?.state === "REOPENED"
+    && latestSubmission
+    && hasFreshEvidenceAfterReopen(result, [latestSubmission.submittedAt])
+  );
+  const pendingAssessment = Boolean(
+    latestSubmission
+    && (
+      !result
+      || (result.state === "INCONCLUSIVE" && latestSubmissionAfterEvaluation)
+      || freshReopenSubmission
+    )
+  );
   const submissionEvidence = latestSubmission
     ? (session.productEvidenceTimeline ?? []).filter((item) => latestSubmission.evidenceIds.includes(item.id))
     : [];
@@ -107,13 +125,21 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
   const taskQueue = buildingTasks(eventQueue, result);
   const activeQueueId = result?.eventId ?? (pendingAssessment ? "INTAKE-1602" : null);
   const currentTask = taskQueue.find((task) => task.eventId === activeQueueId) ?? taskQueue[0];
+  const sameEventReassessment = Boolean(result && pendingAssessment);
+  const observationCycleLabel = sameEventReassessment ? "上一轮事件观测" : "事件观测";
 
   return <div className="professional-workspace property-task-workspace">
     <section className="professional-scene" aria-label="1602卫生间数字孪生">
       <div className="professional-scene-heading">
         <small>筑生样板楼A座 / 16层 / 1602户</small>
         <h1>1602卫生间</h1>
-        <p>{result ? `事件 ${result.eventId}` : pendingAssessment ? `住户证据 ${latestSubmission?.submissionId} 已提交，等待物业确认系统观测` : "等待现场观察进入真实事件引擎"}</p>
+        <p>{pendingAssessment
+          ? result
+            ? `事件 ${result.eventId} · 新住户证据 ${latestSubmission?.submissionId} 待本轮物业确认`
+            : `住户证据 ${latestSubmission?.submissionId} 已提交，等待物业确认系统观测`
+          : result
+            ? `事件 ${result.eventId}`
+            : "等待现场观察进入真实事件引擎"}</p>
       </div>
       <BathroomTwinViewport
         assets={assets}
@@ -140,9 +166,15 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
             return <article key={event.id} className={event.id === activeQueueId ? "current" : ""}><span>{event.floor}F · {event.unitId}</span><strong>{event.title}</strong><small>{task.ownerRole} · {task.title}</small>{result ? <em>完整深链</em> : <em>现场受理</em>}</article>;
           })}</div>
         </details>
-        <small>物业运行席 / 1602 / {pendingAssessment ? "现场受理" : isFactCheck ? "事件接入" : journey.stateLabel}</small>
-        <h2>{pendingAssessment ? "住户原始事实已到，先确认系统观测" : isFactCheck ? result ? "1602事件正在补充现场事实" : "等待1602现场事实进入事件" : journey.headline}</h2>
-        <p>{pendingAssessment ? "住户提交不会自动触发诊断。物业需要核对本轮湿度与微流量等系统观测，明确确认后，确定性事件引擎才开始第一次评估。" : isFactCheck ? "先确认住户原始观察和已经存在的系统事实，再由事件引擎决定需要补什么、是否进入诊断或动作阶段。" : journey.summary}</p>
+        <small>物业运行席 / 1602 / {pendingAssessment ? sameEventReassessment ? "同事件补证" : "现场受理" : isFactCheck ? "事件接入" : journey.stateLabel}</small>
+        <h2>{pendingAssessment
+          ? sameEventReassessment ? "新住户事实已到，继续同一事件前先确认本轮系统观测" : "住户原始事实已到，先确认系统观测"
+          : isFactCheck ? result ? "1602事件正在补充现场事实" : "等待1602现场事实进入事件" : journey.headline}</h2>
+        <p>{pendingAssessment
+          ? sameEventReassessment
+            ? `新提交不会自动改变事件 ${result!.eventId} 的判断。物业需要明确确认本轮湿度与微流量等系统观测，之后只在原事件上继续确定性评估。`
+            : "住户提交不会自动触发诊断。物业需要核对本轮湿度与微流量等系统观测，明确确认后，确定性事件引擎才开始第一次评估。"
+          : isFactCheck ? "先确认住户原始观察和已经存在的系统事实，再由事件引擎决定需要补什么、是否进入诊断或动作阶段。" : journey.summary}</p>
       </header>
 
       {session.notice ? <div className="task-notice" role="status"><AlertTriangle size={15} /><span>{session.notice}</span><button onClick={() => setSession((current) => ({ ...current, notice: null }))} aria-label="关闭提示">×</button></div> : null}
@@ -150,7 +182,7 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
 
       <div className="task-pane-body">
         <section className="product-evidence-source" aria-label="住户原始证据与物业独立复核">
-          <header><span>PRODUCT EVIDENCE</span><strong>{latestSubmission ? "住户原始提交 · 只读" : "尚无住户原始提交"}</strong></header>
+          <header><span>PRODUCT EVIDENCE</span><strong>{latestSubmission ? pendingAssessment ? "住户本轮新提交 · 只读" : "住户最近提交 · 只读" : "尚无住户原始提交"}</strong></header>
           {latestSubmission ? <>
             <dl>
               <div><dt>原始描述</dt><dd>{residentTextEvidence?.observedValue ?? "未记录"}</dd></div>
@@ -177,12 +209,14 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
           <div className="task-section-heading"><Gauge size={18} /><div><strong>此刻只需要核对现场事实</strong><small>系统会调用同一份建筑记忆；不会替人操作阀门。</small></div></div>
           <div className="resident-fact-groups">
             {result?.state === "REOPENED" ? <article className="resident-fact gap reopened-history"><span>历史保留</span><strong>第一次维修与复验仍在事件链</strong><p>{currentTask?.historyRefs.length ? currentTask.historyRefs.join(" · ") : "原维修记录、复验观察与审计顺序保持不变。"}</p><small>新任务：先收集新的现场事实，再决定本轮补证路径；不会覆盖第一次处置。</small></article> : null}
-            {latestHumidity ? <article className="resident-fact known"><span>事件观测</span><strong>湿度观察已进入事件</strong><p>湿度 {latestHumidity.value}%（基线 {latestHumidity.baseline ?? "—"}%），持续 {latestHumidity.durationMinutes ?? 0} 分钟。</p></article> : <article className="resident-fact gap"><span>尚未形成</span><strong>没有事件级湿度观测</strong><p>模板或高级验证中的数值草稿不能冒充当前事实。</p></article>}
-            {latestMicroFlow ? <article className="resident-fact known"><span>事件观测</span><strong>微流量观察已进入事件</strong><p>{latestMicroFlow.value} L/min，持续 {latestMicroFlow.durationMinutes ?? 0} 分钟。</p></article> : <article className="resident-fact gap"><span>尚未形成</span><strong>没有事件级微流量观测</strong><p>只有明确记录到事件中的观测才会出现在这里。</p></article>}
+            {latestHumidity ? <article className="resident-fact known"><span>{observationCycleLabel}</span><strong>{sameEventReassessment ? "上一轮湿度观察已保留" : "湿度观察已进入事件"}</strong><p>湿度 {latestHumidity.value}%（基线 {latestHumidity.baseline ?? "—"}%），持续 {latestHumidity.durationMinutes ?? 0} 分钟。</p>{sameEventReassessment ? <small>本轮新 submission 尚未生成新的系统观测；下面草稿需物业重新确认。</small> : null}</article> : <article className="resident-fact gap"><span>尚未形成</span><strong>没有事件级湿度观测</strong><p>模板或高级验证中的数值草稿不能冒充当前事实。</p></article>}
+            {latestMicroFlow ? <article className="resident-fact known"><span>{observationCycleLabel}</span><strong>{sameEventReassessment ? "上一轮微流量观察已保留" : "微流量观察已进入事件"}</strong><p>{latestMicroFlow.value} L/min，持续 {latestMicroFlow.durationMinutes ?? 0} 分钟。</p>{sameEventReassessment ? <small>旧观测不会自动复制到本轮评估。</small> : null}</article> : <article className="resident-fact gap"><span>尚未形成</span><strong>没有事件级微流量观测</strong><p>只有明确记录到事件中的观测才会出现在这里。</p></article>}
             <article className="resident-fact memory"><span>建筑背景</span><strong>建造期记录可供检索</strong><p>施工、闭水、防水和现场调整记录保持各自来源；只有事件事实形成后才计算诊断相关性。</p></article>
-            <article className="resident-fact gap"><span>{latestSubmission ? "住户已提交" : "等待住户"}</span><strong>{latestSubmission ? "等待物业确认本轮系统观测" : "先收集住户原始现场事实"}</strong><p>{latestSubmission
+            <article className="resident-fact gap"><span>{pendingAssessment ? "本轮住户已提交" : latestSubmission ? "等待新的住户事实" : "等待住户"}</span><strong>{pendingAssessment ? "等待物业确认本轮系统观测" : latestSubmission ? "当前没有待评估的新住户 submission" : "先收集住户原始现场事实"}</strong><p>{pendingAssessment
               ? `${photoConfirmed ? "照片观察已确认。" : "照片当前未形成确定性结论。"}${meterConfirmed ? " 水表观察已确认。" : " 水表当前未形成确定性结论。"} 住户证据本身不会自动触发故障判断。`
-              : "先由住户描述实际看到的现象并提交现场观察；系统随后只请求当前路径真正需要的补证。"}</p></article>
+              : latestSubmission
+                ? "最近一次 submission 已属于上一轮事件事实；需要新的现场证据后才能再次评估。"
+                : "先由住户描述实际看到的现象并提交现场观察；系统随后只请求当前路径真正需要的补证。"}</p></article>
           </div>
           <details className="resident-fact-controls" open={pendingAssessment}>
             <summary>录入物业 / 系统观测草稿 <ChevronDown size={15} /></summary>
@@ -192,9 +226,15 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
               <TaskNumber label="微流量观测" value={session.controls.microFlow.value} unit="L/min" min={0} max={0.2} step={0.01} onChange={(value) => { setSession((current) => ({ ...current, controls: { ...current.controls, microFlow: { ...current.controls.microFlow, value } } })); setInitialObservationConfirmed(false); }} />
             </div>
           </details>
-          {latestSubmission ? <label className="task-control-note"><input type="checkbox" checked={initialObservationConfirmed} onChange={(event) => setInitialObservationConfirmed(event.target.checked)} /> 我确认湿度与微流量是本轮需要进入事件的系统 / 现场观测，不是直接采用预置演示答案</label> : null}
+          {pendingAssessment ? <label className="task-control-note"><input type="checkbox" checked={initialObservationConfirmed} onChange={(event) => setInitialObservationConfirmed(event.target.checked)} /> 我确认湿度与微流量是本轮需要进入事件的系统 / 现场观测，不是直接采用预置演示答案</label> : null}
           {result?.contradictions.length ? <p className="task-blocked"><AlertTriangle size={13} />{result.contradictions[0].explanation}</p> : null}
-          <button className="task-primary" disabled={busy || !assets || !latestSubmission || !initialObservationConfirmed} onClick={evaluate}><FileSearch size={16} />{busy ? "正在核对建筑记忆…" : latestSubmission ? initialObservationConfirmed ? "运行第一次确定性评估" : "确认系统观测后再评估" : "等待住户提交原始证据"}</button>
+          <button className="task-primary" disabled={busy || !assets || !pendingAssessment || !initialObservationConfirmed} onClick={evaluate}><FileSearch size={16} />{busy
+            ? "正在核对建筑记忆…"
+            : pendingAssessment
+              ? initialObservationConfirmed
+                ? sameEventReassessment ? "继续同一事件确定性评估" : "运行第一次确定性评估"
+                : "确认系统观测后再评估"
+              : result ? "等待住户提交新的现场证据" : "等待住户提交原始证据"}</button>
         </section> : null}
 
         {result && !["DETECTED", "COLLECTING_EVIDENCE", "INCONCLUSIVE", "REOPENED"].includes(result.state) ? <section className="task-decision-summary" data-focus="diagnosis" tabIndex={-1}>
