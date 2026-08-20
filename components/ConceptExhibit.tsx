@@ -125,7 +125,7 @@ export function ConceptExhibit() {
       </div>
 
       <aside className="v6-building-pulse">
-        <span>{anchorStatus}</span>
+        <span>FEATURED LIFE EVENT / 1602案例 · {anchorStatus}</span>
         <strong>16层 · 1602卫生间</strong>
         <p>这个脱敏案例从住户现场观察开始，随后回看同一空间的建造记忆；是否形成事件与最终判断仍由当前会话事实决定。</p>
         <button type="button" onClick={advanceSpatialDrill}>{phase === "space" ? "打开这个空间的生命线" : phaseCopy[phase].action} <CornerDownRight size={15} /></button>
