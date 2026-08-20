@@ -16,7 +16,7 @@ export function residentEvidenceNeedsAssessment(
   if (!latest) return false;
   if (!result) return true;
 
-  if (["DETECTED", "COLLECTING_EVIDENCE", "INCONCLUSIVE"].includes(result.state)) {
+  if (result.state === "INCONCLUSIVE") {
     return Date.parse(latest.submittedAt) > Date.parse(result.input.evaluatedAt);
   }
 
