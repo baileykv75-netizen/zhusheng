@@ -4,7 +4,9 @@ import { createDefaultLifeEventEngine } from "../lib/life-event-engine/index.ts"
 import {
   buildAssessmentInput,
   controlsFromTemplate,
+  decideAuthorization,
   evaluateControls,
+  executeAuthorizedClose,
   resumeInconclusiveAssessment
 } from "../lib/life-event-lab/model.ts";
 
@@ -32,6 +34,36 @@ test("resident-backed assessment follows source then system observation then eva
   assert.ok(observedTimes.every((value) => value > Date.parse(submittedAt)));
   assert.ok(observedTimes.every((value) => value < Date.parse(input.evaluatedAt)));
   assert.ok(Date.parse(input.evaluatedAt) <= now);
+});
+
+test("resident-backed first assessment still allows a monotonic human authorization and explicit valve action", () => {
+  let auditNow = now;
+  const engine = createDefaultLifeEventEngine({
+    clock: { now: () => new Date(auditNow).toISOString() }
+  });
+  const submittedAt = new Date(now - 5_000).toISOString();
+  let result = evaluateControls(engine, controlsFromTemplate("joint-supported"), 1, now, submittedAt);
+  assert.equal(result.state, "AUTHORIZATION_PENDING");
+  const firstEvaluatedAt = result.input.evaluatedAt;
+  const initialAuditCount = result.auditLog.length;
+
+  auditNow = now + 2_000;
+  result = decideAuthorization(engine, result, {
+    actorType: "RESIDENT",
+    actorId: "DEMO-RESIDENT-1602",
+    decision: "APPROVED",
+    reason: "resident-backed continuity test"
+  }, now + 2_000);
+  assert.equal(result.state, "AUTHORIZED");
+  assert.ok(Date.parse(result.input.evaluatedAt) >= Date.parse(firstEvaluatedAt));
+  assert.ok(result.auditLog.length > initialAuditCount);
+
+  const authorizationAuditAt = Date.parse(result.auditLog.at(-1)!.timestamp);
+  auditNow = now + 3_000;
+  result = executeAuthorizedClose(engine, result, now + 3_000);
+  assert.equal(result.state, "VERIFYING");
+  assert.equal(result.valvePosition, "CLOSED");
+  assert.ok(Date.parse(result.auditLog.at(-1)!.timestamp) > authorizationAuditAt);
 });
 
 test("new resident evidence refines an INCONCLUSIVE result on the same event id with a new observation cycle", () => {
