@@ -9,6 +9,9 @@ import {
 } from "../lib/life-event-lab/model.ts";
 
 const now = Date.parse("2026-08-20T02:40:00.000Z");
+const deterministicEngine = () => createDefaultLifeEventEngine({
+  clock: { now: () => new Date(now).toISOString() }
+});
 
 test("lab assessment keeps the legacy one-minute clock margin without resident evidence", () => {
   const input = buildAssessmentInput(controlsFromTemplate("joint-supported"), 1, now);
@@ -27,7 +30,7 @@ test("resident-backed assessment cannot predate its immutable resident source", 
 });
 
 test("new resident evidence refines an INCONCLUSIVE result on the same event id", () => {
-  const engine = createDefaultLifeEventEngine();
+  const engine = deterministicEngine();
   const first = evaluateControls(engine, controlsFromTemplate("contradictory-evidence"), 1, now);
   assert.equal(first.state, "INCONCLUSIVE");
 
