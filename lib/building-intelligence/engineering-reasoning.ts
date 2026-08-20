@@ -159,6 +159,11 @@ function relevantFacts(profile: DiagnosticProfile, facts: BuildingFact[]) {
 }
 
 export function deriveEngineeringReasoning(question: string, facts: BuildingFact[]): EngineeringReasoning | null {
+  // A live-state boundary is authoritative. Historical building memory may still
+  // exist, but it must not trigger a diagnostic panel that visually overrides
+  // the deterministic statement that no real-time observation source is connected.
+  if (facts.some((fact) => fact.predicate === "NO_LIVE_OBSERVATION_SOURCE")) return null;
+
   const profile = profileForQuestion(question);
   if (!profile) return null;
 
