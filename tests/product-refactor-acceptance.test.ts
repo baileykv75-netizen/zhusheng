@@ -26,7 +26,9 @@ test("core work routes read as one building product instead of independent demo 
   assert.match(shell, /productNavigation/);
   assert.match(memory, /BuildingMemoryWorkspace/);
   assert.match(property, /这栋房子记得什么/);
-  assert.match(resident, /EVT-1602/);
+  assert.match(resident, /1602现场受理/);
+  assert.match(resident, /result\?\.eventId/);
+  assert.match(resident, /住户事实已保存 · 等待物业接入/);
   assert.match(worker, /BUILDING MEMORY/);
 });
 
@@ -50,7 +52,9 @@ test("the product keeps one deep event without manufacturing building or enterpr
   const [events, group] = await Promise.all([readFile(eventsUrl, "utf8"), readFile(groupUrl, "utf8")]);
 
   assert.match(events, /EVT-1602/);
-  assert.match(events, /完整深度事件/);
+  assert.match(events, /没有活动事件时，这里保持为空/);
+  assert.match(events, /查看四个脱敏事件结构示例/);
+  assert.match(events, /不参与上方任何统计或任务队列/);
   assert.doesNotMatch(events, /Array\.from\(\{ length: 18 \}/);
   assert.doesNotMatch(group, /相似演示事件|演示项目|演示建筑|learning-constellation/);
   assert.match(group, /单事件 ≠ 企业标准/);
