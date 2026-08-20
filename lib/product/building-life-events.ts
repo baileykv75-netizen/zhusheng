@@ -40,6 +40,12 @@ const displayState: Record<LifeEventState, Pick<BuildingLifeEventSummary, "displ
   REOPENED: { displayStatus: "维修后仍有异常", ownerRole: "物业值班", nextAction: "重新收集新一轮现场事实" }
 };
 
+const pendingSameEventAssessment: Pick<BuildingLifeEventSummary, "displayStatus" | "ownerRole" | "nextAction"> = {
+  displayStatus: "新住户事实已提交，等待物业确认本轮系统观测",
+  ownerRole: "物业值班",
+  nextAction: "确认本轮系统观测并在同一事件上继续确定性评估"
+};
+
 const BUILDING_MEMORY_EVIDENCE = new Set(["PIPE_INSTALLATION_RECORD", "WATERPROOFING_RECORD", "CLOSED_WATER_TEST"]);
 
 // These records are intentionally product-structure examples, not current building events.
@@ -121,6 +127,11 @@ export function buildingLifeEvents(
 ): BuildingLifeEventSummary[] {
   const deepResult = source && typeof source === "object" ? source : null;
   const state = typeof source === "string" ? source : deepResult?.state;
+  const pendingSameEvent = Boolean(
+    state
+    && pending1602Evidence
+    && (state === "INCONCLUSIVE" || state === "REOPENED")
+  );
   const deepEvent = state
     ? {
         id: deepResult?.eventId ?? "EVT-1602",
@@ -130,7 +141,7 @@ export function buildingLifeEvents(
         space: "主卫",
         category: "待确定",
         severity: "重要" as const,
-        ...displayState[state],
+        ...(pendingSameEvent ? pendingSameEventAssessment : displayState[state]),
         technicalState: state,
         updatedAt: "刚刚",
         evidenceCount: deepResult ? deepResult.input.evidence.length + deepResult.input.observations.length : 0,
