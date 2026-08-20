@@ -1,4 +1,4 @@
-import { building1602Dataset } from "../building-intelligence/catalog.ts";
+import { building1602Dataset, entityById } from "../building-intelligence/catalog.ts";
 import { resolveBuildingMemoryRelevance, type RelevantBuildingMemory } from "../building-intelligence/memory-relevance.ts";
 import type { BuildingMemoryClass, BuildingMemoryTrade, BuildingRecord, BuildingRecordMemory } from "../building-intelligence/types.ts";
 import type { EvidenceRecord } from "../demo-engine.ts";
@@ -102,6 +102,12 @@ export type BuildingMemoryViewModel = {
   defaultRecordId: string | null;
 };
 
+const LEGACY_WORKER_REF_ALIASES: Record<string, string> = {
+  "1602卫生间": "SPACE-1602-BATHROOM",
+  "MIC-BATH-1602": "SYS-1602-CW",
+  "W-1602-B7": "J-1602-CW-03"
+};
+
 function phaseText(record: BuildingRecord) {
   return `${record.memory?.phase ?? ""} ${record.status ?? ""}`.toUpperCase();
 }
@@ -129,40 +135,60 @@ function isSpecial(record: BuildingRecord) {
   return ["REWORK", "FIELD_CHANGE", "INSPECTION_LIMIT"].includes(record.memory?.memoryClass ?? "");
 }
 
+function canonicalWorkerRefs(refs: readonly string[]) {
+  const normalized = refs.map((id) => LEGACY_WORKER_REF_ALIASES[id] ?? id);
+  const valid = normalized.filter((id) => Boolean(entityById(id)));
+  return [...new Set(valid)];
+}
+
+function workerVisualTarget(refs: readonly string[]) {
+  const visualIds = new Set(building1602Dataset.visualBindings.map((item) => item.businessId));
+  return refs.find((id) => visualIds.has(id)) ?? refs.find((id) => !id.startsWith("SPACE-") && !id.startsWith("SYS-")) ?? null;
+}
+
+function workerStatement(item: EvidenceRecord) {
+  const marker = "原始口述：";
+  const index = item.note.indexOf(marker);
+  return index >= 0 ? item.note.slice(index + marker.length).trim() : item.note;
+}
+
 function workerEvidenceEntries(evidence: EvidenceRecord[]) {
   return evidence
     .filter((item) => item.id === "EV-2848" && item.status === "verified")
-    .map((item): BuildingMemoryEntry => ({
-      recordId: item.id,
-      title: `工友现场复核 · ${item.type}`,
-      summary: item.note,
-      occurredAt: item.capturedAt,
-      recordType: "CONSTRUCTION",
-      subjectBusinessIds: [...item.refs],
-      visualTargetBusinessId: null,
-      memory: {
-        trade: "COLD_WATER",
-        memoryClass: "NORMAL",
-        phase: "现场口述 / 品质核验",
-        originalDesign: "1602卫生间冷热水支管按既定施工与复核流程形成现场证据。",
-        actualCondition: item.note,
-        reason: "工友现场口述与照片用于保留封板前的实际施工状态。",
-        fieldDecision: "AI仅整理口述字段；经人工确认和品质核验后作为施工证据写入建筑记忆视图。",
-        verification: {
-          method: "品质核验",
-          result: "空间、构件、工序与现场影像已核对",
-          checkedItems: ["空间", "构件", "工序", "保压结果", "现场影像"],
-          uncheckedItems: ["长期运行状态", "入住后的实际渗漏表现"]
+    .map((item): BuildingMemoryEntry => {
+      const subjectBusinessIds = canonicalWorkerRefs(item.refs);
+      return {
+        recordId: item.id,
+        title: `工友现场复核 · ${item.type}`,
+        summary: item.note,
+        occurredAt: item.capturedAt,
+        recordType: "CONSTRUCTION",
+        subjectBusinessIds,
+        visualTargetBusinessId: workerVisualTarget(subjectBusinessIds),
+        memory: {
+          trade: "COLD_WATER",
+          memoryClass: "NORMAL",
+          phase: "现场口述 / 品质核验",
+          originalDesign: "1602卫生间冷水支管按既定施工与复核流程形成现场证据。",
+          actualCondition: item.note,
+          reason: "工友现场口述与照片用于保留封板前的实际施工状态。",
+          fieldDecision: "AI仅整理口述字段；空间、系统和构件身份由扫码/BIM任务上下文绑定，经人工确认和品质核验后进入建筑记忆视图。",
+          verification: {
+            method: "品质核验",
+            result: "空间、构件、工序、保压结果与现场影像已核对",
+            checkedItems: ["空间BusinessId", "构件BusinessId", "工序", "保压结果", "现场影像"],
+            uncheckedItems: ["长期运行状态", "入住后的实际渗漏表现"]
+          },
+          residualRisk: "施工期核验通过不代表后续运行期永远无异常。",
+          workerStatement: workerStatement(item)
         },
-        residualRisk: "施工期核验通过不代表后续运行期永远无异常。",
-        workerStatement: item.source
-      },
-      memoryClass: "NORMAL",
-      trade: "COLD_WATER",
-      stage: "INSTALLATION",
-      special: false,
-      eventRelation: null
-    }));
+        memoryClass: "NORMAL",
+        trade: "COLD_WATER",
+        stage: "INSTALLATION",
+        special: false,
+        eventRelation: null
+      };
+    });
 }
 
 function recordMatchesFilter(entry: BuildingMemoryEntry, filter: MemoryFilterId) {
