@@ -8,11 +8,24 @@ export function latestResidentSubmission(
   return submissions?.at(-1) ?? null;
 }
 
+export function latestAssessableResidentSubmission(
+  submissions: readonly ResidentEvidenceSubmission[] | undefined
+): ResidentEvidenceSubmission | null {
+  if (!submissions?.length) return null;
+  for (let index = submissions.length - 1; index >= 0; index -= 1) {
+    const submission = submissions[index];
+    // Legacy submissions predate domainAdapterStatus and were created only by
+    // the leak-evidence flow, so undefined remains assessment-eligible.
+    if (submission.domainAdapterStatus !== "PRODUCT_ONLY") return submission;
+  }
+  return null;
+}
+
 export function residentEvidenceNeedsAssessment(
   result: LifeEventResult | null,
   submissions: readonly ResidentEvidenceSubmission[] | undefined
 ): boolean {
-  const latest = latestResidentSubmission(submissions);
+  const latest = latestAssessableResidentSubmission(submissions);
   if (!latest) return false;
   if (!result) return true;
 

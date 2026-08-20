@@ -43,9 +43,7 @@ export function ConceptExhibit() {
   const { session } = useLifecycleJourney();
   const [phase, setPhase] = useState<HeroDrillPhase>("building");
   const currentIndex = phaseOrder.indexOf(phase);
-  const latestSubmission = session.residentSubmissions?.at(-1);
-  const productOnlySubmission = latestSubmission?.domainAdapterStatus === "PRODUCT_ONLY";
-  const pendingResidentAssessment = !productOnlySubmission && residentEvidenceNeedsAssessment(session.result, session.residentSubmissions);
+  const pendingResidentAssessment = residentEvidenceNeedsAssessment(session.result, session.residentSubmissions);
   const result = session.result;
 
   const anchorStatus = pendingResidentAssessment
@@ -66,9 +64,7 @@ export function ConceptExhibit() {
       ? result.state === "RESOLVED"
         ? `进入16层1602卫生间，事件 ${result.eventId} 已完成验证闭环`
         : `进入16层1602卫生间，事件 ${result.eventId} 当前状态 ${result.state}`
-      : productOnlySubmission
-        ? "进入16层1602卫生间脱敏案例，最近一次住户事实仅保存在产品证据层，不进入当前漏水评估"
-        : "进入16层1602卫生间脱敏案例，当前会话尚未形成正式事件";
+      : "进入16层1602卫生间脱敏案例，当前会话尚未形成正式事件";
 
   function advanceSpatialDrill() {
     if (currentIndex >= phaseOrder.length - 1) {

@@ -21,14 +21,15 @@ test("home spatial drilldown is user-controlled instead of timer-driven", async 
   assert.match(source, /aria-current=\{phase === item \? "location" : undefined\}/);
 });
 
-test("building hero never hardcodes an active life event and receives current session truth", async () => {
+test("building hero consumes the shared pending-assessment truth instead of a local product-only exception", async () => {
   const [concept, hero] = await Promise.all([
     readFile(conceptUrl, "utf8"),
     readFile(heroUrl, "utf8")
   ]);
 
-  assert.match(concept, /residentEvidenceNeedsAssessment/);
-  assert.match(concept, /domainAdapterStatus === "PRODUCT_ONLY"/);
+  assert.match(concept, /const pendingResidentAssessment = residentEvidenceNeedsAssessment\(session\.result, session\.residentSubmissions\)/);
+  assert.doesNotMatch(concept, /domainAdapterStatus === "PRODUCT_ONLY"/);
+  assert.doesNotMatch(concept, /!productOnlySubmission && residentEvidenceNeedsAssessment/);
   assert.match(concept, /FEATURED CASE \/ NOT LIVE/);
   assert.match(concept, /INTAKE \/ NOT YET EVENT/);
   assert.match(concept, /VERIFIED EVENT \/ RESOLVED/);

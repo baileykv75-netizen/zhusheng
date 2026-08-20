@@ -10,6 +10,7 @@ import {
   projectProductEvidenceDomainLinks,
   residentEvidenceToDomainControls
 } from "../lib/product/evidence-adapter.ts";
+import { residentEvidenceNeedsAssessment } from "../lib/product/resident-assessment.ts";
 
 const capturedAt = "2026-08-20T09:00:00.000Z";
 
@@ -44,6 +45,69 @@ test("a stopped leak branch still persists immutable product evidence without in
   const photo = product.evidence.find((item) => item.type === "RESIDENT_PHOTO_OBSERVATION")!;
   assert.equal(text.dataClass, "BROWSER_LOCAL", "typed resident text must not inherit a synthetic photo label");
   assert.equal(photo.dataClass, "DEMO_SYNTHETIC");
+});
+
+test("product-only resident facts do not create a pending domain assessment", () => {
+  const productOnly = createResidentEvidenceSubmission({
+    draft: draft(),
+    eventId: "EVT-1602-LAB-001",
+    submittedAt: capturedAt
+  }).submission;
+
+  assert.equal(productOnly.domainAdapterStatus, "PRODUCT_ONLY");
+  assert.equal(residentEvidenceNeedsAssessment(null, [productOnly]), false);
+});
+
+test("domain-eligible and legacy resident submissions remain assessment eligible", () => {
+  const eligible = createResidentEvidenceSubmission({
+    draft: draft({
+      description: "卫生间北墙可见潮湿。",
+      photo: {
+        dataClass: "BROWSER_LOCAL",
+        fileName: "north-wall.webp",
+        mediaType: "image/webp",
+        size: 2048,
+        finding: "MOISTURE_VISIBLE"
+      },
+      meterFinding: "UNREADABLE"
+    }),
+    eventId: "EVT-1602-LAB-001",
+    submittedAt: capturedAt
+  }).submission;
+
+  assert.equal(eligible.domainAdapterStatus, "DOMAIN_ELIGIBLE");
+  assert.equal(residentEvidenceNeedsAssessment(null, [eligible]), true);
+
+  const legacyEligible = { ...eligible, domainAdapterStatus: undefined };
+  assert.equal(residentEvidenceNeedsAssessment(null, [legacyEligible]), true, "legacy submissions without adapter metadata must preserve the pre-existing assessment path");
+});
+
+test("a later product-only fact cannot hide an earlier unassessed domain-eligible submission", () => {
+  const eligible = createResidentEvidenceSubmission({
+    draft: draft({
+      description: "卫生间北墙可见潮湿。",
+      photo: {
+        dataClass: "BROWSER_LOCAL",
+        fileName: "north-wall.webp",
+        mediaType: "image/webp",
+        size: 2048,
+        finding: "MOISTURE_VISIBLE"
+      },
+      meterFinding: "UNREADABLE"
+    }),
+    eventId: "EVT-1602-LAB-001",
+    submittedAt: capturedAt,
+    submissionSequence: 1
+  }).submission;
+  const laterProductOnly = createResidentEvidenceSubmission({
+    draft: draft({ description: "随后补充：镜前灯仍然闪烁，但没有看到新的潮湿。" }),
+    eventId: "EVT-1602-LAB-001",
+    submittedAt: "2026-08-20T09:10:00.000Z",
+    submissionSequence: 2
+  }).submission;
+
+  assert.equal(laterProductOnly.domainAdapterStatus, "PRODUCT_ONLY");
+  assert.equal(residentEvidenceNeedsAssessment(null, [eligible, laterProductOnly]), true);
 });
 
 test("same-event resident submissions form an explicit revision chain without mutating predecessors", () => {
