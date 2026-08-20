@@ -65,6 +65,10 @@ function driveToReopened() {
   return { engine, reopened: result };
 }
 
+function reopenedResidentTime() {
+  return new Date(start + 44 * 60_000).toISOString();
+}
+
 test("reopened second assessment keeps one event and uses the newest sensor cycle", () => {
   const { engine, reopened } = driveToReopened();
   const previousAuditCount = reopened.auditLog.length;
@@ -78,7 +82,8 @@ test("reopened second assessment keeps one event and uses the newest sensor cycl
   recheck.meterReading = "PRESENT";
   recheck.meterFinding = "NO_CHANGE";
 
-  const second = resumeReopenedAssessment(engine, reopened, recheck, start + 45 * 60_000);
+  const submittedAt = reopenedResidentTime();
+  const second = resumeReopenedAssessment(engine, reopened, recheck, submittedAt, start + 45 * 60_000);
   assert.equal(second.eventId, reopened.eventId);
   assert.ok(second.auditLog.length > previousAuditCount);
 
@@ -94,6 +99,14 @@ test("reopened second assessment keeps one event and uses the newest sensor cycl
   assert.equal(newestFlow.value, 0);
   assert.equal(previousObservationIds.has(newestHumidity.id), false);
   assert.equal(previousObservationIds.has(newestFlow.id), false);
+  assert.ok(Date.parse(newestHumidity.observedAt) > Date.parse(submittedAt));
+  assert.ok(Date.parse(newestFlow.observedAt) > Date.parse(submittedAt));
+
+  const newestResidentEvidence = second.input.evidence
+    .filter((item) => item.sourceActor === "RESIDENT" && item.id.includes("REOPEN"));
+  assert.equal(newestResidentEvidence.length, 2);
+  assert.ok(newestResidentEvidence.every((item) => item.capturedAt === submittedAt));
+  assert.ok(newestResidentEvidence.every((item) => item.supersedesId));
 
   const evidence = evaluateEvidence(second.input, engine.memory);
   assert.equal(evidence.facts.HUMIDITY_ANOMALY.present, false);
@@ -106,7 +119,7 @@ test("reopened second assessment keeps one event and uses the newest sensor cycl
 test("reopened assessment with a genuinely new abnormal cycle can diagnose again", () => {
   const { engine, reopened } = driveToReopened();
   const recheck = controlsFromTemplate("joint-supported");
-  const second = resumeReopenedAssessment(engine, reopened, recheck, start + 45 * 60_000);
+  const second = resumeReopenedAssessment(engine, reopened, recheck, reopenedResidentTime(), start + 45 * 60_000);
   const evidence = evaluateEvidence(second.input, engine.memory);
 
   assert.equal(second.eventId, reopened.eventId);
@@ -114,4 +127,13 @@ test("reopened assessment with a genuinely new abnormal cycle can diagnose again
   assert.equal(evidence.facts.MICRO_FLOW_ANOMALY.present, true);
   assert.ok(evidence.facts.HUMIDITY_ANOMALY.inputRefs.every((id) => id.includes("REOPEN")));
   assert.ok(evidence.facts.MICRO_FLOW_ANOMALY.inputRefs.every((id) => id.includes("REOPEN")));
+});
+
+test("reopened assessment rejects stale resident evidence from before reopen", () => {
+  const { engine, reopened } = driveToReopened();
+  const stale = new Date(start + 39 * 60_000).toISOString();
+  assert.throws(
+    () => resumeReopenedAssessment(engine, reopened, controlsFromTemplate("joint-supported"), stale, start + 45 * 60_000),
+    /晚于事件重新打开时间|晚于上一轮事件评估/
+  );
 });
