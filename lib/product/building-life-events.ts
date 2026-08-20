@@ -123,7 +123,7 @@ export function buildingLifeEvents(
   const state = typeof source === "string" ? source : deepResult?.state;
   const deepEvent = state
     ? {
-        id: "EVT-1602",
+        id: deepResult?.eventId ?? "EVT-1602",
         title: "1602卫生间现场异常",
         floor: 16,
         unitId: "1602",
