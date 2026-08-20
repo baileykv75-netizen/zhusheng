@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Camera, Check, Clock3, House, LockKeyhole, ShieldCheck, Upload, X } from "lucide-react";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
-import { hasFreshEvidenceAfterReopen } from "@/lib/life-event-lab/reopened-cycle.ts";
 import { publicAssetPath } from "@/lib/site-path";
 import type { ResidentMeterFinding, ResidentPhotoFinding } from "@/lib/product/evidence";
+import { latestResidentSubmission, residentEvidenceNeedsAssessment } from "@/lib/product/resident-assessment";
 import { derive1602ResidentFollowUp } from "@/lib/product/resident-intake";
 
 const progressLabels: Record<string, string> = {
@@ -35,20 +35,10 @@ export function ResidentService() {
   const [syntheticPhoto, setSyntheticPhoto] = useState(false);
   const [intakeStage, setIntakeStage] = useState<IntakeStage>("OBSERVATION");
   const fileInput = useRef<HTMLInputElement>(null);
-  const latestSubmission = session.residentSubmissions?.at(-1) ?? null;
-  const latestSubmissionAfterEvaluation = Boolean(
-    result
-    && latestSubmission
-    && Date.parse(latestSubmission.submittedAt) > Date.parse(result.input.evaluatedAt)
-  );
-  const freshReopenEvidence = result?.state === "REOPENED"
-    ? hasFreshEvidenceAfterReopen(result, (session.residentSubmissions ?? []).map((item) => item.submittedAt))
-    : false;
-  const freshInconclusiveEvidence = result?.state === "INCONCLUSIVE" && latestSubmissionAfterEvaluation;
-  const awaitingPropertyAssessment = Boolean(
-    latestSubmission
-    && (!result || freshInconclusiveEvidence || freshReopenEvidence)
-  );
+  const latestSubmission = latestResidentSubmission(session.residentSubmissions);
+  const awaitingPropertyAssessment = residentEvidenceNeedsAssessment(result, session.residentSubmissions);
+  const freshReopenEvidence = result?.state === "REOPENED" && awaitingPropertyAssessment;
+  const freshInconclusiveEvidence = result?.state === "INCONCLUSIVE" && awaitingPropertyAssessment;
   const sameCycleIntake = (!result && !latestSubmission)
     || (Boolean(result) && ["DETECTED", "COLLECTING_EVIDENCE"].includes(result!.state))
     || (result?.state === "INCONCLUSIVE" && !freshInconclusiveEvidence);
