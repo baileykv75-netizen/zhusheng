@@ -33,7 +33,17 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
   const product = useBuildingProductContext();
   const [taskOpen, setTaskOpen] = useState(false);
   const model = useMemo(() => derivePropertyEventViewModel(session), [session]);
-  const directive = session.result?.visualDirective ?? defaultDirective;
+  const sourceDirective = session.result?.visualDirective ?? defaultDirective;
+  const directive: VisualDirective = model.pendingResidentAssessment && session.result
+    ? {
+        ...sourceDirective,
+        view: "VIEW_RESIDENT",
+        highlightBusinessIds: [],
+        evidenceAnchorIds: [],
+        allowedActions: [],
+        authorizationRequired: false
+      }
+    : sourceDirective;
   const next = model.projection.nextAction;
 
   useEffect(() => {
@@ -67,13 +77,20 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
   }
 
   const focusTarget = next.destination.kind === "FOCUS" ? next.destination.focus : null;
+  const contextLine = model.pendingResidentAssessment
+    ? model.result
+      ? `事件 ${model.result.eventId} 保留上一轮状态；新住户事实等待本轮物业确认`
+      : "现场事实已受理但尚未形成正式 Life Event；等待物业确认本轮系统观测"
+    : model.result
+      ? "当前事件与建筑记忆连续可追溯"
+      : "当前没有正式生命事件；模板值不会作为现场事实展示";
 
   return <section className={styles.workspace} aria-label="1602物业事件工作台">
     <header className={styles.eventHeader}>
       <div>
         <span className={styles.eyebrow}>PROPERTY OPERATIONS · {model.eventId}</span>
         <h1>{model.spaceLabel}</h1>
-        <p>{product.buildingLabel} / 16F / 1602 · 当前事件与建筑记忆连续可追溯</p>
+        <p>{product.buildingLabel} / 16F / 1602 · {contextLine}</p>
       </div>
       <div className={styles.headerActions}>
         <span className={styles.stateBadge}><i />{model.projection.stateLabel}</span>
@@ -88,15 +105,15 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
             <span className={styles.sectionLabel}>BUILDING CONTEXT</span>
             <strong>定位当前空间、系统与隐蔽历史</strong>
           </div>
-          <small>{product.queryVisual ? `已按最近一次建筑查询定位 ${product.queryVisual.mode} 视图` : "点击建筑记忆可回到对应施工阶段"}</small>
+          <small>{product.queryVisual ? `已按最近一次建筑查询定位 ${product.queryVisual.mode} 视图` : model.pendingResidentAssessment ? "本轮新事实尚未评估，不自动沿用上一轮候选高亮" : "点击建筑记忆可回到对应施工阶段"}</small>
         </div>
         <div className={styles.sceneViewport}>
           <BathroomTwinViewport
             assets={assets}
             externalError={assetError}
             directive={directive}
-            view={session.selectedView}
-            selectedBusinessId={session.selectedBusinessId}
+            view={model.pendingResidentAssessment ? "VIEW_RESIDENT" : session.selectedView}
+            selectedBusinessId={model.pendingResidentAssessment ? null : session.selectedBusinessId}
             queryVisual={product.queryVisual}
             onViewChange={(selectedView) => setSession((current) => ({ ...current, selectedView }))}
             onSelect={(selectedBusinessId) => product.setSelectedBusinessId(selectedBusinessId)}
@@ -106,12 +123,12 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
 
       <aside className={styles.decisionPane}>
         <section className={styles.assessment}>
-          <span className={styles.sectionLabel}>CURRENT ASSESSMENT</span>
+          <span className={styles.sectionLabel}>{model.pendingResidentAssessment ? "CURRENT INTAKE" : "CURRENT ASSESSMENT"}</span>
           <h2>{model.assessment.title}</h2>
           <p>{model.assessment.explanation}</p>
           <div className={styles.confidence}>
             <ShieldCheck size={14} />
-            <span>当前判断置信度：{model.assessment.confidence}</span>
+            <span>{model.pendingResidentAssessment ? "本轮状态" : "当前判断置信度"}：{model.assessment.confidence}</span>
             {model.assessment.targetBusinessIds[0] ? <span>· {model.assessment.targetBusinessIds[0]}</span> : null}
           </div>
         </section>
@@ -126,7 +143,7 @@ export function PropertyEventWorkspace({ onOpenAdvanced }: { onOpenAdvanced(): v
         <section className={styles.memorySection} aria-label="当前相关建筑记忆">
           <div className={styles.sectionHead}>
             <strong><Database size={14} /> 这栋房子记得什么</strong>
-            <small>{model.result ? "按当前事件事实相关性排序" : "仅按当前空间浏览，不代表诊断优先级"}</small>
+            <small>{model.pendingResidentAssessment ? "本轮评估前仅按空间浏览，不沿用上一轮诊断排序" : model.result ? "按当前事件事实相关性排序" : "仅按当前空间浏览，不代表诊断优先级"}</small>
           </div>
           <div className={styles.memoryList}>
             {model.relevantMemories.slice(0, 3).map((memory) => <button
