@@ -9,21 +9,23 @@ import styles from "./BuildingEventCenter.module.css";
 
 export function BuildingEventCenter() {
   const { session } = useLifecycleJourney();
-  const events = buildingLifeEvents(session.result);
+  const pending1602Evidence = !session.result && Boolean(session.residentSubmissions?.length);
+  const events = buildingLifeEvents(session.result, pending1602Evidence);
   const tasks = buildingTasks(events, session.result);
   const residentOwned = events.filter((event) => event.ownerRole === "住户").length;
   const propertyOwned = events.filter((event) => event.ownerRole.startsWith("物业")).length;
   const resolved = events.filter((event) => event.displayStatus.includes("解决")).length;
+  const deepEventVisible = events.some((event) => event.id === "EVT-1602");
 
   return <div className={`event-center ${styles.center}`}>
     <header className={styles.hero}>
       <div className={styles.heroCopy}>
         <span className={styles.eyebrow}>BUILDING SITUATION · 华章新筑 2号楼</span>
         <h1>这栋楼今天需要处理什么</h1>
-        <p>把正在发生的建筑生命事件放回楼层、空间和责任链中查看。每件事都保留当前状态、负责人和下一项工作，1602可继续进入完整处置闭环。</p>
+        <p>把正在发生的建筑生命事件放回楼层、空间和责任链中查看。只有已经存在的事件或待物业接入的住户事实才进入当前列表；1602可继续进入完整处置闭环。</p>
       </div>
       <div className={styles.metrics} aria-label="建筑事件摘要">
-        <div><strong>{events.length}</strong><span>当前事件</span></div>
+        <div><strong>{events.length}</strong><span>当前事项</span></div>
         <div><strong>{residentOwned}</strong><span>等待住户</span></div>
         <div><strong>{propertyOwned}</strong><span>物业处理中</span></div>
         <div><strong>{resolved}</strong><span>已解决</span></div>
@@ -31,15 +33,15 @@ export function BuildingEventCenter() {
     </header>
 
     <div className={styles.context}>
-      <div><Building2 size={15} /><strong>18层 MiC 住宅</strong><span>当前有事件的空间</span></div>
-      <div><span>完整深度事件</span><strong>EVT-1602</strong><span>其余为建筑态势概览</span></div>
+      <div><Building2 size={15} /><strong>18层 MiC 住宅</strong><span>当前有事项的空间</span></div>
+      <div><span>1602深度链</span><strong>{deepEventVisible ? "EVT-1602" : "尚未进入事件"}</strong><span>{deepEventVisible ? "住户事实 / 事件状态按当前会话展示" : "案例结构可查看，但不冒充当前事件"}</span></div>
     </div>
 
     <main className={styles.layout}>
       <section className={`event-floor-map ${styles.buildingMap}`} aria-label="建筑事件空间分布">
         <header className={styles.mapHeader}>
           <div><span className={styles.sectionLabel}>BUILDING MAP</span><strong>事件分布</strong></div>
-          <small>只显示当前有事件的楼层与空间。</small>
+          <small>只显示当前有事件或待接入事实的楼层与空间。</small>
         </header>
         <div className={`event-floor-stack ${styles.floorStack}`}>
           {events.slice().sort((a, b) => b.floor - a.floor).map((event) => <div key={event.id} className={`${styles.floor} ${event.isDeepDemo ? styles.deepFloor : ""}`}>
@@ -61,7 +63,7 @@ export function BuildingEventCenter() {
 
         {events.map((event, eventIndex) => <article key={event.id} className={`${event.isDeepDemo ? "deep" : ""} ${styles.eventCard}`}>
           <div className={styles.eventCardMain}>
-            <div className={styles.eventTop}><span>{event.id}</span><em>{event.category}</em>{event.isDeepDemo ? <b>完整深度事件</b> : null}</div>
+            <div className={styles.eventTop}><span>{event.id}</span><em>{event.category}</em>{event.isDeepDemo ? <b>{session.result ? "完整深度事件" : "待接入深度事件"}</b> : null}</div>
             <h3>{event.title}</h3>
             <div className={styles.meta}><span><MapPin size={13} />{event.floor}层 · {event.unitId} · {event.space}</span><span><Clock3 size={13} />{event.updatedAt}</span></div>
           </div>
@@ -73,13 +75,13 @@ export function BuildingEventCenter() {
             </dl>
           </div>
           {event.isDeepDemo
-            ? <Link className={styles.deepAction} href="/case-1602">进入1602完整事件 <ArrowRight size={14} /></Link>
+            ? <Link className={styles.deepAction} href={session.result ? "/case-1602" : "/property?mode=task"}>{session.result ? "进入1602完整事件" : "进入物业接入"} <ArrowRight size={14} /></Link>
             : <p className={styles.overviewOnly}>当前提供空间、状态、责任人与下一步概览；专业处置在对应深度事件中展开。</p>}
         </article>)}
 
         <details className={styles.boundary}>
           <summary>数据与事件深度说明</summary>
-          <p>当前五个事件均为脱敏演示数据。只有1602已经实现从住户证据、Building Memory、确定性判断、人工授权、维修到复验的完整闭环；其他四个事件用于验证建筑级事件组织方式。</p>
+          <p>当前建筑态势数据均为脱敏演示数据。1602只有在住户事实进入会话后才显示为待接入事项，并在确定性评估运行后进入正式生命事件状态链；其他四个事件用于验证建筑级事件组织方式。</p>
         </details>
       </section>
     </main>
