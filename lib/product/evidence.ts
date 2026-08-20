@@ -17,7 +17,8 @@ export type EvidenceSource = "BIM_GLTF" | "WORKER" | "RESIDENT" | "PROPERTY" | "
 
 export type ProductEvidenceDataClass = "DEMO_SYNTHETIC" | "BROWSER_LOCAL" | "REAL";
 export type ResidentPhotoFinding = "UNCONFIRMED" | "MOISTURE_VISIBLE" | "NO_VISIBLE_MOISTURE" | "UNREADABLE";
-export type ResidentMeterFinding = "FLOW_CONFIRMED_NO_USE" | "NO_CHANGE" | "UNREADABLE";
+export type ResidentMeterFinding = "FLOW_CONFIRMED_NO_USE" | "NO_CHANGE" | "UNREADABLE" | "NOT_REQUESTED";
+export type StoredResidentMeterFinding = Exclude<ResidentMeterFinding, "NOT_REQUESTED">;
 
 export type ProductEvidenceRecord = {
   id: string;
@@ -50,9 +51,13 @@ export type ResidentEvidenceSubmission = {
   evidenceIds: string[];
   descriptionEvidenceId: string;
   photoEvidenceId: string;
-  meterEvidenceId: string;
+  meterEvidenceId?: string;
   photoFinding: Exclude<ResidentPhotoFinding, "UNCONFIRMED">;
-  meterFinding: ResidentMeterFinding;
+  meterFinding: StoredResidentMeterFinding;
+  meterObservationStatus?: "OBSERVED" | "NOT_REQUESTED";
+  domainAdapterStatus?: "DOMAIN_ELIGIBLE" | "PRODUCT_ONLY";
+  revisionOfSubmissionId?: string;
+  revisionReason?: string;
   immutable: true;
 };
 
@@ -122,6 +127,12 @@ function productEvidenceId(prefix: string, eventId: string, sequence: number) {
   return `${prefix}-${eventId}-${String(sequence).padStart(2, "0")}`;
 }
 
+function residentSubmissionId(eventId: string, sequence: number) {
+  return sequence === 1
+    ? `RES-SUB-${eventId}`
+    : `RES-SUB-${eventId}-R${String(sequence).padStart(2, "0")}`;
+}
+
 export function createResidentEvidenceSubmission(input: {
   draft: ResidentEvidenceDraft;
   eventId: string;
@@ -133,10 +144,12 @@ export function createResidentEvidenceSubmission(input: {
   const submissionSequence = Math.max(1, input.submissionSequence ?? 1);
   const cycleSuffix = submissionSequence === 1 ? "" : `-R${String(submissionSequence).padStart(2, "0")}`;
   const productEventKey = `${input.eventId}${cycleSuffix}`;
-  const submissionId = `RES-SUB-${productEventKey}`;
+  const submissionId = residentSubmissionId(input.eventId, submissionSequence);
   const descriptionEvidenceId = productEvidenceId("PROD-RES-TEXT", productEventKey, 1);
   const photoEvidenceId = productEvidenceId("PROD-RES-PHOTO", productEventKey, 2);
-  const meterEvidenceId = productEvidenceId("PROD-RES-METER", productEventKey, 3);
+  const meterRequested = input.draft.meterFinding !== "NOT_REQUESTED";
+  const storedMeterFinding: StoredResidentMeterFinding = meterRequested ? input.draft.meterFinding : "UNREADABLE";
+  const meterEvidenceId = meterRequested ? productEvidenceId("PROD-RES-METER", productEventKey, 3) : undefined;
   const photoDescription = [
     `人工观察=${input.draft.photo.finding}`,
     input.draft.photo.fileName ? `文件=${input.draft.photo.fileName}` : null,
@@ -157,10 +170,10 @@ export function createResidentEvidenceSubmission(input: {
       type: "RESIDENT_TEXT_OBSERVATION",
       sourceActor: "RESIDENT",
       capturedAt: input.submittedAt,
-      dataClass: input.draft.photo.dataClass,
+      dataClass: "BROWSER_LOCAL",
       status: "PRESENT",
       observedValue: input.draft.description.trim(),
-      disclosure: "住户自然语言原文 · 仅用于来源追踪，不参与诊断评分",
+      disclosure: "住户浏览器本地自然语言原文 · 仅用于来源追踪，不参与诊断评分",
       domainEvidenceRefs: [],
       immutable: true
     },
@@ -174,13 +187,15 @@ export function createResidentEvidenceSubmission(input: {
       sourceActor: "RESIDENT",
       capturedAt: input.submittedAt,
       dataClass: input.draft.photo.dataClass,
-      status: "PRESENT",
+      status: input.draft.photo.finding === "UNREADABLE" ? "UNVERIFIED" : "PRESENT",
       observedValue: photoDescription,
       disclosure,
       domainEvidenceRefs: input.domainPhotoEvidenceId ? [input.domainPhotoEvidenceId] : [],
       immutable: true
-    },
-    {
+    }
+  ];
+  if (meterRequested && meterEvidenceId) {
+    evidence.push({
       id: meterEvidenceId,
       eventId: input.eventId,
       spaceId: "SPACE-1602-BATHROOM",
@@ -189,14 +204,17 @@ export function createResidentEvidenceSubmission(input: {
       type: "RESIDENT_METER_OBSERVATION",
       sourceActor: "RESIDENT",
       capturedAt: input.submittedAt,
-      dataClass: input.draft.photo.dataClass,
-      status: input.draft.meterFinding === "UNREADABLE" ? "UNVERIFIED" : "PRESENT",
-      observedValue: input.draft.meterFinding,
-      disclosure: "住户人工水表观察",
+      dataClass: "BROWSER_LOCAL",
+      status: storedMeterFinding === "UNREADABLE" ? "UNVERIFIED" : "PRESENT",
+      observedValue: storedMeterFinding,
+      disclosure: "住户浏览器本地人工水表观察",
       domainEvidenceRefs: input.domainMeterEvidenceId ? [input.domainMeterEvidenceId] : [],
       immutable: true
-    }
-  ];
+    });
+  }
+  const revisionOfSubmissionId = submissionSequence > 1
+    ? residentSubmissionId(input.eventId, submissionSequence - 1)
+    : undefined;
   return {
     submission: {
       submissionId,
@@ -206,9 +224,15 @@ export function createResidentEvidenceSubmission(input: {
       evidenceIds: evidence.map((item) => item.id),
       descriptionEvidenceId,
       photoEvidenceId,
-      meterEvidenceId,
+      ...(meterEvidenceId ? { meterEvidenceId } : {}),
       photoFinding: input.draft.photo.finding,
-      meterFinding: input.draft.meterFinding,
+      meterFinding: storedMeterFinding,
+      meterObservationStatus: meterRequested ? "OBSERVED" : "NOT_REQUESTED",
+      domainAdapterStatus: input.draft.photo.finding === "MOISTURE_VISIBLE" ? "DOMAIN_ELIGIBLE" : "PRODUCT_ONLY",
+      ...(revisionOfSubmissionId ? {
+        revisionOfSubmissionId,
+        revisionReason: "住户在同一事件中追加新的现场事实；前一Submission保持不可变"
+      } : {}),
       immutable: true
     },
     evidence
@@ -245,10 +269,10 @@ export function createPropertyEvidenceReview(input: {
       type: "PROPERTY_EVIDENCE_REVIEW",
       sourceActor: "PROPERTY",
       capturedAt: input.reviewedAt,
-      dataClass: "DEMO_SYNTHETIC",
+      dataClass: "BROWSER_LOCAL",
       status: "PRESENT",
       observedValue: `${input.draft.decision}：${input.draft.note.trim()}`,
-      disclosure: "物业独立复核记录 · 不覆盖住户原始证据 · 默认不参与诊断评分",
+      disclosure: "物业浏览器本地独立复核记录 · 不覆盖住户原始证据 · 默认不参与诊断评分",
       domainEvidenceRefs: [],
       immutable: true
     }

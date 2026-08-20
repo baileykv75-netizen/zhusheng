@@ -30,6 +30,8 @@ test("resident journey starts from observed facts and does not force unrelated s
   assert.match(source, /useState\(""\)/);
   assert.match(source, /提交初步情况，让筑生决定还缺什么/);
   assert.match(source, /不继续要求水表观察/);
+  assert.match(source, /保存这次现场事实，不进入漏水补证/);
+  assert.match(source, /没有实际发生的补证不会被写成已观察事实/);
   assert.match(source, /不会因为处于卫生间就自动假定为漏水/);
   assert.doesNotMatch(source, /已通知物业创建后续检查任务/);
   assert.match(source, /当前 RESOLVED 不会因为一个反馈按钮被直接改写/);
@@ -182,18 +184,20 @@ test("group governance only accepts the verified package for the current RESOLVE
   assert.match(source, /示例 ≠ 当前事件/);
 });
 
-test("worker confirmation becomes the actual evidence and no longer certifies unrelated trades", async () => {
+test("worker confirmation requires the bound component plus a confirmed image identity", async () => {
   const [worker, engine] = await Promise.all([
     readFile(workerUrl, "utf8"),
     readFile(demoEngineUrl, "utf8")
   ]);
 
-  assert.match(worker, /confirmWorkerEvidence\(\{ transcript, \.\.\.fields \}\)/);
-  assert.doesNotMatch(worker, /markWorkerEvidenceReady/);
-  assert.match(worker, /不替防水或闭水试验记录背书/);
-  assert.match(engine, /confirmWorkerEvidence\(state: DemoSnapshot, draft: WorkerEvidenceDraft\)/);
-  assert.match(engine, /record\.type = process/);
-  assert.match(engine, /record\.refs = \[room, "MIC-BATH-1602", component\]/);
+  assert.match(worker, /confirmWorkerEvidence\(\{ transcript, \.\.\.fields, photo: workerPhoto \}\)/);
+  assert.match(worker, /workerDraftReady = Boolean\(transcript\.trim\(\) && fields\.process\.trim\(\) && fields\.pressure\.trim\(\) && workerPhoto\)/);
+  assert.match(worker, /扫码\/BIM已绑定/);
+  assert.match(worker, /图片字节只在本机预览/);
+  assert.match(engine, /if \(room !== WORKER_SPACE_ID \|\| component !== WORKER_COMPONENT_ID\)/);
+  assert.match(engine, /Worker evidence confirmation requires a valid local or synthetic image identity/);
+  assert.match(engine, /record\.refs = \[WORKER_SPACE_ID, WORKER_SYSTEM_ID, WORKER_COMPONENT_ID\]/);
+  assert.match(engine, /record\.attachment = structuredClone\(draft\.photo\)/);
 });
 
 test("scripted demo state cannot seed the formal lifecycle", async () => {

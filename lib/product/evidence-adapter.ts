@@ -14,12 +14,14 @@ export function residentEvidenceToDomainControls(
   if ((draft.photo.finding as string) === "UNCONFIRMED") {
     throw new Error("住户尚未确认照片观察，不能转换成领域证据");
   }
+  const meterNotRequested = draft.meterFinding === "NOT_REQUESTED";
+  const meterFinding: LabControls["meterFinding"] = meterNotRequested ? "UNREADABLE" : draft.meterFinding;
   return {
     ...base,
-    residentPhoto: "PRESENT",
+    residentPhoto: draft.photo.finding === "UNREADABLE" ? "UNVERIFIED" : "PRESENT",
     photoFinding: draft.photo.finding,
-    meterReading: draft.meterFinding === "UNREADABLE" ? "UNVERIFIED" : "PRESENT",
-    meterFinding: draft.meterFinding
+    meterReading: meterNotRequested ? "MISSING" : draft.meterFinding === "UNREADABLE" ? "UNVERIFIED" : "PRESENT",
+    meterFinding
   };
 }
 
@@ -34,6 +36,20 @@ function domainEvidenceTimeline(result: LifeEventResult, type: EvidenceItem["typ
   return result.input.evidence
     .filter((item): item is EvidenceItem => item.sourceActor === "RESIDENT" && item.type === type)
     .sort((a, b) => (a.capturedAt ?? "").localeCompare(b.capturedAt ?? "") || a.id.localeCompare(b.id));
+}
+
+/**
+ * Compatibility helper for the first resident cycle. Newer code should prefer
+ * immutable Product Evidence records plus projectProductEvidenceDomainLinks.
+ */
+export function residentDomainEvidenceRefs(result: LifeEventResult): {
+  photoEvidenceId?: string;
+  meterEvidenceId?: string;
+} {
+  return {
+    photoEvidenceId: domainEvidenceTimeline(result, "RESIDENT_WALL_PHOTO").at(-1)?.id,
+    meterEvidenceId: domainEvidenceTimeline(result, "METER_READING").at(-1)?.id
+  };
 }
 
 function productEvidenceTimeline(records: ProductEvidenceRecord[], type: LinkableProductType): ProductEvidenceRecord[] {
@@ -72,10 +88,10 @@ export function derivedDomainEvidenceRefs(record: ProductEvidenceRecord, result:
  * 3. Never bind unmatched historical rows to the latest domain evidence.
  */
 export function projectProductEvidenceDomainLinks(
-  records: ProductEvidenceRecord[],
+  records: ProductEvidenceRecord[] | undefined,
   result: LifeEventResult | null
 ): ProductEvidenceRecord[] {
-  const projected = records.map((record) => ({
+  const projected = (records ?? []).map((record) => ({
     ...record,
     relatedBusinessIds: [...record.relatedBusinessIds],
     relatedEvidenceIds: [...record.relatedEvidenceIds],

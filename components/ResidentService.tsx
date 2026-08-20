@@ -129,7 +129,7 @@ export function ResidentService() {
   }
 
   function submitEvidence() {
-    if (!followUp || photoFinding === "UNCONFIRMED" || !meterFinding || (!previewUrl && !syntheticPhoto)) return;
+    if (photoFinding === "UNCONFIRMED" || (!previewUrl && !syntheticPhoto) || (followUp && !meterFinding)) return;
     submitResidentEvidence({
       description,
       photo: syntheticPhoto
@@ -145,7 +145,7 @@ export function ResidentService() {
             size: photoMetadata?.size,
             finding: photoFinding
           },
-      meterFinding
+      meterFinding: followUp ? meterFinding! : "NOT_REQUESTED"
     });
   }
 
@@ -218,13 +218,15 @@ export function ResidentService() {
               <button type="button" className={meterFinding === "UNREADABLE" ? "active" : ""} onClick={() => setMeterFinding("UNREADABLE")}>看不清</button>
             </div>
             <details className="resident-meter-example"><summary>查看水表观察示例</summary><figure><img src={publicAssetPath("/assets/demo-evidence/1602-water-meter-observation.webp")} alt="AI生成的住宅水表脱敏合成演示照片" /><figcaption>AI生成 · 脱敏合成演示</figcaption></figure></details>
-          </article> : <article className="resident-followup-question"><div className="resident-step"><span>停止</span><div><strong>不继续要求水表观察</strong><small>当前描述和照片没有支持潮湿或水迹路径。</small></div></div><div className="resident-followup-reason"><ShieldCheck size={15} /><div><strong>为什么停在这里</strong><p>当前1602深度闭环只验证卫生间潮湿路径。对其他现象继续追问水表，会把未知问题硬塞进漏水流程。</p><small>请返回补充更准确的现场情况，或从事件中心进入其他问题的后续处理。</small></div></div></article>}
+          </article> : <article className="resident-followup-question"><div className="resident-step"><span>停止</span><div><strong>不继续要求水表观察</strong><small>当前描述和照片没有支持潮湿或水迹路径。</small></div></div><div className="resident-followup-reason"><ShieldCheck size={15} /><div><strong>为什么停在这里</strong><p>当前1602深度闭环只验证卫生间潮湿路径。对其他现象继续追问水表，会把未知问题硬塞进漏水流程。</p><small>这条现场事实仍会被保存；没有发生的水表观察不会被伪造成证据。</small></div></div></article>}
 
           <div className="resident-followup-actions">
             <button className="resident-secondary" type="button" onClick={resetFollowUp}>返回修改现场情况</button>
-            {followUp ? <button className="resident-primary" disabled={busy || !meterFinding} onClick={submitEvidence}>{busy ? "正在提交…" : result?.state === "REOPENED" ? "提交新的现场证据" : result?.state === "INCONCLUSIVE" ? "提交补充证据到同一事件" : "提交这项补充并交给物业核对"}<ArrowRight size={17} /></button> : <Link className="resident-secondary" href="/events">返回事件中心</Link>}
+            {followUp
+              ? <button className="resident-primary" disabled={busy || !meterFinding} onClick={submitEvidence}>{busy ? "正在提交…" : result?.state === "REOPENED" ? "提交新的现场证据" : result?.state === "INCONCLUSIVE" ? "提交补充证据到同一事件" : "提交这项补充并交给物业核对"}<ArrowRight size={17} /></button>
+              : <button className="resident-primary" disabled={busy} onClick={submitEvidence}>{busy ? "正在保存…" : "保存这次现场事实，不进入漏水补证"}<ArrowRight size={17} /></button>}
           </div>
-          {followUp ? <p className="resident-boundary"><ShieldCheck size={14} />提交后先形成住户原始证据，不会立刻产生故障判断；物业只能追加独立复核，不能覆盖你的原始提交。</p> : null}
+          <p className="resident-boundary"><ShieldCheck size={14} />提交后先形成住户原始证据，不会立刻产生故障判断；物业只能追加独立复核，不能覆盖你的原始提交。没有实际发生的补证不会被写成已观察事实。</p>
         </>}
 
         <details className="resident-data-details"><summary>数据与隐私说明</summary><p>本演示中的本地照片只在浏览器预览，不上传服务器；脱敏示例图会明确标注。照片结论与后续补证都由你手工确认，系统不会把“上传图片”自动当成“发现潮湿”，也不会因为处于卫生间就自动假定为漏水。提交住户证据不会自动运行诊断，也不会自动操作阀门。</p></details>
