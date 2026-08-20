@@ -27,6 +27,12 @@ type StoryStage = {
   view: VisualDirective["view"];
 };
 
+type SpaceFocusReason = {
+  status: string;
+  title: string;
+  detail: string;
+};
+
 const stageOrder: StoryStageId[] = ["past", "present", "action", "result"];
 
 function lifecycleStage(state?: LifeEventState): StoryStageId {
@@ -59,6 +65,7 @@ export function Case1602Exhibit() {
   const enteredFromBuilding = searchParams.get("entry") === "building";
   const model = useMemo(() => derivePropertyEventViewModel(session), [session]);
   const result = session.result;
+  const latestResidentSubmission = session.residentSubmissions?.at(-1) ?? null;
   const sourceDirective = result?.visualDirective ?? emptyDirective;
   const directive: VisualDirective = model.pendingResidentAssessment && result
     ? {
@@ -81,6 +88,42 @@ export function Case1602Exhibit() {
     setStoryStage(nextStage);
     setView(result?.state || model.pendingResidentAssessment ? presentView : "VIEW_CONSTRUCTION_MEMORY");
   }, [model.pendingResidentAssessment, presentView, result?.state]);
+
+  const focusReason: SpaceFocusReason = model.pendingResidentAssessment
+    ? result
+      ? {
+          status: "NEW FACTS / REASSESS",
+          title: "新的住户事实把这个空间重新带回调查焦点",
+          detail: `${result.eventId} 的历史与上一轮处置仍然保留；当前只说明存在新的可评估现场事实，本轮系统观测还需要物业重新确认。`
+        }
+      : {
+          status: "INTAKE / NOT YET EVENT",
+          title: "住户现场事实已经把1602卫生间带入受理流程",
+          detail: "当前尚未形成正式事件。这个空间被定位，是因为这里存在待物业确认的领域可用住户事实，而不是因为系统已经证明了故障。"
+        }
+    : result
+      ? result.state === "RESOLVED"
+        ? {
+            status: "VERIFIED EVENT / RESOLVED",
+            title: "这个空间保留着一次已经验证闭环的建筑生命事件",
+            detail: `${result.eventId} 已完成确定性复验。继续定位到这里，是为了查看同一空间中的建造记忆、事件证据、人工动作和最终结果如何保持连续。`
+          }
+        : {
+            status: `LIFE EVENT / ${result.state}`,
+            title: "当前正式事件正在这个空间的生命线上推进",
+            detail: `${result.eventId} 当前处于“${model.projection.stateLabel}”。空间定位来自实际事件上下文，后续判断和动作仍由受控流程决定。`
+          }
+      : latestResidentSubmission?.domainAdapterStatus === "PRODUCT_ONLY"
+        ? {
+            status: "PRODUCT EVIDENCE / NOT EVENT",
+            title: "这里有住户事实，但它没有被冒充成漏水事件",
+            detail: "最近一条住户提交只属于 Product Evidence，不进入漏水领域评估。1602卫生间仍作为当前深度案例空间展示，但当前会话没有因此形成正式事件。"
+          }
+        : {
+            status: "FEATURED CASE / NOT LIVE",
+            title: "这是当前产品的深度案例空间，不代表此刻已经发生故障",
+            detail: "筑生用1602卫生间串起建造记忆、住户协作、物业判断与事件闭环。只有当前会话产生真实事实并满足规则时，案例空间才会成为正式事件空间。"
+          };
 
   const stages = useMemo<Record<StoryStageId, StoryStage>>(() => {
     const observationText = model.observations.length
@@ -156,16 +199,38 @@ export function Case1602Exhibit() {
   }
 
   return <div className="case-exhibit">
-    {enteredFromBuilding ? <nav className={styles.spatialHandoff} aria-label="从建筑进入1602卫生间的空间路径">
-      <span>FROM BUILDING / 空间下钻完成</span>
-      <div>
-        <strong>{product.buildingLabel}</strong><ArrowRight size={13} aria-hidden="true" /><strong>16F</strong><ArrowRight size={13} aria-hidden="true" /><strong>1602</strong><ArrowRight size={13} aria-hidden="true" /><strong>卫生间</strong>
+    <nav className={styles.spatialHandoff} aria-label="从建筑进入1602卫生间的空间路径">
+      <div className={styles.spatialIdentity}>
+        <span>{enteredFromBuilding ? "FROM BUILDING / 空间下钻完成" : "CURRENT SPACE / 当前空间身份"}</span>
+        <strong>{product.spaceLabel ?? "1602卫生间"}</strong>
+        <small>{product.spaceId ?? "SPACE-1602-BATHROOM"}</small>
       </div>
-      <Link href="/">返回整栋建筑</Link>
-    </nav> : null}
+      <div className={styles.spatialTrail} aria-label="当前建筑空间层级">
+        <span>{product.buildingLabel}</span><ArrowRight size={13} aria-hidden="true" /><span>{product.floorId ?? "16F"}</span><ArrowRight size={13} aria-hidden="true" /><span>{product.unitId ?? "1602"}</span><ArrowRight size={13} aria-hidden="true" /><strong>卫生间</strong>
+      </div>
+      <div className={styles.spatialReverse} role="group" aria-label="返回上级空间">
+        <Link href="/?drill=unit">查看1602整户</Link>
+        <Link href="/?drill=floor">查看16F</Link>
+        <Link href="/?drill=building">返回整栋建筑</Link>
+      </div>
+    </nav>
+
+    <section className={styles.focusReason} aria-label="为什么定位到1602卫生间">
+      <div className={styles.focusCopy}>
+        <span>{focusReason.status}</span>
+        <h2>{focusReason.title}</h2>
+        <p>{focusReason.detail}</p>
+      </div>
+      <dl className={styles.focusFacts}>
+        <div><dt>空间主键</dt><dd>{product.spaceId ?? "SPACE-1602-BATHROOM"}</dd></div>
+        <div><dt>当前事件</dt><dd>{result?.eventId ?? "未形成正式事件"}</dd></div>
+        <div><dt>相关建筑记忆</dt><dd>{model.relevantMemories.length} 条</dd></div>
+        <div><dt>当前流程状态</dt><dd>{model.projection.stateLabel}</dd></div>
+      </dl>
+    </section>
 
     <section className="case-intro">
-      <div><p className="concept-kicker">筑生 / 1602建筑生命事件</p><h1 className="display-headline"><span className="display-headline-line">一件潮湿异常</span><span className="display-headline-line">唤醒一栋房子的记忆</span></h1><p>从建造时留下的现场经历，到入住后的异常、判断、人工动作与最终验证，一件事始终沿着同一栋房子的生命线向前推进。</p></div>
+      <div><p className="concept-kicker">筑生 / 当前空间生命页</p><h1 className="display-headline"><span className="display-headline-line">1602卫生间</span><span className="display-headline-line">从建造记忆走到今天</span></h1><p>这里不是一个脱离建筑的事件页面。空间身份、建造经历、住户事实、物业判断、人工动作与最终验证，都沿着同一个卫生间的生命线继续向前。</p></div>
       <aside><span>当前真实阶段</span><strong>{stages[currentLifecycleStage].label}</strong><p>{model.pendingResidentAssessment
         ? result ? `事件：${result.eventId} · 新住户事实待本轮评估` : "INTAKE-1602 · 住户现场事实已受理，正式事件尚未形成"
         : result ? `事件：${result.eventId} · ${model.projection.stateLabel}` : "尚未开启1602事件；先查看它在建造期留下了什么"}</p><Link href={actionHref(model.projection.nextAction.destination)}>继续当前任务 <ArrowRight size={15} /></Link></aside>

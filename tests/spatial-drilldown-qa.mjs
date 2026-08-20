@@ -78,6 +78,25 @@ async function openFreshHome(page) {
   await assertPhase(page, "building", "华章新筑 · 2号楼");
 }
 
+async function assertCaseSpatialIdentity(page) {
+  const handoff = page.getByRole("navigation", { name: "从建筑进入1602卫生间的空间路径" });
+  await handoff.waitFor();
+  const handoffText = await handoff.innerText();
+  for (const expected of ["华章新筑 · 2号楼", "16F", "1602", "卫生间", "SPACE-1602-BATHROOM", "查看1602整户", "查看16F", "返回整栋建筑"]) {
+    assert.ok(handoffText.includes(expected), `Case spatial identity is missing ${expected}`);
+  }
+  assert.equal(await handoff.getByRole("link", { name: "查看1602整户", exact: true }).getAttribute("href"), "/?drill=unit");
+  assert.equal(await handoff.getByRole("link", { name: "查看16F", exact: true }).getAttribute("href"), "/?drill=floor");
+  assert.equal(await handoff.getByRole("link", { name: "返回整栋建筑", exact: true }).getAttribute("href"), "/?drill=building");
+
+  const reason = page.getByRole("region", { name: "为什么定位到1602卫生间" });
+  await reason.waitFor();
+  const reasonText = await reason.innerText();
+  assert.ok(reasonText.includes("FEATURED CASE / NOT LIVE"), "fresh Case must explain that the featured space is not a live event");
+  assert.ok(reasonText.includes("不代表此刻已经发生故障"), "fresh Case must not turn featured spatial context into a current fault claim");
+  assert.ok(reasonText.includes("未形成正式事件"), "fresh Case must expose actual event absence");
+}
+
 const launchOptions = {
   headless: true,
   // CI runners may not expose a hardware GPU. Software WebGL is acceptable for
@@ -129,15 +148,22 @@ try {
 
   await primary.click();
   await page.waitForURL((url) => isCaseUrl(url), { timeout: 20_000 });
-  const handoff = page.getByRole("navigation", { name: "从建筑进入1602卫生间的空间路径" });
-  await handoff.waitFor();
-  const handoffText = await handoff.innerText();
-  for (const expected of ["华章新筑 · 2号楼", "16F", "1602", "卫生间", "返回整栋建筑"]) {
-    assert.ok(handoffText.includes(expected), `Case handoff is missing ${expected}`);
-  }
-  assert.equal(await handoff.getByRole("link", { name: "返回整栋建筑", exact: true }).getAttribute("href"), "/");
-  await assertNoHorizontalOverflow(page, "desktop Case handoff");
-  await page.screenshot({ path: path.join(output, "05-case-handoff.png"), fullPage: true });
+  await assertCaseSpatialIdentity(page);
+  await assertNoHorizontalOverflow(page, "desktop Case spatial life page");
+  await page.screenshot({ path: path.join(output, "05-case-spatial-life-page.png"), fullPage: true });
+
+  await page.getByRole("link", { name: "查看1602整户", exact: true }).click();
+  await waitForRealHero(page);
+  await assertPhase(page, "unit", "1602");
+  await assertNoHorizontalOverflow(page, "desktop reverse to unit");
+
+  await page.goto(`${baseUrl}/case-1602?entry=building`, { waitUntil: "networkidle" });
+  await assertCaseSpatialIdentity(page);
+  await page.getByRole("link", { name: "查看16F", exact: true }).click();
+  await waitForRealHero(page);
+  await assertPhase(page, "floor", "16F");
+  await assertNoHorizontalOverflow(page, "desktop reverse to floor");
+
   assert.deepEqual(desktopErrors, [], `desktop spatial runtime errors: ${desktopErrors.join(" | ")}`);
   await desktop.close();
 
@@ -158,13 +184,13 @@ try {
 
   await mobilePrimary.click();
   await mobilePage.waitForURL((url) => isCaseUrl(url), { timeout: 20_000 });
-  await mobilePage.getByRole("navigation", { name: "从建筑进入1602卫生间的空间路径" }).waitFor();
-  await assertNoHorizontalOverflow(mobilePage, "mobile Case handoff 390");
-  await mobilePage.screenshot({ path: path.join(output, "07-mobile-case-handoff-390.png"), fullPage: true });
+  await assertCaseSpatialIdentity(mobilePage);
+  await assertNoHorizontalOverflow(mobilePage, "mobile Case spatial life page 390");
+  await mobilePage.screenshot({ path: path.join(output, "07-mobile-case-spatial-life-page-390.png"), fullPage: true });
   assert.deepEqual(mobileErrors, [], `mobile spatial runtime errors: ${mobileErrors.join(" | ")}`);
   await mobile.close();
 
-  console.log("Spatial drilldown QA passed: published hero GLB, explicit four-step navigation, back/breadcrumb control, no autoplay, trailing-slash-safe Case handoff and 390px continuity.");
+  console.log("Spatial drilldown QA passed: published hero GLB, explicit four-step navigation, truthful Case spatial identity, reverse hierarchy restoration, no autoplay, trailing-slash-safe routing and 390px continuity.");
 } finally {
   await browser.close();
 }

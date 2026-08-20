@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowLeft, ArrowRight, CornerDownRight } from "lucide-react";
 import { BuildingHeroTwin, type HeroDrillPhase } from "@/components/v6/BuildingHeroTwin";
@@ -38,6 +38,12 @@ const phaseCopy: Record<HeroDrillPhase, { index: string; label: string; action: 
   }
 };
 
+function drillPhaseFromLocation(): HeroDrillPhase | null {
+  if (typeof window === "undefined") return null;
+  const requested = new URLSearchParams(window.location.search).get("drill");
+  return phaseOrder.includes(requested as HeroDrillPhase) ? requested as HeroDrillPhase : null;
+}
+
 export function ConceptExhibit() {
   const router = useRouter();
   const { session } = useLifecycleJourney();
@@ -45,6 +51,11 @@ export function ConceptExhibit() {
   const currentIndex = phaseOrder.indexOf(phase);
   const pendingResidentAssessment = residentEvidenceNeedsAssessment(session.result, session.residentSubmissions);
   const result = session.result;
+
+  useEffect(() => {
+    const requested = drillPhaseFromLocation();
+    if (requested) setPhase(requested);
+  }, []);
 
   const anchorStatus = pendingResidentAssessment
     ? result
