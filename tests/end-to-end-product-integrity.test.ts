@@ -170,12 +170,15 @@ test("homepage presents 1602 as a featured case instead of pretending an event i
   assert.doesNotMatch(source, /住户发现持续潮湿，建筑智能体正在重新调用/);
 });
 
-test("group governance cannot borrow a pre-resolved example as the current event result", async () => {
+test("group governance only accepts the verified package for the current RESOLVED event", async () => {
   const source = await readFile(groupUrl, "utf8");
 
-  assert.match(source, /currentResolved = currentPackage\?\.finalState === "RESOLVED"/);
+  assert.match(source, /session\.result\?\.state === "RESOLVED"/);
+  assert.match(source, /currentPackage\?\.eventId === session\.result\.eventId/);
+  assert.match(source, /currentPackage\.finalState === "RESOLVED"/);
+  assert.match(source, /currentEventId = session\.result\?\.eventId \?\? "尚未形成事件"/);
   assert.match(source, /当前事件还没有资格进入经验治理/);
-  assert.match(source, /这里不会用预制结果替代真实闭环/);
+  assert.match(source, /这里不会用预制结果或旧成果包替代真实闭环/);
   assert.match(source, /示例 ≠ 当前事件/);
 });
 
