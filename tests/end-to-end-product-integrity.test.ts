@@ -212,7 +212,8 @@ test("scripted demo state cannot seed the formal lifecycle", async () => {
 test("route membership and active event truth are separate product concepts", async () => {
   const source = await readFile(productContextUrl, "utf8");
 
-  assert.match(source, /session\.result\?\.eventId/);
-  assert.match(source, /route\.currentPath === "\/case-1602" \? route\.canonicalEventId : null/);
-  assert.doesNotMatch(source, /session\.result\?\.eventId \?\? route\.canonicalEventId;/);
+  assert.match(source, /const eventId = session\.result\?\.eventId \?\? null;/);
+  assert.match(source, /canonicalEventId/);
+  assert.doesNotMatch(source, /route\.currentPath === "\/case-1602" \? route\.canonicalEventId : null/);
+  assert.doesNotMatch(source, /session\.result\?\.eventId \?\? route\.canonicalEventId/);
 });
