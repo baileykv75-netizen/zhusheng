@@ -1,6 +1,6 @@
 import type { EvidenceItem, LifeEventResult } from "../life-event-engine/types.ts";
 import type { LabControls } from "../life-event-lab/types.ts";
-import type { ResidentEvidenceDraft } from "./evidence.ts";
+import type { ProductEvidenceRecord, ResidentEvidenceDraft } from "./evidence.ts";
 
 /**
  * Product evidence is richer than the deterministic diagnosis input. This
@@ -39,4 +39,27 @@ export function residentDomainEvidenceRefs(result: LifeEventResult): {
     photoEvidenceId: latestResidentEvidence(active, "RESIDENT_WALL_PHOTO")?.id,
     meterEvidenceId: latestResidentEvidence(active, "METER_READING")?.id
   };
+}
+
+/**
+ * The raw product record remains immutable. Once the deterministic event is
+ * evaluated we derive its domain references for display/export rather than
+ * editing the original resident submission after the fact.
+ */
+export function derivedDomainEvidenceRefs(record: ProductEvidenceRecord, result: LifeEventResult | null): string[] {
+  if (record.domainEvidenceRefs.length) return [...record.domainEvidenceRefs];
+  if (!result || record.sourceActor !== "RESIDENT") return [];
+  const refs = residentDomainEvidenceRefs(result);
+  if (record.type === "RESIDENT_PHOTO_OBSERVATION") return refs.photoEvidenceId ? [refs.photoEvidenceId] : [];
+  if (record.type === "RESIDENT_METER_OBSERVATION") return refs.meterEvidenceId ? [refs.meterEvidenceId] : [];
+  return [];
+}
+
+export function projectProductEvidenceDomainLinks(records: ProductEvidenceRecord[], result: LifeEventResult | null): ProductEvidenceRecord[] {
+  return records.map((record) => ({
+    ...record,
+    relatedBusinessIds: [...record.relatedBusinessIds],
+    relatedEvidenceIds: [...record.relatedEvidenceIds],
+    domainEvidenceRefs: derivedDomainEvidenceRefs(record, result)
+  }));
 }
