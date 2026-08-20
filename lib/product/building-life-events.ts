@@ -42,70 +42,72 @@ const displayState: Record<LifeEventState, Pick<BuildingLifeEventSummary, "displ
 
 const BUILDING_MEMORY_EVIDENCE = new Set(["PIPE_INSTALLATION_RECORD", "WATERPROOFING_RECORD", "CLOSED_WATER_TEST"]);
 
-const overviewEvents: BuildingLifeEventSummary[] = [
+// These records are intentionally product-structure examples, not current building events.
+// They must never participate in active counts, ownership metrics or task queues.
+export const buildingLifeEventExamples: BuildingLifeEventSummary[] = [
   {
-    id: "EVT-1203",
-    title: "1203窗边渗水",
+    id: "EXAMPLE-1203",
+    title: "窗边渗水事件结构示例",
     floor: 12,
     unitId: "1203",
     space: "次卧窗边",
     category: "外围护",
     severity: "一般",
-    displayStatus: "等待补充现场信息",
+    displayStatus: "示例：等待补充现场信息",
     ownerRole: "住户",
-    nextAction: "补拍雨后窗边照片",
-    updatedAt: "18分钟前",
+    nextAction: "示例：补充雨后窗边照片",
+    updatedAt: "示例时间",
     evidenceCount: 1,
     memoryReferenceCount: 2,
     isDeepDemo: false,
     dataClass: "DEMO_SYNTHETIC"
   },
   {
-    id: "EVT-1801",
-    title: "1801水压异常",
+    id: "EXAMPLE-1801",
+    title: "水压异常事件结构示例",
     floor: 18,
     unitId: "1801",
     space: "厨房用水点",
     category: "给排水",
     severity: "关注",
-    displayStatus: "等待人工授权",
+    displayStatus: "示例：等待人工授权",
     ownerRole: "住户",
-    nextAction: "确认是否允许短时测试",
-    updatedAt: "34分钟前",
+    nextAction: "示例：确认是否允许短时测试",
+    updatedAt: "示例时间",
     evidenceCount: 2,
     memoryReferenceCount: 1,
     isDeepDemo: false,
     dataClass: "DEMO_SYNTHETIC"
   },
   {
-    id: "EVT-903",
-    title: "903空调冷凝异常",
+    id: "EXAMPLE-903",
+    title: "空调冷凝事件结构示例",
     floor: 9,
     unitId: "903",
     space: "客厅空调位",
     category: "暖通",
     severity: "关注",
-    displayStatus: "已解决",
+    displayStatus: "示例：已解决",
     ownerRole: "物业维修",
-    nextAction: "无待办",
-    updatedAt: "昨天",
+    nextAction: "示例：无待办",
+    updatedAt: "示例时间",
     evidenceCount: 4,
     memoryReferenceCount: 2,
     isDeepDemo: false,
     dataClass: "DEMO_SYNTHETIC"
   },
   {
-    id: "EVT-702",
-    title: "702卫生间地漏异味",
+    id: "EXAMPLE-702",
+    title: "地漏异味事件结构示例",
     floor: 7,
     unitId: "702",
     space: "公卫地漏",
     category: "给排水",
     severity: "一般",
-    displayStatus: "处理中",
+    displayStatus: "示例：处理中",
     ownerRole: "物业维修",
-    nextAction: "检查水封与通气条件",
-    updatedAt: "2小时前",
+    nextAction: "示例：检查水封与通气条件",
+    updatedAt: "示例时间",
     evidenceCount: 2,
     memoryReferenceCount: 1,
     isDeepDemo: false,
@@ -158,5 +160,5 @@ export function buildingLifeEvents(
         }
       : null;
 
-  return deepEvent ? [deepEvent, ...overviewEvents] : [...overviewEvents];
+  return deepEvent ? [deepEvent] : [];
 }
