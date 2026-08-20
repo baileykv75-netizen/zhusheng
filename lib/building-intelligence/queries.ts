@@ -172,7 +172,22 @@ function history(tool: BuildingQueryToolName, recordType: BuildingRecord["record
 export const getConstructionHistory = (id: string, dataset = building1602Dataset) => history("get_construction_history", "CONSTRUCTION", id, dataset);
 export const getInspectionHistory = (id: string, dataset = building1602Dataset) => history("get_inspection_history", "INSPECTION", id, dataset);
 export const getMaintenanceHistory = (id: string, dataset = building1602Dataset) => history("get_maintenance_history", "MAINTENANCE", id, dataset);
-export const getCurrentObservations = (id: string, dataset = building1602Dataset) => history("get_current_observations", "OBSERVATION", id, dataset);
+
+export function getCurrentObservations(id: string, dataset = building1602Dataset) {
+  const entity = entityById(id, dataset);
+  if (!entity) return result("get_current_observations", "NOT_FOUND", null, [], []);
+  const historical = dataset.records.filter((record) => record.recordType === "OBSERVATION" && record.subjectBusinessIds.includes(id));
+  const sourceIds = searchedRangeSourceIds(historical, entity.provenance.sourceId);
+  const boundary: BuildingFact = {
+    factId: `NO_LIVE_OBSERVATION:${id}`,
+    subjectBusinessId: id,
+    predicate: "NO_LIVE_OBSERVATION_SOURCE",
+    value: `当前筑生演示没有连接可用于回答实时状态的传感器或BMS数据源；静态Building Memory中存在${historical.length}条历史OBSERVATION记录，但这些历史记录不能作为当前读数或当前运行状态`,
+    sourceIds,
+    provenance: sourceClasses(sourceIds, dataset)
+  };
+  return result("get_current_observations", "NOT_RECORDED", { historicalObservationCount: historical.length, liveObservationConnected: false }, [boundary], [id]);
+}
 
 export const buildingQueryTools = {
   find_space: ({ query }: { query: string }) => findSpace(query),
