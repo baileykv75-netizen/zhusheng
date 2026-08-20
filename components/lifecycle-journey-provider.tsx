@@ -256,10 +256,6 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
   }, [assetError, engine, session.controls, session.eventCounter, session.residentSubmissions, session.result]);
 
   const submitResidentEvidence = useCallback((draft: ResidentEvidenceDraft) => {
-    if (!engine) {
-      setSession((current) => ({ ...current, notice: assetError ?? "正在验证建筑记忆和数字样间资产" }));
-      return;
-    }
     const reopeningCycle = session.result?.state === "REOPENED";
     const nowMs = Date.now();
     const controls = residentEvidenceToDomainControls(session.controls, draft);
@@ -305,7 +301,7 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
     } finally {
       setBusy(false);
     }
-  }, [assetError, engine, session.controls, session.eventCounter, session.residentSubmissions, session.result]);
+  }, [session.controls, session.eventCounter, session.residentSubmissions, session.result]);
 
   const submitPropertyReview = useCallback((draft: PropertyReviewDraft) => {
     setSession((current) => {
