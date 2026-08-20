@@ -47,18 +47,27 @@ export function resumeReopenedAssessment(
   engine: LifeEventEngine,
   previous: LifeEventResult,
   controls: LabControls,
+  residentCapturedAt: string,
   nowMs = Date.now()
 ): LifeEventResult {
   if (previous.state !== "REOPENED") throw new Error("只有 REOPENED 事件才能追加重新检查证据");
   const reopenedAt = latestReopenedAt(previous);
   if (!reopenedAt) throw new Error("REOPENED 事件缺少重新打开审计记录");
+
   const reopenedMs = Date.parse(reopenedAt);
   const previousEvaluatedMs = Date.parse(previous.input.evaluatedAt);
-  const observedMs = Math.max(reopenedMs + 1, previousEvaluatedMs + 1, nowMs - 1_000);
+  const capturedMs = Date.parse(residentCapturedAt);
+  if (!Number.isFinite(capturedMs)) throw new Error("住户重新检查证据时间无效");
+  if (capturedMs <= reopenedMs) throw new Error("需要提交晚于事件重新打开时间的新住户证据");
+  if (capturedMs <= previousEvaluatedMs) throw new Error("住户重新检查证据必须晚于上一轮事件评估");
+  if (capturedMs > nowMs) throw new Error("住户重新检查证据不能使用未来时间");
+
+  const observedMs = Math.max(reopenedMs + 1, previousEvaluatedMs + 1, capturedMs + 1, nowMs - 1_000);
   const evaluatedMs = Math.max(previousEvaluatedMs + 1, observedMs + 1);
-  if (evaluatedMs > nowMs) throw new Error("请在事件重新打开后等待新的现场观察再提交");
+  if (evaluatedMs > nowMs) throw new Error("请在住户新证据写入后等待新的系统观测再提交");
 
   const suffix = String(previous.auditLog.length + 1).padStart(3, "0");
+  const capturedAt = new Date(capturedMs).toISOString();
   const observedAt = new Date(observedMs).toISOString();
   const evaluatedAt = new Date(evaluatedMs).toISOString();
   const previousPhoto = latestActiveEvidence(previous, "RESIDENT_WALL_PHOTO");
@@ -96,7 +105,7 @@ export function resumeReopenedAssessment(
       observedValue: controls.photoFinding,
       sourceActor: "RESIDENT",
       relatedBusinessIds: ["WALL-1602-BATHROOM-NORTH", SPACE_ID],
-      capturedAt: observedAt,
+      capturedAt,
       ...(previousPhoto ? {
         supersedesId: previousPhoto.id,
         revisionReason: "事件维修后复验失败并重新打开，住户提交了新的墙面现场观察"
@@ -108,7 +117,7 @@ export function resumeReopenedAssessment(
       observedValue: controls.meterFinding,
       sourceActor: "RESIDENT",
       relatedBusinessIds: ["METER-1602-FLOW-01"],
-      capturedAt: observedAt,
+      capturedAt,
       ...(previousMeter ? {
         supersedesId: previousMeter.id,
         revisionReason: "事件维修后复验失败并重新打开，住户提交了新的水表现场观察"
