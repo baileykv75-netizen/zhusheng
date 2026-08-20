@@ -7,7 +7,12 @@ import { publicAssetPath } from "@/lib/site-path";
 
 export type HeroDrillPhase = "building" | "floor" | "unit" | "space";
 
-type Props = { phase: HeroDrillPhase; onEnter(): void };
+type Props = {
+  phase: HeroDrillPhase;
+  onEnter(): void;
+  statusLabel: string;
+  anchorAriaLabel: string;
+};
 type AnchorManifest = {
   anchors: Record<HeroDrillPhase, { node: string; targetNode: string }>;
   eventAnchorNode: string;
@@ -132,10 +137,10 @@ function applyPhase(runtime: Runtime, phase: HeroDrillPhase) {
   const unit = runtime.scene.getObjectByName(runtime.manifest.focusNodes.unit);
   const space = runtime.scene.getObjectByName(runtime.manifest.focusNodes.space);
   if (unit) unit.visible = phase === "unit" || phase === "space";
-  if (space) space.visible = phase === "space";
+  if (space && space !== unit) space.visible = phase === "space";
 }
 
-export function BuildingHeroTwin({ phase, onEnter }: Props) {
+export function BuildingHeroTwin({ phase, onEnter, statusLabel, anchorAriaLabel }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const eventRef = useRef<HTMLButtonElement>(null);
   const runtimeRef = useRef<Runtime | null>(null);
@@ -260,11 +265,11 @@ export function BuildingHeroTwin({ phase, onEnter }: Props) {
   }, []);
 
   return <div className={`v6-building-twin phase-${phase}`} data-visual-source={source}>
-    <div ref={hostRef} className="v6-building-canvas" role="img" aria-label="华章新筑2号楼18层建筑数字孪生，16层1602存在一项建筑生命事件" />
+    <div ref={hostRef} className="v6-building-canvas" role="img" aria-label="华章新筑2号楼18层建筑数字孪生，空间锚点可沿16层、1602与卫生间逐级下钻" />
     {source === "loading" ? <div className="v6-building-loading">正在核对建筑几何与空间锚点</div> : null}
     {source === "procedural-fallback" ? <div className="v6-building-source-note">建筑资产已降级为程序化几何</div> : null}
-    <button ref={eventRef} type="button" className="v6-event-anchor" onClick={onEnter} aria-label="进入16层1602卫生间建筑生命事件">
-      <i /><span><strong>16F / 1602</strong><small>LIFE EVENT ACTIVE</small></span>
+    <button ref={eventRef} type="button" className="v6-event-anchor" onClick={onEnter} aria-label={anchorAriaLabel}>
+      <i /><span><strong>16F / 1602</strong><small>{statusLabel}</small></span>
     </button>
   </div>;
 }

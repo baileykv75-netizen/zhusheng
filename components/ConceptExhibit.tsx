@@ -1,35 +1,90 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowRight, CornerDownRight } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, CornerDownRight } from "lucide-react";
 import { BuildingHeroTwin, type HeroDrillPhase } from "@/components/v6/BuildingHeroTwin";
+import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
+import { residentEvidenceNeedsAssessment } from "@/lib/product/resident-assessment";
+import styles from "./ConceptExhibit.module.css";
 
-const phaseCopy: Record<HeroDrillPhase, { index: string; label: string }> = {
-  building: { index: "01", label: "华章新筑 · 2号楼" },
-  floor: { index: "02", label: "16F" },
-  unit: { index: "03", label: "1602" },
-  space: { index: "04", label: "卫生间" }
+const phaseOrder: HeroDrillPhase[] = ["building", "floor", "unit", "space"];
+
+const phaseCopy: Record<HeroDrillPhase, { index: string; label: string; action: string; detail: string }> = {
+  building: {
+    index: "01",
+    label: "华章新筑 · 2号楼",
+    action: "进入16层",
+    detail: "从整栋建筑开始。先定位1602所在楼层，再进入户与具体空间。"
+  },
+  floor: {
+    index: "02",
+    label: "16F",
+    action: "进入1602",
+    detail: "已定位到16层。其余楼层暂时退到背景，只保留当前楼层的空间关系。"
+  },
+  unit: {
+    index: "03",
+    label: "1602",
+    action: "进入卫生间",
+    detail: "已进入1602户。下一步进入卫生间，查看这个空间留下的建造记忆与居住事件。"
+  },
+  space: {
+    index: "04",
+    label: "卫生间",
+    action: "打开这个空间的一生",
+    detail: "已到达1602卫生间。这里是建造记忆、住户事实、物业处置与最终验证汇合的空间。"
+  }
 };
 
 export function ConceptExhibit() {
   const router = useRouter();
+  const { session } = useLifecycleJourney();
   const [phase, setPhase] = useState<HeroDrillPhase>("building");
-  const timers = useRef<number[]>([]);
+  const currentIndex = phaseOrder.indexOf(phase);
+  const latestSubmission = session.residentSubmissions?.at(-1);
+  const productOnlySubmission = latestSubmission?.domainAdapterStatus === "PRODUCT_ONLY";
+  const pendingResidentAssessment = !productOnlySubmission && residentEvidenceNeedsAssessment(session.result, session.residentSubmissions);
+  const result = session.result;
 
-  useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), []);
+  const anchorStatus = pendingResidentAssessment
+    ? result
+      ? "NEW FACTS / REASSESS"
+      : "INTAKE / NOT YET EVENT"
+    : result
+      ? result.state === "RESOLVED"
+        ? "VERIFIED EVENT / RESOLVED"
+        : `LIFE EVENT / ${result.state}`
+      : "FEATURED CASE / NOT LIVE";
 
-  function enterBuilding() {
-    if (phase !== "building") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      router.push("/case-1602");
+  const anchorAriaLabel = pendingResidentAssessment
+    ? result
+      ? `进入16层1602卫生间，当前事件 ${result.eventId} 有新的住户事实等待重新评估`
+      : "进入16层1602卫生间，当前只有住户现场事实，正式事件尚未形成"
+    : result
+      ? result.state === "RESOLVED"
+        ? `进入16层1602卫生间，事件 ${result.eventId} 已完成验证闭环`
+        : `进入16层1602卫生间，事件 ${result.eventId} 当前状态 ${result.state}`
+      : productOnlySubmission
+        ? "进入16层1602卫生间脱敏案例，最近一次住户事实仅保存在产品证据层，不进入当前漏水评估"
+        : "进入16层1602卫生间脱敏案例，当前会话尚未形成正式事件";
+
+  function advanceSpatialDrill() {
+    if (currentIndex >= phaseOrder.length - 1) {
+      router.push("/case-1602?entry=building");
       return;
     }
-    setPhase("floor");
-    timers.current.push(window.setTimeout(() => setPhase("unit"), 760));
-    timers.current.push(window.setTimeout(() => setPhase("space"), 1520));
-    timers.current.push(window.setTimeout(() => router.push("/case-1602"), 2450));
+    setPhase(phaseOrder[currentIndex + 1]);
+  }
+
+  function retreatSpatialDrill() {
+    if (currentIndex <= 0) return;
+    setPhase(phaseOrder[currentIndex - 1]);
+  }
+
+  function selectPhase(nextPhase: HeroDrillPhase) {
+    setPhase(nextPhase);
   }
 
   return <div className="v6-home">
@@ -38,27 +93,42 @@ export function ConceptExhibit() {
         <p className="v6-eyebrow">LIVING BUILDING OS / 筑生</p>
         <h1>一栋房子一生的<br /><em>AI 智能体</em></h1>
         <p className="v6-hero-lead">它记得自己如何被建造，<br />也理解入住之后发生的每一件事。</p>
-        <button type="button" className="v6-enter-building" onClick={enterBuilding} disabled={phase !== "building"}>
-          {phase === "building" ? "进入建筑" : "正在进入1602"}<ArrowRight size={18} />
-        </button>
+        <div className={styles.drillActions}>
+          {phase !== "building" ? <button type="button" className={styles.drillBack} onClick={retreatSpatialDrill}><ArrowLeft size={16} />返回上一级</button> : null}
+          <button type="button" className="v6-enter-building" onClick={advanceSpatialDrill}>
+            {phaseCopy[phase].action}<ArrowRight size={18} />
+          </button>
+        </div>
+        <div className={styles.drillContext} aria-live="polite">
+          <span>{phaseCopy[phase].index} / 04 · 当前空间层级</span>
+          <strong>{phaseCopy[phase].label}</strong>
+          <p>{phaseCopy[phase].detail}</p>
+        </div>
       </div>
 
       <div className="v6-hero-visual">
-        <BuildingHeroTwin phase={phase} onEnter={enterBuilding} />
-        <div className="v6-drill-breadcrumb" aria-live="polite">
-          {(Object.keys(phaseCopy) as HeroDrillPhase[]).map((item, index) => {
-            const phases = Object.keys(phaseCopy) as HeroDrillPhase[];
-            const currentIndex = phases.indexOf(phase);
-            return <span key={item} className={index <= currentIndex ? "active" : ""}>{phaseCopy[item].label}</span>;
-          })}
+        <BuildingHeroTwin phase={phase} onEnter={advanceSpatialDrill} statusLabel={anchorStatus} anchorAriaLabel={anchorAriaLabel} />
+        <div className="v6-drill-breadcrumb" aria-label="建筑空间路径">
+          {phaseOrder.map((item, index) => (
+            <span key={item} className={index <= currentIndex ? "active" : ""}>
+              <button
+                type="button"
+                className={styles.drillCrumb}
+                aria-current={phase === item ? "location" : undefined}
+                onClick={() => selectPhase(item)}
+              >
+                {phaseCopy[item].label}
+              </button>
+            </span>
+          ))}
         </div>
       </div>
 
       <aside className="v6-building-pulse">
-        <span>FEATURED LIFE EVENT / 1602案例</span>
+        <span>{anchorStatus}</span>
         <strong>16层 · 1602卫生间</strong>
-        <p>这个脱敏案例从住户现场潮湿观察开始，随后回看同一空间的建造记忆；是否形成事件与最终判断仍由当前会话事实决定。</p>
-        <button type="button" onClick={enterBuilding}>查看这件事如何推进 <CornerDownRight size={15} /></button>
+        <p>这个脱敏案例从住户现场观察开始，随后回看同一空间的建造记忆；是否形成事件与最终判断仍由当前会话事实决定。</p>
+        <button type="button" onClick={advanceSpatialDrill}>{phase === "space" ? "打开这个空间的生命线" : phaseCopy[phase].action} <CornerDownRight size={15} /></button>
       </aside>
 
       <div className="v6-hero-meta"><span>126 SPACES</span><span>750 OBJECTS</span><span><i />MEMORY ONLINE</span></div>

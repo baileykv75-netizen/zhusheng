@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ArrowRight, CheckCircle2, ChevronDown, CircleDot, ExternalLink, LockKeyhole, Wrench } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
@@ -52,8 +53,10 @@ function hasCompletedActionHistory(result: ReturnType<typeof derivePropertyEvent
 }
 
 export function Case1602Exhibit() {
+  const searchParams = useSearchParams();
   const { session, assets, assetError } = useLifecycleJourney();
   const product = useBuildingProductContext();
+  const enteredFromBuilding = searchParams.get("entry") === "building";
   const model = useMemo(() => derivePropertyEventViewModel(session), [session]);
   const result = session.result;
   const sourceDirective = result?.visualDirective ?? emptyDirective;
@@ -153,6 +156,14 @@ export function Case1602Exhibit() {
   }
 
   return <div className="case-exhibit">
+    {enteredFromBuilding ? <nav className={styles.spatialHandoff} aria-label="从建筑进入1602卫生间的空间路径">
+      <span>FROM BUILDING / 空间下钻完成</span>
+      <div>
+        <strong>{product.buildingLabel}</strong><ArrowRight size={13} aria-hidden="true" /><strong>16F</strong><ArrowRight size={13} aria-hidden="true" /><strong>1602</strong><ArrowRight size={13} aria-hidden="true" /><strong>卫生间</strong>
+      </div>
+      <Link href="/">返回整栋建筑</Link>
+    </nav> : null}
+
     <section className="case-intro">
       <div><p className="concept-kicker">筑生 / 1602建筑生命事件</p><h1 className="display-headline"><span className="display-headline-line">一件潮湿异常</span><span className="display-headline-line">唤醒一栋房子的记忆</span></h1><p>从建造时留下的现场经历，到入住后的异常、判断、人工动作与最终验证，一件事始终沿着同一栋房子的生命线向前推进。</p></div>
       <aside><span>当前真实阶段</span><strong>{stages[currentLifecycleStage].label}</strong><p>{model.pendingResidentAssessment
