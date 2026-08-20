@@ -36,7 +36,7 @@ import {
   type ResidentEvidenceDraft,
   type VerifiedProductEvidenceBundle
 } from "@/lib/product/evidence.ts";
-import { residentEvidenceToDomainControls } from "@/lib/product/evidence-adapter.ts";
+import { projectProductEvidenceDomainLinks, residentEvidenceToDomainControls } from "@/lib/product/evidence-adapter.ts";
 
 export const LIFE_EVENT_PACKAGE_KEY = "zhusheng.life-event-package.v1";
 
@@ -367,6 +367,7 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
 
   const buildProductEvidenceBundle = useCallback(() => {
     const verifiedEventPackage = buildVerifiedPackage();
+    const projectedEvidence = projectProductEvidenceDomainLinks(session.productEvidenceTimeline, session.result);
     return {
       schemaVersion: 1,
       verifiedEventPackage,
@@ -374,10 +375,10 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
         eventId: verifiedEventPackage.eventId,
         residentSubmissions: session.residentSubmissions,
         propertyReviews: session.propertyReviews,
-        evidence: session.productEvidenceTimeline
+        evidence: projectedEvidence
       })
     } satisfies VerifiedProductEvidenceBundle<VerifiedLifeEventPackage>;
-  }, [buildVerifiedPackage, session.productEvidenceTimeline, session.propertyReviews, session.residentSubmissions]);
+  }, [buildVerifiedPackage, session.productEvidenceTimeline, session.propertyReviews, session.residentSubmissions, session.result]);
 
   useEffect(() => {
     if (!assets || !session.result || !["RESOLVED", "REOPENED"].includes(session.result.state)) {
