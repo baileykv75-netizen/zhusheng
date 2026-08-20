@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, Building2, Clock3, MapPin } from "lucide-react";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
-import { buildingLifeEvents } from "@/lib/product/building-life-events";
+import { buildingLifeEventExamples, buildingLifeEvents } from "@/lib/product/building-life-events";
 import { buildingTasks } from "@/lib/product/building-tasks";
 import styles from "./BuildingEventCenter.module.css";
 
@@ -22,7 +22,7 @@ export function BuildingEventCenter() {
       <div className={styles.heroCopy}>
         <span className={styles.eyebrow}>BUILDING SITUATION · 华章新筑 2号楼</span>
         <h1>这栋楼今天需要处理什么</h1>
-        <p>把正在发生的建筑生命事件放回楼层、空间和责任链中查看。只有已经存在的事件或待物业接入的住户事实才进入当前列表；1602可继续进入完整处置闭环。</p>
+        <p>当前统计只计算这个会话里真正存在的事件或待物业接入的住户事实。脱敏事件结构示例不会参与数量、责任人与任务队列。</p>
       </div>
       <div className={styles.metrics} aria-label="建筑事件摘要">
         <div><strong>{events.length}</strong><span>当前事项</span></div>
@@ -33,37 +33,37 @@ export function BuildingEventCenter() {
     </header>
 
     <div className={styles.context}>
-      <div><Building2 size={15} /><strong>18层 MiC 住宅</strong><span>当前有事项的空间</span></div>
+      <div><Building2 size={15} /><strong>18层 MiC 住宅</strong><span>当前会话真实事项</span></div>
       <div><span>1602深度链</span><strong>{deepEventVisible ? "EVT-1602" : "尚未进入事件"}</strong><span>{deepEventVisible ? "住户事实 / 事件状态按当前会话展示" : "案例结构可查看，但不冒充当前事件"}</span></div>
     </div>
 
     <main className={styles.layout}>
       <section className={`event-floor-map ${styles.buildingMap}`} aria-label="建筑事件空间分布">
         <header className={styles.mapHeader}>
-          <div><span className={styles.sectionLabel}>BUILDING MAP</span><strong>事件分布</strong></div>
-          <small>只显示当前有事件或待接入事实的楼层与空间。</small>
+          <div><span className={styles.sectionLabel}>BUILDING MAP</span><strong>当前事项分布</strong></div>
+          <small>只显示当前会话已经存在的事件或待接入事实。</small>
         </header>
         <div className={`event-floor-stack ${styles.floorStack}`}>
-          {events.slice().sort((a, b) => b.floor - a.floor).map((event) => <div key={event.id} className={`${styles.floor} ${event.isDeepDemo ? styles.deepFloor : ""}`}>
+          {events.length ? events.slice().sort((a, b) => b.floor - a.floor).map((event) => <div key={event.id} className={`${styles.floor} ${event.isDeepDemo ? styles.deepFloor : ""}`}>
             <span className={styles.floorNumber}>{String(event.floor).padStart(2, "0")}F</span>
             <i className={styles.dot} />
             <div className={styles.floorBody}>
               <div><strong>{event.unitId} · {event.title}</strong><em>{event.displayStatus}</em></div>
               <p>{event.space} · 下一步：{event.nextAction}</p>
             </div>
-          </div>)}
+          </div>) : <p className={styles.overviewOnly}>当前会话还没有活动事件。住户提交现场事实后，1602会先以“待物业接入”出现；第一次确定性评估后才进入正式事件状态。</p>}
         </div>
       </section>
 
       <section className={`event-list ${styles.list}`} aria-label="建筑生命事件列表">
         <header className={styles.listHeader}>
-          <div><span className={styles.sectionLabel}>ACTIVE LIFE EVENTS</span><h2>每件事都指向下一项工作</h2></div>
-          <span>按最近更新</span>
+          <div><span className={styles.sectionLabel}>ACTIVE LIFE EVENTS</span><h2>当前真正存在的事</h2></div>
+          <span>不含结构示例</span>
         </header>
 
-        {events.map((event, eventIndex) => <article key={event.id} className={`${event.isDeepDemo ? "deep" : ""} ${styles.eventCard}`}>
+        {events.length ? events.map((event, eventIndex) => <article key={event.id} className={`${event.isDeepDemo ? "deep" : ""} ${styles.eventCard}`}>
           <div className={styles.eventCardMain}>
-            <div className={styles.eventTop}><span>{event.id}</span><em>{event.category}</em>{event.isDeepDemo ? <b>{session.result ? "完整深度事件" : "待接入深度事件"}</b> : null}</div>
+            <div className={styles.eventTop}><span>{event.id}</span><em>{event.category}</em><b>{session.result ? "完整深度事件" : "待接入深度事件"}</b></div>
             <h3>{event.title}</h3>
             <div className={styles.meta}><span><MapPin size={13} />{event.floor}层 · {event.unitId} · {event.space}</span><span><Clock3 size={13} />{event.updatedAt}</span></div>
           </div>
@@ -74,14 +74,20 @@ export function BuildingEventCenter() {
               <div><dt>唯一下一步</dt><dd>{tasks[eventIndex]?.title ?? event.nextAction}</dd></div>
             </dl>
           </div>
-          {event.isDeepDemo
-            ? <Link className={styles.deepAction} href={session.result ? "/case-1602" : "/property?mode=task"}>{session.result ? "进入1602完整事件" : "进入物业接入"} <ArrowRight size={14} /></Link>
-            : <p className={styles.overviewOnly}>当前提供空间、状态、责任人与下一步概览；专业处置在对应深度事件中展开。</p>}
-        </article>)}
+          <Link className={styles.deepAction} href={session.result ? "/case-1602" : "/property?mode=task"}>{session.result ? "进入1602完整事件" : "进入物业接入"} <ArrowRight size={14} /></Link>
+        </article>) : <p className={styles.overviewOnly}>没有活动事件时，这里保持为空，而不是用脱敏样例填满建筑态势。</p>}
 
         <details className={styles.boundary}>
-          <summary>数据与事件深度说明</summary>
-          <p>当前建筑态势数据均为脱敏演示数据。1602只有在住户事实进入会话后才显示为待接入事项，并在确定性评估运行后进入正式生命事件状态链；其他四个事件用于验证建筑级事件组织方式。</p>
+          <summary>查看四个脱敏事件结构示例</summary>
+          <p>下面四条只验证“空间—状态—责任人—下一步”的建筑级组织方式，ID 统一使用 EXAMPLE 前缀；它们不是这栋楼今天发生的事件，不参与上方任何统计或任务队列。</p>
+          {buildingLifeEventExamples.map((event) => <article key={event.id} className={styles.eventCard}>
+            <div className={styles.eventCardMain}>
+              <div className={styles.eventTop}><span>{event.id}</span><em>{event.category}</em><b>结构示例</b></div>
+              <h3>{event.title}</h3>
+              <div className={styles.meta}><span><MapPin size={13} />{event.floor}层 · {event.unitId} · {event.space}</span></div>
+            </div>
+            <p className={styles.overviewOnly}>{event.displayStatus} · {event.nextAction}</p>
+          </article>)}
         </details>
       </section>
     </main>
