@@ -14,6 +14,7 @@ import {
   evaluateControls,
   executeAuthorizedClose,
   executeAuthorizedReopen,
+  resumeInconclusiveAssessment,
   submitIsolationObservation,
   submitPostRepairObservation,
   submitRepairRecord
@@ -203,6 +204,8 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
       return;
     }
 
+    const latestSubmission = session.residentSubmissions?.at(-1) ?? null;
+
     if (session.result?.state === "REOPENED") {
       const freshResidentEvidence = hasFreshEvidenceAfterReopen(
         session.result,
@@ -233,10 +236,37 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
       return;
     }
 
+    if (session.result?.state === "INCONCLUSIVE" && latestSubmission) {
+      if (Date.parse(latestSubmission.submittedAt) <= Date.parse(session.result.input.evaluatedAt)) {
+        setSession((current) => ({ ...current, notice: "当前仍是上一轮 INCONCLUSIVE 结果。必须先由住户提交晚于上一轮评估的新现场证据，再在同一事件上继续评估。" }));
+        return;
+      }
+      setBusy(true);
+      try {
+        const result = resumeInconclusiveAssessment(engine, session.result, session.controls, latestSubmission.submittedAt, Date.now());
+        setSession((current) => ({
+          ...current,
+          result,
+          activeTab: result.state === "INCONCLUSIVE" ? "input" : "diagnosis",
+          selectedView: result.visualDirective.view,
+          selectedBusinessId: result.visualDirective.highlightBusinessIds[0] ?? null,
+          repairDraft: result.state === "REPAIR_PENDING" ? repairDraftForResult(result) : current.repairDraft,
+          notice: result.state === "INCONCLUSIVE"
+            ? "新住户证据已追加到原事件，但当前仍不足以收敛；事件 ID 与历史保持不变。"
+            : "新住户证据已追加到原事件并完成重新评估；没有创建第二个事件。"
+        }));
+      } catch (reason) {
+        setSession((current) => ({ ...current, notice: reason instanceof Error ? reason.message : "补证后的同事件评估失败" }));
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
+
     const counter = session.eventCounter + 1;
     setBusy(true);
     try {
-      const result = evaluateControls(engine, session.controls, counter);
+      const result = evaluateControls(engine, session.controls, counter, Date.now(), latestSubmission?.submittedAt);
       setSession((current) => ({
         ...current,
         eventCounter: counter,
@@ -294,7 +324,9 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
         productEvidenceTimeline: [...(current.productEvidenceTimeline ?? []), ...product.evidence],
         photoObservationConfirmation: draft.photo.finding,
         activeTab: "input",
-        notice: "住户原始描述与人工观察已形成不可变产品证据；尚未运行故障判断。下一步由物业确认本轮系统观测，再启动确定性评估。"
+        notice: current.result?.state === "INCONCLUSIVE"
+          ? "住户新证据已追加到当前 INCONCLUSIVE 事件；下一步由物业确认本轮系统观测后，在同一事件 ID 上继续评估。"
+          : "住户原始描述与人工观察已形成不可变产品证据；尚未运行故障判断。下一步由物业确认本轮系统观测，再启动确定性评估。"
       }));
     } catch (reason) {
       setSession((current) => ({ ...current, notice: reason instanceof Error ? reason.message : "住户证据提交失败" }));
