@@ -6,10 +6,12 @@ import { derive1602ResidentFollowUp } from "../lib/product/resident-intake.ts";
 const residentUrl = new URL("../components/ResidentService.tsx", import.meta.url);
 const lifecycleProviderUrl = new URL("../components/lifecycle-journey-provider.tsx", import.meta.url);
 const propertyUrl = new URL("../lib/product/property-event-view-model.ts", import.meta.url);
+const propertyWorkspaceUrl = new URL("../components/property/PropertyEventWorkspace.tsx", import.meta.url);
 const propertyWorkbenchUrl = new URL("../components/life-event/ResidentTaskWorkbench.tsx", import.meta.url);
 const caseUrl = new URL("../components/Case1602Exhibit.tsx", import.meta.url);
 const evidenceTimelineUrl = new URL("../components/EvidenceTimeChain.tsx", import.meta.url);
 const memoryUrl = new URL("../lib/product/building-memory-view-model.ts", import.meta.url);
+const memoryWorkspaceUrl = new URL("../components/memory/BuildingMemoryWorkspace.tsx", import.meta.url);
 const eventsUrl = new URL("../lib/product/building-life-events.ts", import.meta.url);
 const eventCenterUrl = new URL("../components/BuildingEventCenter.tsx", import.meta.url);
 const residentAssessmentUrl = new URL("../lib/product/resident-assessment.ts", import.meta.url);
@@ -73,15 +75,21 @@ test("resident property and event center share one pending-assessment selector",
   assert.doesNotMatch(center, /!session\.result && Boolean\(session\.residentSubmissions/);
 });
 
-test("property surfaces only event observations and requires human confirmation of every demo draft", async () => {
-  const [viewModel, workbench] = await Promise.all([
+test("property current-cycle surface neutralizes the previous diagnosis while fresh resident evidence waits", async () => {
+  const [viewModel, workspace, workbench] = await Promise.all([
     readFile(propertyUrl, "utf8"),
+    readFile(propertyWorkspaceUrl, "utf8"),
     readFile(propertyWorkbenchUrl, "utf8")
   ]);
 
-  assert.match(viewModel, /if \(!result\) return \[\]/);
-  assert.match(viewModel, /if \(result\) return memories\.slice\(0, 5\)/);
-  assert.match(viewModel, /plain chronological sample/);
+  assert.match(viewModel, /pendingResidentAssessment = residentEvidenceNeedsAssessment/);
+  assert.match(viewModel, /memoriesFor\(session, pendingResidentAssessment \? null : result\)/);
+  assert.match(viewModel, /上一轮判断暂不更新/);
+  assert.match(viewModel, /targetBusinessIds: \[\]/);
+  assert.match(viewModel, /本轮系统观测确认/);
+  assert.match(workspace, /CURRENT INTAKE/);
+  assert.match(workspace, /highlightBusinessIds: \[\]/);
+  assert.match(workspace, /本轮评估前仅按空间浏览，不沿用上一轮诊断排序/);
   assert.match(workbench, /模板或高级验证中的数值草稿不能冒充当前事实/);
   assert.match(workbench, /initialObservationConfirmed/);
   assert.match(workbench, /不是直接采用预置演示答案/);
@@ -92,25 +100,30 @@ test("property surfaces only event observations and requires human confirmation 
   assert.match(workbench, /postRepairObservationConfirmed/);
 });
 
-test("case and memory stay visually neutral before an event produces a candidate", async () => {
-  const [caseSource, memorySource] = await Promise.all([
+test("case and memory suspend previous-cycle diagnosis relevance while a new resident cycle waits", async () => {
+  const [caseSource, memorySource, memoryWorkspace] = await Promise.all([
     readFile(caseUrl, "utf8"),
-    readFile(memoryUrl, "utf8")
+    readFile(memoryUrl, "utf8"),
+    readFile(memoryWorkspaceUrl, "utf8")
   ]);
 
-  assert.match(caseSource, /highlightBusinessIds: \[\]/);
-  assert.match(caseSource, /result \? directive\.highlightBusinessIds\[0\]/);
+  assert.match(caseSource, /model\.pendingResidentAssessment \? "present"/);
+  assert.match(caseSource, /上一轮处置完整保留，本轮尚未重新进入动作阶段/);
+  assert.match(caseSource, /selectedSceneBusinessId = model\.pendingResidentAssessment/);
+  assert.match(caseSource, /上一轮已经过 · 本轮待重新评估/);
   assert.match(caseSource, /结果不会被提前写好/);
-  assert.match(memorySource, /const hasActiveEvent = Boolean\(session\.result\)/);
-  assert.match(memorySource, /const relations = hasActiveEvent/);
-  assert.match(memorySource, /: entries\[0\]\?\.recordId \?\? null/);
+  assert.match(memorySource, /const pendingResidentAssessment = residentEvidenceNeedsAssessment/);
+  assert.match(memorySource, /const useCurrentEventRelevance = hasActiveEvent && !pendingResidentAssessment/);
+  assert.match(memorySource, /const relations = useCurrentEventRelevance/);
+  assert.match(memorySource, /eventRelatedRecords: useCurrentEventRelevance/);
+  assert.match(memoryWorkspace, /本轮相关性尚未重新计算|本轮事件关系待计算|不沿用上一轮诊断相关性排序/);
 });
 
 test("evidence timeline renders only records that actually exist in the current lifecycle", async () => {
   const source = await readFile(evidenceTimelineUrl, "utf8");
 
   assert.match(source, /只显示已经发生的记录/);
-  assert.match(source, /session\.productEvidenceTimeline/);
+  assert.match(source, /projectProductEvidenceDomainLinks\(session\.productEvidenceTimeline \?\? \[\], result\)/);
   assert.match(source, /result\.input\.evidence/);
   assert.match(source, /result\?\.input\.observations/);
   assert.match(source, /result\?\.repairRecords/);
