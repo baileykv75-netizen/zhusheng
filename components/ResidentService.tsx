@@ -49,6 +49,12 @@ export function ResidentService() {
   const followUp = photoFinding === "UNCONFIRMED"
     ? null
     : derive1602ResidentFollowUp({ description, photoFinding });
+  const residentHeaderId = result?.eventId ?? "1602现场受理";
+  const residentHeaderStatus = result
+    ? "你的现场观察进入同一事件"
+    : awaitingPropertyAssessment
+      ? "住户事实已保存 · 等待物业接入"
+      : "先提交你实际看到的现场事实";
 
   useEffect(() => () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -154,11 +160,11 @@ export function ResidentService() {
   const intakeSubtitle = intakeStage === "FOLLOW_UP"
     ? followUp
       ? "筑生先读取你刚才提交的现象，再只补问当前排查最需要的一项事实。"
-      : "你刚才提交的现象没有进入本次1602潮湿事件的验证路径，系统不会因此强行要求水表或关阀操作。"
+      : "你刚才提交的现象没有进入当前1602潮湿验证路径，系统不会因此强行要求水表或关阀操作。"
     : "先描述现象和现场画面。原因尚未收敛前，筑生不会让你按预设故障流程操作。";
 
   return <div className="resident-service">
-    <header className="resident-service-header"><Link href="/case-1602">EVT-1602</Link><span>住户任务</span><small>你的现场观察进入同一事件</small></header>
+    <header className="resident-service-header"><Link href="/case-1602">{residentHeaderId}</Link><span>住户任务</span><small>{residentHeaderStatus}</small></header>
     <main>
       <section className="resident-service-title"><p>1602 / 卫生间</p><h1>{authorization ? reopening ? "维修完成后，是否允许恢复供水？" : "物业申请临时关闭局部进水阀" : result?.state === "RESOLVED" ? "这件事已经完成维修复验" : result?.state === "REOPENED" && freshReopenEvidence ? "新的现场情况已提交" : awaitingPropertyAssessment ? "你的现场事实已经提交" : intake ? intakeTitle : "物业正在继续处理"}</h1><span>{awaitingPropertyAssessment ? "筑生还没有据此判断原因。下一步由物业确认本轮系统观测，再进入确定性评估。" : intake ? intakeSubtitle : "你只需要关注自己的现场观察和需要你本人作出的授权决定。"}</span></section>
 
@@ -199,7 +205,7 @@ export function ResidentService() {
               <button type="button" className={meterFinding === "UNREADABLE" ? "active" : ""} onClick={() => setMeterFinding("UNREADABLE")}>看不清</button>
             </div>
             <details className="resident-meter-example"><summary>查看水表观察示例</summary><figure><img src={publicAssetPath("/assets/demo-evidence/1602-water-meter-observation.webp")} alt="AI生成的住宅水表脱敏合成演示照片" /><figcaption>AI生成 · 脱敏合成演示</figcaption></figure></details>
-          </article> : <article className="resident-followup-question"><div className="resident-step"><span>停止</span><div><strong>不继续要求水表观察</strong><small>当前描述和照片没有支持潮湿或水迹路径。</small></div></div><div className="resident-followup-reason"><ShieldCheck size={15} /><div><strong>为什么停在这里</strong><p>本次1602闭环只验证卫生间潮湿事件。对其他现象继续追问水表，会把未知问题硬塞进漏水流程。</p><small>请返回补充更准确的现场情况，或从事件中心进入其他问题的后续处理。</small></div></div></article>}
+          </article> : <article className="resident-followup-question"><div className="resident-step"><span>停止</span><div><strong>不继续要求水表观察</strong><small>当前描述和照片没有支持潮湿或水迹路径。</small></div></div><div className="resident-followup-reason"><ShieldCheck size={15} /><div><strong>为什么停在这里</strong><p>当前1602深度闭环只验证卫生间潮湿路径。对其他现象继续追问水表，会把未知问题硬塞进漏水流程。</p><small>请返回补充更准确的现场情况，或从事件中心进入其他问题的后续处理。</small></div></div></article>}
 
           <div className="resident-followup-actions">
             <button className="resident-secondary" type="button" onClick={resetFollowUp}>返回修改现场情况</button>
@@ -211,7 +217,7 @@ export function ResidentService() {
         <details className="resident-data-details"><summary>数据与隐私说明</summary><p>本演示中的本地照片只在浏览器预览，不上传服务器；脱敏示例图会明确标注。照片结论与后续补证都由你手工确认，系统不会把“上传图片”自动当成“发现潮湿”，也不会因为处于卫生间就自动假定为漏水。提交住户证据不会自动运行诊断，也不会自动操作阀门。</p></details>
       </section> : null}
 
-      {awaitingPropertyAssessment ? <section className="resident-progress"><House size={23} /><p>住户原始证据 {latestSubmission?.submissionId}</p><h2>等待物业确认本轮系统观测</h2><span>你的描述、照片观察和本轮补充已经保存，但还没有被系统包装成故障结论。物业确认湿度、微流量等当前观测后，才会运行第一次确定性评估。</span><Link href="/case-1602">查看事件入口 <ArrowRight size={15} /></Link></section> : null}
+      {awaitingPropertyAssessment ? <section className="resident-progress"><House size={23} /><p>住户原始证据 {latestSubmission?.submissionId}</p><h2>等待物业确认本轮系统观测</h2><span>你的描述、照片观察和本轮补充已经保存，但还没有被系统包装成故障结论。物业确认湿度、微流量等当前观测后，才会运行第一次确定性评估。</span><Link href="/case-1602">查看案例入口 <ArrowRight size={15} /></Link></section> : null}
 
       {authorization ? <section className="resident-authorization" data-focus="authorization" tabIndex={-1}>
         <div className="resident-authorization-mark"><LockKeyhole size={23} /></div><p>需要你的决定</p><h2>{reopening ? "模拟恢复1602卫生间局部供水" : "模拟关闭1602卫生间局部进水阀"}</h2>
