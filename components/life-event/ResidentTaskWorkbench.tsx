@@ -103,9 +103,10 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
     .sort((a, b) => a.observedAt.localeCompare(b.observedAt))
     .at(-1);
   const missingTypes = new Set(result?.missingEvidence.map((item) => item.evidenceType) ?? []);
-  const eventQueue = buildingLifeEvents(result);
+  const eventQueue = buildingLifeEvents(result, pendingAssessment);
   const taskQueue = buildingTasks(eventQueue, result);
-  const currentTask = taskQueue.find((task) => task.eventId === "EVT-1602");
+  const activeQueueId = result?.eventId ?? (pendingAssessment ? "INTAKE-1602" : null);
+  const currentTask = taskQueue.find((task) => task.eventId === activeQueueId) ?? taskQueue[0];
 
   return <div className="professional-workspace property-task-workspace">
     <section className="professional-scene" aria-label="1602卫生间数字孪生">
@@ -136,10 +137,10 @@ export function PropertyWorkbench({ onOpenAdvanced, queryVisual = null }: { onOp
           <summary><span><ListTree size={15} /><small>物业事件队列</small><strong>{taskQueue.filter((task) => task.status !== "DONE").length} 项需处理</strong></span><em>当前 · 1602</em><ChevronDown size={14} /></summary>
           <div>{eventQueue.map((event, queueIndex) => {
             const task = taskQueue[queueIndex];
-            return <article key={event.id} className={event.id === "EVT-1602" ? "current" : ""}><span>{event.floor}F · {event.unitId}</span><strong>{event.title}</strong><small>{task.ownerRole} · {task.title}</small>{!event.isDeepDemo ? <em>概览事件</em> : <em>完整深链</em>}</article>;
+            return <article key={event.id} className={event.id === activeQueueId ? "current" : ""}><span>{event.floor}F · {event.unitId}</span><strong>{event.title}</strong><small>{task.ownerRole} · {task.title}</small>{result ? <em>完整深链</em> : <em>现场受理</em>}</article>;
           })}</div>
         </details>
-        <small>物业运行席 / 1602 / {isFactCheck ? "事件接入" : journey.stateLabel}</small>
+        <small>物业运行席 / 1602 / {pendingAssessment ? "现场受理" : isFactCheck ? "事件接入" : journey.stateLabel}</small>
         <h2>{pendingAssessment ? "住户原始事实已到，先确认系统观测" : isFactCheck ? result ? "1602事件正在补充现场事实" : "等待1602现场事实进入事件" : journey.headline}</h2>
         <p>{pendingAssessment ? "住户提交不会自动触发诊断。物业需要核对本轮湿度与微流量等系统观测，明确确认后，确定性事件引擎才开始第一次评估。" : isFactCheck ? "先确认住户原始观察和已经存在的系统事实，再由事件引擎决定需要补什么、是否进入诊断或动作阶段。" : journey.summary}</p>
       </header>
