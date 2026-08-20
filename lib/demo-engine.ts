@@ -1,5 +1,9 @@
 export type RuntimeMode = "ai" | "fallback" | "degraded";
 
+export type EvidenceAttachment =
+  | { dataClass: "BROWSER_LOCAL"; fileName: string; mediaType: string; size: number }
+  | { dataClass: "DEMO_SYNTHETIC"; assetPath: string };
+
 export type EvidenceRecord = {
   id: string;
   type: string;
@@ -8,6 +12,7 @@ export type EvidenceRecord = {
   note: string;
   capturedAt: string;
   refs: string[];
+  attachment?: EvidenceAttachment;
 };
 
 export type WorkerEvidenceDraft = {
@@ -16,6 +21,7 @@ export type WorkerEvidenceDraft = {
   component: string;
   process: string;
   pressure: string;
+  photo: EvidenceAttachment;
 };
 
 export type AgentTrace = {
@@ -60,6 +66,10 @@ export type DemoSnapshot = {
   telemetry: { time: string; humidity: number; flow: number }[];
 };
 
+const WORKER_SPACE_ID = "SPACE-1602-BATHROOM";
+const WORKER_COMPONENT_ID = "J-1602-CW-03";
+const WORKER_SYSTEM_ID = "SYS-1602-CW";
+
 export const demoSteps = [
   { id: "capture", label: "工友提交证据", route: "/worker", task: "口述当前管线工序与现场复核结果" },
   { id: "memory", label: "写入建筑记忆", route: "/worker", task: "人工确认AI整理字段并关联空间与构件" },
@@ -89,29 +99,30 @@ export function createInitialSnapshot(mode: RuntimeMode = "fallback"): DemoSnaps
       {
         id: "EV-2845",
         type: "管线接头影像",
-        source: "工友语音 + 现场照片",
+        source: "工友语音 + 脱敏演示现场照片",
         status: "verified",
-        note: "冷热水支管打压完成，接头无渗漏。",
+        note: "冷水支管打压完成，接头无渗漏；该条为历史脱敏演示记录。",
         capturedAt: "2025-03-18 14:26",
-        refs: ["1602卫生间", "MIC-BATH-1602", "W-1602-B7"]
+        refs: [WORKER_SPACE_ID, WORKER_SYSTEM_ID, WORKER_COMPONENT_ID],
+        attachment: { dataClass: "DEMO_SYNTHETIC", assetPath: "/assets/v5/evidence/ev-2848-joint.webp" }
       },
       {
         id: "EV-2846",
         type: "防水施工记录",
-        source: "MiC模块工序卡",
+        source: "MiC模块工序卡 · 脱敏演示",
         status: "verified",
         note: "聚合物水泥防水涂膜两遍，总厚度1.6 mm。",
         capturedAt: "2025-03-19 10:08",
-        refs: ["1602卫生间", "MIC-BATH-1602"]
+        refs: [WORKER_SPACE_ID, "WP-1602-BATHROOM"]
       },
       {
         id: "EV-2847",
         type: "48小时闭水试验",
-        source: "质量员复核",
+        source: "质量员复核 · 脱敏演示",
         status: "verified",
         note: "液面无明显下降，楼下顶板无湿痕。",
         capturedAt: "2025-03-21 16:40",
-        refs: ["1602卫生间", "MIC-BATH-1602"]
+        refs: [WORKER_SPACE_ID, "WP-1602-BATHROOM"]
       }
     ],
     incident: null,
@@ -149,7 +160,7 @@ function trace(
 
 function workerEvidenceRefs(state: DemoSnapshot) {
   const record = state.evidence.find((item) => item.id === "EV-2848");
-  return record?.refs.length ? [record.id, ...record.refs] : ["EV-2848", "W-1602-B7"];
+  return record?.refs.length ? [record.id, ...record.refs] : ["EV-2848", WORKER_SPACE_ID, WORKER_SYSTEM_ID, WORKER_COMPONENT_ID];
 }
 
 function executeStep(state: DemoSnapshot, index: number): DemoSnapshot {
@@ -158,8 +169,9 @@ function executeStep(state: DemoSnapshot, index: number): DemoSnapshot {
 
   if (index === 2) {
     const record = next.evidence.find((item) => item.id === "EV-2848");
-    if (record) record.status = "verified";
-    trace(next, "工友服务智能体", "品质智能体", "核验证据并写入建筑记忆", "人工确认后的字段、原始口述与现场证据已关联空间、构件、班组与验收阶段。", workerEvidenceRefs(next), 96);
+    if (!record?.attachment) throw new Error("EV-2848 cannot enter Building Memory before a worker evidence image is confirmed");
+    record.status = "verified";
+    trace(next, "工友服务智能体", "品质智能体", "核验证据并写入建筑记忆", "人工确认后的字段、原始口述与影像身份已关联统一空间、系统与构件BusinessId。", workerEvidenceRefs(next), 96);
   }
 
   if (index === 3) {
@@ -216,9 +228,9 @@ function executeStep(state: DemoSnapshot, index: number): DemoSnapshot {
       id: "WO-260725-08",
       status: "dispatched",
       location: "1602卫生间北侧墙体，距完成面1.15 m",
-      component: "PPR DN20支管接头 W-1602-B7",
+      component: `重点冷水接头 ${WORKER_COMPONENT_ID}`,
       instruction: "优先从检修口进入；更换接头后完成30分钟保压。",
-      refs: ["EV-2845", "EV-2848", "BIM-1602-WATER"]
+      refs: ["EV-2845", "EV-2848", WORKER_COMPONENT_ID]
     }];
     trace(next, "住户授权", "设备具身智能体", "执行局部关阀并验证流量", "阀门已关闭，流量降至0，生成物业工单。", ["ACT-001", "V-16F-02-B"], 100);
   }
@@ -254,16 +266,21 @@ function structureWorkerEvidence(state: DemoSnapshot): DemoSnapshot {
   if (!next.evidence.some((item) => item.id === "EV-2848")) {
     next.evidence.push({
       id: "EV-2848",
-      type: "管线接头复核",
-      source: "安装班组口述 + 现场照片",
+      type: "冷水支管接头复核",
+      source: "安装班组口述 · 待确认影像",
       status: "needs_review",
-      note: "待人工确认AI整理字段与原始口述的一致性。",
+      note: "待人工确认AI整理字段、原始口述与本轮影像身份。",
       capturedAt: "2025-03-18 14:26",
-      refs: ["1602卫生间", "MIC-BATH-1602", "W-1602-B7"]
+      refs: [WORKER_SPACE_ID, WORKER_SYSTEM_ID, WORKER_COMPONENT_ID]
     });
   }
-  trace(next, "工友现场口述", "工友服务智能体", "整理施工记录", "识别房间、构件与工序，保留原始口述；尚未写入确认后的字段。", ["MIC-BATH-1602"], 84, next.runtimeMode);
+  trace(next, "工友现场口述", "工友服务智能体", "整理施工记录", "识别工序与保压结果，保留原始口述；空间与构件身份来自当前扫码/BIM任务上下文，尚未完成品质核验。", [WORKER_SPACE_ID, WORKER_COMPONENT_ID], 84, next.runtimeMode);
   return next;
+}
+
+function validAttachment(attachment: EvidenceAttachment) {
+  if (attachment.dataClass === "DEMO_SYNTHETIC") return Boolean(attachment.assetPath.trim());
+  return Boolean(attachment.fileName.trim() && attachment.mediaType.trim() && attachment.size > 0);
 }
 
 function applyWorkerEvidenceDraft(state: DemoSnapshot, draft: WorkerEvidenceDraft): DemoSnapshot {
@@ -275,20 +292,25 @@ function applyWorkerEvidenceDraft(state: DemoSnapshot, draft: WorkerEvidenceDraf
   const process = draft.process.trim();
   const pressure = draft.pressure.trim();
   const transcript = draft.transcript.trim();
-  if (!room || !component || !process || !pressure || !transcript) throw new Error("Worker evidence confirmation requires room, component, process, pressure and original transcript");
+  if (room !== WORKER_SPACE_ID || component !== WORKER_COMPONENT_ID) throw new Error("Worker evidence must keep the scanned/BIM-bound space and component BusinessIds");
+  if (!process || !pressure || !transcript) throw new Error("Worker evidence confirmation requires process, pressure and original transcript");
+  if (!validAttachment(draft.photo)) throw new Error("Worker evidence confirmation requires a valid local or synthetic image identity");
   record.type = process;
-  record.source = "安装班组口述 + 现场照片 · 人工确认";
-  record.note = `${room} · ${component} · ${process} · 保压结果：${pressure}。原始口述：${transcript}`;
-  record.refs = [room, "MIC-BATH-1602", component];
+  record.source = draft.photo.dataClass === "BROWSER_LOCAL" ? "安装班组口述 + 浏览器本地影像 · 人工确认" : "安装班组口述 + DEMO_SYNTHETIC影像 · 人工确认";
+  record.note = `${WORKER_SPACE_ID} · ${WORKER_COMPONENT_ID} · ${process} · 保压结果：${pressure}。原始口述：${transcript}`;
+  record.refs = [WORKER_SPACE_ID, WORKER_SYSTEM_ID, WORKER_COMPONENT_ID];
+  record.attachment = structuredClone(draft.photo);
   return next;
 }
 
 function submitWorkerQuality(state: DemoSnapshot): DemoSnapshot {
+  const record = state.evidence.find((item) => item.id === "EV-2848");
+  if (!record?.attachment) return state;
   const next = structuredClone(state);
   next.currentStep = 1;
   next.workerSubstep = 3;
   if (!next.completedSteps.includes(1)) next.completedSteps.push(1);
-  trace(next, "工友服务智能体", "品质智能体", "提交关键工序证据", "人工确认后的字段与影像证据已提交，等待写入建筑生命记忆。", workerEvidenceRefs(next), 92);
+  trace(next, "工友服务智能体", "品质智能体", "提交关键工序证据", `人工确认后的字段与${record.attachment.dataClass}影像身份已提交，等待写入建筑生命记忆。`, workerEvidenceRefs(next), 92);
   return next;
 }
 
@@ -302,13 +324,32 @@ function startSnapshot(mode: RuntimeMode = "fallback"): DemoSnapshot {
   return { ...createInitialSnapshot(mode), currentStep: 1, workerSubstep: 1 };
 }
 
+function defaultWorkerEvidenceDraft(): WorkerEvidenceDraft {
+  return {
+    transcript: "1602卫生间重点冷水接头施工完成，保压稳定；本条为显式脚本回放使用的脱敏演示口述。",
+    room: WORKER_SPACE_ID,
+    component: WORKER_COMPONENT_ID,
+    process: "冷水支管接头复核",
+    pressure: "30分钟无掉压",
+    photo: { dataClass: "DEMO_SYNTHETIC", assetPath: "/assets/v5/evidence/ev-2848-joint.webp" }
+  };
+}
+
 function advanceState(state: DemoSnapshot): DemoSnapshot {
   if (state.currentStep === 0) return startSnapshot(state.runtimeMode);
   if (state.currentStep === 1 && state.workerSubstep === 1) return structureWorkerEvidence(state);
-  if (state.currentStep === 1 && state.workerSubstep === 2) return submitWorkerQuality(state);
+  // AI整理后的记录不能靠“下一步”绕过人工字段与影像确认。
+  if (state.currentStep === 1 && state.workerSubstep === 2) return state;
   if (state.currentStep === 1 && state.workerSubstep === 3) return executeStep(state, 2);
   if (state.currentStep === 5 && state.incident?.status === "awaiting_authorization") return state;
   return state.currentStep >= 7 ? state : executeStep(state, state.currentStep + 1);
+}
+
+function replayAdvance(state: DemoSnapshot) {
+  if (state.currentStep === 1 && state.workerSubstep === 2) {
+    return submitWorkerQuality(applyWorkerEvidenceDraft(state, defaultWorkerEvidenceDraft()));
+  }
+  return advanceState(state);
 }
 
 function replayToOrdinal(mode: RuntimeMode, target: number): DemoSnapshot {
@@ -317,7 +358,7 @@ function replayToOrdinal(mode: RuntimeMode, target: number): DemoSnapshot {
   while (stageOrdinal(replay) < target) {
     replay = replay.currentStep === 5 && replay.incident?.status === "awaiting_authorization"
       ? executeStep(replay, 6)
-      : advanceState(replay);
+      : replayAdvance(replay);
   }
   return replay;
 }
