@@ -67,7 +67,7 @@ export function EvidenceTimeChain() {
           const item = productItems[row.index];
           return <li key={row.id} className="product-evidence-entry">
             <figure><div><span>{item.sourceActor}</span><strong>不可变产品证据</strong><small>{item.dataClass}</small></div><figcaption>{item.disclosure}</figcaption></figure>
-            <div><small>{String(rowIndex + 1).padStart(2, "0")} / 产品证据</small><strong>{item.type}</strong><p>{item.observedValue}</p><code>{item.id}</code><details><summary>证据身份</summary><dl><div><dt>受理/事件</dt><dd>{item.eventId}</dd></div><div><dt>角色</dt><dd>{item.sourceActor}</dd></div><div><dt>时间</dt><dd>{formatTime(item.capturedAt)}</dd></div><div><dt>领域引用</dt><dd>{item.domainEvidenceRefs.join(" · ") || "尚未进入领域评分"}</dd></div></dl></details></div>
+            <div><small>{String(rowIndex + 1).padStart(2, "0")} / 产品证据</small><strong>{item.type}</strong><p>{item.observedValue}</p><code>{item.id}</code><details><summary>证据身份</summary><dl><div><dt>{result ? "事件" : "受理关联"}</dt><dd>{item.eventId}</dd></div>{!result ? <div><dt>边界</dt><dd>预分配关联 ID，用于后续确定性评估对齐；此刻不代表已经形成 Life Event。</dd></div> : null}<div><dt>角色</dt><dd>{item.sourceActor}</dd></div><div><dt>时间</dt><dd>{formatTime(item.capturedAt)}</dd></div><div><dt>领域引用</dt><dd>{item.domainEvidenceRefs.join(" · ") || "尚未进入领域评分"}</dd></div></dl></details></div>
             {connector}
           </li>;
         }
