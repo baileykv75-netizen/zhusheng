@@ -211,13 +211,19 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
         session.result,
         (session.residentSubmissions ?? []).map((item) => item.submittedAt)
       );
-      if (!freshResidentEvidence) {
+      if (!freshResidentEvidence || !latestSubmission) {
         setSession((current) => ({ ...current, notice: "事件已重新打开。必须先由住户追加新的现场事实；历史证据不能直接触发下一轮判断。" }));
         return;
       }
       setBusy(true);
       try {
-        const result = resumeReopenedAssessment(engine, session.result, session.controls, Date.now());
+        const result = resumeReopenedAssessment(
+          engine,
+          session.result,
+          session.controls,
+          latestSubmission.submittedAt,
+          Date.now()
+        );
         setSession((current) => ({
           ...current,
           result,
