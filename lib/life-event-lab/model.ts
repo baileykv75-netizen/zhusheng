@@ -76,24 +76,33 @@ function evidence(id: string, input: Omit<EvidenceItem, "id" | "reliability" | "
   return { id, ...input, reliability: reliability ?? statusReliability(input.status), provenance: "阶段4B浏览器本地脱敏合成输入", syntheticDemo: true };
 }
 
-export function buildAssessmentInput(controls: LabControls, eventCounter: number, nowMs = Date.now()): LifeEventInput {
+function validatedResidentCapturedAt(value: string | undefined, nowMs: number, fallbackOffsetMs: number) {
+  if (!value) return iso(nowMs, fallbackOffsetMs);
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) throw new Error("住户证据时间无效");
+  if (parsed > nowMs) throw new Error("住户证据不能使用未来时间");
+  return new Date(parsed).toISOString();
+}
+
+export function buildAssessmentInput(controls: LabControls, eventCounter: number, nowMs = Date.now(), residentCapturedAt?: string): LifeEventInput {
   const suffix = String(eventCounter).padStart(3, "0");
   const eventId = `EVT-1602-LAB-${suffix}`;
   const detectedAt = iso(nowMs, -10 * 60_000);
   const observedAt = iso(nowMs, -5 * 60_000);
-  const capturedAt = iso(nowMs, -3 * 60_000);
+  const photoCapturedAt = validatedResidentCapturedAt(residentCapturedAt, nowMs, -3 * 60_000);
+  const meterCapturedAt = validatedResidentCapturedAt(residentCapturedAt, nowMs, -2 * 60_000);
   const observations: SensorObservation[] = [
     { id: `OBS-HUM-LAB-${suffix}`, sensorBusinessId: "SENSOR-1602-HUM-01", observedAt, metric: "RELATIVE_HUMIDITY", value: controls.humidity.value, unit: "%", ...(controls.humidity.baseline === null ? {} : { baseline: controls.humidity.baseline }), durationMinutes: controls.humidity.durationMinutes, quality: controls.humidity.quality, syntheticDemo: true },
     { id: `OBS-FLOW-LAB-${suffix}`, sensorBusinessId: "METER-1602-FLOW-01", observedAt, metric: "MICRO_FLOW", value: controls.microFlow.value, unit: "L/min", ...(controls.microFlow.baseline === null ? {} : { baseline: controls.microFlow.baseline }), durationMinutes: controls.microFlow.durationMinutes, quality: controls.microFlow.quality, syntheticDemo: true }
   ];
   return {
-    eventId, buildingId: BUILDING_ID, spaceId: SPACE_ID, detectedAt, evaluatedAt: iso(nowMs, -60_000), observations,
+    eventId, buildingId: BUILDING_ID, spaceId: SPACE_ID, detectedAt, evaluatedAt: iso(nowMs, 0), observations,
     evidence: [
       evidence(`EVD-PIPE-LAB-${suffix}`, { type: "PIPE_INSTALLATION_RECORD", status: controls.pipeInstallation, observedValue: "TRACEABLE", sourceActor: "WORKER", relatedBusinessIds: ["J-1602-CW-03", "PIPE-1602-CW-01"], capturedAt: "2025-03-18T14:26:00.000Z" }),
       evidence(`EVD-WP-LAB-${suffix}`, { type: "WATERPROOFING_RECORD", status: controls.waterproofing, observedValue: "COMPLETE", sourceActor: "WORKER", relatedBusinessIds: ["WP-1602-BATHROOM"], capturedAt: "2025-03-19T10:08:00.000Z" }),
       evidence(`EVD-CWT-LAB-${suffix}`, { type: "CLOSED_WATER_TEST", status: controls.closedWaterTest, observedValue: "PASS", sourceActor: "PROPERTY", relatedBusinessIds: ["WP-1602-BATHROOM"], capturedAt: "2025-03-21T16:40:00.000Z" }),
-      evidence(`EVD-PHOTO-LAB-${suffix}`, { type: "RESIDENT_WALL_PHOTO", status: controls.residentPhoto, observedValue: controls.photoFinding, sourceActor: "RESIDENT", relatedBusinessIds: ["WALL-1602-BATHROOM-NORTH", SPACE_ID], capturedAt }),
-      evidence(`EVD-METER-LAB-${suffix}`, { type: "METER_READING", status: controls.meterReading, observedValue: controls.meterFinding, sourceActor: "RESIDENT", relatedBusinessIds: ["METER-1602-FLOW-01"], capturedAt: iso(nowMs, -2 * 60_000) })
+      evidence(`EVD-PHOTO-LAB-${suffix}`, { type: "RESIDENT_WALL_PHOTO", status: controls.residentPhoto, observedValue: controls.photoFinding, sourceActor: "RESIDENT", relatedBusinessIds: ["WALL-1602-BATHROOM-NORTH", SPACE_ID], capturedAt: photoCapturedAt }),
+      evidence(`EVD-METER-LAB-${suffix}`, { type: "METER_READING", status: controls.meterReading, observedValue: controls.meterFinding, sourceActor: "RESIDENT", relatedBusinessIds: ["METER-1602-FLOW-01"], capturedAt: meterCapturedAt })
     ], syntheticDemo: true
   };
 }
@@ -111,8 +120,54 @@ function operationTime(previous: LifeEventResult, preferredOffsetMs: number, now
   return new Date(Math.min(now, Math.max(minimum, now + preferredOffsetMs))).toISOString();
 }
 
-export function evaluateControls(engine: LifeEventEngine, controls: LabControls, eventCounter: number, nowMs = Date.now()): LifeEventResult {
-  return assertStage4ABoundary(engine.evaluate(buildAssessmentInput(controls, eventCounter, nowMs)));
+function latestActiveResidentEvidence(previous: LifeEventResult, type: EvidenceItem["type"]): EvidenceItem | null {
+  const superseded = new Set(previous.input.evidence.flatMap((item) => item.supersedesId ? [item.supersedesId] : []));
+  return previous.input.evidence
+    .filter((item) => item.type === type && item.sourceActor === "RESIDENT" && !superseded.has(item.id))
+    .sort((a, b) => (a.capturedAt ?? "").localeCompare(b.capturedAt ?? ""))
+    .at(-1) ?? null;
+}
+
+export function evaluateControls(engine: LifeEventEngine, controls: LabControls, eventCounter: number, nowMs = Date.now(), residentCapturedAt?: string): LifeEventResult {
+  return assertStage4ABoundary(engine.evaluate(buildAssessmentInput(controls, eventCounter, nowMs, residentCapturedAt)));
+}
+
+export function resumeInconclusiveAssessment(
+  engine: LifeEventEngine,
+  previous: LifeEventResult,
+  controls: LabControls,
+  residentCapturedAt: string,
+  nowMs = Date.now()
+): LifeEventResult {
+  if (previous.state !== "INCONCLUSIVE") throw new Error("只有 INCONCLUSIVE 事件才能在原事件上追加补证评估");
+  const capturedMs = Date.parse(residentCapturedAt);
+  if (!Number.isFinite(capturedMs)) throw new Error("住户补证时间无效");
+  if (capturedMs <= Date.parse(previous.input.evaluatedAt)) throw new Error("需要提交晚于上一轮评估的新住户证据");
+  const evaluatedMs = Math.max(Date.parse(previous.input.evaluatedAt) + 1, capturedMs + 1);
+  if (evaluatedMs > nowMs) throw new Error("请等待新住户证据写入后再重新评估");
+  const capturedAt = new Date(capturedMs).toISOString();
+  const observedAt = new Date(Math.max(Date.parse(previous.input.evaluatedAt) + 1, Math.min(capturedMs, nowMs - 1))).toISOString();
+  const suffix = String(previous.auditLog.length + 1).padStart(3, "0");
+  const previousPhoto = latestActiveResidentEvidence(previous, "RESIDENT_WALL_PHOTO");
+  const previousMeter = latestActiveResidentEvidence(previous, "METER_READING");
+  const input = resumeInput(previous, new Date(evaluatedMs).toISOString());
+  input.observations = [
+    { id: `OBS-HUM-REFINE-${suffix}`, sensorBusinessId: "SENSOR-1602-HUM-01", observedAt, metric: "RELATIVE_HUMIDITY", value: controls.humidity.value, unit: "%", ...(controls.humidity.baseline === null ? {} : { baseline: controls.humidity.baseline }), durationMinutes: controls.humidity.durationMinutes, quality: controls.humidity.quality, syntheticDemo: true },
+    { id: `OBS-FLOW-REFINE-${suffix}`, sensorBusinessId: "METER-1602-FLOW-01", observedAt, metric: "MICRO_FLOW", value: controls.microFlow.value, unit: "L/min", ...(controls.microFlow.baseline === null ? {} : { baseline: controls.microFlow.baseline }), durationMinutes: controls.microFlow.durationMinutes, quality: controls.microFlow.quality, syntheticDemo: true }
+  ];
+  input.evidence = [
+    evidence(`EVD-PHOTO-REFINE-${suffix}`, {
+      type: "RESIDENT_WALL_PHOTO", status: controls.residentPhoto, observedValue: controls.photoFinding,
+      sourceActor: "RESIDENT", relatedBusinessIds: ["WALL-1602-BATHROOM-NORTH", SPACE_ID], capturedAt,
+      ...(previousPhoto ? { supersedesId: previousPhoto.id, revisionReason: "住户在证据不足后提交了新的墙面现场观察" } : {})
+    }),
+    evidence(`EVD-METER-REFINE-${suffix}`, {
+      type: "METER_READING", status: controls.meterReading, observedValue: controls.meterFinding,
+      sourceActor: "RESIDENT", relatedBusinessIds: ["METER-1602-FLOW-01"], capturedAt,
+      ...(previousMeter ? { supersedesId: previousMeter.id, revisionReason: "住户在证据不足后提交了新的水表现场观察" } : {})
+    })
+  ];
+  return assertStage4ABoundary(engine.evaluate(input, previous));
 }
 
 export function attemptUnauthorizedClose(engine: LifeEventEngine, previous: LifeEventResult, nowMs = Date.now()): LifeEventResult {
