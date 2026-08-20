@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { createBrowserLifeEventEngine, loadBrowserLifeEventAssets, type BrowserLifeEventAssets } from "@/lib/life-event-engine/adapters/browser/index.ts";
 import { createVerifiedEventPackage, verifyEventPackage } from "@/lib/life-event-engine/event-package.ts";
 import type { LifeEventResult, VerifiedLifeEventPackage } from "@/lib/life-event-engine/types.ts";
@@ -28,7 +28,6 @@ import {
   type LabTemplateId,
   withProductEvidenceDefaults
 } from "@/lib/life-event-lab/types.ts";
-import type { DraftFields } from "@/lib/building-agent/types.ts";
 import {
   createProductEvidenceAppendix,
   createPropertyEvidenceReview,
@@ -38,7 +37,6 @@ import {
   type VerifiedProductEvidenceBundle
 } from "@/lib/product/evidence.ts";
 import { residentEvidenceToDomainControls } from "@/lib/product/evidence-adapter.ts";
-import { useDemo } from "./demo-provider";
 
 export const LIFE_EVENT_PACKAGE_KEY = "zhusheng.life-event-package.v1";
 
@@ -72,41 +70,18 @@ function repairDraftForResult(result: LifeEventResult) {
   return draft;
 }
 
-function controlsFromDraft(fields: DraftFields): LabControls {
-  const defaults = controlsFromTemplate("joint-supported");
-  return {
-    ...defaults,
-    humidity: {
-      value: fields.humidity ?? defaults.humidity.value,
-      baseline: fields.humidityBaseline,
-      durationMinutes: fields.durationMinutes ?? defaults.humidity.durationMinutes,
-      quality: fields.dataQuality
-    },
-    microFlow: {
-      value: fields.microFlow ?? defaults.microFlow.value,
-      baseline: fields.microFlowBaseline,
-      durationMinutes: fields.durationMinutes ?? defaults.microFlow.durationMinutes,
-      quality: fields.dataQuality
-    },
-    residentPhoto: fields.photoPresent === false ? "MISSING" : fields.photoFinding ? "PRESENT" : "UNVERIFIED",
-    photoFinding: fields.photoFinding ?? "UNREADABLE",
-    meterReading: fields.meterFinding ? "PRESENT" : "UNVERIFIED",
-    meterFinding: fields.meterFinding ?? "UNREADABLE"
-  };
-}
-
 function pendingEventId(eventCounter: number) {
   return `EVT-1602-LAB-${String(eventCounter + 1).padStart(3, "0")}`;
 }
 
-function loadStoredSession(): { session: LabSession; found: boolean } {
+function loadStoredSession(): LabSession {
   try {
     const value = JSON.parse(sessionStorage.getItem(LAB_SESSION_KEY) ?? "null") as LabSession | null;
-    if (value?.schemaVersion === LAB_SCHEMA_VERSION) return { session: withProductEvidenceDefaults(value), found: true };
+    if (value?.schemaVersion === LAB_SCHEMA_VERSION) return withProductEvidenceDefaults(value);
   } catch {
     sessionStorage.removeItem(LAB_SESSION_KEY);
   }
-  return { session: initialSession(), found: false };
+  return initialSession();
 }
 
 function loadStoredPackage(): VerifiedLifeEventPackage | null {
@@ -139,7 +114,6 @@ type LifecycleJourneyValue = {
   submitIsolation(): void;
   submitRepair(): void;
   submitPostRepair(): void;
-  seedFromAgent(fields: DraftFields, result: LifeEventResult): void;
   resetLab(): void;
   buildVerifiedPackage(): VerifiedLifeEventPackage;
   buildProductEvidenceBundle(): VerifiedProductEvidenceBundle<VerifiedLifeEventPackage>;
@@ -148,21 +122,16 @@ type LifecycleJourneyValue = {
 const LifecycleJourneyContext = createContext<LifecycleJourneyValue | null>(null);
 
 export function LifecycleJourneyProvider({ children }: { children: React.ReactNode }) {
-  const { state: demoState, hydrated: demoHydrated } = useDemo();
   const [session, setSession] = useState<LabSession>(initialSession);
   const [hydrated, setHydrated] = useState(false);
   const [assets, setAssets] = useState<BrowserLifeEventAssets | null>(null);
   const [assetError, setAssetError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [currentPackage, setCurrentPackage] = useState<VerifiedLifeEventPackage | null>(null);
-  const hadStoredSession = useRef(false);
-  const migratedLegacy = useRef(false);
   const engine = useMemo(() => assets ? createBrowserLifeEventEngine(assets) : null, [assets]);
 
   useEffect(() => {
-    const stored = loadStoredSession();
-    hadStoredSession.current = stored.found;
-    setSession(stored.session);
+    setSession(loadStoredSession());
     setCurrentPackage(loadStoredPackage());
     setHydrated(true);
   }, []);
@@ -205,41 +174,6 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
       setBusy(false);
     }
   }, [commit]);
-
-  useEffect(() => {
-    if (!engine || !demoHydrated || migratedLegacy.current || hadStoredSession.current || session.result || demoState.currentStep < 3) return;
-    migratedLegacy.current = true;
-    try {
-      const template: LabTemplateId = demoState.currentStep === 3 ? "humidity-only" : demoState.currentStep === 4 ? "missing-evidence" : "joint-supported";
-      const controls = controlsFromTemplate(template);
-      let result = evaluateControls(engine, controls, 1);
-      if (demoState.currentStep >= 6 && result.state === "AUTHORIZATION_PENDING") {
-        result = decideAuthorization(engine, result, {
-          actorType: "RESIDENT",
-          actorId: "DEMO-RESIDENT-1602",
-          decision: "APPROVED",
-          reason: "从旧引导演示迁移的脱敏人工授权"
-        });
-        result = executeAuthorizedClose(engine, result);
-        result = submitIsolationObservation(engine, result, structuredClone(DEFAULT_ISOLATION_CONTROLS));
-      }
-      setSession((current) => ({
-        ...current,
-        controls,
-        eventCounter: 1,
-        result,
-        activeTab: result.state === "INCONCLUSIVE" ? "input" : "actions",
-        selectedView: result.visualDirective.view,
-        selectedBusinessId: result.visualDirective.highlightBusinessIds[0] ?? null,
-        repairDraft: result.state === "REPAIR_PENDING" ? repairDraftForResult(result) : current.repairDraft,
-        notice: demoState.currentStep >= 7
-          ? "旧演示已安全迁移到待维修状态；不会依据旧快照直接标记为已解决。"
-          : "已将旧引导演示迁移到真实生命事件会话。"
-      }));
-    } catch (reason) {
-      setSession((current) => ({ ...current, notice: reason instanceof Error ? reason.message : "旧演示迁移失败" }));
-    }
-  }, [demoHydrated, demoState.currentStep, engine, session.result]);
 
   const patchControls = useCallback((patch: Partial<LabControls>) => {
     setSession((current) => ({ ...current, controls: { ...current.controls, ...patch }, notice: null }));
@@ -426,20 +360,6 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
     if (engine && session.result) run(() => submitPostRepairObservation(engine, session.result!, session.postRepair), "actions");
   }, [engine, run, session.postRepair, session.result]);
 
-  const seedFromAgent = useCallback((fields: DraftFields, result: LifeEventResult) => {
-    setSession((current) => ({
-      ...current,
-      controls: controlsFromDraft(fields),
-      eventCounter: Math.max(1, current.eventCounter),
-      result,
-      activeTab: result.state === "INCONCLUSIVE" ? "input" : "diagnosis",
-      selectedView: result.visualDirective.view,
-      selectedBusinessId: result.visualDirective.highlightBusinessIds[0] ?? null,
-      repairDraft: result.state === "REPAIR_PENDING" ? repairDraftForResult(result) : current.repairDraft,
-      notice: "总智能体确认的观察与同一事件结果已进入任务处置。"
-    }));
-  }, []);
-
   const buildVerifiedPackage = useCallback(() => {
     if (!assets || !session.result) throw new Error("事件资产或结果尚未就绪");
     const sourceAssetHashes = Object.fromEntries(Object.entries(assets.integrity.files).map(([name, item]) => [name, item.sha256]));
@@ -507,11 +427,10 @@ export function LifecycleJourneyProvider({ children }: { children: React.ReactNo
     submitIsolation,
     submitRepair,
     submitPostRepair,
-    seedFromAgent,
     resetLab,
     buildVerifiedPackage,
     buildProductEvidenceBundle
-  }), [applyTemplate, assetError, assets, attemptUnauthorized, buildProductEvidenceBundle, buildVerifiedPackage, busy, currentPackage, decide, engine, evaluate, executeValveAction, hydrated, patchControls, resetLab, seedFromAgent, session, submitIsolation, submitPostRepair, submitPropertyReview, submitRepair, submitResidentEvidence]);
+  }), [applyTemplate, assetError, assets, attemptUnauthorized, buildProductEvidenceBundle, buildVerifiedPackage, busy, currentPackage, decide, engine, evaluate, executeValveAction, hydrated, patchControls, resetLab, session, submitIsolation, submitPostRepair, submitPropertyReview, submitRepair, submitResidentEvidence]);
 
   return <LifecycleJourneyContext.Provider value={value}>{children}</LifecycleJourneyContext.Provider>;
 }
