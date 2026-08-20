@@ -4,6 +4,7 @@ import type { BuildingMemoryClass, BuildingMemoryTrade, BuildingRecord, Building
 import type { EvidenceRecord } from "../demo-engine.ts";
 import type { LabSession } from "../life-event-lab/types.ts";
 import { derive1602MemoryRelevanceInput } from "./property-event-view-model.ts";
+import { residentEvidenceNeedsAssessment } from "./resident-assessment.ts";
 
 export type MemoryLifecycleStageId =
   | "PREPARATION"
@@ -92,6 +93,7 @@ export type BuildingMemoryEntry = {
 export type BuildingMemoryViewModel = {
   eventId: string;
   hasActiveEvent: boolean;
+  pendingResidentAssessment: boolean;
   totalRecords: number;
   specialRecords: number;
   eventRelatedRecords: number;
@@ -190,8 +192,10 @@ export function groupBuildingMemoryEntries(entries: BuildingMemoryEntry[]) {
 
 export function deriveBuildingMemoryViewModel(session: LabSession, workerEvidence: EvidenceRecord[] = []): BuildingMemoryViewModel {
   const hasActiveEvent = Boolean(session.result);
-  const relationInput = derive1602MemoryRelevanceInput(session);
-  const relations = hasActiveEvent
+  const pendingResidentAssessment = residentEvidenceNeedsAssessment(session.result, session.residentSubmissions);
+  const useCurrentEventRelevance = hasActiveEvent && !pendingResidentAssessment;
+  const relationInput = derive1602MemoryRelevanceInput(session, useCurrentEventRelevance ? session.result : null);
+  const relations = useCurrentEventRelevance
     ? resolveBuildingMemoryRelevance({
         ...relationInput,
         // Browsing a memory record changes selectedBusinessId. Do not let that UI selection
@@ -227,14 +231,15 @@ export function deriveBuildingMemoryViewModel(session: LabSession, workerEvidenc
   return {
     eventId: session.result?.eventId ?? "尚未进入事件",
     hasActiveEvent,
+    pendingResidentAssessment,
     totalRecords: entries.length,
     specialRecords: entries.filter((entry) => entry.special).length,
-    eventRelatedRecords: hasActiveEvent
+    eventRelatedRecords: useCurrentEventRelevance
       ? entries.filter((entry) => entry.eventRelation && ["HIGH", "MEDIUM"].includes(entry.eventRelation.relevance)).length
       : 0,
     tradeCount: new Set(entries.map((entry) => entry.trade).filter(Boolean)).size,
     entries,
-    defaultRecordId: hasActiveEvent
+    defaultRecordId: useCurrentEventRelevance
       ? firstHighSpecial?.recordId ?? firstSpecial?.recordId ?? entries[0]?.recordId ?? null
       : entries[0]?.recordId ?? null
   };
