@@ -38,10 +38,6 @@ jobs:
         run: |
           pnpm add -w --save-dev --lockfile=false playwright@1.55.0
           pnpm exec playwright install --with-deps chromium
-          sed -i 's#"C:/Users/Admin/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright"#"playwright"#g' tests/evidence-correctness-qa.mjs tests/v6-lifecycle-qa.mjs
-          sed -i 's#const output = "D:/Admin/Desktop/Project/zhusheng-agent/artifacts/exhibit-qa";#const output = "artifacts/exhibit-qa";#' tests/evidence-correctness-qa.mjs
-          sed -i 's#const output = "D:/Admin/Desktop/Project/zhusheng-agent/artifacts/v6-lifecycle";#const output = "artifacts/v6-lifecycle";#' tests/v6-lifecycle-qa.mjs
-          sed -i 's#, executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe"##' tests/evidence-correctness-qa.mjs
       - name: Start validation server
         run: |
           pnpm dev > /tmp/zhusheng-step4-next.log 2>&1 &
@@ -54,10 +50,9 @@ jobs:
           done
           cat /tmp/zhusheng-step4-next.log
           exit 1
-      - name: Product boundary browser QA
+      - name: Current product browser QA
         run: |
-          pnpm run test:evidence-correctness
-          pnpm run test:v6-lifecycle
+          pnpm run test:qa:current
           pnpm run security:scan
       - name: Stop validation server
         if: always()
