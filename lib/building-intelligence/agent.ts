@@ -91,7 +91,7 @@ export function planLocalBuildingQuery(question: string, selectedBusinessId?: st
   if (/施工|建造|留痕|安装|照片|热熔/.test(question)) return [invoke("get_construction_history", { businessId: componentId ?? systemId ?? "SPACE-1602-BATHROOM" })];
   if (/检查|检验|保压/.test(question)) return [invoke("get_inspection_history", { businessId: componentId ?? systemId ?? "SPACE-1602-BATHROOM" })];
   if (/维修|修过|维护/.test(question)) return [invoke("get_maintenance_history", { businessId: componentId ?? "SPACE-1602-BATHROOM" })];
-  if (/观察|湿度|现在|当前/.test(question) && !systemId) return [invoke("get_current_observations", { businessId: componentId ?? "SPACE-1602-BATHROOM" })];
+  if (/观察|湿度|现在|当前|实时/.test(question) && !systemId) return [invoke("get_current_observations", { businessId: componentId ?? "SPACE-1602-BATHROOM" })];
   if (/上游|从哪来|前面/.test(question) && componentId) return [invoke("get_upstream", { businessId: componentId })];
   if (/下游|到哪里|后面连接/.test(question) && componentId) return [invoke("get_downstream", { businessId: componentId })];
   if (componentId && /说明|信息|详情|这个|该构件|选中/.test(question)) return [invoke("get_component_detail", { businessId: componentId })];
@@ -107,7 +107,12 @@ export function composeAnswer(invocations: Invocation[]) {
   const invocation = invocations[invocations.length - 1];
   const { result, tool } = invocation;
   if (result.status === "NOT_FOUND") return "在当前 1602 深度空间数据中没有找到对应对象。";
-  if (result.status === "NOT_RECORDED") return "当前建筑记忆未记录这项信息。未记录不等于从未发生，需要现场或资料复核。";
+  if (result.status === "NOT_RECORDED") {
+    if (tool === "get_current_observations" && result.facts.some((fact) => fact.predicate === "NO_LIVE_OBSERVATION_SOURCE")) {
+      return "当前筑生演示没有连接实时传感器或 BMS 数据源，因此不能回答此刻的湿度、流量或运行状态。Building Memory 中存在历史观察记录，但它们不能当作当前读数。";
+    }
+    return "当前建筑记忆未记录这项信息。未记录不等于从未发生，需要现场或资料复核。";
+  }
   if (result.status === "AMBIGUOUS") return `找到多个可能对象：${(result.candidates ?? []).map((item) => item.displayName).join("、")}。请再指定一个。`;
   if (tool === "get_components_behind_surface") {
     const surfaceId = invocation.arguments.surfaceBusinessId;
@@ -119,7 +124,7 @@ export function composeAnswer(invocations: Invocation[]) {
     const route = links.map((fact) => `${readableName(fact.subjectBusinessId)} → ${readableName(String(fact.value))}`).join("；");
     return `${readableName(systemId)}的已记录功能路径为：${route || "当前只记录了系统成员，未形成连接路径"}。`;
   }
-  if (tool.endsWith("history") || tool === "get_current_observations") return result.facts.map((fact) => {
+  if (tool.endsWith("history")) return result.facts.map((fact) => {
     const [time, title, summary] = String(fact.value).split("｜");
     if (!summary) return String(fact.value);
     const date = time.slice(0, 10).replaceAll("-", ".");
