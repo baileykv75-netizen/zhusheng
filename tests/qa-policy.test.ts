@@ -6,6 +6,7 @@ const packageUrl = new URL("../package.json", import.meta.url);
 const policyUrl = new URL("./QA_POLICY.md", import.meta.url);
 const guardUrl = new URL("./legacy-qa-guard.mjs", import.meta.url);
 const workflowUrl = new URL("../.github/workflows/step4-validation.yml", import.meta.url);
+const spatialQaUrl = new URL("./spatial-drilldown-qa.mjs", import.meta.url);
 
 const legacyScripts = [
   ["test:exhibit", "exhibit"],
@@ -22,13 +23,36 @@ test("current browser QA has one explicit source-of-truth entrypoint", async () 
   const current = pkg.scripts["test:qa:current"] as string;
 
   assert.match(current, /test:css-delivery/);
+  assert.match(current, /test:spatial-drilldown/);
   assert.match(current, /test:evidence-correctness/);
   assert.match(current, /test:v6-lifecycle/);
   assert.doesNotMatch(current, /test:exhibit|test:stage4b-visual|test:journey-visual|test:unified-workspace/);
 
   assert.equal(pkg.scripts["test:css-delivery"], "node tests/css-delivery-qa.mjs");
+  assert.equal(pkg.scripts["test:spatial-drilldown"], "node tests/spatial-drilldown-qa.mjs");
   assert.equal(pkg.scripts["test:evidence-correctness"], "node tests/evidence-correctness-qa.mjs");
   assert.equal(pkg.scripts["test:v6-lifecycle"], "node tests/v6-lifecycle-qa.mjs");
+});
+
+test("current spatial QA validates real user-controlled building continuity", async () => {
+  const [source, policy] = await Promise.all([
+    readFile(spatialQaUrl, "utf8"),
+    readFile(policyUrl, "utf8")
+  ]);
+
+  assert.match(source, /data-visual-source/);
+  assert.match(source, /hero-glb/);
+  assert.match(source, /phase-building/);
+  assert.match(source, /phase-floor/);
+  assert.match(source, /phase-unit/);
+  assert.match(source, /phase-space/);
+  assert.match(source, /waitForTimeout\(2700\)/);
+  assert.match(source, /entry.*building/);
+  assert.match(source, /从建筑进入1602卫生间的空间路径/);
+  assert.match(source, /390/);
+  assert.match(source, /scrollWidth/);
+  assert.match(policy, /真实 `hero-glb` 加载/);
+  assert.match(policy, /程序化 fallback 只用于产品降级/);
 });
 
 test("historical QA cannot silently masquerade as current acceptance", async () => {

@@ -13,13 +13,14 @@
 5. `pnpm run build:next`
 6. `pnpm run test:pages-export`
 
-其中 `test:qa:current` 只包含三条当前浏览器 QA：
+其中 `test:qa:current` 包含四条当前浏览器 QA：
 
 - `test:css-delivery`：当前产品壳、样式交付、响应式与静态资源完整性。
+- `test:spatial-drilldown`：真实 `hero-glb` 加载、Building → 16F → 1602 → 卫生间用户控制下钻、返回与 breadcrumb、无自动跳转、Case 空间交接与移动端无横向溢出。
 - `test:evidence-correctness`：Product Evidence / Domain Evidence、人工观察、来源、独立物业复核与 PRODUCT_ONLY 边界。
 - `test:v6-lifecycle`：住户事实 → 物业确定性评估 → 人工授权 → 设备动作 → 隔离验证 → 维修证据 → 独立恢复授权 → 维修后复验 → PILOT_ONLY。
 
-`tests/evidence-correctness-qa.mjs` 与 `tests/v6-lifecycle-qa.mjs` 是稳定入口，实际分别加载当前 v2 脚本。
+`tests/evidence-correctness-qa.mjs` 与 `tests/v6-lifecycle-qa.mjs` 是稳定入口，实际分别加载当前 v2 脚本；`tests/spatial-drilldown-qa.mjs` 直接验证当前空间连续性。
 
 ## 2. 当前产品的不可回退语义
 
@@ -36,6 +37,7 @@
 - 维修后复验需要新的证据身份与明确人工确认。
 - Case 当前叙事是 `过去 / 此刻 / 处置 / 结果` 四阶段。
 - Building → 16F → 1602 → 卫生间是用户控制的空间下钻，不是定时自动播放。
+- 首页空间下钻的当前验收要求真实 `hero-glb` 成功加载；程序化 fallback 只用于产品降级，不代表主视觉空间资产验收通过。
 - 单事件经验最多进入 `PILOT_ONLY`，不会自动升级为企业标准。
 
 ## 3. 历史阶段 QA
@@ -63,7 +65,7 @@
 
 以后修改产品时：
 
-1. 先更新 Node regression / 当前 v2 browser QA，保证测试表达的是产品真值。
+1. 先更新 Node regression / 当前 browser QA，保证测试表达的是产品真值。
 2. 不为了让旧 QA 变绿而回退当前产品行为。
 3. 如果历史脚本仍有可复用价值，应把有效断言迁移进当前 QA，而不是直接恢复旧脚本的权威地位。
 4. 新增现行浏览器 QA 时，应加入 `test:qa:current`，并同步更新本文件和 `tests/qa-policy.test.ts`。
