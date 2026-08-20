@@ -84,6 +84,15 @@ function validatedResidentCapturedAt(value: string | undefined, nowMs: number, f
   return new Date(parsed).toISOString();
 }
 
+function assessmentEvaluatedAt(residentCapturedAt: string | undefined, nowMs: number) {
+  if (!residentCapturedAt) return iso(nowMs, -60_000);
+  const capturedMs = Date.parse(residentCapturedAt);
+  if (!Number.isFinite(capturedMs)) throw new Error("住户证据时间无效");
+  if (capturedMs > nowMs) throw new Error("住户证据不能使用未来时间");
+  const preferredMs = nowMs - 1_000;
+  return new Date(Math.min(nowMs, Math.max(capturedMs + 1, preferredMs))).toISOString();
+}
+
 export function buildAssessmentInput(controls: LabControls, eventCounter: number, nowMs = Date.now(), residentCapturedAt?: string): LifeEventInput {
   const suffix = String(eventCounter).padStart(3, "0");
   const eventId = `EVT-1602-LAB-${suffix}`;
@@ -96,7 +105,7 @@ export function buildAssessmentInput(controls: LabControls, eventCounter: number
     { id: `OBS-FLOW-LAB-${suffix}`, sensorBusinessId: "METER-1602-FLOW-01", observedAt, metric: "MICRO_FLOW", value: controls.microFlow.value, unit: "L/min", ...(controls.microFlow.baseline === null ? {} : { baseline: controls.microFlow.baseline }), durationMinutes: controls.microFlow.durationMinutes, quality: controls.microFlow.quality, syntheticDemo: true }
   ];
   return {
-    eventId, buildingId: BUILDING_ID, spaceId: SPACE_ID, detectedAt, evaluatedAt: iso(nowMs, 0), observations,
+    eventId, buildingId: BUILDING_ID, spaceId: SPACE_ID, detectedAt, evaluatedAt: assessmentEvaluatedAt(residentCapturedAt, nowMs), observations,
     evidence: [
       evidence(`EVD-PIPE-LAB-${suffix}`, { type: "PIPE_INSTALLATION_RECORD", status: controls.pipeInstallation, observedValue: "TRACEABLE", sourceActor: "WORKER", relatedBusinessIds: ["J-1602-CW-03", "PIPE-1602-CW-01"], capturedAt: "2025-03-18T14:26:00.000Z" }),
       evidence(`EVD-WP-LAB-${suffix}`, { type: "WATERPROOFING_RECORD", status: controls.waterproofing, observedValue: "COMPLETE", sourceActor: "WORKER", relatedBusinessIds: ["WP-1602-BATHROOM"], capturedAt: "2025-03-19T10:08:00.000Z" }),
