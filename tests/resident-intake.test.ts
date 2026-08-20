@@ -42,6 +42,24 @@ test("photo-confirmed moisture can trigger meter follow-up even when resident wo
   assert.deepEqual(request.triggeredBy, ["SPACE_CONTEXT", "PHOTO"]);
 });
 
+test("moisture wording alone cannot override a photo that shows no visible moisture", () => {
+  const request = derive1602ResidentFollowUp({
+    description: "卫生间墙角一直很潮，感觉像在渗水",
+    photoFinding: "NO_VISIBLE_MOISTURE"
+  });
+
+  assert.equal(request, null);
+});
+
+test("unreadable photo stops the meter branch even when the description mentions moisture", () => {
+  const request = derive1602ResidentFollowUp({
+    description: "卫生间墙角最近返潮",
+    photoFinding: "UNREADABLE"
+  });
+
+  assert.equal(request, null);
+});
+
 test("non-moisture resident symptoms never get forced into the water-meter leak workflow", () => {
   const request = derive1602ResidentFollowUp({
     description: "卫生间镜前灯一直闪烁",
