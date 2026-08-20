@@ -1,5 +1,5 @@
-import assert from "node:assert/strict";
 import test from "node:test";
+import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const packageUrl = new URL("../package.json", import.meta.url);
@@ -53,6 +53,26 @@ test("current spatial QA validates real user-controlled building continuity", as
   assert.match(source, /scrollWidth/);
   assert.match(policy, /真实 `hero-glb` 加载/);
   assert.match(policy, /程序化 fallback 只用于产品降级/);
+});
+
+test("spatial QA is portable across trailing-slash routes and headless CI", async () => {
+  const [source, policy] = await Promise.all([
+    readFile(spatialQaUrl, "utf8"),
+    readFile(policyUrl, "utf8")
+  ]);
+
+  assert.match(source, /createRequire/);
+  assert.match(source, /CODEX_PLAYWRIGHT_MODULE/);
+  assert.match(source, /browserExecutable/);
+  assert.match(source, /normalizePathname/);
+  assert.match(source, /trailingSlash: true/);
+  assert.match(source, /enable-unsafe-swiftshader/);
+  assert.doesNotMatch(source, /import \{ chromium \} from "playwright"/);
+
+  assert.match(policy, /trailingSlash: true/);
+  assert.match(policy, /CODEX_PLAYWRIGHT_MODULE/);
+  assert.match(policy, /SwiftShader 软件 WebGL/);
+  assert.match(policy, /必须加载真实 `hero-glb`/);
 });
 
 test("historical QA cannot silently masquerade as current acceptance", async () => {
