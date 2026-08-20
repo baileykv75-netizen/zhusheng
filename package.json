@@ -30,7 +30,6 @@
     "check:building-intelligence-assets": "node --experimental-strip-types scripts/sync-building-intelligence-assets.ts --check",
     "group:export": "node --experimental-strip-types scripts/generate-group-learning-artifacts.ts",
     "test:stage5-visual": "node tests/stage5-visual-qa.mjs",
-    "test:stage6a-visual": "node tests/stage6a-visual-qa.mjs",
     "test:stage6b-visual": "node tests/stage6b-visual-qa.mjs",
     "test:journey-visual": "node tests/journey-visual-qa.mjs",
     "test:unified-workspace": "node tests/unified-lifecycle-visual-qa.mjs",
