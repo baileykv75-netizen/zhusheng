@@ -27,7 +27,7 @@ test("core work routes read as one building product instead of independent demo 
   assert.match(memory, /BuildingMemoryWorkspace/);
   assert.match(property, /这栋房子记得什么/);
   assert.match(resident, /1602现场受理/);
-  assert.match(resident, /result\?\.eventId/);
+  assert.match(resident, /residentEvidenceNeedsAssessment/);
   assert.match(resident, /住户事实已保存 · 等待物业接入/);
   assert.match(worker, /BUILDING MEMORY/);
 });
@@ -51,7 +51,10 @@ test("mobile primary navigation never labels a link as building overview while s
 test("the product keeps one deep event without manufacturing building or enterprise scale", async () => {
   const [events, group] = await Promise.all([readFile(eventsUrl, "utf8"), readFile(groupUrl, "utf8")]);
 
-  assert.match(events, /EVT-1602/);
+  assert.match(events, /residentEvidenceNeedsAssessment\(session\.result, session\.residentSubmissions\)/);
+  assert.match(events, /session\.result\?\.eventId \?\? "尚未进入事件"/);
+  assert.match(events, /待接入现场受理|同事件补证待确认/);
+  assert.match(events, /完整深度事件/);
   assert.match(events, /没有活动事件时，这里保持为空/);
   assert.match(events, /查看四个脱敏事件结构示例/);
   assert.match(events, /不参与上方任何统计或任务队列/);
