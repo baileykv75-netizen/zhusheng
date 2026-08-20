@@ -25,7 +25,7 @@ const progressLabels: Record<string, string> = {
 type IntakeStage = "OBSERVATION" | "FOLLOW_UP";
 
 export function ResidentService() {
-  const { session, setSession, assets, busy, submitResidentEvidence, decideAuthorization } = useLifecycleJourney();
+  const { session, setSession, busy, submitResidentEvidence, decideAuthorization } = useLifecycleJourney();
   const result = session.result;
   const [description, setDescription] = useState("");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -209,7 +209,7 @@ export function ResidentService() {
 
           <div className="resident-followup-actions">
             <button className="resident-secondary" type="button" onClick={resetFollowUp}>返回修改现场情况</button>
-            {followUp ? <button className="resident-primary" disabled={busy || !assets || !meterFinding} onClick={submitEvidence}>{busy ? "正在提交…" : result?.state === "REOPENED" ? "提交新的现场证据" : "提交这项补充并交给物业核对"}<ArrowRight size={17} /></button> : <Link className="resident-secondary" href="/events">返回事件中心</Link>}
+            {followUp ? <button className="resident-primary" disabled={busy || !meterFinding} onClick={submitEvidence}>{busy ? "正在提交…" : result?.state === "REOPENED" ? "提交新的现场证据" : "提交这项补充并交给物业核对"}<ArrowRight size={17} /></button> : <Link className="resident-secondary" href="/events">返回事件中心</Link>}
           </div>
           {followUp ? <p className="resident-boundary"><ShieldCheck size={14} />提交后先形成住户原始证据，不会立刻产生故障判断；物业只能追加独立复核，不能覆盖你的原始提交。</p> : null}
         </>}
