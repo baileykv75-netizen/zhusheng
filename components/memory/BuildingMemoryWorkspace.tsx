@@ -105,7 +105,9 @@ export function BuildingMemoryWorkspace() {
   const groups = useMemo(() => groupBuildingMemoryEntries(visibleEntries), [visibleEntries]);
   const selected = model.entries.find((entry) => entry.recordId === selectedRecordId) ?? model.entries.find((entry) => entry.recordId === model.defaultRecordId) ?? null;
   const queryVisual = memoryVisual(selected);
-  const directive: VisualDirective = session.result?.visualDirective ?? defaultDirective;
+  const directive: VisualDirective = model.pendingResidentAssessment
+    ? defaultDirective
+    : session.result?.visualDirective ?? defaultDirective;
 
   function selectRecord(entry: BuildingMemoryEntry) {
     setSelectedRecordId(entry.recordId);
@@ -132,21 +134,23 @@ export function BuildingMemoryWorkspace() {
       <div className={styles.heroCopy}>
         <span className={styles.eyebrow}>BUILDING MEMORY · 16F / 1602</span>
         <h1>这栋房子记得自己经历过什么</h1>
-        <p>{model.hasActiveEvent
-          ? `当前处理 ${model.eventId} 时，相关历史会参与排查优先级，但不会被自动升级为故障结论。`
-          : "当前没有活动事件。这里先作为建筑生命周期档案浏览；返工、现场调整或检查边界都只是历史事实，不代表今天存在对应故障。"}</p>
+        <p>{model.pendingResidentAssessment
+          ? `事件 ${model.eventId} 仍然保留，但新的住户事实尚未完成本轮确定性评估。此刻只按生命周期、空间与构件浏览历史，不沿用上一轮诊断相关性排序。`
+          : model.hasActiveEvent
+            ? `当前处理 ${model.eventId} 时，已由当前事件事实确认的相关历史会参与排查优先级，但不会被自动升级为故障结论。`
+            : "当前没有活动事件。这里先作为建筑生命周期档案浏览；返工、现场调整或检查边界都只是历史事实，不代表今天存在对应故障。"}</p>
       </div>
       <div className={styles.metrics} aria-label="建筑记忆摘要">
         <div><strong>{model.totalRecords}</strong><span>生命周期记忆</span></div>
         <div><strong>{model.specialRecords}</strong><span>特殊历史节点</span></div>
-        <div><strong>{model.eventRelatedRecords}</strong><span>当前事件相关</span></div>
+        <div><strong>{model.eventRelatedRecords}</strong><span>{model.pendingResidentAssessment ? "本轮已确认相关" : "当前事件相关"}</span></div>
         <div><strong>{model.tradeCount}</strong><span>专业 / 阶段</span></div>
       </div>
     </header>
 
     <div className={styles.contextBar}>
       <div><Database size={15} /><span>{product.buildingLabel}</span><strong>1602卫生间</strong></div>
-      <div><span>当前事件</span><strong>{model.eventId}</strong><span className={styles.demoTag}>脱敏演示数据</span></div>
+      <div><span>当前事件</span><strong>{model.eventId}</strong><span className={styles.demoTag}>{model.pendingResidentAssessment ? "本轮待评估" : "脱敏演示数据"}</span></div>
     </div>
 
     <div className={styles.toolbar}>
@@ -160,7 +164,7 @@ export function BuildingMemoryWorkspace() {
       <section className={styles.timeline} aria-label="建筑记忆时间线">
         <div className={styles.timelineHead}>
           <div><span>生命周期时间线</span><strong>{visibleEntries.length} 条记录</strong></div>
-          <small>特殊节点提高视觉权重；正常记录仍保留为建筑背景，而不是故障排除证明。</small>
+          <small>{model.pendingResidentAssessment ? "新一轮评估完成前不显示旧轮次的 HIGH / MEDIUM 事件相关标签。" : "特殊节点提高视觉权重；正常记录仍保留为建筑背景，而不是故障排除证明。"}</small>
         </div>
 
         {groups.length ? groups.map((group) => <section className={styles.stage} key={group.id}>
@@ -243,7 +247,7 @@ export function BuildingMemoryWorkspace() {
               <div className={styles.relationHeadline}><strong>{relevanceLabel[selected.eventRelation.relevance]}</strong><span>{signalLabel[selected.eventRelation.historicalSignal]}</span></div>
               <div className={styles.reasonList}>{selected.eventRelation.reasons.map((reason) => <span key={`${reason.code}-${reason.detail ?? ""}`}>{reason.label}{reason.detail ? ` · ${reason.detail}` : ""}</span>)}</div>
               <p>{selected.eventRelation.historicalBoundary}</p>
-            </section> : <section className={styles.eventRelation}><div className={styles.sectionTitle}><ShieldCheck size={14} /><strong>{model.hasActiveEvent ? "当前事件关系" : "生命周期背景"}</strong></div><p>{model.hasActiveEvent ? "这条记录目前只作为建筑生命周期背景保存，没有被当前事件相关性规则提升优先级。" : "当前没有活动事件，这条记录只按原始时间、空间和构件身份保存，不参与任何诊断排序。"}</p></section>}
+            </section> : <section className={styles.eventRelation}><div className={styles.sectionTitle}><ShieldCheck size={14} /><strong>{model.pendingResidentAssessment ? "本轮事件关系待计算" : model.hasActiveEvent ? "当前事件关系" : "生命周期背景"}</strong></div><p>{model.pendingResidentAssessment ? "新住户事实尚未完成本轮确定性评估，因此这里不沿用上一轮的 HIGH / MEDIUM 相关性；记录仍作为建筑历史完整保留。" : model.hasActiveEvent ? "这条记录目前只作为建筑生命周期背景保存，没有被当前事件相关性规则提升优先级。" : "当前没有活动事件，这条记录只按原始时间、空间和构件身份保存，不参与任何诊断排序。"}</p></section>}
 
             <div className={styles.businessIds}>
               <span>关联构件 / 系统</span>
