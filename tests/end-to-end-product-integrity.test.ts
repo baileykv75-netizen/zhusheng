@@ -12,6 +12,7 @@ const evidenceTimelineUrl = new URL("../components/EvidenceTimeChain.tsx", impor
 const memoryUrl = new URL("../lib/product/building-memory-view-model.ts", import.meta.url);
 const eventsUrl = new URL("../lib/product/building-life-events.ts", import.meta.url);
 const eventCenterUrl = new URL("../components/BuildingEventCenter.tsx", import.meta.url);
+const residentAssessmentUrl = new URL("../lib/product/resident-assessment.ts", import.meta.url);
 const groupUrl = new URL("../app/group/page.tsx", import.meta.url);
 const workerUrl = new URL("../app/worker/page.tsx", import.meta.url);
 const demoEngineUrl = new URL("../lib/demo-engine.ts", import.meta.url);
@@ -54,6 +55,24 @@ test("resident evidence intake persists without requiring event-engine assets", 
   assert.doesNotMatch(provider, /const submitResidentEvidence = useCallback\(\(draft: ResidentEvidenceDraft\) => \{\s*if \(!engine\)/);
 });
 
+test("resident property and event center share one pending-assessment selector", async () => {
+  const [resident, propertyWorkbench, center, selector] = await Promise.all([
+    readFile(residentUrl, "utf8"),
+    readFile(propertyWorkbenchUrl, "utf8"),
+    readFile(eventCenterUrl, "utf8"),
+    readFile(residentAssessmentUrl, "utf8")
+  ]);
+
+  assert.match(selector, /export function residentEvidenceNeedsAssessment/);
+  assert.match(selector, /result\.state === "INCONCLUSIVE"/);
+  assert.match(selector, /result\.state === "REOPENED"/);
+  assert.match(selector, /hasFreshEvidenceAfterReopen/);
+  for (const source of [resident, propertyWorkbench, center]) {
+    assert.match(source, /residentEvidenceNeedsAssessment/);
+  }
+  assert.doesNotMatch(center, /!session\.result && Boolean\(session\.residentSubmissions/);
+});
+
 test("property surfaces only event observations and requires human confirmation of every demo draft", async () => {
   const [viewModel, workbench] = await Promise.all([
     readFile(propertyUrl, "utf8"),
@@ -66,6 +85,8 @@ test("property surfaces only event observations and requires human confirmation 
   assert.match(workbench, /模板或高级验证中的数值草稿不能冒充当前事实/);
   assert.match(workbench, /initialObservationConfirmed/);
   assert.match(workbench, /不是直接采用预置演示答案/);
+  assert.match(workbench, /继续同一事件确定性评估/);
+  assert.match(workbench, /上一轮事件观测/);
   assert.match(workbench, /isolationObservationConfirmed/);
   assert.match(workbench, /repairRecordConfirmed/);
   assert.match(workbench, /postRepairObservationConfirmed/);
@@ -101,7 +122,7 @@ test("evidence timeline renders only records that actually exist in the current 
   assert.doesNotMatch(source, /恢复供水后的新观察/);
 });
 
-test("building situation keeps intake separate from EVT-1602 and uses actual event counts after assessment", async () => {
+test("building situation keeps intake separate from event instances and surfaces pending same-event evidence", async () => {
   const [model, center] = await Promise.all([
     readFile(eventsUrl, "utf8"),
     readFile(eventCenterUrl, "utf8")
@@ -110,7 +131,9 @@ test("building situation keeps intake separate from EVT-1602 and uses actual eve
   assert.match(model, /deepResult\.input\.evidence\.length \+ deepResult\.input\.observations\.length/);
   assert.match(model, /pending1602Evidence = false/);
   assert.match(model, /id: "INTAKE-1602"/);
-  assert.match(model, /id: "EVT-1602"/);
+  assert.match(model, /deepResult\?\.eventId \?\? "EVT-1602"/);
+  assert.match(model, /pendingSameEventAssessment/);
+  assert.match(model, /新住户事实已提交，等待物业确认本轮系统观测/);
   assert.match(model, /1602卫生间现场事实待评估/);
   assert.match(model, /return deepEvent \? \[deepEvent\] : \[\]/);
   assert.match(model, /buildingLifeEventExamples/);
@@ -118,8 +141,9 @@ test("building situation keeps intake separate from EVT-1602 and uses actual eve
   assert.match(model, /按当前事实补充下一项必要证据/);
   assert.doesNotMatch(model, /evidenceCount: 6/);
   assert.doesNotMatch(model, /COLLECTING_EVIDENCE: \{[^\n]*确认水表观察/);
-  assert.match(center, /const pending1602Evidence = !session\.result && Boolean\(session\.residentSubmissions\?\.length\)/);
+  assert.match(center, /residentEvidenceNeedsAssessment\(session\.result, session\.residentSubmissions\)/);
   assert.match(center, /buildingLifeEvents\(session\.result, pending1602Evidence\)/);
+  assert.match(center, /进入物业继续评估/);
   assert.match(center, /没有活动事件时，这里保持为空/);
   assert.match(center, /不参与上方任何统计或任务队列/);
 });
