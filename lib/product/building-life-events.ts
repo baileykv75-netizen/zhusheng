@@ -42,101 +42,121 @@ const displayState: Record<LifeEventState, Pick<BuildingLifeEventSummary, "displ
 
 const BUILDING_MEMORY_EVIDENCE = new Set(["PIPE_INSTALLATION_RECORD", "WATERPROOFING_RECORD", "CLOSED_WATER_TEST"]);
 
-export function buildingLifeEvents(source?: LifeEventResult | LifeEventState | null): BuildingLifeEventSummary[] {
+const overviewEvents: BuildingLifeEventSummary[] = [
+  {
+    id: "EVT-1203",
+    title: "1203窗边渗水",
+    floor: 12,
+    unitId: "1203",
+    space: "次卧窗边",
+    category: "外围护",
+    severity: "一般",
+    displayStatus: "等待补充现场信息",
+    ownerRole: "住户",
+    nextAction: "补拍雨后窗边照片",
+    updatedAt: "18分钟前",
+    evidenceCount: 1,
+    memoryReferenceCount: 2,
+    isDeepDemo: false,
+    dataClass: "DEMO_SYNTHETIC"
+  },
+  {
+    id: "EVT-1801",
+    title: "1801水压异常",
+    floor: 18,
+    unitId: "1801",
+    space: "厨房用水点",
+    category: "给排水",
+    severity: "关注",
+    displayStatus: "等待人工授权",
+    ownerRole: "住户",
+    nextAction: "确认是否允许短时测试",
+    updatedAt: "34分钟前",
+    evidenceCount: 2,
+    memoryReferenceCount: 1,
+    isDeepDemo: false,
+    dataClass: "DEMO_SYNTHETIC"
+  },
+  {
+    id: "EVT-903",
+    title: "903空调冷凝异常",
+    floor: 9,
+    unitId: "903",
+    space: "客厅空调位",
+    category: "暖通",
+    severity: "关注",
+    displayStatus: "已解决",
+    ownerRole: "物业维修",
+    nextAction: "无待办",
+    updatedAt: "昨天",
+    evidenceCount: 4,
+    memoryReferenceCount: 2,
+    isDeepDemo: false,
+    dataClass: "DEMO_SYNTHETIC"
+  },
+  {
+    id: "EVT-702",
+    title: "702卫生间地漏异味",
+    floor: 7,
+    unitId: "702",
+    space: "公卫地漏",
+    category: "给排水",
+    severity: "一般",
+    displayStatus: "处理中",
+    ownerRole: "物业维修",
+    nextAction: "检查水封与通气条件",
+    updatedAt: "2小时前",
+    evidenceCount: 2,
+    memoryReferenceCount: 1,
+    isDeepDemo: false,
+    dataClass: "DEMO_SYNTHETIC"
+  }
+];
+
+export function buildingLifeEvents(
+  source?: LifeEventResult | LifeEventState | null,
+  pending1602Evidence = false
+): BuildingLifeEventSummary[] {
   const deepResult = source && typeof source === "object" ? source : null;
   const state = typeof source === "string" ? source : deepResult?.state;
-  const current = state ? displayState[state] : displayState.DETECTED;
-  const evidenceCount = deepResult
-    ? deepResult.input.evidence.length + deepResult.input.observations.length
-    : 0;
-  const memoryReferenceCount = deepResult
-    ? deepResult.input.evidence.filter((item) => BUILDING_MEMORY_EVIDENCE.has(item.type)).length
-    : 0;
+  const deepEvent = state
+    ? {
+        id: "EVT-1602",
+        title: "1602卫生间现场异常",
+        floor: 16,
+        unitId: "1602",
+        space: "主卫",
+        category: "待确定",
+        severity: "重要" as const,
+        ...displayState[state],
+        technicalState: state,
+        updatedAt: "刚刚",
+        evidenceCount: deepResult ? deepResult.input.evidence.length + deepResult.input.observations.length : 0,
+        memoryReferenceCount: deepResult
+          ? deepResult.input.evidence.filter((item) => BUILDING_MEMORY_EVIDENCE.has(item.type)).length
+          : 0,
+        isDeepDemo: true,
+        dataClass: "DEMO_SYNTHETIC" as const
+      }
+    : pending1602Evidence
+      ? {
+          id: "EVT-1602",
+          title: "1602卫生间现场事实待评估",
+          floor: 16,
+          unitId: "1602",
+          space: "主卫",
+          category: "待评估",
+          severity: "关注" as const,
+          displayStatus: "住户事实已提交，等待物业确认系统观测",
+          ownerRole: "物业值班" as const,
+          nextAction: "核对本轮系统观测并运行第一次确定性评估",
+          updatedAt: "刚刚",
+          evidenceCount: 0,
+          memoryReferenceCount: 0,
+          isDeepDemo: true,
+          dataClass: "DEMO_SYNTHETIC" as const
+        }
+      : null;
 
-  return [
-    {
-      id: "EVT-1602",
-      title: "1602卫生间持续潮湿",
-      floor: 16,
-      unitId: "1602",
-      space: "主卫北侧墙",
-      category: "给排水",
-      severity: "重要",
-      ...current,
-      ...(state ? { technicalState: state } : {}),
-      updatedAt: "刚刚",
-      evidenceCount,
-      memoryReferenceCount,
-      isDeepDemo: true,
-      dataClass: "DEMO_SYNTHETIC"
-    },
-    {
-      id: "EVT-1203",
-      title: "1203窗边渗水",
-      floor: 12,
-      unitId: "1203",
-      space: "次卧窗边",
-      category: "外围护",
-      severity: "一般",
-      displayStatus: "等待补充现场信息",
-      ownerRole: "住户",
-      nextAction: "补拍雨后窗边照片",
-      updatedAt: "18分钟前",
-      evidenceCount: 1,
-      memoryReferenceCount: 2,
-      isDeepDemo: false,
-      dataClass: "DEMO_SYNTHETIC"
-    },
-    {
-      id: "EVT-1801",
-      title: "1801水压异常",
-      floor: 18,
-      unitId: "1801",
-      space: "厨房用水点",
-      category: "给排水",
-      severity: "关注",
-      displayStatus: "等待人工授权",
-      ownerRole: "住户",
-      nextAction: "确认是否允许短时测试",
-      updatedAt: "34分钟前",
-      evidenceCount: 2,
-      memoryReferenceCount: 1,
-      isDeepDemo: false,
-      dataClass: "DEMO_SYNTHETIC"
-    },
-    {
-      id: "EVT-903",
-      title: "903空调冷凝异常",
-      floor: 9,
-      unitId: "903",
-      space: "客厅空调位",
-      category: "暖通",
-      severity: "关注",
-      displayStatus: "已解决",
-      ownerRole: "物业维修",
-      nextAction: "无待办",
-      updatedAt: "昨天",
-      evidenceCount: 4,
-      memoryReferenceCount: 2,
-      isDeepDemo: false,
-      dataClass: "DEMO_SYNTHETIC"
-    },
-    {
-      id: "EVT-702",
-      title: "702卫生间地漏异味",
-      floor: 7,
-      unitId: "702",
-      space: "公卫地漏",
-      category: "给排水",
-      severity: "一般",
-      displayStatus: "处理中",
-      ownerRole: "物业维修",
-      nextAction: "检查水封与通气条件",
-      updatedAt: "2小时前",
-      evidenceCount: 2,
-      memoryReferenceCount: 1,
-      isDeepDemo: false,
-      dataClass: "DEMO_SYNTHETIC"
-    }
-  ];
+  return deepEvent ? [deepEvent, ...overviewEvents] : [...overviewEvents];
 }
