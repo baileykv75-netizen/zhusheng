@@ -48,17 +48,20 @@ test("event center shows only actual event locations instead of eighteen mostly 
 
   assert.doesNotMatch(source, /Array\.from\(\{ length: 18 \}/);
   assert.doesNotMatch(source, /暂无事件/);
-  assert.match(source, /当前有事件的空间|只显示当前有事件的楼层与空间/);
-  assert.match(source, /完整深度事件/);
+  assert.match(source, /只显示当前有事件或待接入事实的楼层与空间/);
   assert.match(source, /专业处置在对应深度事件中展开/);
+  assert.match(source, /pending1602Evidence/);
 });
 
-test("1602 event summary never preselects meter or a component before evidence supports it", async () => {
+test("1602 is not manufactured as an active event before resident evidence exists", async () => {
   const source = await readFile(eventModelUrl, "utf8");
 
-  assert.match(source, /DETECTED: \{ displayStatus: "等待住户描述现场"/);
+  assert.match(source, /pending1602Evidence = false/);
+  assert.match(source, /: pending1602Evidence/);
+  assert.match(source, /1602卫生间现场事实待评估/);
+  assert.match(source, /: null;/);
   assert.match(source, /按当前事实补充下一项必要证据/);
-  assert.match(source, /const current = state \? displayState\[state\] : displayState\.DETECTED/);
+  assert.doesNotMatch(source, /state \? displayState\[state\] : displayState\.DETECTED/);
   assert.doesNotMatch(source, /DETECTED: \{[^\n]*北侧墙角/);
   assert.doesNotMatch(source, /COLLECTING_EVIDENCE: \{[^\n]*确认水表观察/);
 });
