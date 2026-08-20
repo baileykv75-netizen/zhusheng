@@ -148,7 +148,9 @@ export function createResidentEvidenceSubmission(input: {
   const descriptionEvidenceId = productEvidenceId("PROD-RES-TEXT", productEventKey, 1);
   const photoEvidenceId = productEvidenceId("PROD-RES-PHOTO", productEventKey, 2);
   const meterRequested = input.draft.meterFinding !== "NOT_REQUESTED";
-  const storedMeterFinding: StoredResidentMeterFinding = meterRequested ? input.draft.meterFinding : "UNREADABLE";
+  const storedMeterFinding: StoredResidentMeterFinding = input.draft.meterFinding === "NOT_REQUESTED"
+    ? "UNREADABLE"
+    : input.draft.meterFinding;
   const meterEvidenceId = meterRequested ? productEvidenceId("PROD-RES-METER", productEventKey, 3) : undefined;
   const photoDescription = [
     `人工观察=${input.draft.photo.finding}`,

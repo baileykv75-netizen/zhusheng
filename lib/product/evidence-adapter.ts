@@ -15,7 +15,9 @@ export function residentEvidenceToDomainControls(
     throw new Error("住户尚未确认照片观察，不能转换成领域证据");
   }
   const meterNotRequested = draft.meterFinding === "NOT_REQUESTED";
-  const meterFinding: LabControls["meterFinding"] = meterNotRequested ? "UNREADABLE" : draft.meterFinding;
+  const meterFinding: LabControls["meterFinding"] = draft.meterFinding === "NOT_REQUESTED"
+    ? "UNREADABLE"
+    : draft.meterFinding;
   return {
     ...base,
     residentPhoto: draft.photo.finding === "UNREADABLE" ? "UNVERIFIED" : "PRESENT",
