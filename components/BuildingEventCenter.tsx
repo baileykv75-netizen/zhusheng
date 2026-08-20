@@ -5,16 +5,18 @@ import { ArrowRight, Building2, Clock3, MapPin } from "lucide-react";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { buildingLifeEventExamples, buildingLifeEvents } from "@/lib/product/building-life-events";
 import { buildingTasks } from "@/lib/product/building-tasks";
+import { residentEvidenceNeedsAssessment } from "@/lib/product/resident-assessment";
 import styles from "./BuildingEventCenter.module.css";
 
 export function BuildingEventCenter() {
   const { session } = useLifecycleJourney();
-  const pending1602Evidence = !session.result && Boolean(session.residentSubmissions?.length);
+  const pending1602Evidence = residentEvidenceNeedsAssessment(session.result, session.residentSubmissions);
   const events = buildingLifeEvents(session.result, pending1602Evidence);
   const tasks = buildingTasks(events, session.result);
   const residentOwned = events.filter((event) => event.ownerRole === "住户").length;
   const propertyOwned = events.filter((event) => event.ownerRole.startsWith("物业")).length;
   const resolved = events.filter((event) => event.displayStatus.includes("解决")).length;
+  const sameEventReassessment = Boolean(session.result && pending1602Evidence);
 
   return <div className={`event-center ${styles.center}`}>
     <header className={styles.hero}>
@@ -33,7 +35,7 @@ export function BuildingEventCenter() {
 
     <div className={styles.context}>
       <div><Building2 size={15} /><strong>18层 MiC 住宅</strong><span>当前会话真实事项</span></div>
-      <div><span>1602深度链</span><strong>{session.result?.eventId ?? "尚未进入事件"}</strong><span>{session.result ? "事件实例 ID 直接来自确定性引擎" : pending1602Evidence ? "住户事实已受理，仍处于 INTAKE-1602" : "案例结构可查看，但不冒充当前事件"}</span></div>
+      <div><span>1602深度链</span><strong>{session.result?.eventId ?? "尚未进入事件"}</strong><span>{sameEventReassessment ? "新住户证据已到，等待物业继续原事件评估" : session.result ? "事件实例 ID 直接来自确定性引擎" : pending1602Evidence ? "住户事实已受理，仍处于 INTAKE-1602" : "案例结构可查看，但不冒充当前事件"}</span></div>
     </div>
 
     <main className={styles.layout}>
@@ -62,7 +64,7 @@ export function BuildingEventCenter() {
 
         {events.length ? events.map((event, eventIndex) => <article key={event.id} className={`${event.isDeepDemo ? "deep" : ""} ${styles.eventCard}`}>
           <div className={styles.eventCardMain}>
-            <div className={styles.eventTop}><span>{event.id}</span><em>{event.category}</em><b>{session.result ? "完整深度事件" : "待接入现场受理"}</b></div>
+            <div className={styles.eventTop}><span>{event.id}</span><em>{event.category}</em><b>{sameEventReassessment ? "同事件补证待确认" : session.result ? "完整深度事件" : "待接入现场受理"}</b></div>
             <h3>{event.title}</h3>
             <div className={styles.meta}><span><MapPin size={13} />{event.floor}层 · {event.unitId} · {event.space}</span><span><Clock3 size={13} />{event.updatedAt}</span></div>
           </div>
@@ -73,7 +75,7 @@ export function BuildingEventCenter() {
               <div><dt>唯一下一步</dt><dd>{tasks[eventIndex]?.title ?? event.nextAction}</dd></div>
             </dl>
           </div>
-          <Link className={styles.deepAction} href={session.result ? "/case-1602" : "/property?mode=task"}>{session.result ? "进入1602完整事件" : "进入物业接入"} <ArrowRight size={14} /></Link>
+          <Link className={styles.deepAction} href={pending1602Evidence ? "/property?mode=task" : session.result ? "/case-1602" : "/property?mode=task"}>{pending1602Evidence ? sameEventReassessment ? "进入物业继续评估" : "进入物业接入" : "进入1602完整事件"} <ArrowRight size={14} /></Link>
         </article>) : <p className={styles.overviewOnly}>没有活动事件时，这里保持为空，而不是用脱敏样例填满建筑态势。</p>}
 
         <details className={styles.boundary}>
