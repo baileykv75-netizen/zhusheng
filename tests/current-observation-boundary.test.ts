@@ -49,6 +49,17 @@ test("current microflow is also routed to the authoritative no-live-source bound
   assert.equal(deriveEngineeringReasoning(turn.question, turn.facts), null);
 });
 
+test("current abnormal reading questions cannot append historical diagnostic memory", () => {
+  const turn = createLocalBuildingAgentTurn("1602卫生间现在微流量异常吗？");
+  assert.deepEqual(turn.toolTrace.map((item) => item.tool), ["get_current_observations"]);
+  assert.match(turn.answer, /没有连接实时传感器或 BMS 数据源/);
+  assert.equal(
+    turn.facts.some((fact) => ["constructionRecord", "inspectionRecord", "maintenanceRecord"].includes(fact.predicate)),
+    false
+  );
+  assert.equal(deriveEngineeringReasoning(turn.question, turn.facts), null);
+});
+
 test("current wording does not hijack structural system queries", () => {
   assert.equal(isCurrentObservationQuery("冷水系统当前有哪些构件？"), false);
   const turn = createLocalBuildingAgentTurn("冷水系统当前有哪些构件？");
