@@ -27,6 +27,7 @@
 - URL 断言必须兼容 `next.config.ts` 的 `trailingSlash: true`，不能把 `/case-1602/` 误判为失败。
 - Playwright 优先使用项目运行时依赖；Codex 本地环境允许通过 `CODEX_PLAYWRIGHT_MODULE` 或既有 runtime fallback 加载，不要求把 Playwright 永久写入产品依赖。
 - Spatial QA 在无硬件 GPU 的 CI runner 上允许使用 SwiftShader 软件 WebGL；这只是浏览器测试运行方式，不降低“必须加载真实 `hero-glb`”的产品验收要求。
+- Pages 与 STEP 4 Validation 对同一发布流只保留最新提交的运行；新提交应取消旧的 in-progress run，避免过期失败被误认成当前 HEAD 的结果。
 
 ## 2. 当前产品的不可回退语义
 
@@ -37,6 +38,7 @@
 - `PRODUCT_ONLY` 事实不会进入漏水 pending assessment。
 - 图片被选择不等于人工确认了照片中的现象。
 - 物业必须独立确认本轮系统/现场观测后，第一次确定性评估才能形成正式事件。
+- 任何“当前 / 实时 / 此刻”的湿度、微流量、传感器读数或运行状态问题，都必须先经过 `get_current_observations` 的实时数据源边界；静态 Building Memory、历史 OBSERVATION 或系统拓扑不能冒充当前读数。未连接实时传感器/BMS 时，权威结果是 `NOT_RECORDED / NO_LIVE_OBSERVATION_SOURCE`。
 - 关阀授权与恢复供水授权是两个独立门禁。
 - 授权本身不执行设备动作。
 - 维修提交需要当前维修证据身份与明确人工确认。
@@ -84,3 +86,6 @@
 3. 如果历史脚本仍有可复用价值，应把有效断言迁移进当前 QA，而不是直接恢复旧脚本的权威地位。
 4. 新增现行浏览器 QA 时，应加入 `test:qa:current`，并同步更新本文件和 `tests/qa-policy.test.ts`。
 5. CI 的当前浏览器验收应调用统一入口 `pnpm run test:qa:current`，避免 workflow 与本地验收出现两套定义。
+6. 核心真值优先验证函数返回、状态转换、结构化数据和用户可观察行为；只要能用行为测试表达，就不得把“内部变量必须如何赋值、某个三元表达式必须长什么样、某段 JSX 必须原样存在”作为主要产品合同。
+7. 源码形状测试只用于安全边界、依赖图、CI wiring、关键入口是否存在等难以廉价行为验证的结构约束；重构内部实现但保持行为不变时，不应产生产品回退失败。
+8. 用户可见文案测试只锁必要的真值边界关键词或法律/治理要求；除非完整措辞本身就是合同，否则不得用整句文案和标点作为脆弱断言。
