@@ -111,7 +111,10 @@ test("case and memory suspend previous-cycle diagnosis relevance while a new res
 
   assert.match(caseSource, /model\.pendingResidentAssessment \? "present"/);
   assert.match(caseSource, /上一轮处置完整保留，本轮尚未重新进入动作阶段/);
-  assert.match(caseSource, /selectedSceneBusinessId = model\.pendingResidentAssessment/);
+  assert.match(caseSource, /const selectedSceneBusinessId = spatialSelectionId/);
+  assert.match(caseSource, /model\.pendingResidentAssessment\s+\? null/);
+  assert.match(caseSource, /setSpatialSelectionId\(null\)/);
+  assert.match(caseSource, /\[model\.latestResidentSubmissionId, result\?\.eventId, result\?\.state\]/);
   assert.match(caseSource, /上一轮已经过 · 本轮待重新评估/);
   assert.match(caseSource, /结果不会被提前写好/);
   assert.match(memorySource, /const pendingResidentAssessment = residentEvidenceNeedsAssessment/);
