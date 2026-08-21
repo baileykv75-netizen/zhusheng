@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { useBuildingProductContext } from "@/components/product/BuildingContextProvider";
 import { BathroomTwinViewport } from "@/components/life-event/BathroomTwinViewport";
-import { EvidenceTimeChain } from "@/components/EvidenceTimeChain";
+import { EvidenceTimeChain, type EvidenceSpatialFocusRequest } from "@/components/EvidenceTimeChain";
 import { building1602Dataset, entityById } from "@/lib/building-intelligence/catalog";
 import { traceSystem } from "@/lib/building-intelligence/queries";
 import type { RelevantBuildingMemory } from "@/lib/building-intelligence/memory-relevance";
@@ -39,7 +39,7 @@ type SpaceFocusReason = {
 };
 
 type SpatialFocusState = {
-  kind: "MEMORY" | "EVIDENCE" | "CANDIDATE" | "SYSTEM" | "MODEL";
+  kind: "MEMORY" | "EVIDENCE" | "CANDIDATE" | "SYSTEM" | "MODEL" | "TIMELINE";
   label: string;
   businessId: string | null;
 };
@@ -102,6 +102,7 @@ export function Case1602Exhibit() {
   const [spatialSelectionId, setSpatialSelectionId] = useState<string | null>(null);
   const [caseQueryVisual, setCaseQueryVisual] = useState<QueryVisualDirective | null>(null);
   const [spatialFocus, setSpatialFocus] = useState<SpatialFocusState | null>(null);
+  const [timelineSpatialSourceId, setTimelineSpatialSourceId] = useState<string | null>(null);
 
   useEffect(() => {
     const nextStage = model.pendingResidentAssessment ? "present" : lifecycleStage(result?.state);
@@ -113,6 +114,7 @@ export function Case1602Exhibit() {
     setSpatialSelectionId(null);
     setCaseQueryVisual(null);
     setSpatialFocus(null);
+    setTimelineSpatialSourceId(null);
   }, [model.latestResidentSubmissionId, result?.eventId, result?.state]);
 
   const focusReason: SpaceFocusReason = model.pendingResidentAssessment
@@ -251,6 +253,7 @@ export function Case1602Exhibit() {
     setSpatialSelectionId(input.businessId);
     product.setSelectedBusinessId(input.businessId);
     setSpatialFocus({ kind: input.kind, label: input.label, businessId: input.businessId });
+    setTimelineSpatialSourceId(null);
     setStoryStage(input.nextStage);
     setView(input.nextView);
   }
@@ -306,8 +309,34 @@ export function Case1602Exhibit() {
     setSpatialSelectionId(primaryBusinessId);
     product.setSelectedBusinessId(primaryBusinessId);
     setSpatialFocus({ kind: "SYSTEM", label: `系统追踪 · ${system.displayName}`, businessId: system.businessId });
+    setTimelineSpatialSourceId(null);
     setStoryStage("present");
     setView("VIEW_DIAGNOSTIC");
+  }
+
+  function focusTimelineEvidence(request: EvidenceSpatialFocusRequest) {
+    const businessId = firstSpecificBusinessId(request.businessIds);
+    if (!businessId) return;
+    setCaseQueryVisual(null);
+    setSpatialSelectionId(businessId);
+    product.setSelectedBusinessId(businessId);
+    setSpatialFocus({ kind: "TIMELINE", label: `证据时间线 · ${request.label}`, businessId });
+    setTimelineSpatialSourceId(request.sourceId);
+
+    if (request.sourceKind === "CONSTRUCTION_MEMORY") {
+      setStoryStage("past");
+      setView("VIEW_CONSTRUCTION_MEMORY");
+    } else if (request.sourceKind === "REPAIR_RECORD") {
+      setStoryStage("action");
+      setView("VIEW_MAINTENANCE");
+    } else {
+      setStoryStage("present");
+      setView(request.sourceKind === "PRODUCT_EVIDENCE" ? "VIEW_RESIDENT" : "VIEW_DIAGNOSTIC");
+    }
+
+    requestAnimationFrame(() => {
+      document.querySelector(".case-model")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
   }
 
   function handleTwinSelect(businessId: string | null) {
@@ -315,6 +344,7 @@ export function Case1602Exhibit() {
     setSpatialSelectionId(businessId);
     product.setSelectedBusinessId(businessId);
     setSpatialFocus(businessId ? { kind: "MODEL", label: `3D直接选择 · ${businessId}`, businessId } : null);
+    setTimelineSpatialSourceId(null);
   }
 
   function clearSpatialFocus() {
@@ -322,6 +352,7 @@ export function Case1602Exhibit() {
     setSpatialSelectionId(null);
     product.setSelectedBusinessId(null);
     setSpatialFocus(null);
+    setTimelineSpatialSourceId(null);
   }
 
   return <div className="case-exhibit">
@@ -470,8 +501,8 @@ export function Case1602Exhibit() {
     </section>
 
     <details className={styles.evidenceDetails}>
-      <summary><span>展开证据时间链</span><small>住户观察、系统事实与事件证据完整保留，按需查看</small></summary>
-      <EvidenceTimeChain />
+      <summary><span>展开证据时间链</span><small>住户观察、系统事实与事件证据完整保留；带空间关联的记录可直接定位回3D。</small></summary>
+      <EvidenceTimeChain onSpatialFocus={focusTimelineEvidence} activeSpatialSourceId={timelineSpatialSourceId} />
     </details>
 
     <section className="case-route" aria-label="1602事件生命线">

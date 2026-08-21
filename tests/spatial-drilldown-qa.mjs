@@ -128,6 +128,32 @@ async function assertCaseSpatialLinkage(page) {
   assert.ok((await linkage.locator("[data-spatial-focus]").innerText()).includes("选择一条已有事实"), "clear action must restore neutral spatial linkage state");
 }
 
+async function assertEvidenceTimelineSpatialEntry(page) {
+  const linkage = page.getByRole("region", { name: "空间事实与3D联动" });
+  const systemButtons = linkage.locator('button[data-spatial-kind="system"]');
+  assert.ok(await systemButtons.count() > 0, "timeline override check needs one recorded system focus first");
+  await systemButtons.first().click();
+  await page.waitForFunction(() => document.querySelector("[data-spatial-focus]")?.textContent?.startsWith("系统追踪 · "));
+
+  await page.getByText("展开证据时间链", { exact: true }).click();
+  const timeline = page.locator(".evidence-time-chain");
+  await timeline.waitFor();
+  const action = timeline.locator('button[data-evidence-spatial-kind="CONSTRUCTION_MEMORY"]');
+  assert.equal(await action.count(), 1, "fresh timeline should expose exactly one construction-memory spatial entry");
+  const businessId = await action.getAttribute("data-business-id");
+  assert.ok(businessId, "construction-memory timeline entry must carry its recorded business id");
+
+  await action.click();
+  await page.waitForFunction((expected) => document.querySelector("[data-spatial-focus]")?.textContent?.startsWith("证据时间线 · ") && document.querySelector(`[data-evidence-spatial-source][data-business-id="${expected}"]`)?.getAttribute("aria-pressed") === "true", businessId);
+  const timelineFocus = await linkage.locator("[data-spatial-focus]").innerText();
+  assert.ok(timelineFocus.startsWith("证据时间线 · "), `timeline entry did not replace the previous system focus: ${timelineFocus}`);
+  const inspectorText = await page.locator(".component-inspector").innerText();
+  assert.ok(inspectorText.includes(businessId), `timeline entry did not drive the shared 3D inspector to ${businessId}`);
+
+  await linkage.getByRole("button", { name: "清除3D联动", exact: true }).click();
+  assert.equal(await action.getAttribute("aria-pressed"), "false", "clearing shared 3D focus must clear the timeline active state too");
+}
+
 const launchOptions = {
   headless: true,
   // CI runners may not expose a hardware GPU. Software WebGL is acceptable for
@@ -181,8 +207,9 @@ try {
   await page.waitForURL((url) => isCaseUrl(url), { timeout: 20_000 });
   await assertCaseSpatialIdentity(page);
   await assertCaseSpatialLinkage(page);
+  await assertEvidenceTimelineSpatialEntry(page);
   await assertNoHorizontalOverflow(page, "desktop Case spatial life page");
-  await page.screenshot({ path: path.join(output, "05-case-spatial-linkage.png"), fullPage: true });
+  await page.screenshot({ path: path.join(output, "05-case-timeline-spatial-entry.png"), fullPage: true });
 
   await page.getByRole("link", { name: "查看1602整户", exact: true }).click();
   await waitForRealHero(page);
@@ -218,12 +245,14 @@ try {
   await mobilePage.waitForURL((url) => isCaseUrl(url), { timeout: 20_000 });
   await assertCaseSpatialIdentity(mobilePage);
   await mobilePage.getByRole("region", { name: "空间事实与3D联动" }).waitFor();
-  await assertNoHorizontalOverflow(mobilePage, "mobile Case spatial life page 390");
-  await mobilePage.screenshot({ path: path.join(output, "07-mobile-case-spatial-linkage-390.png"), fullPage: true });
+  await mobilePage.getByText("展开证据时间链", { exact: true }).click();
+  await mobilePage.locator(".evidence-time-chain").waitFor();
+  await assertNoHorizontalOverflow(mobilePage, "mobile Case timeline spatial entry 390");
+  await mobilePage.screenshot({ path: path.join(output, "07-mobile-case-timeline-390.png"), fullPage: true });
   assert.deepEqual(mobileErrors, [], `mobile spatial runtime errors: ${mobileErrors.join(" | ")}`);
   await mobile.close();
 
-  console.log("Spatial drilldown QA passed: published hero GLB, explicit four-step navigation, truthful Case spatial identity, recorded-fact-to-3D linkage, deterministic system trace, reverse hierarchy restoration and 390px continuity.");
+  console.log("Spatial drilldown QA passed: published hero GLB, explicit four-step navigation, truthful Case spatial identity, recorded-fact-to-3D linkage, evidence-timeline spatial entry, deterministic system trace, reverse hierarchy restoration and 390px continuity.");
 } finally {
   await browser.close();
 }

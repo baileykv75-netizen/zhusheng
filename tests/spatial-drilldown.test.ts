@@ -5,6 +5,7 @@ import { readFile } from "node:fs/promises";
 const conceptUrl = new URL("../components/ConceptExhibit.tsx", import.meta.url);
 const heroUrl = new URL("../components/v6/BuildingHeroTwin.tsx", import.meta.url);
 const caseUrl = new URL("../components/Case1602Exhibit.tsx", import.meta.url);
+const evidenceChainUrl = new URL("../components/EvidenceTimeChain.tsx", import.meta.url);
 
 test("home spatial drilldown is user-controlled instead of timer-driven", async () => {
   const source = await readFile(conceptUrl, "utf8");
@@ -126,4 +127,35 @@ test("explicit case focus can inspect current evidence without reviving stale pe
   )?.[0] ?? "";
   assert.match(evidenceFocus, /evidence\.relatedBusinessIds/);
   assert.doesNotMatch(evidenceFocus, /traceSystem|trace_system/);
+});
+
+test("evidence time chain exposes only recorded spatial links and lets Case own the 3D transition", async () => {
+  const [caseSource, timeline] = await Promise.all([
+    readFile(caseUrl, "utf8"),
+    readFile(evidenceChainUrl, "utf8")
+  ]);
+
+  assert.match(timeline, /export type EvidenceSpatialFocusRequest/);
+  assert.match(timeline, /onSpatialFocus\?: \(request: EvidenceSpatialFocusRequest\) => void/);
+  assert.match(timeline, /activeSpatialSourceId\?: string \| null/);
+  assert.match(timeline, /constructionMemory\.componentId/);
+  assert.match(timeline, /item\.relatedBusinessIds\.length \? item\.relatedBusinessIds : \[item\.spaceId\]/);
+  assert.match(timeline, /item\.relatedBusinessIds\)/);
+  assert.match(timeline, /item\.sensorBusinessId/);
+  assert.match(timeline, /item\.targetBusinessId/);
+  assert.match(timeline, /data-evidence-spatial-source=\{request\.sourceId\}/);
+  assert.match(timeline, /aria-pressed=\{active\}/);
+  assert.match(timeline, /onClick=\{\(\) => onSpatialFocus\(request\)\}/);
+  assert.doesNotMatch(timeline, /observedValue.*split|description.*match|new RegExp/s);
+
+  assert.match(caseSource, /type EvidenceSpatialFocusRequest/);
+  assert.match(caseSource, /function focusTimelineEvidence\(request: EvidenceSpatialFocusRequest\)/);
+  assert.match(caseSource, /setCaseQueryVisual\(null\)/);
+  assert.match(caseSource, /setSpatialSelectionId\(businessId\)/);
+  assert.match(caseSource, /setTimelineSpatialSourceId\(request\.sourceId\)/);
+  assert.match(caseSource, /kind: "TIMELINE"/);
+  assert.match(caseSource, /request\.sourceKind === "CONSTRUCTION_MEMORY"/);
+  assert.match(caseSource, /request\.sourceKind === "REPAIR_RECORD"/);
+  assert.match(caseSource, /scrollIntoView\(\{ behavior: "smooth", block: "center" \}\)/);
+  assert.match(caseSource, /<EvidenceTimeChain onSpatialFocus=\{focusTimelineEvidence\} activeSpatialSourceId=\{timelineSpatialSourceId\} \/>/);
 });
