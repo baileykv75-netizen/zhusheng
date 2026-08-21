@@ -128,7 +128,7 @@ export class DeepSeekChatProvider {
     this.now = options.now ?? (() => new Date().toISOString());
   }
 
-  async call(task: ModelTask, payload: { input?: string; verifiedResult?: Record<string, unknown> }, suppliedRequestId = randomUUID(), emptyContentRetry = 0): Promise<{ result: InterpretOutput | ExplainOutput; metadata: GatewayCallMetadata }> {
+  async call(task: ModelTask, payload: { input?: string; verifiedResult?: Record<string, unknown> }, suppliedRequestId: string = randomUUID(), emptyContentRetry = 0): Promise<{ result: InterpretOutput | ExplainOutput; metadata: GatewayCallMetadata }> {
     if (!this.config.apiKey) throw new GatewayProviderError("UNCONFIGURED", "DeepSeek API未配置", suppliedRequestId);
     let minimalPayload: { input: string } | { verifiedResult: Record<string, unknown> | undefined };
     try {
@@ -194,7 +194,7 @@ export class DeepSeekChatProvider {
     }
   }
 
-  async queryBuilding(question: string, selectedBusinessId: string | null, suppliedRequestId = randomUUID()): Promise<{ result: BuildingAgentTurnResult; metadata: { requestId: string; model: string; responseId: string; rounds: number; toolCalls: number; schemaValid: true } }> {
+  async queryBuilding(question: string, selectedBusinessId: string | null, suppliedRequestId: string = randomUUID()): Promise<{ result: BuildingAgentTurnResult; metadata: { requestId: string; model: string; responseId: string; rounds: number; toolCalls: number; schemaValid: true } }> {
     if (!this.config.apiKey) throw new GatewayProviderError("UNCONFIGURED", "DeepSeek API未配置", suppliedRequestId);
     const safeQuestion = sanitizeUserText(question, this.config.maxInputChars);
     const targetEntityResolution = resolveTargetEntity(safeQuestion, selectedBusinessId);
