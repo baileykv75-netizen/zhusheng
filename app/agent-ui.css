@@ -1,30 +1,30 @@
-/* UI-0 / UI-1: shared product rhythm and the wide Ask-the-Building surface.
-   Domain state, query planning, model access and authorization semantics do not live here. */
+/* Agent Drawer 2.0 — a right-side AI workspace, not a narrow utility drawer.
+   Query behavior, data truth, authorization and gateway semantics stay outside this file. */
 
 .building-agent-shell {
   color-scheme: light;
 }
 
 .building-agent-scrim {
-  background: rgba(7, 9, 8, .62);
-  backdrop-filter: blur(6px);
+  background: rgba(7, 9, 8, .66);
+  backdrop-filter: blur(8px);
 }
 
 .building-agent-drawer {
-  width: min(var(--zs-panel-wide), 58vw);
-  min-width: 760px;
+  width: min(1160px, 68vw);
+  min-width: 980px;
   grid-template-rows: auto minmax(0, 1fr) auto;
   color: var(--zs-ink);
   background: var(--zs-paper-elevated);
-  box-shadow: -32px 0 88px rgba(0, 0, 0, .24);
+  box-shadow: -40px 0 110px rgba(0, 0, 0, .26);
 }
 
 .agent-drawer-header {
-  min-height: 128px;
+  min-height: 136px;
   align-items: flex-start;
-  gap: var(--zs-space-5);
-  padding: 24px 30px 22px;
-  border-bottom: 1px solid rgba(243, 240, 232, .11);
+  gap: var(--zs-space-6);
+  padding: 26px 36px 22px;
+  border-bottom: 1px solid rgba(243, 240, 232, .1);
   color: #f4f0e8;
   background: var(--zs-charcoal);
 }
@@ -35,25 +35,25 @@
 }
 
 .agent-eyebrow {
-  color: #af9278 !important;
+  color: #aa8e76 !important;
   font: 700 9px/1.3 "Zhusheng Sans", sans-serif !important;
-  letter-spacing: .14em !important;
+  letter-spacing: .15em !important;
 }
 
 .agent-drawer-header h2 {
   margin-top: 6px;
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1.08;
-  letter-spacing: -.03em;
+  letter-spacing: -.035em;
   font-weight: 600;
 }
 
 .agent-drawer-header p {
-  max-width: 620px;
+  max-width: 720px;
   margin-top: 8px;
   color: #9ba19c;
   font-size: 12px;
-  line-height: 1.65;
+  line-height: 1.7;
 }
 
 .agent-header-actions {
@@ -61,39 +61,37 @@
 }
 
 .agent-header-actions > button {
-  width: 38px;
-  height: 38px;
-  border-color: rgba(243, 240, 232, .16);
+  width: 40px;
+  height: 40px;
+  border-color: rgba(243, 240, 232, .15);
   color: #ece8df;
   background: transparent;
 }
 
 .agent-header-actions > button:hover {
-  border-color: rgba(243, 240, 232, .32);
-  background: rgba(243, 240, 232, .06);
+  border-color: rgba(243, 240, 232, .34);
+  background: rgba(243, 240, 232, .055);
 }
 
 .agent-context-meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px 18px;
-  margin-top: 18px;
-  color: #7f8782;
-  font-size: 11px;
+  gap: 8px 20px;
+  margin-top: 17px;
 }
 
 .agent-context-meta > span {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #89908c !important;
+  color: #8d948f !important;
   font: 500 11px/1.4 "Zhusheng Sans", sans-serif !important;
   letter-spacing: 0 !important;
 }
 
 .agent-context-meta strong {
-  color: #c8c2b8;
+  color: #cec8bd;
   font-weight: 620;
 }
 
@@ -101,9 +99,9 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  max-width: 700px;
-  margin-top: 12px;
-  color: #7f8782;
+  max-width: 780px;
+  margin-top: 11px;
+  color: #808782;
   font-size: 10px;
   line-height: 1.55;
 }
@@ -132,12 +130,12 @@
 }
 
 .agent-drawer-footer {
-  min-height: 56px;
+  min-height: 52px;
   justify-content: flex-end;
-  padding: 9px 20px;
+  padding: 7px 28px;
   border-top: 1px solid var(--zs-line-soft);
   color: var(--zs-ink-secondary);
-  background: rgba(243, 240, 232, .96);
+  background: var(--zs-paper-elevated);
 }
 
 .agent-footer-actions {
@@ -145,68 +143,98 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 8px;
 }
 
 .agent-footer-actions a {
-  min-height: 36px;
+  min-height: 34px;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 0 11px;
-  border: 1px solid var(--zs-line-soft);
-  border-radius: var(--zs-radius-sm);
-  color: #535b56;
+  padding: 0 10px;
+  border: 0;
+  color: #69706c;
   background: transparent;
   font-size: 10px;
 }
 
 .agent-footer-actions a:hover {
-  border-color: rgba(155, 63, 52, .26);
   color: #7d3b31;
   background: rgba(155, 63, 52, .035);
 }
 
-/* The workspace keeps all existing query behavior, but its hierarchy becomes conversation-first. */
+/* Shared workspace chrome */
 .building-agent-drawer .building-ai {
   color: var(--zs-ink);
   background: transparent;
 }
 
-.building-agent-drawer .building-ai > header {
-  min-height: 52px;
-  padding: 0 40px;
-  border-bottom: 1px solid var(--zs-line-soft);
-  background: rgba(235, 231, 222, .46);
+.building-agent-drawer .building-ai-runtime,
+.building-agent-drawer .building-ai-result > header {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 56px 0;
+  color: #656c68;
+  background: transparent;
 }
 
-.building-agent-drawer .building-ai > header > div,
-.building-agent-drawer .building-ai > header > button {
+.building-agent-drawer .building-ai-runtime > span {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 620;
+}
+
+.building-agent-drawer .building-ai-result > header {
+  padding-top: 0;
+  border-bottom: 1px solid var(--zs-line-soft);
+}
+
+.building-agent-drawer .building-ai-result > header > button {
+  border: 0;
+  color: #5f6762;
+  background: transparent;
+  font-size: 11px;
 }
 
 .building-agent-drawer .gateway-badge {
   font-size: 9px;
-  letter-spacing: .06em;
+  letter-spacing: .055em;
 }
 
+/* Empty state: two generous zones instead of a narrow stacked page. */
 .building-agent-drawer .building-ai-empty {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
   min-height: 0;
 }
 
+.building-agent-drawer .building-ai-start {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.28fr) minmax(300px, .72fr);
+  align-items: center;
+  gap: clamp(42px, 5vw, 76px);
+  padding: clamp(34px, 4.8vh, 62px) 56px 34px;
+}
+
+.building-agent-drawer .building-ai-start-primary {
+  min-width: 0;
+  max-width: 720px;
+}
+
 .building-agent-drawer .building-ai-intro {
-  align-self: auto;
-  padding: 40px 40px 22px;
+  padding: 0;
 }
 
 .building-agent-drawer .building-ai-intro > i {
-  width: 36px;
-  height: 36px;
-  margin-bottom: 22px;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 25px;
   color: #d9cdbf;
   background: var(--zs-charcoal);
 }
@@ -215,38 +243,39 @@
   margin-bottom: 10px;
   color: #96614d;
   font: 700 9px/1.35 "Zhusheng Sans", sans-serif;
-  letter-spacing: .12em;
+  letter-spacing: .13em;
 }
 
 .building-agent-drawer .building-ai-intro h2 {
-  max-width: 620px;
+  max-width: 700px;
   color: var(--zs-ink);
   font-family: "Zhusheng Sans", "Noto Sans SC", sans-serif;
-  font-size: clamp(30px, 2.5vw, 38px);
-  font-weight: 560;
-  line-height: 1.12;
-  letter-spacing: -.04em;
+  font-size: clamp(38px, 3.2vw, 50px);
+  font-weight: 550;
+  line-height: 1.08;
+  letter-spacing: -.05em;
 }
 
 .building-agent-drawer .building-ai-intro > span {
-  max-width: 650px;
-  margin-top: 14px;
-  color: #676f6a;
+  display: block;
+  max-width: 680px;
+  margin-top: 18px;
+  color: #646c67;
   font-size: 13px;
-  line-height: 1.75;
+  line-height: 1.8;
 }
 
 .building-agent-drawer .building-ai-memory-scope {
-  margin: 0 40px 20px;
+  margin: 30px 0 0;
   padding: 0;
   border: 0;
-  color: #858b87;
+  color: #8b918d;
   font: 500 11px/1.5 "Zhusheng Sans", sans-serif;
 }
 
 .building-agent-drawer .building-ai-memory-scope strong {
-  color: #424945;
-  font-size: 12px;
+  color: #404642;
+  font-size: 13px;
 }
 
 .building-agent-drawer .building-ai-memory-scope i {
@@ -256,7 +285,7 @@
 
 .building-agent-drawer .selected-context {
   min-height: 44px;
-  margin: 0 40px 18px;
+  margin: 22px 0 0;
   padding: 0 14px;
   border: 0;
   border-left: 2px solid rgba(155, 63, 52, .32);
@@ -269,62 +298,100 @@
   font-size: 11px;
 }
 
-.building-agent-drawer .building-ai-examples {
+.building-agent-drawer .building-ai-start-prompts {
+  min-width: 0;
+  align-self: stretch;
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 0 40px 24px;
-  border: 0;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 36px;
+  border-left: 1px solid var(--zs-line-soft);
+}
+
+.building-agent-drawer .building-ai-prompt-heading > span {
+  color: #313633;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.building-agent-drawer .building-ai-prompt-heading > p {
+  max-width: 320px;
+  margin-top: 7px;
+  color: #858b87;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.building-agent-drawer .building-ai-examples {
+  display: grid;
+  gap: 0;
+  margin: 22px 0 0;
+  border-top: 1px solid var(--zs-line-soft);
   background: transparent;
 }
 
 .building-agent-drawer .building-ai-examples button {
-  min-height: 38px;
-  flex: 1 1 calc(50% - 4px);
+  min-height: 56px;
+  display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  padding: 9px 12px;
-  border: 1px solid var(--zs-line-soft);
-  border-radius: var(--zs-radius-sm);
-  color: #626965;
-  background: var(--zs-surface-subtle);
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border: 0;
+  border-bottom: 1px solid var(--zs-line-soft);
+  border-radius: 0;
+  color: #5e6661;
+  background: transparent;
+  text-align: left;
   font-size: 11px;
-  line-height: 1.45;
+  line-height: 1.5;
+}
+
+.building-agent-drawer .building-ai-examples button svg {
+  color: #a09b93;
+  transform: rotate(45deg);
+  transition: transform var(--zs-motion-fast) ease, color var(--zs-motion-fast) ease;
 }
 
 .building-agent-drawer .building-ai-examples button:hover {
-  border-color: rgba(155, 63, 52, .22);
-  color: #71392f;
-  background: rgba(155, 63, 52, .035);
+  color: #70372f;
+  background: transparent;
 }
 
+.building-agent-drawer .building-ai-examples button:hover svg {
+  color: #8d4238;
+  transform: translate(2px, -2px) rotate(45deg);
+}
+
+/* Composer is the visual anchor. */
 .building-agent-drawer .building-ai-form {
-  grid-template-columns: minmax(0, 1fr) 54px;
-  margin: auto 40px 10px;
-  border: 1px solid rgba(23, 26, 25, .2);
-  border-radius: var(--zs-radius-md);
+  grid-template-columns: minmax(0, 1fr) 58px;
+  margin: 0 56px 10px;
+  border: 1px solid rgba(23, 26, 25, .19);
+  border-radius: 10px;
   background: #fff;
-  box-shadow: 0 12px 30px rgba(23, 26, 25, .055);
+  box-shadow: 0 16px 42px rgba(23, 26, 25, .07);
 }
 
 .building-agent-drawer .building-ai-form label {
-  top: 10px;
-  left: 14px;
+  top: 11px;
+  left: 16px;
   color: #8b918d;
   font-size: 10px;
-  letter-spacing: .06em;
+  letter-spacing: .055em;
 }
 
 .building-agent-drawer .building-ai-form textarea {
-  min-height: 82px;
-  padding: 31px 14px 11px;
-  color: #262b28;
+  min-height: 94px;
+  padding: 33px 16px 13px;
+  color: #252a27;
   font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 .building-agent-drawer .building-ai-form button {
-  margin: 9px;
-  border-radius: var(--zs-radius-sm);
+  margin: 10px;
+  border-radius: 6px;
   background: var(--zs-accent);
 }
 
@@ -333,28 +400,29 @@
 }
 
 .building-agent-drawer .building-ai-unavailable {
-  margin: 0 40px 18px;
+  margin: 0 56px 18px;
   color: #8a704b;
   font: 500 10px/1.5 "Zhusheng Sans", sans-serif;
 }
 
-/* Result state: conclusion and action stay visible; candidate mechanics and raw traces are opt-in. */
+/* Result state: use the new width rather than reverting to a narrow reading column. */
 .building-agent-drawer .building-ai-result {
   grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
 .building-agent-drawer .ai-result-scroll {
-  padding: 30px 40px 36px;
+  padding: 32px 56px 40px;
 }
 
 .building-agent-drawer .ai-question {
+  max-width: 880px;
   margin-bottom: 14px;
   color: #777e79;
   font-size: 12px;
 }
 
 .building-agent-drawer .ai-answer {
-  padding: 20px 0 24px;
+  padding: 22px 0 28px;
   border-top: 1px solid var(--zs-line-soft);
   border-bottom: 1px solid var(--zs-line-soft);
 }
@@ -366,21 +434,33 @@
 }
 
 .building-agent-drawer .ai-answer h2 {
-  max-width: var(--zs-content-reading);
-  margin-top: 10px;
+  max-width: 920px;
+  margin-top: 11px;
   font-family: "Zhusheng Sans", "Noto Sans SC", sans-serif;
-  font-size: clamp(22px, 2vw, 28px);
+  font-size: clamp(24px, 2.1vw, 30px);
   font-weight: 560;
   line-height: 1.5;
-  letter-spacing: -.025em;
+  letter-spacing: -.027em;
+}
+
+.building-agent-drawer [class*="reasoningStack"] {
+  max-width: 960px;
+}
+
+.building-agent-drawer [class*="confirmedCard"],
+.building-agent-drawer [class*="nextStepCard"],
+.building-agent-drawer [class*="boundaryCard"] {
+  border-left-width: 1px;
+  box-shadow: none;
 }
 
 .building-agent-drawer .building-ai-hypothesis-details {
+  max-width: 960px;
   border-bottom: 1px solid var(--zs-line-soft);
 }
 
 .building-agent-drawer .building-ai-hypothesis-details > summary {
-  min-height: 52px;
+  min-height: 54px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -412,22 +492,63 @@
 }
 
 .building-agent-drawer .building-ai-result > .building-ai-form {
-  margin: 10px 40px 18px;
+  margin: 12px 56px 18px;
 }
 
-@media (max-width: 1200px) and (min-width: 781px) {
+/* Large laptop: keep workspace generous even before full desktop widths. */
+@media (max-width: 1500px) and (min-width: 901px) {
   .building-agent-drawer {
-    width: min(860px, 72vw);
-    min-width: 680px;
+    width: min(1080px, calc(100vw - 72px));
+    min-width: 0;
+  }
+
+  .building-agent-drawer .building-ai-start {
+    gap: 42px;
+    padding-inline: 44px;
+  }
+
+  .building-agent-drawer .building-ai-form,
+  .building-agent-drawer .building-ai-unavailable,
+  .building-agent-drawer .building-ai-result > .building-ai-form {
+    margin-left: 44px;
+    margin-right: 44px;
+  }
+
+  .building-agent-drawer .building-ai-runtime,
+  .building-agent-drawer .building-ai-result > header,
+  .building-agent-drawer .ai-result-scroll {
+    padding-left: 44px;
+    padding-right: 44px;
   }
 }
 
-@media (max-width: 780px) {
+/* Tablet shifts to one reading plane before mobile. */
+@media (max-width: 900px) {
   .building-agent-drawer {
     width: 100vw;
     min-width: 0;
   }
 
+  .building-agent-drawer .building-ai-start {
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: 28px;
+    overflow-y: auto;
+  }
+
+  .building-agent-drawer .building-ai-start-prompts {
+    padding: 24px 0 0;
+    border-top: 1px solid var(--zs-line-soft);
+    border-left: 0;
+  }
+
+  .building-agent-drawer .building-ai-examples {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 22px;
+  }
+}
+
+@media (max-width: 780px) {
   .agent-drawer-header {
     min-height: 0;
     padding: 18px 18px 16px;
@@ -459,33 +580,32 @@
     padding: 0;
   }
 
-  .building-agent-drawer .building-ai > header,
-  .building-agent-drawer .building-ai-intro,
+  .building-agent-drawer .building-ai-runtime,
+  .building-agent-drawer .building-ai-result > header,
+  .building-agent-drawer .building-ai-start,
   .building-agent-drawer .ai-result-scroll {
     padding-left: 18px;
     padding-right: 18px;
   }
 
-  .building-agent-drawer .building-ai-memory-scope,
-  .building-agent-drawer .selected-context,
-  .building-agent-drawer .building-ai-examples,
+  .building-agent-drawer .building-ai-start {
+    padding-top: 28px;
+    padding-bottom: 24px;
+  }
+
+  .building-agent-drawer .building-ai-intro h2 {
+    font-size: 32px;
+  }
+
+  .building-agent-drawer .building-ai-examples {
+    grid-template-columns: 1fr;
+  }
+
   .building-agent-drawer .building-ai-form,
   .building-agent-drawer .building-ai-unavailable,
   .building-agent-drawer .building-ai-result > .building-ai-form {
     margin-left: 18px;
     margin-right: 18px;
-  }
-
-  .building-agent-drawer .building-ai-intro {
-    padding-top: 26px;
-  }
-
-  .building-agent-drawer .building-ai-intro h2 {
-    font-size: 29px;
-  }
-
-  .building-agent-drawer .building-ai-examples button {
-    flex-basis: 100%;
   }
 
   .agent-drawer-footer {
@@ -498,7 +618,7 @@
   }
 
   .agent-footer-actions a {
-    flex: 1 1 auto;
+    flex: 1;
     justify-content: center;
   }
 }

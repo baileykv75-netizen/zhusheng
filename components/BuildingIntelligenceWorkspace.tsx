@@ -33,11 +33,18 @@ export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onRe
   }
 
   if (!result) return <section className="building-ai building-ai-empty" aria-label="筑生建筑智能查询">
-    <header><div><Sparkles size={16} /><span>筑生 AI</span></div><GatewayBadge health={health} /></header>
-    <div className="building-ai-intro"><i><Bot size={20} /></i><p>BUILDING MEMORY + INTELLIGENCE</p><h2>从这栋房子的记忆开始问</h2><span>施工、验收、交付与运行记录会先被检索；原因类问题再基于这些本楼事实组织排查顺序，而不是直接套用通用故障清单。</span></div>
-    <div className={`${styles.memoryScope} building-ai-memory-scope`}><strong>{building1602Dataset.records.length}</strong><span>条生命周期记忆</span><i /><strong>{memoryTradeCount}</strong><span>类专业/阶段</span><i /><span>施工 → 验收 → 交付 → 运行</span></div>
-    {selected ? <button className="selected-context" type="button" onClick={() => setQuestion(`请说明${selected.displayName}的已记录信息`)}><LocateFixed size={14} /><span>已选中 {selected.displayName}</span><strong>问筑生这个构件</strong></button> : null}
-    <div className="building-ai-examples">{examples.map((item) => <button key={item} type="button" onClick={() => setQuestion(item)}>{item}<ArrowUp size={13} /></button>)}</div>
+    <div className="building-ai-runtime"><span><Sparkles size={15} />建筑智能查询</span><GatewayBadge health={health} /></div>
+    <div className="building-ai-start">
+      <div className="building-ai-start-primary">
+        <div className="building-ai-intro"><i><Bot size={21} /></i><p>BUILDING MEMORY + INTELLIGENCE</p><h2>从这栋房子的记忆开始问</h2><span>施工、验收、交付与运行记录会先被检索；原因类问题再基于这些本楼事实组织排查顺序，而不是直接套用通用故障清单。</span></div>
+        <div className={`${styles.memoryScope} building-ai-memory-scope`}><strong>{building1602Dataset.records.length}</strong><span>条生命周期记忆</span><i /><strong>{memoryTradeCount}</strong><span>类专业/阶段</span><i /><span>施工 → 验收 → 交付 → 运行</span></div>
+        {selected ? <button className="selected-context" type="button" onClick={() => setQuestion(`请说明${selected.displayName}的已记录信息`)}><LocateFixed size={14} /><span>已选中 {selected.displayName}</span><strong>问筑生这个构件</strong></button> : null}
+      </div>
+      <aside className="building-ai-start-prompts" aria-label="推荐提问">
+        <div className="building-ai-prompt-heading"><span>可以直接这样问</span><p>选择一个问题开始，或者在下方输入你真正关心的建筑问题。</p></div>
+        <div className="building-ai-examples">{examples.map((item) => <button key={item} type="button" onClick={() => setQuestion(item)}><span>{item}</span><ArrowUp size={13} /></button>)}</div>
+      </aside>
+    </div>
     <QuestionForm idPrefix={idPrefix} question={question} busy={busy} setQuestion={setQuestion} ask={ask} />
     {!health ? <p className="building-ai-unavailable"><TriangleAlert size={13} />LOCAL READ-ONLY · Live AI 当前不可用，仍可使用确定性建筑查询</p> : null}
   </section>;
