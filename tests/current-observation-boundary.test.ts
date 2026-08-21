@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
 import test from "node:test";
 import { createLocalBuildingAgentTurn, isCurrentObservationQuery } from "../lib/building-intelligence/agent.ts";
 import { building1602Dataset } from "../lib/building-intelligence/catalog.ts";
@@ -75,8 +74,10 @@ test("public gateway short-circuits current readings before DeepSeek can choose 
     }
   } as unknown as DeepSeekChatProvider;
 
-  const output = await queryBuildingWithObservationBoundary(provider, "1602卫生间现在湿度多少？", null, randomUUID());
+  const requestId = "REQ-CURRENT-OBS";
+  const output = await queryBuildingWithObservationBoundary(provider, "1602卫生间现在湿度多少？", null, requestId);
   assert.equal(upstreamCalled, false);
+  assert.equal(output.metadata.requestId, requestId);
   assert.equal(output.result.mode, "LOCAL_READ_ONLY");
   assert.equal(output.result.toolTrace[0].tool, "get_current_observations");
   assert.equal(output.result.toolTrace[0].status, "NOT_RECORDED");
@@ -85,16 +86,20 @@ test("public gateway short-circuits current readings before DeepSeek can choose 
 
 test("gateway still delegates ordinary structural questions to DeepSeek", async () => {
   let upstreamCalled = false;
+  let receivedRequestId = "";
   const provider = {
-    async queryBuilding() {
+    async queryBuilding(_question: string, _selectedBusinessId: string | null, requestId: string) {
       upstreamCalled = true;
+      receivedRequestId = requestId;
       throw new Error("UPSTREAM_CALLED");
     }
   } as unknown as DeepSeekChatProvider;
 
+  const requestId = "REQ-STRUCTURE";
   await assert.rejects(
-    () => queryBuildingWithObservationBoundary(provider, "冷水系统当前有哪些构件？", null, randomUUID()),
+    () => queryBuildingWithObservationBoundary(provider, "冷水系统当前有哪些构件？", null, requestId),
     /UPSTREAM_CALLED/
   );
   assert.equal(upstreamCalled, true);
+  assert.equal(receivedRequestId, requestId);
 });
