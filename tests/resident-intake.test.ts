@@ -13,7 +13,7 @@ test("resident sees observed-fact intake before any water-meter follow-up", asyn
   assert.match(source, /intakeStage === "OBSERVATION"/);
   assert.match(source, /intakeStage === "FOLLOW_UP"/);
   assert.match(source, /为什么现在问这个/);
-  assert.match(source, /不代表筑生已经判断为管道漏水/);
+  assert.match(source, /\{followUp\.boundary\}/);
   assert.match(source, /useState\(""\)/);
   assert.match(source, /不继续要求水表观察/);
 });
