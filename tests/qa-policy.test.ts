@@ -47,10 +47,11 @@ test("current spatial QA validates real user-controlled building continuity", as
 
   assert.match(source, /data-visual-source/);
   assert.match(source, /hero-glb/);
-  assert.match(source, /phase-building/);
-  assert.match(source, /phase-floor/);
-  assert.match(source, /phase-unit/);
-  assert.match(source, /phase-space/);
+  assert.match(source, /\.v6-building-twin\.phase-\$\{phase\}/);
+  assert.match(source, /assertPhase\(page, "building", "华章新筑 · 2号楼"\)/);
+  assert.match(source, /assertPhase\(page, "floor", "16F"\)/);
+  assert.match(source, /assertPhase\(page, "unit", "1602"\)/);
+  assert.match(source, /assertPhase\(page, "space", "卫生间"\)/);
   assert.match(source, /waitForTimeout\(2700\)/);
   assert.match(source, /entry.*building/);
   assert.match(source, /从建筑进入1602卫生间的空间路径/);
