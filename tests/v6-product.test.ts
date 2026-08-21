@@ -69,7 +69,10 @@ test("REOPENED creates a second inspection task without losing first repair hist
   assert.match(task.blockingReason ?? "", /仍观察到异常/);
   assert.match(task.nextStateHint, /保留第一次维修与复验记录/);
   assert.deepEqual(task.historyRefs, ["REPAIR-FIRST-01", "POST-REPAIR-OBS-01"]);
-  assert.ok(task.requiredEvidence.includes("新的现场照片"));
+  assert.ok(task.requiredEvidence.includes("新的现场描述"));
+  assert.ok(task.requiredEvidence.includes("新的现场观察"));
+  assert.ok(task.requiredEvidence.includes("第一次维修记录"));
+  assert.ok(task.requiredEvidence.includes("第一次复验结果"));
 });
 
 test("every group decision produces an actionable bounded task", () => {
