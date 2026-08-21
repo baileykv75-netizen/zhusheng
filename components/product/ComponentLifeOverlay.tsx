@@ -85,7 +85,7 @@ export function ComponentLifeOverlay() {
 
     <section className={styles.section}>
       <span>EVIDENCE & OBSERVATION</span>
-      <h3>当前证据关联</h3>
+      <h3>已记录证据关联</h3>
       <div className={styles.list}>
         {life.productEvidence.slice(-3).reverse().map((item) => <div className={styles.item} key={item.id}>
           <strong>Product · {item.type}</strong><small>{item.status} · {item.dataClass} · {item.capturedAt}</small>
