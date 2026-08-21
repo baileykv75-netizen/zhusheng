@@ -64,11 +64,12 @@ export function EvidenceTimeChain({ onSpatialFocus, activeSpatialSourceId = null
 
   const rows: TimelineRow[] = [
     { kind: "construction", id: constructionMemory.id, capturedAt: constructionMemory.capturedAt },
-    ...productItems.map((item, index) => ({ kind: "product" as const, id: item.id, capturedAt: item.capturedAt, index })),
-    ...domainEvidence.map((item, index) => ({ kind: "domain" as const, id: item.id, capturedAt: item.capturedAt ?? result!.input.evaluatedAt, index })),
-    ...observations.map((item, index) => ({ kind: "observation" as const, id: item.id, capturedAt: item.observedAt, index })),
-    ...repairs.map((item, index) => ({ kind: "repair" as const, id: item.repairRecordId, capturedAt: item.submittedAt, index }))
-  ].sort((a, b) => a.capturedAt.localeCompare(b.capturedAt) || a.id.localeCompare(b.id));
+    ...productItems.map((item, index): TimelineRow => ({ kind: "product", id: item.id, capturedAt: item.capturedAt, index })),
+    ...domainEvidence.map((item, index): TimelineRow => ({ kind: "domain", id: item.id, capturedAt: item.capturedAt ?? result!.input.evaluatedAt, index })),
+    ...observations.map((item, index): TimelineRow => ({ kind: "observation", id: item.id, capturedAt: item.observedAt, index })),
+    ...repairs.map((item, index): TimelineRow => ({ kind: "repair", id: item.repairRecordId, capturedAt: item.submittedAt, index }))
+  ];
+  rows.sort((a, b) => a.capturedAt.localeCompare(b.capturedAt) || a.id.localeCompare(b.id));
 
   function spatialAction(request: EvidenceSpatialFocusRequest | null) {
     if (!request || !onSpatialFocus) return null;
