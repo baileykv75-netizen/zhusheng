@@ -126,8 +126,10 @@ test("INCONCLUSIVE without fresh resident evidence asks for a genuinely new resi
 
   assert.equal(model.pendingResidentAssessment, false);
   assert.equal(model.projection.nextAction.id, "COLLECT_RESIDENT_EVIDENCE");
+  assert.equal(model.evidenceGaps.length, 1);
   assert.equal(model.evidenceGaps[0].actor, "住户");
   assert.match(model.evidenceGaps[0].label, /本轮新的住户现场证据/);
+  assert.doesNotMatch(model.evidenceGaps[0].label, /水表|照片|维修结果/);
 });
 
 test("fresh INCONCLUSIVE submission neutralizes the previous diagnosis until the same event is reassessed", () => {
