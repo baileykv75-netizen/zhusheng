@@ -141,6 +141,128 @@
   overflow-wrap: anywhere;
 }
 
+.spatialLinkage {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  background: rgba(9, 11, 11, .7);
+}
+
+.spatialLinkage > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.spatialLinkage > header > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.spatialLinkage > header span {
+  color: rgba(255, 255, 255, .4);
+  font: 9px/1.4 Consolas, monospace;
+  letter-spacing: .11em;
+}
+
+.spatialLinkage > header strong {
+  color: rgba(255, 255, 255, .9);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.spatialLinkage > header button {
+  flex: 0 0 auto;
+  padding: 7px 9px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  background: transparent;
+  color: rgba(255, 255, 255, .58);
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.spatialLinkage > header button:hover {
+  border-color: rgba(255, 255, 255, .28);
+  color: #fff;
+}
+
+.linkageGroups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: rgba(255, 255, 255, .1);
+}
+
+.linkageGroups > section {
+  min-width: 0;
+  padding: 13px;
+  background: rgba(13, 15, 15, .96);
+}
+
+.linkageGroups h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 620;
+}
+
+.linkageGroups section > p {
+  min-height: 48px;
+  margin: 6px 0 10px;
+  color: rgba(255, 255, 255, .46);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.linkageButtons {
+  display: grid;
+  gap: 6px;
+}
+
+.linkageButtons > button {
+  width: 100%;
+  display: grid;
+  gap: 3px;
+  padding: 9px 10px;
+  border: 1px solid rgba(255, 255, 255, .1);
+  background: rgba(255, 255, 255, .025);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.linkageButtons > button:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, .28);
+  background: rgba(255, 255, 255, .055);
+}
+
+.linkageButtons > button:disabled {
+  cursor: default;
+  opacity: .5;
+}
+
+.linkageButtons strong {
+  font-size: 11px;
+  font-weight: 560;
+  line-height: 1.4;
+}
+
+.linkageButtons small,
+.linkageButtons > small {
+  color: rgba(255, 255, 255, .42);
+  font: 9px/1.45 Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.linkageBoundary {
+  color: rgba(255, 255, 255, .42);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
 .storyMeta {
   display: grid;
   gap: 10px;
@@ -178,8 +300,17 @@
 }
 
 .memoryItem {
+  width: 100%;
   padding: 12px 13px;
+  border: 0;
   background: rgba(12, 14, 14, .94);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.memoryItem:hover {
+  background: rgba(21, 24, 24, .98);
 }
 
 .memoryItem span {
@@ -202,6 +333,14 @@
   color: rgba(255, 255, 255, .55);
   font-size: 11px;
   line-height: 1.5;
+}
+
+.memoryItem small {
+  display: inline-block;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, .4);
+  font-size: 9px;
+  letter-spacing: .07em;
 }
 
 .evidenceDetails {
@@ -253,6 +392,14 @@
   .focusReason {
     grid-template-columns: 1fr;
   }
+
+  .linkageGroups {
+    grid-template-columns: 1fr;
+  }
+
+  .linkageGroups section > p {
+    min-height: 0;
+  }
 }
 
 @media (max-width: 760px) {
@@ -295,6 +442,10 @@
 
   .focusFacts {
     grid-template-columns: 1fr;
+  }
+
+  .spatialLinkage > header {
+    flex-direction: column;
   }
 
   .storyMeta div {

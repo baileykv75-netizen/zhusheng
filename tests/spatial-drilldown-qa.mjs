@@ -97,6 +97,37 @@ async function assertCaseSpatialIdentity(page) {
   assert.ok(reasonText.includes("未形成正式事件"), "fresh Case must expose actual event absence");
 }
 
+async function assertCaseSpatialLinkage(page) {
+  const linkage = page.getByRole("region", { name: "空间事实与3D联动" });
+  await linkage.waitFor();
+
+  const text = await linkage.innerText();
+  for (const expected of ["当前候选", "建筑记忆", "Product Evidence", "可追溯系统", "3D 联动只改变“看哪里”"]) {
+    assert.ok(text.includes(expected), `Case spatial linkage is missing ${expected}`);
+  }
+  assert.ok(text.includes("当前没有可安全展示的领域候选"), "fresh Case must not invent a current diagnostic candidate");
+  assert.ok(text.includes("当前会话还没有 Product Evidence"), "fresh Case must not invent Product Evidence");
+
+  const memoryButtons = linkage.locator('button[data-spatial-kind="memory"]:not([disabled])');
+  assert.ok(await memoryButtons.count() > 0, "fresh featured Case should expose at least one recorded Building Memory target");
+  await memoryButtons.first().click();
+  await page.locator(".component-inspector").waitFor();
+  const memoryFocus = await linkage.locator("[data-spatial-focus]").innerText();
+  assert.ok(memoryFocus.startsWith("建筑记忆 · "), `memory click did not drive shared 3D focus: ${memoryFocus}`);
+
+  const systemButtons = linkage.locator('button[data-spatial-kind="system"]');
+  assert.ok(await systemButtons.count() > 0, "recorded memory relations should expose at least one traceable system");
+  await systemButtons.first().click();
+  await page.waitForFunction(() => document.querySelector("[data-spatial-focus]")?.textContent?.startsWith("系统追踪 · "));
+  const systemFocus = await linkage.locator("[data-spatial-focus]").innerText();
+  assert.ok(systemFocus.startsWith("系统追踪 · "), `system trace did not become the active spatial focus: ${systemFocus}`);
+  const statusStrip = await page.locator(".twin-status-strip").innerText();
+  assert.ok(statusStrip.includes("已定位"), "system trace must drive the existing twin visual targeting");
+
+  await linkage.getByRole("button", { name: "清除3D联动", exact: true }).click();
+  assert.ok((await linkage.locator("[data-spatial-focus]").innerText()).includes("选择一条已有事实"), "clear action must restore neutral spatial linkage state");
+}
+
 const launchOptions = {
   headless: true,
   // CI runners may not expose a hardware GPU. Software WebGL is acceptable for
@@ -149,8 +180,9 @@ try {
   await primary.click();
   await page.waitForURL((url) => isCaseUrl(url), { timeout: 20_000 });
   await assertCaseSpatialIdentity(page);
+  await assertCaseSpatialLinkage(page);
   await assertNoHorizontalOverflow(page, "desktop Case spatial life page");
-  await page.screenshot({ path: path.join(output, "05-case-spatial-life-page.png"), fullPage: true });
+  await page.screenshot({ path: path.join(output, "05-case-spatial-linkage.png"), fullPage: true });
 
   await page.getByRole("link", { name: "查看1602整户", exact: true }).click();
   await waitForRealHero(page);
@@ -185,12 +217,13 @@ try {
   await mobilePrimary.click();
   await mobilePage.waitForURL((url) => isCaseUrl(url), { timeout: 20_000 });
   await assertCaseSpatialIdentity(mobilePage);
+  await mobilePage.getByRole("region", { name: "空间事实与3D联动" }).waitFor();
   await assertNoHorizontalOverflow(mobilePage, "mobile Case spatial life page 390");
-  await mobilePage.screenshot({ path: path.join(output, "07-mobile-case-spatial-life-page-390.png"), fullPage: true });
+  await mobilePage.screenshot({ path: path.join(output, "07-mobile-case-spatial-linkage-390.png"), fullPage: true });
   assert.deepEqual(mobileErrors, [], `mobile spatial runtime errors: ${mobileErrors.join(" | ")}`);
   await mobile.close();
 
-  console.log("Spatial drilldown QA passed: published hero GLB, explicit four-step navigation, truthful Case spatial identity, reverse hierarchy restoration, no autoplay, trailing-slash-safe routing and 390px continuity.");
+  console.log("Spatial drilldown QA passed: published hero GLB, explicit four-step navigation, truthful Case spatial identity, recorded-fact-to-3D linkage, deterministic system trace, reverse hierarchy restoration and 390px continuity.");
 } finally {
   await browser.close();
 }

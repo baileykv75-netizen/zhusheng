@@ -85,3 +85,40 @@ test("case is a spatial life page with identity, truthful focus reason, and reve
   assert.match(source, /1602卫生间/);
   assert.match(source, /从建造记忆走到今天/);
 });
+
+test("case spatial linkage uses only recorded relations and deterministic system tracing", async () => {
+  const source = await readFile(caseUrl, "utf8");
+
+  assert.match(source, /空间事实与3D联动/);
+  assert.match(source, /session\.productEvidenceTimeline/);
+  assert.match(source, /evidence\.relatedBusinessIds/);
+  assert.match(source, /memory\.relatedBusinessIds/);
+  assert.match(source, /model\.assessment\.targetBusinessIds/);
+  assert.match(source, /entity\?\.systemId/);
+  assert.match(source, /traceSystem\(systemId\)/);
+  assert.match(source, /sourceTool: "trace_system"/);
+  assert.match(source, /mode: "SYSTEM_TRACE"/);
+  assert.match(source, /focusMemory\(memory: RelevantBuildingMemory\)/);
+  assert.match(source, /focusEvidence\(evidence: ProductEvidenceRecord\)/);
+  assert.match(source, /focusCandidate\(businessId: string\)/);
+  assert.match(source, /focusSystem\(systemId: string\)/);
+  assert.match(source, /data-spatial-kind="memory"/);
+  assert.match(source, /data-spatial-kind="evidence"/);
+  assert.match(source, /data-spatial-kind="candidate"/);
+  assert.match(source, /data-spatial-kind="system"/);
+  assert.match(source, /3D 联动只改变“看哪里”，不改变事件状态、证据身份、候选排序或人工授权/);
+  assert.match(source, /不从住户文字自行猜测构件或故障原因/);
+  assert.match(source, /待重新评估时不会复用上一轮候选/);
+});
+
+test("explicit case focus can inspect current evidence without reviving stale pending candidates", async () => {
+  const source = await readFile(caseUrl, "utf8");
+
+  assert.match(source, /const \[spatialSelectionId, setSpatialSelectionId\]/);
+  assert.match(source, /const selectedSceneBusinessId = spatialSelectionId/);
+  assert.match(source, /model\.pendingResidentAssessment\s+\? null/);
+  assert.match(source, /setSpatialSelectionId\(null\)/);
+  assert.match(source, /\[model\.latestResidentSubmissionId, result\?\.eventId, result\?\.state\]/);
+  assert.match(source, /onSelect=\{handleTwinSelect\}/);
+  assert.doesNotMatch(source, /Product Evidence.*trace_system/s);
+});

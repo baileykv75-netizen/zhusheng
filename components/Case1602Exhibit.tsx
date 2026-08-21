@@ -8,7 +8,12 @@ import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { useBuildingProductContext } from "@/components/product/BuildingContextProvider";
 import { BathroomTwinViewport } from "@/components/life-event/BathroomTwinViewport";
 import { EvidenceTimeChain } from "@/components/EvidenceTimeChain";
+import { building1602Dataset, entityById } from "@/lib/building-intelligence/catalog";
+import { traceSystem } from "@/lib/building-intelligence/queries";
+import type { RelevantBuildingMemory } from "@/lib/building-intelligence/memory-relevance";
+import type { QueryVisualDirective } from "@/lib/building-intelligence/types";
 import { derivePropertyEventViewModel } from "@/lib/product/property-event-view-model";
+import type { ProductEvidenceRecord } from "@/lib/product/evidence";
 import type { LifeEventState, VisualDirective } from "@/lib/life-event-engine/types";
 import styles from "./Case1602Exhibit.module.css";
 
@@ -31,6 +36,12 @@ type SpaceFocusReason = {
   status: string;
   title: string;
   detail: string;
+};
+
+type SpatialFocusState = {
+  kind: "MEMORY" | "EVIDENCE" | "CANDIDATE" | "SYSTEM" | "MODEL";
+  label: string;
+  businessId: string | null;
 };
 
 const stageOrder: StoryStageId[] = ["past", "present", "action", "result"];
@@ -58,6 +69,12 @@ function hasCompletedActionHistory(result: ReturnType<typeof derivePropertyEvent
   ].includes(entry.actionType));
 }
 
+function firstSpecificBusinessId(ids: readonly string[]) {
+  return ids.find((id) => !id.startsWith("SPACE-") && !id.startsWith("SYS-"))
+    ?? ids[0]
+    ?? null;
+}
+
 export function Case1602Exhibit() {
   const searchParams = useSearchParams();
   const { session, assets, assetError } = useLifecycleJourney();
@@ -82,12 +99,21 @@ export function Case1602Exhibit() {
   const previousActionCompleted = hasCompletedActionHistory(result);
   const [storyStage, setStoryStage] = useState<StoryStageId>(currentLifecycleStage);
   const [view, setView] = useState<VisualDirective["view"]>(directive.view);
+  const [spatialSelectionId, setSpatialSelectionId] = useState<string | null>(null);
+  const [caseQueryVisual, setCaseQueryVisual] = useState<QueryVisualDirective | null>(null);
+  const [spatialFocus, setSpatialFocus] = useState<SpatialFocusState | null>(null);
 
   useEffect(() => {
     const nextStage = model.pendingResidentAssessment ? "present" : lifecycleStage(result?.state);
     setStoryStage(nextStage);
     setView(result?.state || model.pendingResidentAssessment ? presentView : "VIEW_CONSTRUCTION_MEMORY");
   }, [model.pendingResidentAssessment, presentView, result?.state]);
+
+  useEffect(() => {
+    setSpatialSelectionId(null);
+    setCaseQueryVisual(null);
+    setSpatialFocus(null);
+  }, [model.latestResidentSubmissionId, result?.eventId, result?.state]);
 
   const focusReason: SpaceFocusReason = model.pendingResidentAssessment
     ? result
@@ -187,15 +213,115 @@ export function Case1602Exhibit() {
     };
   }, [directive.view, model, presentView, previousActionCompleted, result]);
 
+  const spatialEvidence = [...(session.productEvidenceTimeline ?? [])].reverse().slice(0, 4);
+  const systemSourceBusinessIds = [
+    ...model.assessment.targetBusinessIds,
+    ...model.relevantMemories.flatMap((memory) => [...memory.subjectBusinessIds, ...memory.relatedBusinessIds]),
+    ...spatialEvidence.flatMap((evidence) => evidence.relatedBusinessIds)
+  ];
+  const relatedSystemIds = new Set(systemSourceBusinessIds.flatMap((businessId) => {
+    const directSystem = building1602Dataset.systems.find((system) => system.businessId === businessId);
+    if (directSystem) return [directSystem.businessId];
+    const entity = entityById(businessId);
+    return entity?.systemId ? [entity.systemId] : [];
+  }));
+  const relatedSystems = building1602Dataset.systems.filter((system) => relatedSystemIds.has(system.businessId)).slice(0, 4);
+
   const current = stages[storyStage];
   const currentIndex = stageOrder.indexOf(currentLifecycleStage);
-  const selectedSceneBusinessId = model.pendingResidentAssessment
-    ? null
-    : product.selectedBusinessId ?? (result ? directive.highlightBusinessIds[0] ?? null : null);
+  const selectedSceneBusinessId = spatialSelectionId
+    ?? (model.pendingResidentAssessment
+      ? null
+      : product.selectedBusinessId ?? (result ? directive.highlightBusinessIds[0] ?? null : null));
+  const activeQueryVisual = caseQueryVisual ?? product.queryVisual;
 
   function selectStoryStage(id: StoryStageId) {
     setStoryStage(id);
     setView(stages[id].view);
+  }
+
+  function applyDirectSpatialFocus(input: {
+    kind: SpatialFocusState["kind"];
+    label: string;
+    businessId: string;
+    nextView: VisualDirective["view"];
+    nextStage: StoryStageId;
+  }) {
+    setCaseQueryVisual(null);
+    setSpatialSelectionId(input.businessId);
+    product.setSelectedBusinessId(input.businessId);
+    setSpatialFocus({ kind: input.kind, label: input.label, businessId: input.businessId });
+    setStoryStage(input.nextStage);
+    setView(input.nextView);
+  }
+
+  function focusMemory(memory: RelevantBuildingMemory) {
+    const businessId = firstSpecificBusinessId(memory.relatedBusinessIds.length ? memory.relatedBusinessIds : memory.subjectBusinessIds);
+    if (!businessId) return;
+    applyDirectSpatialFocus({
+      kind: "MEMORY",
+      label: `建筑记忆 · ${memory.title}`,
+      businessId,
+      nextView: "VIEW_CONSTRUCTION_MEMORY",
+      nextStage: "past"
+    });
+  }
+
+  function focusEvidence(evidence: ProductEvidenceRecord) {
+    const businessId = firstSpecificBusinessId(evidence.relatedBusinessIds) ?? evidence.spaceId;
+    applyDirectSpatialFocus({
+      kind: "EVIDENCE",
+      label: `Product Evidence · ${evidence.type}`,
+      businessId,
+      nextView: "VIEW_RESIDENT",
+      nextStage: "present"
+    });
+  }
+
+  function focusCandidate(businessId: string) {
+    const entity = entityById(businessId);
+    applyDirectSpatialFocus({
+      kind: "CANDIDATE",
+      label: `当前候选 · ${entity?.displayName ?? businessId}`,
+      businessId,
+      nextView: "VIEW_DIAGNOSTIC",
+      nextStage: "present"
+    });
+  }
+
+  function focusSystem(systemId: string) {
+    const system = building1602Dataset.systems.find((item) => item.businessId === systemId);
+    if (!system) return;
+    const trace = traceSystem(systemId);
+    if (trace.status !== "OK") return;
+    const targetBusinessIds = system.memberIds.filter((businessId) => Boolean(entityById(businessId)));
+    const primaryBusinessId = targetBusinessIds[0] ?? null;
+    const visual: QueryVisualDirective = {
+      mode: "SYSTEM_TRACE",
+      targetBusinessIds,
+      revealBusinessIds: trace.businessIds,
+      sourceTool: "trace_system"
+    };
+    setCaseQueryVisual(visual);
+    setSpatialSelectionId(primaryBusinessId);
+    product.setSelectedBusinessId(primaryBusinessId);
+    setSpatialFocus({ kind: "SYSTEM", label: `系统追踪 · ${system.displayName}`, businessId: system.businessId });
+    setStoryStage("present");
+    setView("VIEW_DIAGNOSTIC");
+  }
+
+  function handleTwinSelect(businessId: string | null) {
+    setCaseQueryVisual(null);
+    setSpatialSelectionId(businessId);
+    product.setSelectedBusinessId(businessId);
+    setSpatialFocus(businessId ? { kind: "MODEL", label: `3D直接选择 · ${businessId}`, businessId } : null);
+  }
+
+  function clearSpatialFocus() {
+    setCaseQueryVisual(null);
+    setSpatialSelectionId(null);
+    product.setSelectedBusinessId(null);
+    setSpatialFocus(null);
   }
 
   return <div className="case-exhibit">
@@ -249,19 +375,88 @@ export function Case1602Exhibit() {
           view={view}
           selectedBusinessId={selectedSceneBusinessId}
           onViewChange={setView}
-          onSelect={product.setSelectedBusinessId}
-          queryVisual={product.queryVisual}
+          onSelect={handleTwinSelect}
+          queryVisual={activeQueryVisual}
         />
       </div>
 
       <div className="case-workspace">
+        <section className={styles.spatialLinkage} aria-label="空间事实与3D联动">
+          <header>
+            <div>
+              <span>SPACE LINKAGE / 事实与数字样间</span>
+              <strong data-spatial-focus>{spatialFocus?.label ?? "选择一条已有事实，在同一空间里定位它"}</strong>
+            </div>
+            {spatialFocus ? <button type="button" onClick={clearSpatialFocus}>清除3D联动</button> : null}
+          </header>
+
+          <div className={styles.linkageGroups}>
+            <section>
+              <h3>当前候选</h3>
+              <p>只显示确定性事件引擎当前允许展示的候选；待重新评估时不会复用上一轮候选。</p>
+              <div className={styles.linkageButtons}>
+                {model.assessment.targetBusinessIds.length
+                  ? model.assessment.targetBusinessIds.map((businessId) => {
+                      const entity = entityById(businessId);
+                      return <button type="button" key={businessId} data-spatial-kind="candidate" data-business-id={businessId} onClick={() => focusCandidate(businessId)}>
+                        <strong>{entity?.displayName ?? businessId}</strong><small>{businessId}</small>
+                      </button>;
+                    })
+                  : <small>当前没有可安全展示的领域候选。</small>}
+              </div>
+            </section>
+
+            <section>
+              <h3>建筑记忆</h3>
+              <p>历史记录只负责把过去定位回构件；点击不会把历史相关性升级成当前故障证据。</p>
+              <div className={styles.linkageButtons}>
+                {model.relevantMemories.slice(0, 3).map((memory) => {
+                  const businessId = firstSpecificBusinessId(memory.relatedBusinessIds.length ? memory.relatedBusinessIds : memory.subjectBusinessIds);
+                  return <button type="button" key={memory.recordId} disabled={!businessId} data-spatial-kind="memory" data-business-id={businessId ?? undefined} onClick={() => focusMemory(memory)}>
+                    <strong>{memory.title}</strong><small>{businessId ?? "仅空间级历史记录"}</small>
+                  </button>;
+                })}
+              </div>
+            </section>
+
+            <section>
+              <h3>Product Evidence</h3>
+              <p>只按已经保存的 relatedBusinessIds 定位，不从住户文字自行猜测构件或故障原因。</p>
+              <div className={styles.linkageButtons}>
+                {spatialEvidence.length
+                  ? spatialEvidence.map((evidence) => {
+                      const businessId = firstSpecificBusinessId(evidence.relatedBusinessIds) ?? evidence.spaceId;
+                      return <button type="button" key={evidence.id} data-spatial-kind="evidence" data-business-id={businessId} onClick={() => focusEvidence(evidence)}>
+                        <strong>{evidence.type}</strong><small>{evidence.sourceActor} · {evidence.status} · {businessId}</small>
+                      </button>;
+                    })
+                  : <small>当前会话还没有 Product Evidence。</small>}
+              </div>
+            </section>
+
+            <section>
+              <h3>可追溯系统</h3>
+              <p>系统入口来自候选、记忆或证据已经关联的构件；点击后由 Building Intelligence 的 trace_system 真查询驱动整条系统可视化。</p>
+              <div className={styles.linkageButtons}>
+                {relatedSystems.length
+                  ? relatedSystems.map((system) => <button type="button" key={system.businessId} data-spatial-kind="system" data-business-id={system.businessId} onClick={() => focusSystem(system.businessId)}>
+                      <strong>{system.displayName}</strong><small>{system.businessId} · {system.memberIds.length} 个成员</small>
+                    </button>)
+                  : <small>当前事实尚未建立到具体系统的结构化关联。</small>}
+              </div>
+            </section>
+          </div>
+
+          <small className={styles.linkageBoundary}>3D 联动只改变“看哪里”，不改变事件状态、证据身份、候选排序或人工授权。</small>
+        </section>
+
         <nav aria-label="1602事件时间导航">
           {stageOrder.map((id) => <button type="button" key={id} className={storyStage === id ? "active" : ""} onClick={() => selectStoryStage(id)}>{stages[id].shortLabel}</button>)}
         </nav>
         <article className="case-current-card">
           <p>{current.label}</p>
           <h2 className="display-headline">{current.title}</h2>
-          {storyStage === "past" ? <div className={styles.memoryList}>{model.relevantMemories.slice(0, 3).map((memory) => <div className={styles.memoryItem} key={memory.recordId}><span>{memory.occurredAt.slice(0, 10).replaceAll("-", ".")} · {memory.historicalSignal}</span><strong>{memory.title}</strong><p>{memory.summary}</p></div>)}</div> : null}
+          {storyStage === "past" ? <div className={styles.memoryList}>{model.relevantMemories.slice(0, 3).map((memory) => <button type="button" className={styles.memoryItem} key={memory.recordId} onClick={() => focusMemory(memory)}><span>{memory.occurredAt.slice(0, 10).replaceAll("-", ".")} · {memory.historicalSignal}</span><strong>{memory.title}</strong><p>{memory.summary}</p><small>定位到3D构件</small></button>)}</div> : null}
           <div><span>这一阶段发生什么</span><strong>{current.fact}</strong></div>
           <div><span>为什么重要</span><strong>{current.why}</strong></div>
           <div className={styles.storyMeta}>
