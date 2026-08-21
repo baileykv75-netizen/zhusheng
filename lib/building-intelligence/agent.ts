@@ -72,6 +72,7 @@ function diagnosticTargetsForQuestion(question: string) {
 }
 
 function diagnosticMemoryInvocations(question: string): Invocation[] {
+  if (isCurrentObservationQuery(question)) return [];
   const targets = diagnosticTargetsForQuestion(question);
   if (!targets.length) return [];
   if (!/(为什么|原因|可能|异常|故障|排查|解决|怎么处理|怎么修|臭味|异味|返味|反味|漏|渗|潮|湿|不亮|闪烁|跳闸|排水不畅|下水慢)/u.test(question)) return [];
