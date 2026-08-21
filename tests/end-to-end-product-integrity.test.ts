@@ -43,7 +43,8 @@ test("resident intake is not labelled as a formed event before property assessme
   assert.match(source, /const residentHeaderId = result\?\.eventId \?\? "1602现场受理"/);
   assert.match(source, /住户事实已保存 · 等待物业接入/);
   assert.match(source, /先提交你实际看到的现场事实/);
-  assert.match(source, /result \? "你的现场观察进入同一事件"/);
+  assert.match(source, /const residentHeaderStatus = result/);
+  assert.match(source, /\? "你的现场观察进入同一事件"/);
   assert.doesNotMatch(source, /<Link href="\/case-1602">EVT-1602<\/Link><span>住户任务<\/span><small>你的现场观察进入同一事件<\/small>/);
 });
 
