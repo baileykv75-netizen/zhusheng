@@ -146,7 +146,7 @@ test("evidence time chain exposes only recorded spatial links and lets Case own 
   assert.match(timeline, /data-evidence-spatial-source=\{request\.sourceId\}/);
   assert.match(timeline, /aria-pressed=\{active\}/);
   assert.match(timeline, /onClick=\{\(\) => onSpatialFocus\(request\)\}/);
-  assert.doesNotMatch(timeline, /observedValue.*split|description.*match|new RegExp/s);
+  assert.doesNotMatch(timeline, /(observedValue[\s\S]*split|description[\s\S]*match|new RegExp)/);
 
   assert.match(caseSource, /type EvidenceSpatialFocusRequest/);
   assert.match(caseSource, /function focusTimelineEvidence\(request: EvidenceSpatialFocusRequest\)/);
