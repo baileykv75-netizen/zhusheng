@@ -7,6 +7,7 @@ const policyUrl = new URL("./QA_POLICY.md", import.meta.url);
 const guardUrl = new URL("./legacy-qa-guard.mjs", import.meta.url);
 const workflowUrl = new URL("../.github/workflows/step4-validation.yml", import.meta.url);
 const spatialQaUrl = new URL("./spatial-drilldown-qa.mjs", import.meta.url);
+const componentLifeQaUrl = new URL("./component-life-qa.mjs", import.meta.url);
 
 const legacyScripts = [
   ["test:exhibit", "exhibit"],
@@ -24,12 +25,14 @@ test("current browser QA has one explicit source-of-truth entrypoint", async () 
 
   assert.match(current, /test:css-delivery/);
   assert.match(current, /test:spatial-drilldown/);
+  assert.match(current, /test:component-life/);
   assert.match(current, /test:evidence-correctness/);
   assert.match(current, /test:v6-lifecycle/);
   assert.doesNotMatch(current, /test:exhibit|test:stage4b-visual|test:journey-visual|test:unified-workspace/);
 
   assert.equal(pkg.scripts["test:css-delivery"], "node tests/css-delivery-qa.mjs");
   assert.equal(pkg.scripts["test:spatial-drilldown"], "node tests/spatial-drilldown-qa.mjs");
+  assert.equal(pkg.scripts["test:component-life"], "node tests/component-life-qa.mjs");
   assert.equal(pkg.scripts["test:evidence-correctness"], "node tests/evidence-correctness-qa.mjs");
   assert.equal(pkg.scripts["test:v6-lifecycle"], "node tests/v6-lifecycle-qa.mjs");
 });
@@ -53,6 +56,22 @@ test("current spatial QA validates real user-controlled building continuity", as
   assert.match(source, /scrollWidth/);
   assert.match(policy, /真实 `hero-glb` 加载/);
   assert.match(policy, /程序化 fallback 只用于产品降级/);
+});
+
+test("component life QA keeps reverse 3D lookup inside the current truth contract", async () => {
+  const [source, policy] = await Promise.all([
+    readFile(componentLifeQaUrl, "utf8"),
+    readFile(policyUrl, "utf8")
+  ]);
+
+  assert.match(source, /构件生命索引/);
+  assert.match(source, /data-component-life-id/);
+  assert.match(source, /NO LIVE EVENT \/ 尚无正式事件/);
+  assert.match(source, /CURRENT CANDIDATE \/ 当前候选/);
+  assert.match(source, /清除3D联动/);
+  assert.match(source, /390/);
+  assert.match(policy, /3D → 对象生命索引/);
+  assert.match(policy, /历史相关性不能升级成当前故障结论/);
 });
 
 test("spatial QA is portable across trailing-slash routes and headless CI", async () => {
