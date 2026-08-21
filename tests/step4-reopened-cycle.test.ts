@@ -149,7 +149,9 @@ test("reopened assessment with a genuinely new abnormal cycle can diagnose again
 
 test("reopened assessment rejects stale resident evidence from before reopen", () => {
   const { engine, reopened, setAuditTime } = driveToReopened();
-  const stale = new Date(start + 39 * 60_000).toISOString();
+  const reopenedAt = [...reopened.auditLog].reverse().find((item) => item.nextState === "REOPENED")?.timestamp;
+  assert.ok(reopenedAt);
+  const stale = new Date(Date.parse(reopenedAt) - 1_000).toISOString();
   setAuditTime(start + 45 * 60_000);
   assert.throws(
     () => resumeReopenedAssessment(engine, reopened, controlsFromTemplate("joint-supported"), stale, start + 45 * 60_000),
