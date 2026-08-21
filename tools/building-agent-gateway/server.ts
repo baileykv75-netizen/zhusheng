@@ -11,6 +11,7 @@ import { redactError } from "./redaction.ts";
 import type { GatewayConfig, ModelTask } from "./types.ts";
 
 type ServerOptions = { config?: GatewayConfig; provider?: DeepSeekChatProvider; rateLimiter?: MemoryRateLimiter };
+type GatewayRequestId = ReturnType<typeof randomUUID>;
 
 function sendJson(response: ServerResponse, status: number, value: unknown) {
   response.statusCode = status;
@@ -32,7 +33,7 @@ export async function queryBuildingWithObservationBoundary(
   provider: DeepSeekChatProvider,
   question: string,
   selectedBusinessId: string | null,
-  requestId: string
+  requestId: GatewayRequestId
 ) {
   if (!isCurrentObservationQuery(question)) return provider.queryBuilding(question, selectedBusinessId, requestId);
   const result = createLocalBuildingAgentTurn(question, selectedBusinessId, "LOCAL_READ_ONLY");
