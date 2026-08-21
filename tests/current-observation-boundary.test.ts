@@ -8,16 +8,27 @@ import { getCurrentObservations } from "../lib/building-intelligence/queries.ts"
 import { DeepSeekChatProvider } from "../tools/building-agent-gateway/deepseek-provider.ts";
 import { queryBuildingWithObservationBoundary } from "../tools/building-agent-gateway/server.ts";
 
-test("static lifecycle memory contains historical observations but no live observation source", () => {
-  const historical = building1602Dataset.records.filter((record) => record.recordType === "OBSERVATION");
-  assert.ok(historical.length >= 3);
-  assert.ok(historical.every((record) => Date.parse(record.occurredAt) < Date.parse("2026-01-01T00:00:00Z")));
-  assert.ok(historical.every((record) => record.provenance.sourceClass === "SYNTHETIC_ENGINEERING_RECORD"));
+test("building memory may contain historical observations but current query exposes no live observation source", () => {
+  const subjectId = "SPACE-1602-BATHROOM";
+  const historical = building1602Dataset.records.filter(
+    (record) => record.recordType === "OBSERVATION" && record.subjectBusinessIds.includes(subjectId)
+  );
+  assert.ok(historical.length >= 1);
 
-  const current = getCurrentObservations("SPACE-1602-BATHROOM");
+  const current = getCurrentObservations(subjectId);
   assert.equal(current.status, "NOT_RECORDED");
+  assert.deepEqual(current.data, {
+    historicalObservationCount: historical.length,
+    liveObservationConnected: false
+  });
   assert.ok(current.facts.some((fact) => fact.predicate === "NO_LIVE_OBSERVATION_SOURCE"));
   assert.equal(current.facts.some((fact) => fact.predicate === "observationRecord"), false);
+
+  const historicalIds = new Set(historical.map((record) => record.recordId));
+  assert.equal(current.facts.some((fact) => historicalIds.has(fact.factId)), false);
+  const boundary = current.facts.find((fact) => fact.predicate === "NO_LIVE_OBSERVATION_SOURCE");
+  assert.ok(boundary);
+  assert.match(String(boundary.value), /历史OBSERVATION记录.*不能作为当前读数或当前运行状态/);
 });
 
 test("Ask Building cannot answer a current humidity question from historical observation memory", () => {
