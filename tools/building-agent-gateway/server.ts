@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
+import { createLocalBuildingAgentTurn, isCurrentObservationQuery } from "../../lib/building-intelligence/agent.ts";
 import { loadGatewayConfig } from "./config.ts";
 import { DeepSeekChatProvider, GatewayProviderError } from "./deepseek-provider.ts";
 import { MemoryRateLimiter } from "./rate-limit.ts";
@@ -25,6 +26,27 @@ function statusForProviderError(type: string) {
   if (type === "SENSITIVE_INPUT") return 400;
   if (type === "MODEL_UNAVAILABLE") return 422;
   return 502;
+}
+
+export async function queryBuildingWithObservationBoundary(
+  provider: DeepSeekChatProvider,
+  question: string,
+  selectedBusinessId: string | null,
+  requestId: string
+) {
+  if (!isCurrentObservationQuery(question)) return provider.queryBuilding(question, selectedBusinessId, requestId);
+  const result = createLocalBuildingAgentTurn(question, selectedBusinessId, "LOCAL_READ_ONLY");
+  return {
+    result,
+    metadata: {
+      requestId,
+      model: "deterministic-current-observation-boundary",
+      responseId: "local-current-observation-boundary",
+      rounds: 0,
+      toolCalls: result.toolTrace.length,
+      schemaValid: true as const
+    }
+  };
 }
 
 export function createGatewayServer(options: ServerOptions = {}): { server: Server; config: GatewayConfig } {
@@ -61,7 +83,7 @@ export function createGatewayServer(options: ServerOptions = {}): { server: Serv
       if (request.url === "/v1/agent/query") {
         if (typeof body.question !== "string" || !body.question.trim()) throw new GatewayRequestError(400, "QUESTION_INVALID", "question必须是非空字符串");
         if (body.selectedBusinessId !== undefined && body.selectedBusinessId !== null && typeof body.selectedBusinessId !== "string") throw new GatewayRequestError(400, "CONTEXT_INVALID", "selectedBusinessId必须是字符串或null");
-        const output = await provider.queryBuilding(body.question, typeof body.selectedBusinessId === "string" ? body.selectedBusinessId : null, requestId);
+        const output = await queryBuildingWithObservationBoundary(provider, body.question, typeof body.selectedBusinessId === "string" ? body.selectedBusinessId : null, requestId);
         sendJson(response, 200, { ok: true, ...output });
         return;
       }
