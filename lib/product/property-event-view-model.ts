@@ -192,37 +192,47 @@ export function derivePropertyEventViewModel(session: LabSession): PropertyEvent
   const pendingResidentAssessment = residentEvidenceNeedsAssessment(result, session.residentSubmissions);
   const projection = deriveGuardedLifecycleProjection(result, { hasResidentEvidence: pendingResidentAssessment });
   const relevantMemories = memoriesFor(session, pendingResidentAssessment ? null : result);
+  const needsNewResidentCycle = !pendingResidentAssessment && (result?.state === "REOPENED" || result?.state === "INCONCLUSIVE");
 
-  const evidenceGaps: PropertyEvidenceGap[] = pendingResidentAssessment
-    ? [{
-        id: "property-system-observation-confirmation",
-        label: "本轮系统观测确认",
-        actor: "物业",
-        reason: result
-          ? "新住户证据已经存在，但尚未进入本轮确定性评估；物业需要明确确认本轮湿度、微流量等系统/现场观测，不能复用上一轮值。"
-          : "住户原始证据已经受理；物业需要明确确认本轮湿度、微流量等系统/现场观测，才能形成第一次确定性评估。"
-      }]
-    : (result?.missingEvidence ?? []).map((item, index) => ({
-        id: `${item.evidenceType}-${index}`,
-        label: EVIDENCE_LABELS[item.evidenceType],
-        actor: actorLabel(item.requestedFrom),
-        reason: item.reason
-      }));
+  let evidenceGaps: PropertyEvidenceGap[];
+  if (pendingResidentAssessment) {
+    evidenceGaps = [{
+      id: "property-system-observation-confirmation",
+      label: "本轮系统观测确认",
+      actor: "物业",
+      reason: result
+        ? "新住户证据已经存在，但尚未进入本轮确定性评估；物业需要明确确认本轮湿度、微流量等系统/现场观测，不能复用上一轮值。"
+        : "住户原始证据已经受理；物业需要明确确认本轮湿度、微流量等系统/现场观测，才能形成第一次确定性评估。"
+    }];
+  } else if (needsNewResidentCycle) {
+    // A new resident cycle is the gate after INCONCLUSIVE/REOPENED. Do not
+    // surface the previous round's missing-evidence checklist as if it were the
+    // current intake plan; the new facts must arrive first and may change what
+    // the next domain evidence request should be.
+    evidenceGaps = [{
+      id: "resident-origin-evidence",
+      label: "本轮新的住户现场证据",
+      actor: "住户",
+      reason: result?.state === "REOPENED"
+        ? "重新打开后的事件不能复用上一轮住户证据，需要新的现场描述与观察；后续补证项由本轮事实重新决定。"
+        : "上一轮证据仍不足以收敛；需要住户提交晚于上一轮评估的新现场事实，再在原事件 ID 上继续评估。"
+    }];
+  } else {
+    evidenceGaps = (result?.missingEvidence ?? []).map((item, index) => ({
+      id: `${item.evidenceType}-${index}`,
+      label: EVIDENCE_LABELS[item.evidenceType],
+      actor: actorLabel(item.requestedFrom),
+      reason: item.reason
+    }));
+  }
 
-  if (!pendingResidentAssessment && !evidenceGaps.some((item) => item.actor === "住户")) {
-    const needsNewResidentCycle = result?.state === "REOPENED" || result?.state === "INCONCLUSIVE";
-    if (!result || needsNewResidentCycle) {
-      evidenceGaps.unshift({
-        id: "resident-origin-evidence",
-        label: needsNewResidentCycle ? "本轮新的住户现场证据" : "住户原始现场证据",
-        actor: "住户",
-        reason: result?.state === "REOPENED"
-          ? "重新打开后的事件不能复用上一轮住户证据，需要新的现场描述与观察；后续补证项由本轮事实重新决定。"
-          : result?.state === "INCONCLUSIVE"
-            ? "上一轮证据仍不足以收敛；需要住户提交晚于上一轮评估的新现场事实，再在原事件 ID 上继续评估。"
-            : "物业不能代替住户填写原始描述与现场观察；后续是否需要水表等补证，由当前事实决定。"
-      });
-    }
+  if (!pendingResidentAssessment && !result) {
+    evidenceGaps.unshift({
+      id: "resident-origin-evidence",
+      label: "住户原始现场证据",
+      actor: "住户",
+      reason: "物业不能代替住户填写原始描述与现场观察；后续是否需要水表等补证，由当前事实决定。"
+    });
   }
 
   return {
