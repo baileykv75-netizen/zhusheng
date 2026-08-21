@@ -26,7 +26,9 @@ test("advanced verification is a transaction-like sandbox and restores task trut
   assert.match(source, /structuredClone\(session\)/);
   assert.match(source, /if \(modeRef\.current !== "lab"\) return/);
   assert.match(source, /退出沙盒并恢复物业任务/);
-  assert.match(source, /退出、刷新或离开页面后都恢复进入前的物业会话/);
+  assert.match(source, /退出、刷新、异常中断后重新进入正式任务/);
+  assert.match(source, /恢复进入前的物业会话/);
+  assert.match(source, /不写回任务真相/);
 });
 
 test("legacy detailed property work remains available only behind the secondary task layer", async () => {
