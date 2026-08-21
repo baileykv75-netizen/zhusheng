@@ -34,7 +34,17 @@
   --zs-type-section: clamp(18px, 1.7vw, 22px);
   --zs-type-body: 14px;
 
+  --zs-content-reading: 760px;
+  --zs-content-work: 1280px;
+  --zs-content-wide: 1480px;
+  --zs-panel-wide: 920px;
+  --zs-panel-narrow: 680px;
   --zs-content-max: 1540px;
+
+  --zs-surface-subtle: rgba(23, 26, 25, .035);
+  --zs-surface-raised: rgba(248, 246, 240, .94);
+  --zs-shadow-floating: 0 28px 80px rgba(0, 0, 0, .22);
+
   --zs-ease: cubic-bezier(.22, 1, .36, 1);
   --zs-motion-fast: 180ms;
   --zs-motion: 320ms;

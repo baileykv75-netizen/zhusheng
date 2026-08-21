@@ -13,6 +13,7 @@ import "./product-tokens.css";
 import "./product-polish.css";
 import "./product-route-polish.css";
 import "./product-finishing.css";
+import "./agent-ui.css";
 
 export const metadata: Metadata = {
   title: "筑生：一栋房子一生的AI智能体",

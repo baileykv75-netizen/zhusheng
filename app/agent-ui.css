@@ -1,0 +1,504 @@
+/* UI-0 / UI-1: shared product rhythm and the wide Ask-the-Building surface.
+   Domain state, query planning, model access and authorization semantics do not live here. */
+
+.building-agent-shell {
+  color-scheme: light;
+}
+
+.building-agent-scrim {
+  background: rgba(7, 9, 8, .62);
+  backdrop-filter: blur(6px);
+}
+
+.building-agent-drawer {
+  width: min(var(--zs-panel-wide), 58vw);
+  min-width: 760px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  color: var(--zs-ink);
+  background: var(--zs-paper-elevated);
+  box-shadow: -32px 0 88px rgba(0, 0, 0, .24);
+}
+
+.agent-drawer-header {
+  min-height: 128px;
+  align-items: flex-start;
+  gap: var(--zs-space-5);
+  padding: 24px 30px 22px;
+  border-bottom: 1px solid rgba(243, 240, 232, .11);
+  color: #f4f0e8;
+  background: var(--zs-charcoal);
+}
+
+.agent-header-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.agent-eyebrow {
+  color: #af9278 !important;
+  font: 700 9px/1.3 "Zhusheng Sans", sans-serif !important;
+  letter-spacing: .14em !important;
+}
+
+.agent-drawer-header h2 {
+  margin-top: 6px;
+  font-size: 28px;
+  line-height: 1.08;
+  letter-spacing: -.03em;
+  font-weight: 600;
+}
+
+.agent-drawer-header p {
+  max-width: 620px;
+  margin-top: 8px;
+  color: #9ba19c;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.agent-header-actions {
+  flex: 0 0 auto;
+}
+
+.agent-header-actions > button {
+  width: 38px;
+  height: 38px;
+  border-color: rgba(243, 240, 232, .16);
+  color: #ece8df;
+  background: transparent;
+}
+
+.agent-header-actions > button:hover {
+  border-color: rgba(243, 240, 232, .32);
+  background: rgba(243, 240, 232, .06);
+}
+
+.agent-context-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 18px;
+  color: #7f8782;
+  font-size: 11px;
+}
+
+.agent-context-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #89908c !important;
+  font: 500 11px/1.4 "Zhusheng Sans", sans-serif !important;
+  letter-spacing: 0 !important;
+}
+
+.agent-context-meta strong {
+  color: #c8c2b8;
+  font-weight: 620;
+}
+
+.agent-header-boundary {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 700px;
+  margin-top: 12px;
+  color: #7f8782;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.agent-header-boundary svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: #789184;
+}
+
+.agent-header-boundary span {
+  color: inherit !important;
+  font: inherit !important;
+  letter-spacing: 0 !important;
+}
+
+.agent-body {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+  background: var(--zs-paper-elevated);
+}
+
+.agent-body > .building-ai {
+  height: 100%;
+}
+
+.agent-drawer-footer {
+  min-height: 56px;
+  justify-content: flex-end;
+  padding: 9px 20px;
+  border-top: 1px solid var(--zs-line-soft);
+  color: var(--zs-ink-secondary);
+  background: rgba(243, 240, 232, .96);
+}
+
+.agent-footer-actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.agent-footer-actions a {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 11px;
+  border: 1px solid var(--zs-line-soft);
+  border-radius: var(--zs-radius-sm);
+  color: #535b56;
+  background: transparent;
+  font-size: 10px;
+}
+
+.agent-footer-actions a:hover {
+  border-color: rgba(155, 63, 52, .26);
+  color: #7d3b31;
+  background: rgba(155, 63, 52, .035);
+}
+
+/* The workspace keeps all existing query behavior, but its hierarchy becomes conversation-first. */
+.building-agent-drawer .building-ai {
+  color: var(--zs-ink);
+  background: transparent;
+}
+
+.building-agent-drawer .building-ai > header {
+  min-height: 52px;
+  padding: 0 40px;
+  border-bottom: 1px solid var(--zs-line-soft);
+  background: rgba(235, 231, 222, .46);
+}
+
+.building-agent-drawer .building-ai > header > div,
+.building-agent-drawer .building-ai > header > button {
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 620;
+}
+
+.building-agent-drawer .gateway-badge {
+  font-size: 9px;
+  letter-spacing: .06em;
+}
+
+.building-agent-drawer .building-ai-empty {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.building-agent-drawer .building-ai-intro {
+  align-self: auto;
+  padding: 40px 40px 22px;
+}
+
+.building-agent-drawer .building-ai-intro > i {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 22px;
+  color: #d9cdbf;
+  background: var(--zs-charcoal);
+}
+
+.building-agent-drawer .building-ai-intro p {
+  margin-bottom: 10px;
+  color: #96614d;
+  font: 700 9px/1.35 "Zhusheng Sans", sans-serif;
+  letter-spacing: .12em;
+}
+
+.building-agent-drawer .building-ai-intro h2 {
+  max-width: 620px;
+  color: var(--zs-ink);
+  font-family: "Zhusheng Sans", "Noto Sans SC", sans-serif;
+  font-size: clamp(30px, 2.5vw, 38px);
+  font-weight: 560;
+  line-height: 1.12;
+  letter-spacing: -.04em;
+}
+
+.building-agent-drawer .building-ai-intro > span {
+  max-width: 650px;
+  margin-top: 14px;
+  color: #676f6a;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.building-agent-drawer .building-ai-memory-scope {
+  margin: 0 40px 20px;
+  padding: 0;
+  border: 0;
+  color: #858b87;
+  font: 500 11px/1.5 "Zhusheng Sans", sans-serif;
+}
+
+.building-agent-drawer .building-ai-memory-scope strong {
+  color: #424945;
+  font-size: 12px;
+}
+
+.building-agent-drawer .building-ai-memory-scope i {
+  height: 10px;
+  background: var(--zs-line);
+}
+
+.building-agent-drawer .selected-context {
+  min-height: 44px;
+  margin: 0 40px 18px;
+  padding: 0 14px;
+  border: 0;
+  border-left: 2px solid rgba(155, 63, 52, .32);
+  color: #5d655f;
+  background: var(--zs-surface-subtle);
+}
+
+.building-agent-drawer .selected-context span,
+.building-agent-drawer .selected-context strong {
+  font-size: 11px;
+}
+
+.building-agent-drawer .building-ai-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 40px 24px;
+  border: 0;
+  background: transparent;
+}
+
+.building-agent-drawer .building-ai-examples button {
+  min-height: 38px;
+  flex: 1 1 calc(50% - 4px);
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 9px 12px;
+  border: 1px solid var(--zs-line-soft);
+  border-radius: var(--zs-radius-sm);
+  color: #626965;
+  background: var(--zs-surface-subtle);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.building-agent-drawer .building-ai-examples button:hover {
+  border-color: rgba(155, 63, 52, .22);
+  color: #71392f;
+  background: rgba(155, 63, 52, .035);
+}
+
+.building-agent-drawer .building-ai-form {
+  grid-template-columns: minmax(0, 1fr) 54px;
+  margin: auto 40px 10px;
+  border: 1px solid rgba(23, 26, 25, .2);
+  border-radius: var(--zs-radius-md);
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(23, 26, 25, .055);
+}
+
+.building-agent-drawer .building-ai-form label {
+  top: 10px;
+  left: 14px;
+  color: #8b918d;
+  font-size: 10px;
+  letter-spacing: .06em;
+}
+
+.building-agent-drawer .building-ai-form textarea {
+  min-height: 82px;
+  padding: 31px 14px 11px;
+  color: #262b28;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.building-agent-drawer .building-ai-form button {
+  margin: 9px;
+  border-radius: var(--zs-radius-sm);
+  background: var(--zs-accent);
+}
+
+.building-agent-drawer .building-ai-form button:hover:not(:disabled) {
+  background: var(--zs-accent-hover);
+}
+
+.building-agent-drawer .building-ai-unavailable {
+  margin: 0 40px 18px;
+  color: #8a704b;
+  font: 500 10px/1.5 "Zhusheng Sans", sans-serif;
+}
+
+/* Result state: conclusion and action stay visible; candidate mechanics and raw traces are opt-in. */
+.building-agent-drawer .building-ai-result {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.building-agent-drawer .ai-result-scroll {
+  padding: 30px 40px 36px;
+}
+
+.building-agent-drawer .ai-question {
+  margin-bottom: 14px;
+  color: #777e79;
+  font-size: 12px;
+}
+
+.building-agent-drawer .ai-answer {
+  padding: 20px 0 24px;
+  border-top: 1px solid var(--zs-line-soft);
+  border-bottom: 1px solid var(--zs-line-soft);
+}
+
+.building-agent-drawer .ai-answer span {
+  color: #8a8f8b;
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+
+.building-agent-drawer .ai-answer h2 {
+  max-width: var(--zs-content-reading);
+  margin-top: 10px;
+  font-family: "Zhusheng Sans", "Noto Sans SC", sans-serif;
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 560;
+  line-height: 1.5;
+  letter-spacing: -.025em;
+}
+
+.building-agent-drawer .building-ai-hypothesis-details {
+  border-bottom: 1px solid var(--zs-line-soft);
+}
+
+.building-agent-drawer .building-ai-hypothesis-details > summary {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  list-style: none;
+  color: #626a65;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.building-agent-drawer .building-ai-hypothesis-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.building-agent-drawer .building-ai-hypothesis-details > summary span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.building-agent-drawer .building-ai-hypothesis-details > summary em {
+  color: #8a8f8b;
+  font-size: 10px;
+  font-style: normal;
+}
+
+.building-agent-drawer .building-ai-hypothesis-details[open] > summary {
+  color: #7c3b31;
+}
+
+.building-agent-drawer .building-ai-result > .building-ai-form {
+  margin: 10px 40px 18px;
+}
+
+@media (max-width: 1200px) and (min-width: 781px) {
+  .building-agent-drawer {
+    width: min(860px, 72vw);
+    min-width: 680px;
+  }
+}
+
+@media (max-width: 780px) {
+  .building-agent-drawer {
+    width: 100vw;
+    min-width: 0;
+  }
+
+  .agent-drawer-header {
+    min-height: 0;
+    padding: 18px 18px 16px;
+  }
+
+  .agent-drawer-header h2 {
+    font-size: 24px;
+  }
+
+  .agent-drawer-header p {
+    display: block;
+    font-size: 11px;
+  }
+
+  .agent-context-meta {
+    gap: 6px 12px;
+    margin-top: 14px;
+  }
+
+  .agent-context-meta > span:nth-child(3) {
+    display: none;
+  }
+
+  .agent-header-boundary {
+    margin-top: 10px;
+  }
+
+  .agent-body {
+    padding: 0;
+  }
+
+  .building-agent-drawer .building-ai > header,
+  .building-agent-drawer .building-ai-intro,
+  .building-agent-drawer .ai-result-scroll {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .building-agent-drawer .building-ai-memory-scope,
+  .building-agent-drawer .selected-context,
+  .building-agent-drawer .building-ai-examples,
+  .building-agent-drawer .building-ai-form,
+  .building-agent-drawer .building-ai-unavailable,
+  .building-agent-drawer .building-ai-result > .building-ai-form {
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+
+  .building-agent-drawer .building-ai-intro {
+    padding-top: 26px;
+  }
+
+  .building-agent-drawer .building-ai-intro h2 {
+    font-size: 29px;
+  }
+
+  .building-agent-drawer .building-ai-examples button {
+    flex-basis: 100%;
+  }
+
+  .agent-drawer-footer {
+    overflow: visible;
+    white-space: normal;
+  }
+
+  .agent-footer-actions {
+    justify-content: stretch;
+  }
+
+  .agent-footer-actions a {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}

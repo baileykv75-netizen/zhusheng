@@ -34,12 +34,12 @@ export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onRe
 
   if (!result) return <section className="building-ai building-ai-empty" aria-label="筑生建筑智能查询">
     <header><div><Sparkles size={16} /><span>筑生 AI</span></div><GatewayBadge health={health} /></header>
-    <div className="building-ai-intro"><i><Bot size={22} /></i><p>QUERYABLE BUILDING INTELLIGENCE</p><h2>问这栋房子<br />任何问题</h2><span>事实来自建筑数据；原因类问题会优先回看这栋房子的正常施工、现场调整、返工、验收边界与交付基线，再给出排查顺序。</span></div>
-    <div className={styles.memoryScope}><strong>{building1602Dataset.records.length}</strong><span>条生命周期记忆</span><i /><strong>{memoryTradeCount}</strong><span>类专业/阶段</span><i /><span>施工 → 验收 → 交付 → 运行</span></div>
+    <div className="building-ai-intro"><i><Bot size={20} /></i><p>BUILDING MEMORY + INTELLIGENCE</p><h2>从这栋房子的记忆开始问</h2><span>施工、验收、交付与运行记录会先被检索；原因类问题再基于这些本楼事实组织排查顺序，而不是直接套用通用故障清单。</span></div>
+    <div className={`${styles.memoryScope} building-ai-memory-scope`}><strong>{building1602Dataset.records.length}</strong><span>条生命周期记忆</span><i /><strong>{memoryTradeCount}</strong><span>类专业/阶段</span><i /><span>施工 → 验收 → 交付 → 运行</span></div>
     {selected ? <button className="selected-context" type="button" onClick={() => setQuestion(`请说明${selected.displayName}的已记录信息`)}><LocateFixed size={14} /><span>已选中 {selected.displayName}</span><strong>问筑生这个构件</strong></button> : null}
     <div className="building-ai-examples">{examples.map((item) => <button key={item} type="button" onClick={() => setQuestion(item)}>{item}<ArrowUp size={13} /></button>)}</div>
     <QuestionForm idPrefix={idPrefix} question={question} busy={busy} setQuestion={setQuestion} ask={ask} />
-    {!health ? <p className="building-ai-unavailable"><TriangleAlert size={13} /> LIVE AI UNAVAILABLE · 可继续使用本地确定性只读查询</p> : null}
+    {!health ? <p className="building-ai-unavailable"><TriangleAlert size={13} />LOCAL READ-ONLY · Live AI 当前不可用，仍可使用确定性建筑查询</p> : null}
   </section>;
 
   const synthetic = result.sources.some((source) => source.synthetic);
@@ -56,21 +56,7 @@ export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onRe
         <section className={styles.confirmedCard}>
           <div className={styles.sectionLabel}><CheckCircle2 size={14} />已确认的建筑事实</div>
           <strong>{reasoning.confirmedSummary}</strong>
-          <p>{reasoning.memoryBased ? "系统已把本次问题与 1602 的相关施工、返工、验收和交付记忆交叉匹配；下面的优先级来自这栋房子的历史，而不是通用故障清单。" : "当前没有足够的本楼施工记忆用于排序，因此只能退回一般工程机理。"}</p>
-        </section>
-
-        <section className={styles.hypothesisBlock}>
-          <div className={styles.hypothesisHeader}>
-            <span><CircleHelp size={14} />{reasoning.memoryBased ? "基于本楼记忆的诊断候选" : "工程推理"}</span>
-            <em>{reasoning.memoryBased ? "建筑记忆优先" : "待验证假设"}</em>
-          </div>
-          <div className={styles.hypothesisGrid}>{reasoning.hypotheses.map((item) => <article className={styles.hypothesisCard} key={item.id}>
-            <div className={styles.memoryMeta}><span>优先级 {item.priority}</span>{item.sourceRecordId ? <code>{item.sourceRecordId}</code> : <code>GENERAL</code>}</div>
-            <strong>{item.title}</strong>
-            <p>{item.mechanism}</p>
-            {item.evidence ? <p className={styles.evidenceLine}>建筑记忆依据：{item.evidence}</p> : null}
-            <small>怎么验证：{item.verification}</small>
-          </article>)}</div>
+          <p>{reasoning.memoryBased ? "系统已把本次问题与 1602 的相关施工、返工、验收和交付记忆交叉匹配；当前结论仍以已记录事实为边界。" : "当前没有足够的本楼施工记忆用于排序，因此只能退回一般工程机理。"}</p>
         </section>
 
         <section className={styles.nextStepCard}>
@@ -83,6 +69,19 @@ export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onRe
           <div className={styles.sectionLabel}><ShieldCheck size={14} />事实边界</div>
           <p>{reasoning.boundary}</p>
         </section>
+
+        <details className="building-ai-hypothesis-details">
+          <summary><span><CircleHelp size={14} />查看诊断候选与验证顺序</span><em>{reasoning.hypotheses.length} 项</em></summary>
+          <div className={styles.hypothesisBlock}>
+            <div className={styles.hypothesisGrid}>{reasoning.hypotheses.map((item) => <article className={styles.hypothesisCard} key={item.id}>
+              <div className={styles.memoryMeta}><span>优先级 {item.priority}</span>{item.sourceRecordId ? <code>{item.sourceRecordId}</code> : <code>GENERAL</code>}</div>
+              <strong>{item.title}</strong>
+              <p>{item.mechanism}</p>
+              {item.evidence ? <p className={styles.evidenceLine}>建筑记忆依据：{item.evidence}</p> : null}
+              <small>怎么验证：{item.verification}</small>
+            </article>)}</div>
+          </div>
+        </details>
       </div> : null}
 
       {synthetic ? <div className={styles.demoNote}><TriangleAlert size={13} /><span>DEMO DATA</span><p>部分工程记录为合成数据；用于演示“建筑历史如何改变诊断顺序”，不冒充真实竣工档案。</p></div> : null}
@@ -102,5 +101,5 @@ export function BuildingIntelligenceWorkspace({ selectedBusinessId, result, onRe
   </section>;
 }
 
-function GatewayBadge({ health, mode }: { health: GatewayHealth | null; mode?: BuildingAgentTurnResult["mode"] }) { const live = mode === "LIVE_AI" || mode === "LIVE_AI_CLARIFICATION" || (!mode && health?.providerConfigured); return <span className={`gateway-badge ${live ? "live" : "local"}`}><i />{live ? `${mode === "LIVE_AI_CLARIFICATION" ? "LIVE AI · CLARIFICATION" : "LIVE AI"} · ${health?.model ?? "DeepSeek"}` : "LOCAL READ-ONLY QUERY"}</span>; }
+function GatewayBadge({ health, mode }: { health: GatewayHealth | null; mode?: BuildingAgentTurnResult["mode"] }) { const live = mode === "LIVE_AI" || mode === "LIVE_AI_CLARIFICATION" || (!mode && health?.providerConfigured); return <span className={`gateway-badge ${live ? "live" : "local"}`}><i />{live ? `${mode === "LIVE_AI_CLARIFICATION" ? "LIVE AI · CLARIFICATION" : "LIVE AI"} · ${health?.model ?? "DeepSeek"}` : "LOCAL READ-ONLY"}</span>; }
 function QuestionForm({ idPrefix, question, busy, setQuestion, ask, compact = false }: { idPrefix: string; question: string; busy: boolean; setQuestion(value: string): void; ask(event?: FormEvent): void; compact?: boolean }) { const id = `${idPrefix}-${compact ? "next" : "question"}`; return <form className={`building-ai-form ${compact ? "compact" : ""}`} onSubmit={ask}><label htmlFor={id}>向筑生提问</label><textarea id={id} value={question} onChange={(event) => setQuestion(event.target.value)} rows={compact ? 1 : 2} placeholder="例如：卫生间有臭味可能是什么原因？" /><button type="submit" aria-label="发送问题" disabled={!question.trim() || busy}>{busy ? <LoaderCircle className="spin" size={17} /> : <ArrowUp size={17} />}</button></form>; }
