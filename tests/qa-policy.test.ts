@@ -6,6 +6,7 @@ const packageUrl = new URL("../package.json", import.meta.url);
 const policyUrl = new URL("./QA_POLICY.md", import.meta.url);
 const guardUrl = new URL("./legacy-qa-guard.mjs", import.meta.url);
 const workflowUrl = new URL("../.github/workflows/step4-validation.yml", import.meta.url);
+const deployWorkflowUrl = new URL("../.github/workflows/deploy-pages.yml", import.meta.url);
 const spatialQaUrl = new URL("./spatial-drilldown-qa.mjs", import.meta.url);
 const componentLifeQaUrl = new URL("./component-life-qa.mjs", import.meta.url);
 const objectHandoffUrl = new URL("../components/product/ObjectHandoffBar.tsx", import.meta.url);
@@ -145,4 +146,23 @@ test("STEP 4 CI consumes the same current browser QA entrypoint", async () => {
   assert.doesNotMatch(workflow, /pnpm run test:journey-visual/);
   assert.doesNotMatch(workflow, /pnpm run test:unified-workspace/);
   assert.doesNotMatch(workflow, /sed -i .*evidence-correctness-qa\.mjs/);
+});
+
+test("CI keeps only the latest branch run instead of reporting stale failures", async () => {
+  const [validation, deploy] = await Promise.all([
+    readFile(workflowUrl, "utf8"),
+    readFile(deployWorkflowUrl, "utf8")
+  ]);
+
+  assert.match(validation, /concurrency:[\s\S]*group: step4-validation[\s\S]*cancel-in-progress: true/);
+  assert.match(deploy, /concurrency:[\s\S]*group: github-pages[\s\S]*cancel-in-progress: true/);
+});
+
+test("QA policy prefers observable behavior over incidental source shape", async () => {
+  const policy = await readFile(policyUrl, "utf8");
+
+  assert.match(policy, /核心真值优先验证函数返回、状态转换、结构化数据和用户可观察行为/);
+  assert.match(policy, /不得把“内部变量必须如何赋值、某个三元表达式必须长什么样/);
+  assert.match(policy, /源码形状测试只用于安全边界、依赖图、CI wiring、关键入口是否存在/);
+  assert.match(policy, /静态 Building Memory、历史 OBSERVATION 或系统拓扑不能冒充当前读数/);
 });
