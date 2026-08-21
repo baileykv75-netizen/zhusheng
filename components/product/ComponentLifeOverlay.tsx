@@ -24,8 +24,9 @@ export function ComponentLifeOverlay() {
   const product = useBuildingProductContext();
   const model = useMemo(() => derivePropertyEventViewModel(session), [session]);
   const onCase1602 = isCase1602Path(pathname);
-  const requestedObjectId = onCase1602 ? resolveComponentLifeObjectId(searchParams.get("object")) : null;
-  const selectedObjectId = requestedObjectId ?? product.selectedBusinessId;
+  const rawObjectParam = searchParams.get("object");
+  const requestedObjectId = onCase1602 ? resolveComponentLifeObjectId(rawObjectParam) : null;
+  const selectedObjectId = rawObjectParam === null ? product.selectedBusinessId : requestedObjectId;
   const life = useMemo(() => deriveComponentLifeView(selectedObjectId, {
     productEvidence: session.productEvidenceTimeline,
     result: session.result,

@@ -75,9 +75,13 @@ export function BuildingContextProvider({ children }: { children: React.ReactNod
   useEffect(() => {
     if (!onCase1602 || !objectParam || requestedObjectId) return;
     // Unknown / out-of-space object ids are presentation input only. They may not
-    // create a Building Intelligence entity, lifecycle event or candidate identity.
+    // create a Building Intelligence entity, lifecycle event or candidate identity,
+    // and they may not silently fall back to a previously selected valid object.
+    setSession((current) => current.selectedBusinessId === null
+      ? current
+      : { ...current, selectedBusinessId: null });
     syncSelectedObjectUrl(null);
-  }, [objectParam, onCase1602, requestedObjectId, syncSelectedObjectUrl]);
+  }, [objectParam, onCase1602, requestedObjectId, setSession, syncSelectedObjectUrl]);
 
   useEffect(() => {
     if (!requestedObjectId || pendingResidentAssessment) return;

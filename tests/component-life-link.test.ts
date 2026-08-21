@@ -32,7 +32,7 @@ test("shared Building Context owns URL-to-object hydration and object-to-URL syn
   assert.match(provider, /useSearchParams/);
   assert.match(provider, /useRouter/);
   assert.match(provider, /resolveComponentLifeObjectId\(objectParam\)/);
-  assert.match(provider, /function|syncSelectedObjectUrl/);
+  assert.match(provider, /syncSelectedObjectUrl/);
   assert.match(provider, /params\.set\("object", nextResolved\)/);
   assert.match(provider, /params\.delete\("object"\)/);
   assert.match(provider, /router\.replace/);
@@ -41,15 +41,18 @@ test("shared Building Context owns URL-to-object hydration and object-to-URL syn
   assert.match(provider, /setSelectedBusinessId\(value\)/);
   assert.match(provider, /syncSelectedObjectUrl\(value\)/);
   assert.match(provider, /syncSelectedObjectUrl\(target\)/);
-  assert.match(provider, /Unknown \/ out-of-space object ids/);
+  assert.match(provider, /may not silently fall back to a previously selected valid object/);
+  const invalidGuard = provider.match(/useEffect\(\(\) => \{[\s\S]*?Unknown \/ out-of-space object ids[\s\S]*?\}, \[objectParam/)?.[0] ?? "";
+  assert.match(invalidGuard, /selectedBusinessId: null/);
+  assert.match(invalidGuard, /syncSelectedObjectUrl\(null\)/);
 });
 
-test("component life overlay can render directly from the validated object query without inventing event truth", async () => {
+test("component life overlay treats an explicit object query as authoritative and never falls back from an invalid id", async () => {
   const overlay = await readFile(overlayUrl, "utf8");
 
-  assert.match(overlay, /searchParams\.get\("object"\)/);
-  assert.match(overlay, /resolveComponentLifeObjectId/);
-  assert.match(overlay, /requestedObjectId \?\? product\.selectedBusinessId/);
+  assert.match(overlay, /rawObjectParam = searchParams\.get\("object"\)/);
+  assert.match(overlay, /resolveComponentLifeObjectId\(rawObjectParam\)/);
+  assert.match(overlay, /rawObjectParam === null \? product\.selectedBusinessId : requestedObjectId/);
   assert.match(overlay, /data-component-life-deep-linked/);
   assert.match(overlay, /componentLifeHref\(life\.entity\.businessId\)/);
   assert.match(overlay, /data-component-life-link/);
