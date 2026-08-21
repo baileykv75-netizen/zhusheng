@@ -120,5 +120,10 @@ test("explicit case focus can inspect current evidence without reviving stale pe
   assert.match(source, /setSpatialSelectionId\(null\)/);
   assert.match(source, /\[model\.latestResidentSubmissionId, result\?\.eventId, result\?\.state\]/);
   assert.match(source, /onSelect=\{handleTwinSelect\}/);
-  assert.doesNotMatch(source, /Product Evidence.*trace_system/s);
+
+  const evidenceFocus = source.match(
+    /function focusEvidence\(evidence: ProductEvidenceRecord\)[\s\S]*?(?=\n  function focusCandidate)/
+  )?.[0] ?? "";
+  assert.match(evidenceFocus, /evidence\.relatedBusinessIds/);
+  assert.doesNotMatch(evidenceFocus, /traceSystem|trace_system/);
 });
