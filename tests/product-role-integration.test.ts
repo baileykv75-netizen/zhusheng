@@ -91,9 +91,11 @@ test("group governance no longer uses fabricated scale counters as the primary s
 test("group task mode cannot manufacture a resolved source when the current event is unfinished", async () => {
   const source = await readFile(groupUrl, "utf8");
 
-  assert.match(source, /currentResolved = currentPackage\?\.finalState === "RESOLVED"/);
+  assert.match(source, /session\.result\?\.state === "RESOLVED"/);
+  assert.match(source, /currentPackage\?\.eventId === session\.result\.eventId/);
+  assert.match(source, /currentPackage\.finalState === "RESOLVED"/);
   assert.match(source, /当前事件还没有资格进入经验治理/);
-  assert.match(source, /这里不会用预制结果替代真实闭环/);
+  assert.match(source, /这里不会用预制结果或旧成果包替代真实闭环/);
   assert.match(source, /mode === "task" && !currentResolved \? null : <GroupLearningWorkbench/);
   assert.match(source, /示例 ≠ 当前事件/);
 });
