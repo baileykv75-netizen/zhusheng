@@ -53,7 +53,7 @@ try {
   await overlay.waitFor();
   assert.equal(await overlay.getAttribute("data-component-life-id"), businessId, "object life must follow the same shared selectedBusinessId as the 3D twin");
   const text = await overlay.innerText();
-  for (const expected of ["这个对象的一生", "当前事件身份", "系统归属", "建造与历史记忆", "当前证据关联", "维修与事件留痕", "NO LIVE EVENT / 尚无正式事件"]) {
+  for (const expected of ["这个对象的一生", "当前事件身份", "系统归属", "建造与历史记忆", "已记录证据关联", "维修与事件留痕", "NO LIVE EVENT / 尚无正式事件"]) {
     assert.ok(text.includes(expected), `component life overlay is missing ${expected}`);
   }
   assert.ok(!text.includes("CURRENT CANDIDATE / 当前候选"), "fresh featured Case must not invent a current candidate identity");
