@@ -24,6 +24,14 @@ export function selectedContextForQuestion(question: string, selectedBusinessId?
   return selectedBusinessId && SELECTION_REFERENCE.test(question) ? selectedBusinessId : null;
 }
 
+export function isCurrentObservationQuery(question: string) {
+  const asksCurrent = /(现在|当前|实时|此刻|目前|眼下|刚刚)/u.test(question);
+  const asksObservationValue = /(湿度|温度|微流量|流量|读数|数值|运行状态|传感器状态)/u.test(question);
+  const asksValue = /(多少|是多少|读数|数值|值|状态|有没有变化|是否变化)/u.test(question);
+  const structuralOnly = /(在哪里|在哪|位置|有哪些|构件|组成|路径|怎么走|连接|属于什么系统)/u.test(question);
+  return asksCurrent && asksObservationValue && (asksValue || !structuralOnly);
+}
+
 function resolveComponent(question: string, selectedBusinessId?: string | null) {
   const selectedContext = selectedContextForQuestion(question, selectedBusinessId);
   const target = resolveTargetEntity(question, selectedContext);
@@ -91,7 +99,7 @@ export function planLocalBuildingQuery(question: string, selectedBusinessId?: st
   if (/施工|建造|留痕|安装|照片|热熔/.test(question)) return [invoke("get_construction_history", { businessId: componentId ?? systemId ?? "SPACE-1602-BATHROOM" })];
   if (/检查|检验|保压/.test(question)) return [invoke("get_inspection_history", { businessId: componentId ?? systemId ?? "SPACE-1602-BATHROOM" })];
   if (/维修|修过|维护/.test(question)) return [invoke("get_maintenance_history", { businessId: componentId ?? "SPACE-1602-BATHROOM" })];
-  if (/观察|湿度|现在|当前|实时/.test(question) && !systemId) return [invoke("get_current_observations", { businessId: componentId ?? "SPACE-1602-BATHROOM" })];
+  if (isCurrentObservationQuery(question)) return [invoke("get_current_observations", { businessId: componentId ?? systemId ?? "SPACE-1602-BATHROOM" })];
   if (/上游|从哪来|前面/.test(question) && componentId) return [invoke("get_upstream", { businessId: componentId })];
   if (/下游|到哪里|后面连接/.test(question) && componentId) return [invoke("get_downstream", { businessId: componentId })];
   if (componentId && /说明|信息|详情|这个|该构件|选中/.test(question)) return [invoke("get_component_detail", { businessId: componentId })];
