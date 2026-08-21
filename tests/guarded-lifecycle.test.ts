@@ -181,7 +181,13 @@ test("reopened assessment appends fresh evidence to the same event and supersede
     meterFinding: "FLOW_CONFIRMED_NO_USE"
   } as never;
 
-  const returned = resumeReopenedAssessment(engine, previous, controls, Date.parse("2026-08-13T10:00:05.000Z"));
+  const returned = resumeReopenedAssessment(
+    engine,
+    previous,
+    controls,
+    "2026-08-13T10:00:05.000Z",
+    Date.parse("2026-08-13T10:00:10.000Z")
+  );
   assert.equal(returned, previous);
   assert.equal(captured.previous, previous);
   assert.equal(captured.input?.eventId, "EVT-1602-LAB-001");
