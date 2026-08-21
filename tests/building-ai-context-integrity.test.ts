@@ -19,12 +19,12 @@ test("explicit selected-component pronoun still resolves the selected component"
 });
 
 test("live gateway request omits stale selected component for a generic diagnostic question", async () => {
-  let requestBody: { question?: string; selectedBusinessId?: string | null } | null = null;
+  const captured: { body?: { question?: string; selectedBusinessId?: string | null } } = {};
   const offlineFetcher = (async (_input: RequestInfo | URL, init?: RequestInit) => {
-    requestBody = JSON.parse(String(init?.body ?? "{}"));
+    captured.body = JSON.parse(String(init?.body ?? "{}"));
     throw new Error("offline");
   }) as typeof fetch;
 
   await queryBuildingAgent("卫生间潮湿可能是什么原因？", "J-1602-CW-03", offlineFetcher);
-  assert.equal(requestBody?.selectedBusinessId, null);
+  assert.equal(captured.body?.selectedBusinessId, null);
 });
