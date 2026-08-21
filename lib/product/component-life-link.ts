@@ -1,4 +1,4 @@
-import { building1602Dataset, entityById } from "../building-intelligence/catalog.ts";
+import { building1602Dataset } from "../building-intelligence/catalog.ts";
 import type { BuildingIntelligenceDataset } from "../building-intelligence/types.ts";
 
 export const CASE_1602_PATH = "/case-1602";
@@ -15,9 +15,9 @@ export function resolveComponentLifeObjectId(
 ): string | null {
   const businessId = rawBusinessId?.trim();
   if (!businessId) return null;
-  const entity = entityById(businessId, dataset);
-  if (!entity || entity.spaceId !== CASE_1602_SPACE_ID) return null;
-  return entity.businessId;
+  const component = dataset.components.find((entity) => entity.businessId === businessId) ?? null;
+  if (!component || component.spaceId !== CASE_1602_SPACE_ID) return null;
+  return component.businessId;
 }
 
 export function componentLifeHref(

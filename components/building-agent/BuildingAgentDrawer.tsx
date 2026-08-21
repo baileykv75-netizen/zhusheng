@@ -5,7 +5,8 @@ import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { ArrowRight, Database, LocateFixed, ShieldCheck, Sparkles, X } from "lucide-react";
 import { BuildingIntelligenceWorkspace } from "@/components/BuildingIntelligenceWorkspace";
-import { building1602Dataset } from "@/lib/building-intelligence/catalog.ts";
+import { building1602Dataset, entityById } from "@/lib/building-intelligence/catalog.ts";
+import { componentLifeHref, resolveComponentLifeObjectId } from "@/lib/product/component-life-link";
 import { useBuildingProductContext } from "@/components/product/BuildingContextProvider";
 
 const memoryTradeCount = new Set(building1602Dataset.records.map((record) => record.memory?.trade).filter(Boolean)).size;
@@ -14,6 +15,16 @@ export function BuildingAgentDrawer({ open, onClose }: { open: boolean; onClose:
   const closeRef = useRef<HTMLButtonElement>(null);
   const product = useBuildingProductContext();
   const hasSharedVisualScene = ["/case-1602", "/property"].includes(product.currentPath) && Boolean(product.queryVisual);
+  const visual = product.agentResult?.visualDirective;
+  const agentObjectId = product.agentResult
+    ? [
+        ...(visual?.targetBusinessIds ?? []),
+        ...(visual?.revealBusinessIds ?? []),
+        product.agentResult.selectedBusinessId ?? null
+      ].map((id) => resolveComponentLifeObjectId(id)).find((id): id is string => Boolean(id)) ?? null
+    : null;
+  const agentObjectHref = agentObjectId ? componentLifeHref(agentObjectId) : null;
+  const agentObject = agentObjectId ? entityById(agentObjectId) : null;
 
   useEffect(() => { if (open) closeRef.current?.focus(); }, [open]);
 
@@ -52,6 +63,9 @@ export function BuildingAgentDrawer({ open, onClose }: { open: boolean; onClose:
         <span><Database size={13} />{building1602Dataset.records.length} 条生命周期记忆</span>
         <span><LocateFixed size={13} />16F / 1602 / 卫生间</span>
         <span><Sparkles size={13} />本楼事实优先</span>
+        {agentObjectHref ? <Link href={agentObjectHref} onClick={onClose} data-agent-object-handoff data-business-id={agentObjectId ?? undefined}>
+          查看{agentObject?.displayName ?? "查询对象"}的一生<ArrowRight size={13} />
+        </Link> : null}
         <Link href="/property" onClick={onClose}>进入物业事件处理<ArrowRight size={13} /></Link>
       </footer>
     </aside>

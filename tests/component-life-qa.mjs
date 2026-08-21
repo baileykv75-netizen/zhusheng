@@ -32,12 +32,28 @@ const executablePath = browserExecutable(chromium);
 if (executablePath) launchOptions.executablePath = executablePath;
 
 const joint = "J-1602-CW-03";
+const memoryRecord = "REC-CONSTRUCTION-J03";
 const browser = await chromium.launch(launchOptions);
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.addInitScript(() => sessionStorage.clear());
+
+  await page.goto(`${baseUrl}/memory?record=${memoryRecord}`, { waitUntil: "networkidle" });
+  const handoff = page.getByRole("complementary", { name: "跨角色对象交接" });
+  await handoff.waitFor();
+  const memoryHandoff = handoff.locator('[data-object-handoff-source="BUILDING_MEMORY"]');
+  await memoryHandoff.waitFor();
+  assert.equal(await memoryHandoff.getAttribute("data-business-id"), joint, "Building Memory record must hand off its structured J03 component identity");
+  assert.equal(await memoryHandoff.getAttribute("href"), `/case-1602?object=${joint}`);
+  await memoryHandoff.click();
+  const memoryLinkedOverlay = page.getByRole("complementary", { name: "构件生命索引" });
+  await memoryLinkedOverlay.waitFor();
+  assert.equal(await memoryLinkedOverlay.getAttribute("data-component-life-id"), joint);
+  assert.ok((await memoryLinkedOverlay.innerText()).includes("NO LIVE EVENT / 尚无正式事件"), "Memory handoff must not create a lifecycle event or candidate");
+
+  await page.evaluate(() => sessionStorage.clear());
   await page.goto(`${baseUrl}/case-1602?entry=building`, { waitUntil: "networkidle" });
 
   assert.equal(await page.getByRole("complementary", { name: "构件生命索引" }).count(), 0, "fresh Case must not open an object life panel before a spatial object is selected");
@@ -94,11 +110,16 @@ try {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${baseUrl}/case-1602?object=${joint}`, { waitUntil: "networkidle" });
   await linkedOverlay.waitFor();
-  const sizes = await page.evaluate(() => ({ viewport: innerWidth, html: document.documentElement.scrollWidth, body: document.body.scrollWidth }));
+  let sizes = await page.evaluate(() => ({ viewport: innerWidth, html: document.documentElement.scrollWidth, body: document.body.scrollWidth }));
   assert.ok(sizes.html <= sizes.viewport + 1 && sizes.body <= sizes.viewport + 1, `390px component life overlay overflow: ${JSON.stringify(sizes)}`);
+
+  await page.goto(`${baseUrl}/memory?record=${memoryRecord}`, { waitUntil: "networkidle" });
+  await handoff.waitFor();
+  sizes = await page.evaluate(() => ({ viewport: innerWidth, html: document.documentElement.scrollWidth, body: document.body.scrollWidth }));
+  assert.ok(sizes.html <= sizes.viewport + 1 && sizes.body <= sizes.viewport + 1, `390px cross-role handoff overflow: ${JSON.stringify(sizes)}`);
   assert.deepEqual(errors, [], `component life browser runtime errors: ${errors.join(" | ")}`);
 
-  console.log("Component life QA passed: shared spatial selection writes a canonical object deep link, valid links restore a truth-bounded object-life index, invalid ids are removed, and the view remains usable at 390px.");
+  console.log("Component life QA passed: Building Memory hands off a structured object into the canonical life view, shared spatial selection stays URL-synchronized, invalid ids are rejected, and both surfaces remain usable at 390px.");
 } finally {
   await browser.close();
 }

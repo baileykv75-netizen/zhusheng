@@ -8,6 +8,8 @@ const guardUrl = new URL("./legacy-qa-guard.mjs", import.meta.url);
 const workflowUrl = new URL("../.github/workflows/step4-validation.yml", import.meta.url);
 const spatialQaUrl = new URL("./spatial-drilldown-qa.mjs", import.meta.url);
 const componentLifeQaUrl = new URL("./component-life-qa.mjs", import.meta.url);
+const objectHandoffUrl = new URL("../components/product/ObjectHandoffBar.tsx", import.meta.url);
+const agentDrawerUrl = new URL("../components/building-agent/BuildingAgentDrawer.tsx", import.meta.url);
 
 const legacyScripts = [
   ["test:exhibit", "exhibit"],
@@ -58,10 +60,12 @@ test("current spatial QA validates real user-controlled building continuity", as
   assert.match(policy, /程序化 fallback 只用于产品降级/);
 });
 
-test("component life QA keeps reverse 3D lookup and object deep links inside the current truth contract", async () => {
-  const [source, policy] = await Promise.all([
+test("component life QA keeps reverse lookup, deep links and cross-role handoff inside the current truth contract", async () => {
+  const [source, policy, handoff, drawer] = await Promise.all([
     readFile(componentLifeQaUrl, "utf8"),
-    readFile(policyUrl, "utf8")
+    readFile(policyUrl, "utf8"),
+    readFile(objectHandoffUrl, "utf8"),
+    readFile(agentDrawerUrl, "utf8")
   ]);
 
   assert.match(source, /构件生命索引/);
@@ -69,16 +73,26 @@ test("component life QA keeps reverse 3D lookup and object deep links inside the
   assert.match(source, /NO LIVE EVENT \/ 尚无正式事件/);
   assert.match(source, /CURRENT CANDIDATE \/ 当前候选/);
   assert.match(source, /清除3D联动/);
-  assert.match(source, /searchParams\.get\("object"\)|object=/);
+  assert.match(source, /object=/);
   assert.match(source, /data-component-life-link/);
   assert.match(source, /UNKNOWN-1602-OBJECT/);
   assert.match(source, /entry.*building/);
+  assert.match(source, /跨角色对象交接/);
+  assert.match(source, /BUILDING_MEMORY/);
+  assert.match(source, /REC-CONSTRUCTION-J03/);
   assert.match(source, /390/);
+  assert.match(handoff, /deriveObjectHandoffs/);
+  assert.match(handoff, /data-object-handoff-source/);
+  assert.match(drawer, /data-agent-object-handoff/);
+  assert.match(drawer, /componentLifeHref/);
   assert.match(policy, /3D → 对象生命索引/);
   assert.match(policy, /历史相关性不能升级成当前故障结论/);
-  assert.match(policy, /只接受 Building Intelligence 中真实存在/);
+  assert.match(policy, /`building1602Dataset\.components`/);
   assert.match(policy, /不能绕过既有候选遮罩/);
   assert.match(policy, /不得伪造 `entry=building`/);
+  assert.match(policy, /Building Memory \/ Property \/ Event \/ Building Agent/);
+  assert.match(policy, /不得重新暴露上一轮候选、授权对象或维修目标/);
+  assert.match(policy, /禁止从回答自然语言中猜测对象/);
 });
 
 test("spatial QA is portable across trailing-slash routes and headless CI", async () => {
