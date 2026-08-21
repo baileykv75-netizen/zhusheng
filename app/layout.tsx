@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { DemoProvider } from "@/components/demo-provider";
 import { LifecycleJourneyProvider } from "@/components/lifecycle-journey-provider";
 import { BuildingContextProvider } from "@/components/product/BuildingContextProvider";
+import { ComponentLifeOverlay } from "@/components/product/ComponentLifeOverlay";
 import { Shell } from "@/components/shell";
 import "./globals.css";
 import "./v6.css";
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <LifecycleJourneyProvider>
               <BuildingContextProvider>
                 <Shell>{children}</Shell>
+                <ComponentLifeOverlay />
               </BuildingContextProvider>
             </LifecycleJourneyProvider>
           </DemoProvider>
