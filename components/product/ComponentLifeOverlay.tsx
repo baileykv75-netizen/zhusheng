@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { useBuildingProductContext } from "@/components/product/BuildingContextProvider";
 import { derivePropertyEventViewModel } from "@/lib/product/property-event-view-model";
 import { deriveComponentLifeView, type ComponentCandidateStatus } from "@/lib/product/component-life";
+import { componentLifeHref, isCase1602Path, resolveComponentLifeObjectId } from "@/lib/product/component-life-link";
 import styles from "./ComponentLifeOverlay.module.css";
 
 const candidateLabels: Record<ComponentCandidateStatus, string> = {
@@ -16,26 +17,32 @@ const candidateLabels: Record<ComponentCandidateStatus, string> = {
   NOT_CURRENT_CANDIDATE: "NOT CURRENT CANDIDATE / 本轮未列入"
 };
 
-function onCaseRoute(pathname: string | null) {
-  const normalized = (pathname ?? "").replace(/\/+$/, "");
-  return normalized.endsWith("/case-1602");
-}
-
 export function ComponentLifeOverlay() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { session } = useLifecycleJourney();
   const product = useBuildingProductContext();
   const model = useMemo(() => derivePropertyEventViewModel(session), [session]);
-  const life = useMemo(() => deriveComponentLifeView(product.selectedBusinessId, {
+  const onCase1602 = isCase1602Path(pathname);
+  const requestedObjectId = onCase1602 ? resolveComponentLifeObjectId(searchParams.get("object")) : null;
+  const selectedObjectId = requestedObjectId ?? product.selectedBusinessId;
+  const life = useMemo(() => deriveComponentLifeView(selectedObjectId, {
     productEvidence: session.productEvidenceTimeline,
     result: session.result,
     currentCandidateIds: model.assessment.targetBusinessIds,
     pendingResidentAssessment: model.pendingResidentAssessment
-  }), [model.assessment.targetBusinessIds, model.pendingResidentAssessment, product.selectedBusinessId, session.productEvidenceTimeline, session.result]);
+  }), [model.assessment.targetBusinessIds, model.pendingResidentAssessment, selectedObjectId, session.productEvidenceTimeline, session.result]);
 
-  if (!onCaseRoute(pathname) || !life) return null;
+  if (!onCase1602 || !life) return null;
+  const canonicalHref = componentLifeHref(life.entity.businessId);
+  const openedFromDeepLink = requestedObjectId === life.entity.businessId;
 
-  return <aside className={styles.overlay} aria-label="构件生命索引" data-component-life-id={life.entity.businessId}>
+  return <aside
+    className={styles.overlay}
+    aria-label="构件生命索引"
+    data-component-life-id={life.entity.businessId}
+    data-component-life-deep-linked={openedFromDeepLink ? "true" : "false"}
+  >
     <header className={styles.header}>
       <span>OBJECT LIFE / 3D 反向空间查询</span>
       <strong>这个对象的一生</strong>
@@ -45,6 +52,11 @@ export function ComponentLifeOverlay() {
       <small>{life.entity.entityType} · {life.entity.provenance.sourceClass}{life.entity.provenance.synthetic ? " · SYNTHETIC" : ""}</small>
       <h2>{life.entity.displayName}</h2>
       <code>{life.entity.businessId}</code>
+      {canonicalHref ? <a className={styles.deepLink} href={canonicalHref} data-component-life-link>
+        <span>OBJECT DEEP LINK</span>
+        <strong>直接打开这个对象</strong>
+        <code>{canonicalHref}</code>
+      </a> : null}
     </section>
 
     <dl className={styles.metrics}>

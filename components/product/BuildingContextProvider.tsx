@@ -1,7 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { usePathname } from "next/navigation";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   BUILDING_PRODUCT_ID,
   BUILDING_PRODUCT_LABEL,
@@ -11,6 +11,7 @@ import {
 import type { BuildingAgentTurnResult, QueryVisualDirective } from "@/lib/building-intelligence/types.ts";
 import { useLifecycleJourney } from "@/components/lifecycle-journey-provider";
 import { residentEvidenceNeedsAssessment } from "@/lib/product/resident-assessment";
+import { isCase1602Path, resolveComponentLifeObjectId } from "@/lib/product/component-life-link";
 
 type BuildingProductContextValue = BuildingRouteContext & {
   buildingId: typeof BUILDING_PRODUCT_ID;
@@ -28,11 +29,32 @@ const BuildingProductContext = createContext<BuildingProductContextValue | null>
 
 export function BuildingContextProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { session, setSession } = useLifecycleJourney();
   const [agentResult, setAgentResultState] = useState<BuildingAgentTurnResult | null>(null);
   const route = useMemo(() => deriveBuildingRouteContext(pathname), [pathname]);
   const pendingResidentAssessment = residentEvidenceNeedsAssessment(session.result, session.residentSubmissions);
   const eventId = session.result?.eventId ?? null;
+  const onCase1602 = isCase1602Path(pathname);
+  const searchText = searchParams.toString();
+  const objectParam = searchParams.get("object");
+  const requestedObjectId = onCase1602 ? resolveComponentLifeObjectId(objectParam) : null;
+
+  const syncSelectedObjectUrl = useCallback((value: string | null) => {
+    if (!onCase1602) return;
+    const params = new URLSearchParams(searchText);
+    const currentRaw = params.get("object");
+    const currentResolved = resolveComponentLifeObjectId(currentRaw);
+    const nextResolved = value ? resolveComponentLifeObjectId(value) : null;
+
+    if (currentResolved === nextResolved && (currentRaw === null || currentResolved !== null)) return;
+
+    if (nextResolved) params.set("object", nextResolved);
+    else params.delete("object");
+    const query = params.toString();
+    router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
+  }, [onCase1602, pathname, router, searchText]);
 
   useEffect(() => {
     if (!pendingResidentAssessment) return;
@@ -50,6 +72,23 @@ export function BuildingContextProvider({ children }: { children: React.ReactNod
     });
   }, [pendingResidentAssessment, setSession]);
 
+  useEffect(() => {
+    if (!onCase1602 || !objectParam || requestedObjectId) return;
+    // Unknown / out-of-space object ids are presentation input only. They may not
+    // create a Building Intelligence entity, lifecycle event or candidate identity.
+    syncSelectedObjectUrl(null);
+  }, [objectParam, onCase1602, requestedObjectId, syncSelectedObjectUrl]);
+
+  useEffect(() => {
+    if (!requestedObjectId || pendingResidentAssessment) return;
+    // A valid object deep link restores only shared spatial identity. During a
+    // pending assessment/reassessment the existing truth guard keeps 3D candidate
+    // focus cleared; the object-life overlay may still explain the requested object.
+    setSession((current) => current.selectedBusinessId === requestedObjectId
+      ? current
+      : { ...current, selectedBusinessId: requestedObjectId });
+  }, [pendingResidentAssessment, requestedObjectId, setSession]);
+
   const value = useMemo<BuildingProductContextValue>(() => ({
     ...route,
     buildingId: BUILDING_PRODUCT_ID,
@@ -60,6 +99,7 @@ export function BuildingContextProvider({ children }: { children: React.ReactNod
     queryVisual: agentResult?.visualDirective ?? null,
     setSelectedBusinessId(value) {
       setSession((current) => ({ ...current, selectedBusinessId: value }));
+      syncSelectedObjectUrl(value);
     },
     setAgentResult(value) {
       setAgentResultState(value);
@@ -71,9 +111,10 @@ export function BuildingContextProvider({ children }: { children: React.ReactNod
         ?? null;
       if (target) {
         setSession((current) => ({ ...current, selectedBusinessId: target }));
+        syncSelectedObjectUrl(target);
       }
     }
-  }), [agentResult, eventId, route, session.selectedBusinessId, setSession]);
+  }), [agentResult, eventId, route, session.selectedBusinessId, setSession, syncSelectedObjectUrl]);
 
   return <BuildingProductContext.Provider value={value}>{children}</BuildingProductContext.Provider>;
 }

@@ -31,6 +31,7 @@ const launchOptions = { headless: true, args: ["--enable-unsafe-swiftshader"] };
 const executablePath = browserExecutable(chromium);
 if (executablePath) launchOptions.executablePath = executablePath;
 
+const joint = "J-1602-CW-03";
 const browser = await chromium.launch(launchOptions);
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
@@ -48,6 +49,10 @@ try {
   assert.ok(businessId, "recorded Building Memory must expose a structured businessId");
   await memory.click();
   await page.locator(".component-inspector").waitFor();
+  await page.waitForFunction((id) => {
+    const url = new URL(location.href);
+    return url.searchParams.get("object") === id && url.searchParams.get("entry") === "building";
+  }, businessId);
 
   const overlay = page.getByRole("complementary", { name: "构件生命索引" });
   await overlay.waitFor();
@@ -57,18 +62,43 @@ try {
     assert.ok(text.includes(expected), `component life overlay is missing ${expected}`);
   }
   assert.ok(!text.includes("CURRENT CANDIDATE / 当前候选"), "fresh featured Case must not invent a current candidate identity");
+  assert.equal(
+    await overlay.locator("[data-component-life-link]").getAttribute("href"),
+    `/case-1602?object=${businessId}`,
+    "object life must expose a canonical cross-role deep link without pretending it came from Building drilldown"
+  );
 
   await linkage.getByRole("button", { name: "清除3D联动", exact: true }).click();
   await overlay.waitFor({ state: "detached" });
+  await page.waitForFunction(() => {
+    const url = new URL(location.href);
+    return !url.searchParams.has("object") && url.searchParams.get("entry") === "building";
+  });
+
+  await page.evaluate(() => sessionStorage.clear());
+  await page.goto(`${baseUrl}/case-1602?object=${joint}`, { waitUntil: "networkidle" });
+  const linkedOverlay = page.getByRole("complementary", { name: "构件生命索引" });
+  await linkedOverlay.waitFor();
+  assert.equal(await linkedOverlay.getAttribute("data-component-life-id"), joint, "valid object deep link must restore the requested 1602 object");
+  assert.equal(await linkedOverlay.getAttribute("data-component-life-deep-linked"), "true");
+  await page.locator(".component-inspector").waitFor();
+  assert.equal(new URL(page.url()).searchParams.get("object"), joint);
+  assert.ok((await linkedOverlay.innerText()).includes("NO LIVE EVENT / 尚无正式事件"), "a valid object deep link must not create a lifecycle event or candidate");
+
+  await page.evaluate(() => sessionStorage.clear());
+  await page.goto(`${baseUrl}/case-1602?entry=building&object=UNKNOWN-1602-OBJECT`, { waitUntil: "networkidle" });
+  await page.waitForFunction(() => !new URL(location.href).searchParams.has("object"));
+  assert.equal(new URL(page.url()).searchParams.get("entry"), "building", "invalid object cleanup must preserve unrelated Case handoff parameters");
+  assert.equal(await page.getByRole("complementary", { name: "构件生命索引" }).count(), 0, "invalid object id must not create a phantom component-life panel");
 
   await page.setViewportSize({ width: 390, height: 844 });
-  await memory.click();
-  await overlay.waitFor();
+  await page.goto(`${baseUrl}/case-1602?object=${joint}`, { waitUntil: "networkidle" });
+  await linkedOverlay.waitFor();
   const sizes = await page.evaluate(() => ({ viewport: innerWidth, html: document.documentElement.scrollWidth, body: document.body.scrollWidth }));
   assert.ok(sizes.html <= sizes.viewport + 1 && sizes.body <= sizes.viewport + 1, `390px component life overlay overflow: ${JSON.stringify(sizes)}`);
   assert.deepEqual(errors, [], `component life browser runtime errors: ${errors.join(" | ")}`);
 
-  console.log("Component life QA passed: shared spatial selection opens a truth-bounded object-life index, clears with the shared focus, and remains usable at 390px.");
+  console.log("Component life QA passed: shared spatial selection writes a canonical object deep link, valid links restore a truth-bounded object-life index, invalid ids are removed, and the view remains usable at 390px.");
 } finally {
   await browser.close();
 }

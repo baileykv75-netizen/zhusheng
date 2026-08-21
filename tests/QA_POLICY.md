@@ -17,11 +17,11 @@
 
 - `test:css-delivery`：当前产品壳、样式交付、响应式与静态资源完整性。
 - `test:spatial-drilldown`：真实 `hero-glb` 加载、Building → 16F → 1602 → 卫生间用户控制下钻、返回与 breadcrumb、无自动跳转、Case 空间交接与移动端无横向溢出。
-- `test:component-life`：Case 中共享空间选择驱动 3D → 对象生命索引反查；验证对象身份、历史记忆、系统归属、证据/维修聚合、无事件时不虚构当前候选，以及 390px 可用性。
+- `test:component-life`：Case 中共享空间选择驱动 3D → 对象生命索引反查；验证对象身份、历史记忆、系统归属、证据/维修聚合、无事件时不虚构当前候选、`?object=<businessId>` 深链接双向同步/非法 ID 清理，以及 390px 可用性。
 - `test:evidence-correctness`：Product Evidence / Domain Evidence、人工观察、来源、独立物业复核与 PRODUCT_ONLY 边界。
 - `test:v6-lifecycle`：住户事实 → 物业确定性评估 → 人工授权 → 设备动作 → 隔离验证 → 维修证据 → 独立恢复授权 → 维修后复验 → PILOT_ONLY。
 
-`tests/evidence-correctness-qa.mjs` 与 `tests/v6-lifecycle-qa.mjs` 是稳定入口，实际分别加载当前 v2 脚本；`tests/spatial-drilldown-qa.mjs` 直接验证当前空间连续性；`tests/component-life-qa.mjs` 验证共享 `selectedBusinessId` 能反向聚合对象生命信息。
+`tests/evidence-correctness-qa.mjs` 与 `tests/v6-lifecycle-qa.mjs` 是稳定入口，实际分别加载当前 v2 脚本；`tests/spatial-drilldown-qa.mjs` 直接验证当前空间连续性；`tests/component-life-qa.mjs` 验证共享 `selectedBusinessId` 能反向聚合对象生命信息，并与可分享对象 URL 保持一致。
 
 当前浏览器 QA 必须可在开发机与 GitHub Actions/Linux headless Chromium 中一致运行：
 - URL 断言必须兼容 `next.config.ts` 的 `trailingSlash: true`，不能把 `/case-1602/` 误判为失败。
@@ -46,6 +46,9 @@
 - 首页空间下钻的当前验收要求真实 `hero-glb` 成功加载；程序化 fallback 只用于产品降级，不代表主视觉空间资产验收通过。
 - Case 中事实 → 3D 与 3D → 对象生命索引都必须复用结构化 `businessId`；不能从住户自然语言或视觉文案猜测构件身份。
 - 对象生命索引可以展示历史、证据、系统归属和维修留痕，但历史相关性不能升级成当前故障结论；`pending reassessment` 时不得复用上一轮候选身份。
+- `/case-1602?object=<businessId>` 只接受 Building Intelligence 中真实存在且属于 `SPACE-1602-BATHROOM` 的对象；未知 ID、系统 ID 或越界对象不能凭 URL 生成实体、事件、证据或候选身份。
+- 对象深链接只交接“正在查看哪个对象”。待首次评估/重新评估时，它可以保留对象生命索引的身份上下文，但不能绕过既有候选遮罩、恢复上一轮诊断或改变事件状态。
+- Canonical 对象链接使用 `/case-1602?object=<businessId>`；除非用户确实从 Building 空间下钻进入，否则分享链接不得伪造 `entry=building` 来源语义。
 - 单事件经验最多进入 `PILOT_ONLY`，不会自动升级为企业标准。
 
 ## 3. 历史阶段 QA

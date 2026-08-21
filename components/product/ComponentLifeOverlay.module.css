@@ -62,6 +62,37 @@
   overflow-wrap: anywhere;
 }
 
+.deepLink {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+  padding: 10px 11px;
+  border: 1px solid rgba(127, 160, 160, .28);
+  background: rgba(127, 160, 160, .055);
+}
+
+.deepLink:hover {
+  border-color: rgba(127, 160, 160, .58);
+  background: rgba(127, 160, 160, .09);
+}
+
+.deepLink span {
+  color: rgba(238, 233, 223, .38);
+  font: 8px/1.4 Consolas, monospace;
+  letter-spacing: .12em;
+}
+
+.deepLink strong {
+  color: #c8d6d1;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.deepLink code {
+  color: rgba(200, 214, 209, .56);
+  font-size: 8px;
+}
+
 .metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

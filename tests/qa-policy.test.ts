@@ -58,7 +58,7 @@ test("current spatial QA validates real user-controlled building continuity", as
   assert.match(policy, /程序化 fallback 只用于产品降级/);
 });
 
-test("component life QA keeps reverse 3D lookup inside the current truth contract", async () => {
+test("component life QA keeps reverse 3D lookup and object deep links inside the current truth contract", async () => {
   const [source, policy] = await Promise.all([
     readFile(componentLifeQaUrl, "utf8"),
     readFile(policyUrl, "utf8")
@@ -69,9 +69,16 @@ test("component life QA keeps reverse 3D lookup inside the current truth contrac
   assert.match(source, /NO LIVE EVENT \/ 尚无正式事件/);
   assert.match(source, /CURRENT CANDIDATE \/ 当前候选/);
   assert.match(source, /清除3D联动/);
+  assert.match(source, /searchParams\.get\("object"\)|object=/);
+  assert.match(source, /data-component-life-link/);
+  assert.match(source, /UNKNOWN-1602-OBJECT/);
+  assert.match(source, /entry.*building/);
   assert.match(source, /390/);
   assert.match(policy, /3D → 对象生命索引/);
   assert.match(policy, /历史相关性不能升级成当前故障结论/);
+  assert.match(policy, /只接受 Building Intelligence 中真实存在/);
+  assert.match(policy, /不能绕过既有候选遮罩/);
+  assert.match(policy, /不得伪造 `entry=building`/);
 });
 
 test("spatial QA is portable across trailing-slash routes and headless CI", async () => {
